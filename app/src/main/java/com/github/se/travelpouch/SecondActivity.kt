@@ -1,4 +1,4 @@
-package com.android.sample
+package com.github.se.travelpouch
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
