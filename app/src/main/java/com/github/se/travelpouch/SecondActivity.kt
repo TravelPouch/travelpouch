@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.github.se.travelpouch.resources.C
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 
-
 class SecondActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
