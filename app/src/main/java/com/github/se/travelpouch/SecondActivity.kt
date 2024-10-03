@@ -12,8 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
-import com.android.sample.resources.C
-import com.android.sample.ui.theme.SampleAppTheme
+import com.github.se.travelpouch.resources.C
+import com.github.se.travelpouch.ui.theme.SampleAppTheme
+
 
 class SecondActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
