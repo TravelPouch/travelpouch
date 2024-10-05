@@ -1,4 +1,4 @@
-package com.android.sample
+package com.github.se.travelpouch
 
 import kotlin.math.sqrt
 

@@ -7,11 +7,12 @@ plugins {
 }
 
 android {
-    namespace = "com.android.sample"
+    namespace = "com.github.se.travelpouch"
+    compileSdk = 34
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.android.sample"
+        applicationId = "com.github.se.travelpouch"
         minSdk = 28
         targetSdk = 34
         versionCode = 1

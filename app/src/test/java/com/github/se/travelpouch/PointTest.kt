@@ -1,4 +1,4 @@
-package com.android.sample
+package com.github.se.travelpouch
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
