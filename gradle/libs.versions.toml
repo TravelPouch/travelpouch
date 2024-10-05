@@ -16,6 +16,7 @@ kaspresso = "1.5.5"
 robolectric = "4.11.1"
 sonar = "4.4.1.3373"
 firebaseCommonKtx = "21.0.0"
+navigationCompose = "2.8.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,7 @@ kaspresso = { group = "com.kaspersky.android-components", name = "kaspresso", ve
 kaspresso-compose = { group = "com.kaspersky.android-components", name = "kaspresso-compose-support", version.ref = "kaspresso" }
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
 
 [plugins]
