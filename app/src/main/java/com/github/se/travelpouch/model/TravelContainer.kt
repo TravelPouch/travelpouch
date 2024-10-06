@@ -103,11 +103,15 @@ data class Location(
     val longitude: Double,
     val insertTime: Timestamp,
     val name: String,
-) {Adds extra verification for TravelContainer object and related classes.
+) {
   init {
-      // Double.MIN_VALUE has to be checked manually because otherwise it doesn't catch it
-    require(latitude in -90.0..90.0 && latitude != Double.MIN_VALUE) { "Latitude must be between -90.0 and 90.0" }
-    require(longitude in -180.0..180.0 && longitude != Double.MIN_VALUE) { "Longitude must be between -180.0 and 180.0" }
+    // Double.MIN_VALUE has to be checked manually because otherwise it doesn't catch it
+    require(latitude in -90.0..90.0 && latitude != Double.MIN_VALUE) {
+      "Latitude must be between -90.0 and 90.0"
+    }
+    require(longitude in -180.0..180.0 && longitude != Double.MIN_VALUE) {
+      "Longitude must be between -180.0 and 180.0"
+    }
     require(name.isNotBlank()) { "Location name cannot be blank" }
   }
 }
