@@ -179,6 +179,19 @@ class TravelContainerUnitTest {
               participants3)
         }
     assertEquals("startTime must be strictly before endTime", exception.message)
+    exception =
+        assertThrows(IllegalArgumentException::class.java) {
+          TravelContainer(
+              "sigma gyat",
+              "Title",
+              "Test Description",
+              Timestamp(1234567890L - 1, 0),
+              Timestamp(1234567890L, 0),
+              location,
+              attachments,
+              participants3)
+        }
+    assertEquals("Invalid fsUid format", exception.message)
   }
 
   @Test
