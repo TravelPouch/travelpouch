@@ -119,6 +119,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
+    implementation(libs.firebase.common.ktx)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
