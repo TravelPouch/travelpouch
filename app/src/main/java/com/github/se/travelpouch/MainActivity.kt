@@ -4,18 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.testTag
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.github.se.travelpouch.resources.C
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
@@ -28,17 +26,17 @@ class MainActivity : ComponentActivity() {
       SampleAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
-            modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
-            color = MaterialTheme.colorScheme.background) {
-              TravelApp()
-            }
+            modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
+        ) {
+          TravelPouchApp()
+        }
       }
     }
   }
 }
 
 @Composable
-fun TravelApp() {
+fun TravelPouchApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
@@ -54,5 +52,5 @@ fun TravelApp() {
 
 @Composable
 fun Greeting() {
-  Text(text = "Hello ")
+  Text(text = "Hello", modifier = Modifier.testTag("GreetingText"))
 }
