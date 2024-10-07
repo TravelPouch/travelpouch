@@ -21,44 +21,38 @@ import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 
-
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            SampleAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .semantics { testTag = C.Tag.main_screen_container },
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    BootcampApp()
-                }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      SampleAppTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
+            color = MaterialTheme.colorScheme.background) {
+              TravelApp()
             }
-        }
+      }
     }
+  }
 }
 
-
 @Composable
-fun BootcampApp() {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
+fun TravelApp() {
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
 
-    NavHost(navController = navController, startDestination = Route.AUTH) {
-        navigation(
-            startDestination = Screen.AUTH,
-            route = Route.AUTH,
-        ) {
-            composable(Screen.AUTH) { Greeting() }
-        }
+  NavHost(navController = navController, startDestination = Route.AUTH) {
+    navigation(
+        startDestination = Screen.AUTH,
+        route = Route.AUTH,
+    ) {
+      composable(Screen.AUTH) { Greeting() }
     }
+  }
 }
 
 @Composable
 fun Greeting() {
-    Text(text = "Hello ")
+  Text(text = "Hello ")
 }
-
