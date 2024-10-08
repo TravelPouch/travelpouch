@@ -21,7 +21,7 @@ Commit naming follows the [Conventional Commits](https://www.conventionalcommits
 \[optional footer]
 ```
 
-The type should be chosen in these : feat, fix, buidl, chore, ci, docs, style, refactor, perf, test, revert
+The type should be chosen in these : feat, fix, build, chore, ci, docs, style, refactor, perf, test, revert
 
 The scope, if present, is a one-word which describes the part of the app touched by the changes
 
