@@ -70,13 +70,13 @@ class TravelRepositoryFirestore(
   ) {
     Log.d("TravelRepositoryFirestore", "updateTravel")
     performFirestoreOperation(
-        db.collection(collectionPath).document(travel.fsUid).set(travel) , onSuccess, onFailure)
+        db.collection(collectionPath).document(travel.fsUid).set(travel), onSuccess, onFailure)
   }
 
   /**
    * Deletes a travel document from the Firestore database by its identifier.
    *
-   * @param id The identifier of the travel document to delete. 
+   * @param id The identifier of the travel document to delete.
    * @param onSuccess The callback to call if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
