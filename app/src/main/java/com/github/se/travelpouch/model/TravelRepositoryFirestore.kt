@@ -70,13 +70,13 @@ class TravelRepositoryFirestore(
   ) {
     Log.d("TravelRepositoryFirestore", "updateTravel")
     performFirestoreOperation(
-        db.collection(collectionPath).document(travel.fsUid).set(travel), onSuccess, onFailure)
+        db.collection(collectionPath).document(travel.fsUid).set(travel) , onSuccess, onFailure)
   }
 
   /**
    * Deletes a travel document from the Firestore database by its identifier.
    *
-   * @param id The identifier of the travel document to delete.
+   * @param id The identifier of the travel document to delete. 
    * @param onSuccess The callback to call if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
    */
@@ -158,17 +158,17 @@ class TravelRepositoryFirestore(
       val description = document.getString("description") ?: return null
       val startTime = document.getTimestamp("startDate") ?: return null
       val endTime = document.getTimestamp("endDate") ?: return null
-      val locationData = document.get("location") as? Map<*, *> ?: return null
+      val locationData = document["location"] as? Map<*, *> ?: return null
       val location =
           Location(
               latitude = locationData["latitude"] as? Double ?: 0.0,
               longitude = locationData["longitude"] as? Double ?: 0.0,
               name = locationData["name"] as? String ?: "",
               insertTime = locationData["insertTime"] as? Timestamp ?: Timestamp(0, 0))
-      val allAttachmentsData = document.get("allAttachments") as? Map<*, *> ?: return null
+      val allAttachmentsData = document["allAttachments"] as? Map<*, *> ?: return null
       val allAttachments =
           allAttachmentsData.map { (key, value) -> key as String to value as String }.toMap()
-      val allParticipantsData = document.get("allParticipants") as? Map<*, *> ?: return null
+      val allParticipantsData = document["allParticipants"] as? Map<*, *> ?: return null
       val allParticipants =
           allParticipantsData
               .map { (key, value) -> Participant(key as String) to Role.valueOf(value as String) }
