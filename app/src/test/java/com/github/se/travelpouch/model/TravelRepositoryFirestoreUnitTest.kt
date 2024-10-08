@@ -624,4 +624,632 @@ class TravelRepositoryFirestoreUnitTest {
 
     assertTrue(failureCalled)
   }
+
+    @Test
+    fun returnsNullWhenTitleIsNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn(null)
+        whenever(document.getString("description")).thenReturn("Test description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNull(result)
+    }
+
+    @Test
+    fun returnsTravelWhenTitleIsNotNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals("Test Title", result?.title)
+    }
+
+    @Test
+    fun returnsNullWhenDescriptionIsBlank() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+    }
+
+    @Test
+    fun returnsNullWhenDescriptionIsNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn(null)
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNull(result)
+    }
+
+    @Test
+    fun returnsTravelWhenDescriptionIsNotNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals("Test Description", result?.description)
+    }
+
+    @Test
+    fun returnsNullWhenStartDateIsNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(null)
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNull(result)
+    }
+
+    @Test
+    fun returnsTravelWhenStartDateIsNotNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertNotNull(result?.startTime)
+    }
+
+    @Test
+    fun returnsNullWhenEndDateIsNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(null)
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNull(result)
+    }
+
+    @Test
+    fun returnsTravelWhenEndDateIsNotNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertNotNull(result?.endTime)
+    }
+
+    @Test
+    fun returnsNullWhenLocationIsNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        whenever(document.get("location")).thenReturn(null)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNull(result)
+    }
+
+    @Test
+    fun returnsTravelWhenLocationIsNotNull() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate"))
+            .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+
+        val locationMap =
+            mapOf(
+                "latitude" to 0.0,
+                "longitude" to 0.0,
+                "name" to "Test Location",
+                "insertTime" to Timestamp.now())
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val method =
+            travelRepositoryFirestore::class
+                .java
+                .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertNotNull(result?.location)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithValidLatitude() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val locationMap = mapOf(
+            "latitude" to 10.0,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to Timestamp.now()
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals(10.0, result?.location?.latitude)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithInvalidLatitude() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val locationMap = mapOf(
+            "latitude" to null,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to Timestamp.now()
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals(0.0, result?.location?.latitude)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithValidLongitude() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val locationMap = mapOf(
+            "latitude" to 10.0,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to Timestamp.now()
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals(20.0, result?.location?.longitude)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithInvalidLongitude() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val locationMap = mapOf(
+            "latitude" to 10.0,
+            "longitude" to null,
+            "name" to "Test Location",
+            "insertTime" to Timestamp.now()
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals(0.0, result?.location?.longitude)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithValidName() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val locationMap = mapOf(
+            "latitude" to 10.0,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to Timestamp.now()
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals("Test Location", result?.location?.name)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithInvalidName() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val locationMap = mapOf(
+            "latitude" to 10.0,
+            "longitude" to 20.0,
+            "name" to null,
+            "insertTime" to Timestamp.now()
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNull(result)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithValidInsertTime() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val validTimestamp = Timestamp.now()
+        val locationMap = mapOf(
+            "latitude" to 10.0,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to validTimestamp
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals(validTimestamp, result?.location?.insertTime)
+    }
+
+    @Test
+    fun convertsDocumentToTravelWithInvalidInsertTime() {
+        val document: DocumentSnapshot = mock()
+        whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+        whenever(document.getString("title")).thenReturn("Test Title")
+        whenever(document.getString("description")).thenReturn("Test Description")
+        whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
+        whenever(document.getTimestamp("endDate")).thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+        val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+        whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
+
+        val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+        whenever(document.get("allParticipants"))
+            .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+        val locationMap = mapOf(
+            "latitude" to 10.0,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to null
+        )
+        whenever(document.get("location")).thenReturn(locationMap)
+
+        val method = travelRepositoryFirestore::class.java.getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
+        method.isAccessible = true
+        val result = method.invoke(travelRepositoryFirestore, document) as TravelContainer?
+
+        assertNotNull(result)
+        assertEquals(Timestamp(0, 0), result?.location?.insertTime)
+    }
+
 }
