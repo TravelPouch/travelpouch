@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +28,9 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
 
   /** Gets all Travel documents. */
   fun getTravels() {
-    repository.getTravels(onSuccess = { travels_.value = it }, onFailure = {})
+    repository.getTravels(
+        onSuccess = { travels_.value = it },
+        onFailure = { e -> Log.e("ListTravelViewModel", "Failed to get travels", e) })
   }
 
   /**
@@ -55,5 +58,16 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    */
   fun deleteTravelById(id: String) {
     repository.deleteTravelById(id = id, onSuccess = { getTravels() }, onFailure = {})
+  }
+
+  /**
+   * Selects a Travel document.
+   *
+   * This function updates the `selectedTravel_` state with the provided `travel` object.
+   *
+   * @param travel The Travel document to be selected.
+   */
+  fun selectTravel(travel: TravelContainer) {
+    selectedTravel_.value = travel
   }
 }
