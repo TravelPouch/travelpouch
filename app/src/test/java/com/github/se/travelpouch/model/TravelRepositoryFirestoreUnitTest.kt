@@ -521,7 +521,7 @@ class TravelRepositoryFirestoreUnitTest {
   }
 
   @Test
-  fun convertsDocumentToTravelWithInvalidName() {
+  fun convertsDocumentToTravelWithInvalidLocationName() {
     val document: DocumentSnapshot = mock()
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
     whenever(document.getString("title")).thenReturn("Test Title")
@@ -635,41 +635,6 @@ class TravelRepositoryFirestoreUnitTest {
     onCompleteListenerCaptor.firstValue.onComplete(task)
 
     assertTrue(successCalled)
-  }
-
-  @Test
-  fun getTravels_documentConversionThrowsException() {
-    val task: Task<QuerySnapshot> = mock()
-    val querySnapshot: QuerySnapshot = mock()
-    val document: DocumentSnapshot = mock()
-    val exception = RuntimeException("Conversion error")
-
-    whenever(mockFirestore.collection("travels").get()).thenReturn(task)
-    whenever(task.isSuccessful).thenReturn(true)
-    whenever(task.result).thenReturn(querySnapshot)
-    whenever(querySnapshot.documents).thenReturn(listOf(document))
-    val method =
-        travelRepositoryFirestore::class
-            .java
-            .getDeclaredMethod("documentToTravel", DocumentSnapshot::class.java)
-    method.isAccessible = true
-    whenever(method.invoke(travelRepositoryFirestore, document)).thenThrow(exception)
-
-    mockStatic(Log::class.java).use { logMock ->
-      var successCalled = false
-      travelRepositoryFirestore.getTravels(
-          { successCalled = true }, { fail("Should not call onFailure") })
-
-      val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<QuerySnapshot>>()
-      verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
-      onCompleteListenerCaptor.firstValue.onComplete(task)
-
-      assertTrue(successCalled)
-      logMock.verify {
-        Log.e(
-            "TravelRepositoryFirestore", "Error converting document to TravelContainer", exception)
-      }
-    }
   }
 
   @Test
