@@ -154,35 +154,35 @@ class TravelRepositoryFirestore(
   private fun documentToTravel(document: DocumentSnapshot): TravelContainer? {
     return try {
       val fsUid = document.id
-      val title = document.getString("title") ?: return null
-      val description = document.getString("description") ?: return null
-      val startTime = document.getTimestamp("startDate") ?: return null
-      val endTime = document.getTimestamp("endDate") ?: return null
-      val locationData = document["location"] as? Map<*, *> ?: return null
+      val title = document.getString("title")
+      val description = document.getString("description")
+      val startTime = document.getTimestamp("startDate")
+      val endTime = document.getTimestamp("endDate")
+      val locationData = document["location"] as? Map<*, *>
       val location =
           Location(
-              latitude = locationData["latitude"] as? Double ?: 0.0,
-              longitude = locationData["longitude"] as? Double ?: 0.0,
-              name = locationData["name"] as? String ?: "",
-              insertTime = locationData["insertTime"] as? Timestamp ?: Timestamp(0, 0))
-      val allAttachmentsData = document["allAttachments"] as? Map<*, *> ?: return null
+              latitude = locationData?.get("latitude") as? Double ?: 0.0,
+              longitude = locationData?.get("longitude") as? Double ?: 0.0,
+              name = locationData?.get("name") as? String ?: "",
+              insertTime = locationData?.get("insertTime") as? Timestamp ?: Timestamp(0, 0))
+      val allAttachmentsData = document["allAttachments"] as? Map<*, *>
       val allAttachments =
-          allAttachmentsData.map { (key, value) -> key as String to value as String }.toMap()
-      val allParticipantsData = document["allParticipants"] as? Map<*, *> ?: return null
+          allAttachmentsData?.map { (key, value) -> key as String to value as String }?.toMap()
+      val allParticipantsData = document["allParticipants"] as? Map<*, *>
       val allParticipants =
           allParticipantsData
-              .map { (key, value) -> Participant(key as String) to Role.valueOf(value as String) }
-              .toMap()
+              ?.map { (key, value) -> Participant(key as String) to Role.valueOf(value as String) }
+              ?.toMap()
 
-      TravelContainer(
-          fsUid = fsUid,
-          title = title,
-          description = description,
-          startTime = startTime,
-          endTime = endTime,
-          location = location,
-          allAttachments = allAttachments,
-          allParticipants = allParticipants)
+        TravelContainer(
+            fsUid = fsUid,
+            title = title!!,
+            description = description!!,
+            startTime = startTime!!,
+            endTime = endTime!!,
+            location = location,
+            allAttachments = allAttachments!!,
+            allParticipants = allParticipants!!)
     } catch (e: Exception) {
       Log.e("TravelRepositoryFirestore", "Error converting document to TravelContainer", e)
       null
