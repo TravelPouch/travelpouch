@@ -39,9 +39,10 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    * @param travel The Travel document to be added.
    */
   fun addTravel(travel: TravelContainer) {
-    repository.addTravel(travel = travel, onSuccess = { getTravels() }, onFailure = {
-        Log.e("ListTravelViewModel", "Failed to add travel", it)
-    })
+    repository.addTravel(
+        travel = travel,
+        onSuccess = { getTravels() },
+        onFailure = { Log.e("ListTravelViewModel", "Failed to add travel", it) })
   }
 
   /**
@@ -50,9 +51,10 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    * @param travel The Travel document to be updated.
    */
   fun updateTravel(travel: TravelContainer) {
-    repository.updateTravel(travel = travel, onSuccess = { getTravels() }, onFailure = {
-        Log.e("ListTravelViewModel", "Failed to update travel", it)
-    })
+    repository.updateTravel(
+        travel = travel,
+        onSuccess = { getTravels() },
+        onFailure = { Log.e("ListTravelViewModel", "Failed to update travel", it) })
   }
 
   /**
@@ -61,9 +63,10 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    * @param id The ID of the Travel document to be deleted.
    */
   fun deleteTravelById(id: String) {
-    repository.deleteTravelById(id = id, onSuccess = { getTravels() }, onFailure = {
-        Log.e("ListTravelViewModel", "Failed to delete travel", it)
-    })
+    repository.deleteTravelById(
+        id = id,
+        onSuccess = { getTravels() },
+        onFailure = { Log.e("ListTravelViewModel", "Failed to delete travel", it) })
   }
 
   /**

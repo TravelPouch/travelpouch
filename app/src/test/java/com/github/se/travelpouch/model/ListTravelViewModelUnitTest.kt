@@ -215,83 +215,91 @@ class ListTravelViewModelTest {
     assertThat(listTravelViewModel.selectedTravel.value, `is`(travel))
   }
 
-    @Test
-    fun getTravels_logsErrorOnFailure() {
-        val errorMessage = "Failed to get travels"
-        val exception = Exception("Get Travels Failed Test")
-        doAnswer { invocation ->
-            val onFailure = invocation.getArgument(1) as (Exception) -> Unit
-            onFailure(exception)
-            null
-        }.whenever(travelRepository).getTravels(anyOrNull(), anyOrNull())
-
-        mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
-            logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
-
-            listTravelViewModel.getTravels()
-
-            verify(travelRepository).getTravels(anyOrNull(), anyOrNull())
-            logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
+  @Test
+  fun getTravels_logsErrorOnFailure() {
+    val errorMessage = "Failed to get travels"
+    val exception = Exception("Get Travels Failed Test")
+    doAnswer { invocation ->
+          val onFailure = invocation.getArgument(1) as (Exception) -> Unit
+          onFailure(exception)
+          null
         }
+        .whenever(travelRepository)
+        .getTravels(anyOrNull(), anyOrNull())
+
+    mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
+      logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
+
+      listTravelViewModel.getTravels()
+
+      verify(travelRepository).getTravels(anyOrNull(), anyOrNull())
+      logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
+  }
 
-    @Test
-    fun addTravel_logsErrorOnFailure() {
-        val errorMessage = "Failed to add travel"
-        val exception = Exception("Add Travel Failed Test")
-        doAnswer { invocation ->
-            val onFailure = invocation.getArgument(2) as (Exception) -> Unit
-            onFailure(exception)
-            null
-        }.whenever(travelRepository).addTravel(anyOrNull(), anyOrNull(), anyOrNull())
-
-        mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
-            logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
-
-            listTravelViewModel.addTravel(travel)
-
-            verify(travelRepository).addTravel(anyOrNull(), anyOrNull(), anyOrNull())
-            logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
+  @Test
+  fun addTravel_logsErrorOnFailure() {
+    val errorMessage = "Failed to add travel"
+    val exception = Exception("Add Travel Failed Test")
+    doAnswer { invocation ->
+          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          onFailure(exception)
+          null
         }
+        .whenever(travelRepository)
+        .addTravel(anyOrNull(), anyOrNull(), anyOrNull())
+
+    mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
+      logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
+
+      listTravelViewModel.addTravel(travel)
+
+      verify(travelRepository).addTravel(anyOrNull(), anyOrNull(), anyOrNull())
+      logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
+  }
 
-    @Test
-    fun updateTravel_logsErrorOnFailure() {
-        val errorMessage = "Failed to update travel"
-        val exception = Exception("Update Travel Failed Test")
-        doAnswer { invocation ->
-            val onFailure = invocation.getArgument(2) as (Exception) -> Unit
-            onFailure(exception)
-            null
-        }.whenever(travelRepository).updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
-
-        mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
-            logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
-
-            listTravelViewModel.updateTravel(travel)
-
-            verify(travelRepository).updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
-            logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
+  @Test
+  fun updateTravel_logsErrorOnFailure() {
+    val errorMessage = "Failed to update travel"
+    val exception = Exception("Update Travel Failed Test")
+    doAnswer { invocation ->
+          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          onFailure(exception)
+          null
         }
+        .whenever(travelRepository)
+        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+
+    mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
+      logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
+
+      listTravelViewModel.updateTravel(travel)
+
+      verify(travelRepository).updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+      logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
+  }
 
-    @Test
-    fun deleteTravelById_logsErrorOnFailure() {
-        val errorMessage = "Failed to delete travel"
-        val exception = Exception("Delete Travel Failed Test")
-        doAnswer { invocation ->
-            val onFailure = invocation.getArgument(2) as (Exception) -> Unit
-            onFailure(exception)
-            null
-        }.whenever(travelRepository).deleteTravelById(anyOrNull(), anyOrNull(), anyOrNull())
-
-        mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
-            logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
-
-            listTravelViewModel.deleteTravelById(travel.fsUid)
-
-            verify(travelRepository).deleteTravelById(anyOrNull(), anyOrNull(), anyOrNull())
-            logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
+  @Test
+  fun deleteTravelById_logsErrorOnFailure() {
+    val errorMessage = "Failed to delete travel"
+    val exception = Exception("Delete Travel Failed Test")
+    doAnswer { invocation ->
+          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          onFailure(exception)
+          null
         }
+        .whenever(travelRepository)
+        .deleteTravelById(anyOrNull(), anyOrNull(), anyOrNull())
+
+    mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
+      logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
+
+      listTravelViewModel.deleteTravelById(travel.fsUid)
+
+      verify(travelRepository).deleteTravelById(anyOrNull(), anyOrNull(), anyOrNull())
+      logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
+  }
 }
