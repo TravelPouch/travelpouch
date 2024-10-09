@@ -1,9 +1,5 @@
-package com.github.se.travelpouch
+package com.github.se.travelpouch.model
 
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.TravelContainer
 import com.google.firebase.Timestamp
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
