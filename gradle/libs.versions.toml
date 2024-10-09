@@ -28,6 +28,8 @@ firebaseAuthKtx = "23.0.0"
 firebaseDatabaseKtx = "21.0.0"
 firebaseFirestore = "25.1.0"
 firebaseUiAuth = "8.0.0"
+firebaseCommonKtx = "21.0.0"
+
 
 # Testing UI
 espressoCore = "3.6.1"
@@ -37,7 +39,6 @@ mockkAgent = "1.13.7"
 mockkAndroid = "1.13.7"
 robolectric = "4.11.1"
 sonar = "4.4.1.3373"
-firebaseCommonKtx = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
