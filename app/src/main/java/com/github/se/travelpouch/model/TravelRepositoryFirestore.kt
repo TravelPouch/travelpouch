@@ -101,9 +101,8 @@ class TravelRepositoryFirestore(
     db.collection(collectionPath).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         val travels =
-            task.result?.documents?.mapNotNull { document ->
-                documentToTravel(document)
-            } ?: emptyList()
+            task.result?.documents?.mapNotNull { document -> documentToTravel(document) }
+                ?: emptyList()
         onSuccess(travels)
       } else {
         task.exception?.let { e ->
