@@ -102,13 +102,7 @@ class TravelRepositoryFirestore(
       if (task.isSuccessful) {
         val travels =
             task.result?.documents?.mapNotNull { document ->
-              try {
                 documentToTravel(document)
-              } catch (e: Exception) {
-                Log.e(
-                    "TravelRepositoryFirestore", "Error converting document to TravelContainer", e)
-                null
-              }
             } ?: emptyList()
         onSuccess(travels)
       } else {
