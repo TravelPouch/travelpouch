@@ -16,6 +16,14 @@ kaspresso = "1.5.5"
 robolectric = "4.11.1"
 sonar = "4.4.1.3373"
 firebaseCommonKtx = "21.0.0"
+navigationCompose = "2.8.2"
+
+# Testing Unit
+mockitoCore = "3.12.4"
+mockitoInline = "3.12.4"
+mockitoKotlin = "5.4.0"
+mockk = "1.13.7"
+mockitoAndroid = "5.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,7 +49,13 @@ kaspresso = { group = "com.kaspersky.android-components", name = "kaspresso", ve
 kaspresso-compose = { group = "com.kaspersky.android-components", name = "kaspresso-compose-support", version.ref = "kaspresso" }
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin" , version.ref="mockitoKotlin"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
