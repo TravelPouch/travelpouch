@@ -6,6 +6,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * ViewModel for managing travel-related data and operations.
+ *
+ * @property repository The repository used for accessing travel data.
+ */
 open class ListTravelViewModel(private val repository: TravelRepository) : ViewModel() {
   private val travels_ = MutableStateFlow<List<TravelContainer>>(emptyList())
   val travels: StateFlow<List<TravelContainer>> = travels_.asStateFlow()
