@@ -219,6 +219,22 @@ class TravelContainerUnitTest {
           // contains a non-alphanumeric character
         }
     assertEquals("Invalid fsUid format", exception.message)
+
+    exception =
+        assertThrows(IllegalArgumentException::class.java) {
+          val participant3 = Participant("?sUid1234567890123456")
+          // verifies it starts with alphanumeric
+          //
+        }
+    assertEquals("Invalid fsUid format", exception.message)
+
+    exception =
+        assertThrows(IllegalArgumentException::class.java) {
+          val participant3 = Participant("sUid1234567890123456____")
+          // verifies it ends after 20 alphanumeric characters
+          //
+        }
+    assertEquals("Invalid fsUid format", exception.message)
   }
 
   @Test
