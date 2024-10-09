@@ -174,15 +174,15 @@ class TravelRepositoryFirestore(
               ?.map { (key, value) -> Participant(key as String) to Role.valueOf(value as String) }
               ?.toMap()
 
-        TravelContainer(
-            fsUid = fsUid,
-            title = title!!,
-            description = description!!,
-            startTime = startTime!!,
-            endTime = endTime!!,
-            location = location,
-            allAttachments = allAttachments!!,
-            allParticipants = allParticipants!!)
+      TravelContainer(
+          fsUid = fsUid,
+          title = title!!,
+          description = description!!,
+          startTime = startTime!!,
+          endTime = endTime!!,
+          location = location,
+          allAttachments = allAttachments!!,
+          allParticipants = allParticipants!!)
     } catch (e: Exception) {
       Log.e("TravelRepositoryFirestore", "Error converting document to TravelContainer", e)
       null
