@@ -12,6 +12,7 @@ lifecycleRuntimeKtx = "2.8.6"
 json = "20240303"
 mockitoAndroid = "5.13.0"
 gms = "4.4.2"
+navigationCompose = "2.8.2"
 
 # Testing Unit
 junit = "4.13.2"
