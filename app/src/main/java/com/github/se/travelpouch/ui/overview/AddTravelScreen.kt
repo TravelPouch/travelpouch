@@ -165,22 +165,40 @@ fun AddTravelScreen(
                           .show()
                     } else {
                       Log.d("AddTravelScreen", "All inputs are valid, proceeding to add travel")
-                      listTravelViewModel.addTravel(
-                          TravelContainer(
-                              fsUid = listTravelViewModel.getNewUid(),
-                              title = title,
-                              description = description,
-                              startTime = Timestamp(startCalendar.time),
-                              endTime = Timestamp(endCalendar.time),
-                              location = location,
-                              allAttachments = emptyMap(),
-                              allParticipants =
-                                  mapOf(
-                                      Participant(fsUid = listTravelViewModel.getNewUid()) to
-                                          Role.OWNER)))
 
-                      navigationActions.goBack()
-                      return@Button
+                      try {
+                        val travelContainer =
+                            TravelContainer(
+                                fsUid = listTravelViewModel.getNewUid(),
+                                title = title,
+                                description = description,
+                                startTime = Timestamp(startCalendar.time),
+                                endTime = Timestamp(endCalendar.time),
+                                location = location,
+                                allAttachments = emptyMap(),
+                                allParticipants =
+                                    mapOf(
+                                        Participant(fsUid = listTravelViewModel.getNewUid()) to
+                                            Role.OWNER))
+
+                        // Call the ViewModel method to add the travel data
+                        listTravelViewModel.addTravel(travelContainer)
+
+                        Toast.makeText(context, "Travel added successfully!", Toast.LENGTH_SHORT)
+                            .show()
+
+                        // Optionally navigate back after successful addition
+                        navigationActions.goBack()
+
+                        return@Button
+                      } catch (e: Exception) {
+                        Log.e("AddTravelScreen", "Error adding travel: $e")
+                        Toast.makeText(
+                                context,
+                                "Error adding travel. Please try again.",
+                                Toast.LENGTH_SHORT)
+                            .show()
+                      }
                     }
                   },
                   modifier =
