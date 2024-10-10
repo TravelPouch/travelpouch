@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model
 
 import com.google.firebase.Timestamp
+import java.util.Date
 
 /**
  * Data class representing a travel container.
@@ -65,6 +66,7 @@ data class TravelContainer(
         "allParticipants" to allParticipants.mapKeys { it.key.fsUid }.mapValues { it.value.name })
   }
 }
+
 /**
  * Function to check if a Firestore UID is valid. Firestore UID must be 20 characters long and
  * contain only alphanumeric characters.
@@ -122,5 +124,67 @@ data class Location(
       "Longitude must be between -180.0 and 180.0"
     }
     require(name.isNotBlank()) { "Location name cannot be blank" }
+  }
+}
+
+/*
+ * Mock data generator for TravelContainer.
+ */
+object TravelContainerMock {
+
+  fun generateAutoId(): String {
+    val chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return (1..20).map { chars.random() }.joinToString("")
+  }
+
+  fun createMockTravelContainer(
+      fsUid: String = generateAutoId(),
+      title: String = "Mock Travel",
+      description: String = "This is a mock travel container",
+      startTime: Timestamp = Timestamp.now(),
+      endTime: Timestamp = Timestamp(Date(Timestamp.now().toDate().time + 86400000)), // Add one day
+      location: Location = Location(46.5191, 6.5668, Timestamp.now(), "EPFL"),
+      allAttachments: Map<String, String> = mapOf("Attachment1" to "mockAttachmentUid1"),
+      allParticipants: Map<Participant, Role> = mapOf(Participant(generateAutoId()) to Role.OWNER)
+  ): TravelContainer {
+    return TravelContainer(
+        fsUid = fsUid,
+        title = title,
+        description = description,
+        startTime = startTime,
+        endTime = endTime,
+        location = location,
+        allAttachments = allAttachments,
+        allParticipants = allParticipants)
+  }
+
+  fun createMockTravelContainersList(
+      size: Int,
+      fsUidGenerator: () -> String = ::generateAutoId,
+      titleGenerator: (Int) -> String = { "Mock Travel $it" },
+      descriptionGenerator: (Int) -> String = { "This is mock travel container $it" },
+      startTimeGenerator: (Int) -> Timestamp = { Timestamp.now() },
+      endTimeGenerator: (Int) -> Timestamp = { index ->
+        Timestamp(Date(startTimeGenerator(index).toDate().time + 86400000)) // Add one day
+      },
+      locationGenerator: (Int) -> Location = { Location(46.5191, 6.5668, Timestamp.now(), "EPFL") },
+      allAttachmentsGenerator: (Int) -> Map<String, String> = { index ->
+        mapOf("Attachment$index" to "mockAttachmentUid$index")
+      },
+      allParticipantsGenerator: (Int) -> Map<Participant, Role> = {
+        mapOf(Participant(generateAutoId()) to Role.OWNER)
+      }
+  ): List<TravelContainer> {
+    return (1..size).map { index ->
+      createMockTravelContainer(
+          fsUid = fsUidGenerator(),
+          title = titleGenerator(index),
+          description = descriptionGenerator(index),
+          startTime = startTimeGenerator(index),
+          endTime = endTimeGenerator(index),
+          location = locationGenerator(index),
+          allAttachments = allAttachmentsGenerator(index),
+          allParticipants = allParticipantsGenerator(index))
+    }
   }
 }
