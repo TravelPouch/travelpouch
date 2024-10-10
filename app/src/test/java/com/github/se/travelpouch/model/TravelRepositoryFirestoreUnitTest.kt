@@ -12,6 +12,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -136,7 +138,7 @@ class TravelRepositoryFirestoreUnitTest {
   @Test
   fun addsTravelSuccessfully() {
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel))
+    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel.toMap()))
         .thenReturn(task)
     whenever(task.isSuccessful).thenReturn(true)
 
@@ -155,7 +157,7 @@ class TravelRepositoryFirestoreUnitTest {
   @Test
   fun failsToAddTravel() {
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel))
+    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel.toMap()))
         .thenReturn(task)
     whenever(task.isSuccessful).thenReturn(false)
     whenever(task.exception).thenReturn(Exception("Firestore error"))
@@ -175,7 +177,7 @@ class TravelRepositoryFirestoreUnitTest {
   @Test
   fun updatesTravelSuccessfully() {
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel))
+    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel.toMap()))
         .thenReturn(task)
     whenever(task.isSuccessful).thenReturn(true)
 
@@ -194,7 +196,7 @@ class TravelRepositoryFirestoreUnitTest {
   @Test
   fun failsToUpdateTravel() {
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel))
+    whenever(mockFirestore.collection("travels").document(travel.fsUid).set(travel.toMap()))
         .thenReturn(task)
     whenever(task.isSuccessful).thenReturn(false)
     whenever(task.exception).thenReturn(Exception("Firestore error"))
@@ -363,8 +365,8 @@ class TravelRepositoryFirestoreUnitTest {
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h") // Ensure getId() returns a String
     whenever(document.getString("title")).thenReturn("Test Title")
     whenever(document.getString("description")).thenReturn("Test Description")
-    whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
-    whenever(document.getTimestamp("endDate"))
+    whenever(document.getTimestamp("startTime")).thenReturn(Timestamp.now())
+    whenever(document.getTimestamp("endTime"))
         .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
@@ -424,8 +426,8 @@ class TravelRepositoryFirestoreUnitTest {
     whenever(document.id).thenReturn(null)
     whenever(document.getString("title")).thenReturn(null)
     whenever(document.getString("description")).thenReturn(null)
-    whenever(document.getTimestamp("startDate")).thenReturn(null)
-    whenever(document.getTimestamp("endDate")).thenReturn(null)
+    whenever(document.getTimestamp("startTime")).thenReturn(null)
+    whenever(document.getTimestamp("endTime")).thenReturn(null)
 
     whenever(document.get("location")).thenReturn(null)
     whenever(document.get("allAttachments")).thenReturn(null)
@@ -456,8 +458,8 @@ class TravelRepositoryFirestoreUnitTest {
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
     whenever(document.getString("title")).thenReturn("Test Title")
     whenever(document.getString("description")).thenReturn("Test Description")
-    whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
-    whenever(document.getTimestamp("endDate"))
+    whenever(document.getTimestamp("startTime")).thenReturn(Timestamp.now())
+    whenever(document.getTimestamp("endTime"))
         .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
@@ -491,8 +493,8 @@ class TravelRepositoryFirestoreUnitTest {
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
     whenever(document.getString("title")).thenReturn("Test Title")
     whenever(document.getString("description")).thenReturn("Test Description")
-    whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
-    whenever(document.getTimestamp("endDate"))
+    whenever(document.getTimestamp("startTime")).thenReturn(Timestamp.now())
+    whenever(document.getTimestamp("endTime"))
         .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
@@ -526,8 +528,8 @@ class TravelRepositoryFirestoreUnitTest {
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
     whenever(document.getString("title")).thenReturn("Test Title")
     whenever(document.getString("description")).thenReturn("Test Description")
-    whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
-    whenever(document.getTimestamp("endDate"))
+    whenever(document.getTimestamp("startTime")).thenReturn(Timestamp.now())
+    whenever(document.getTimestamp("endTime"))
         .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
@@ -560,8 +562,8 @@ class TravelRepositoryFirestoreUnitTest {
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
     whenever(document.getString("title")).thenReturn("Test Title")
     whenever(document.getString("description")).thenReturn("Test Description")
-    whenever(document.getTimestamp("startDate")).thenReturn(Timestamp.now())
-    whenever(document.getTimestamp("endDate"))
+    whenever(document.getTimestamp("startTime")).thenReturn(Timestamp.now())
+    whenever(document.getTimestamp("endTime"))
         .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
@@ -679,5 +681,37 @@ class TravelRepositoryFirestoreUnitTest {
       assertTrue(failureCalled)
       logMock.verify { Log.e("TravelRepositoryFirestore", "Error getting documents", exception) }
     }
+  }
+
+  @Test
+  fun checkAddTravelSerializeCorrectlyToFirebaseWithReflection() {
+    val db2 = FirebaseFirestore.getInstance()
+    val travelRepositoryFirestore2 = TravelRepositoryFirestore(db2)
+    val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
+    val attachments: Map<String, String> = mapOf("Test Key item" to "Test Value item")
+    val user1ID = travelRepositoryFirestore2.getNewUid()
+    val user2ID = travelRepositoryFirestore2.getNewUid()
+    val participants: Map<Participant, Role> =
+        mapOf(Participant(user1ID) to Role.OWNER, Participant(user2ID) to Role.PARTICIPANT)
+    val travelContainer =
+        TravelContainer(
+            user2ID,
+            "Test Title",
+            "Test Description",
+            Timestamp(1234567890L - 1, 0),
+            Timestamp(1234567890L, 0),
+            location,
+            attachments,
+            participants)
+
+    val addLatch = CountDownLatch(1)
+    travelRepositoryFirestore2.addTravel(
+        travelContainer, { addLatch.countDown() }, { fail("Should not call onFailure") })
+    addLatch.await(4, TimeUnit.SECONDS) // Wait for the addTravel operation to complete
+
+    val travelContainer2 = travelContainer.copy(title = "Title After Change")
+    val updateLatch = CountDownLatch(1)
+    travelRepositoryFirestore2.updateTravel(
+        travelContainer2, { updateLatch.countDown() }, { fail("Should not call onFailure") })
   }
 }
