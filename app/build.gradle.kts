@@ -52,17 +52,25 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
         }
     }
 
@@ -120,9 +128,23 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
     implementation(libs.firebase.common.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+
+    androidTestImplementation(platform(libs.compose.bom))
+        testImplementation(libs.mockito.core)
+        testImplementation(libs.mockito.kotlin)
+        androidTestImplementation(libs.mockito.android)
+        androidTestImplementation(libs.mockito.kotlin)
+
+        androidTestImplementation(libs.mockk)
+        androidTestImplementation(libs.mockk.android)
+        androidTestImplementation(libs.mockk.agent)
+        testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+
 
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
