@@ -49,7 +49,6 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelTitle").assertTextEquals("Create a new travel")
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelSaveButton").assertTextEquals("Save")
 
     composeTestRule.onNodeWithTag("inputTravelTitle").assertIsDisplayed()
@@ -182,6 +181,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("10/10/2024")
     composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("20/10/2024")
 
+    composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
     // Simulate clicking the save button
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
 
