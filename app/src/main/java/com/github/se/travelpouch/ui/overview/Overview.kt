@@ -30,14 +30,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import java.util.Locale
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter") // TODO useful?
 @Composable
-fun OverviewScreen(
-    // navigationActions: NavigationActions,
-    travelContainers: List<TravelContainer>
-) {
+fun OverviewScreen(navigationActions: NavigationActions, travelContainers: List<TravelContainer>) {
 
   Scaffold(
       modifier = Modifier.testTag("overviewScreen"),
