@@ -33,6 +33,12 @@ import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import java.util.Locale
 
+/**
+ * Composable function for the Overview screen.
+ *
+ * @param navigationActions Actions for navigation.
+ * @param travelContainers List of travel containers to display.
+ */
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter") // TODO useful?
 @Composable
 fun OverviewScreen(navigationActions: NavigationActions, travelContainers: List<TravelContainer>) {
@@ -71,6 +77,12 @@ fun OverviewScreen(navigationActions: NavigationActions, travelContainers: List<
       })
 }
 
+/**
+ * Composable function for displaying a travel item.
+ *
+ * @param travelContainer The travel container to display.
+ * @param onClick Callback function for item click.
+ */
 @Composable
 fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
   Card(

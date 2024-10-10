@@ -20,7 +20,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
-fun MapScreen(navigationActions: NavigationActions, travelContainers: List<TravelContainer>) {
+fun MapScreen(
+    navigationActions: NavigationActions? = null,
+    travelContainers: List<TravelContainer>
+) {
   Scaffold(
       modifier = Modifier.testTag("overviewScreen"),
       //        bottomBar = {
@@ -36,7 +39,7 @@ fun MapScreen(navigationActions: NavigationActions, travelContainers: List<Trave
 
 @Composable
 fun MapContent(modifier: Modifier = Modifier, travelContainers: List<TravelContainer>) {
-  val markers = travelContainers.filter { it.location != null }
+  val markers = travelContainers.filter { true }
 
   val cameraPositionState = rememberCameraPositionState {
     // Set initial camera position to the first TravelContainer's location or a default
