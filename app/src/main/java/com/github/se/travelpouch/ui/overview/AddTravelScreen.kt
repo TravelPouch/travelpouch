@@ -1,8 +1,5 @@
 package com.github.se.travelpouch.ui.overview
 
-import android.icu.util.GregorianCalendar
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -15,7 +12,6 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.*
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.google.firebase.Timestamp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,72 +131,7 @@ fun AddTravelScreen(
 
               // Save Button
               Button(
-                  onClick = {
-                    val startCalendar = parseDate(startDate)
-                    val endCalendar = parseDate(endDate)
-
-                    val location = createLocation(latitude, longitude, locationName)
-
-                    Log.d("AddTravelScreen", "Start date: $startDate, End date: $endDate")
-                    Log.d(
-                        "AddTravelScreen",
-                        "Location - Name: $locationName, Latitude: $latitude, Longitude: $longitude")
-
-                    // Check if date parsing was successful
-                    if (startCalendar == null || endCalendar == null) {
-                      Log.e("AddTravelScreen", "Invalid date format")
-                      Toast.makeText(
-                              context,
-                              "Invalid date format. Please use DD/MM/YYYY.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-
-                      // Check if location is valid
-                    } else if (location == null) {
-                      Log.e("AddTravelScreen", "Invalid location format")
-                      Toast.makeText(
-                              context,
-                              "Invalid location format. Ensure latitude is between -90 and 90 and longitude is between -180 and 180.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-                    } else {
-                      Log.d("AddTravelScreen", "All inputs are valid, proceeding to add travel")
-
-                      try {
-                        val travelContainer =
-                            TravelContainer(
-                                fsUid = listTravelViewModel.getNewUid(),
-                                title = title,
-                                description = description,
-                                startTime = Timestamp(startCalendar.time),
-                                endTime = Timestamp(endCalendar.time),
-                                location = location,
-                                allAttachments = emptyMap(),
-                                allParticipants =
-                                    mapOf(
-                                        Participant(fsUid = listTravelViewModel.getNewUid()) to
-                                            Role.OWNER))
-
-                        // Call the ViewModel method to add the travel data
-                        listTravelViewModel.addTravel(travelContainer)
-
-                        Toast.makeText(context, "Travel added successfully!", Toast.LENGTH_SHORT)
-                            .show()
-
-                        // Optionally navigate back after successful addition
-                        navigationActions.goBack()
-
-                        return@Button
-                      } catch (e: Exception) {
-                        Log.e("AddTravelScreen", "Error adding travel: $e")
-                        Toast.makeText(
-                                context,
-                                "Error adding travel. Please try again.",
-                                Toast.LENGTH_SHORT)
-                            .show()
-                      }
-                    }
-                  },
+                  onClick = {},
                   modifier =
                       Modifier.fillMaxWidth().semantics {
                         testTag = "travelSaveButton"
@@ -216,37 +147,4 @@ fun AddTravelScreen(
                   }
             }
       })
-}
-
-// Function to parse a date in DD/MM/YYYY format
-fun parseDate(dateString: String): GregorianCalendar? {
-  val parts = dateString.split("/")
-  return if (parts.size == 3) {
-    try {
-      val calendar = GregorianCalendar()
-      calendar.set(parts[2].toInt(), parts[1].toInt() - 1, parts[0].toInt(), 0, 0, 0)
-      calendar
-    } catch (e: Exception) {
-      null // Return null if there's a parsing issue
-    }
-  } else {
-    null // Return null if the date format is incorrect
-  }
-}
-
-fun createLocation(latitudeStr: String, longitudeStr: String, name: String): Location? {
-  val latitude = latitudeStr.toDoubleOrNull()
-  val longitude = longitudeStr.toDoubleOrNull()
-
-  // Check if latitude and longitude are valid numbers and within valid ranges
-  if (latitude == null || latitude !in -90.0..90.0) {
-    return null // Return null for invalid latitude
-  }
-  if (longitude == null || longitude !in -180.0..180.0) {
-    return null // Return null for invalid longitude
-  }
-
-  // Return the Location object if everything is valid
-  return Location(
-      latitude = latitude, longitude = longitude, insertTime = Timestamp.now(), name = name)
 }
