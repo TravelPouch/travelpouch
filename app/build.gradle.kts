@@ -147,6 +147,7 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
+    testImplementation (libs.mockk.v1120)
 
     // Test UI
     androidTestImplementation(libs.androidx.junit)
@@ -158,6 +159,8 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.kaspresso)
+    androidTestImplementation(libs.androidx.espresso.intents)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)

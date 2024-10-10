@@ -50,6 +50,11 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * A composable function that displays the sign-in screen.
+ *
+ * @param navigationActions An instance of `NavigationActions` to handle navigation events.
+ */
 @Composable
 fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
@@ -81,7 +86,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
               painter =
                   painterResource(id = R.drawable.travelpouch_logo), // Ensure this drawable exists
               contentDescription = "App Logo",
-              modifier = Modifier.size(250.dp))
+              modifier = Modifier.size(250.dp).testTag("loginLogo"))
 
           Spacer(modifier = Modifier.height(16.dp))
 
@@ -92,8 +97,6 @@ fun SignInScreen(navigationActions: NavigationActions) {
               style =
                   MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,
-              // center the text
-
               textAlign = TextAlign.Center)
 
           Spacer(modifier = Modifier.height(48.dp))
@@ -113,6 +116,11 @@ fun SignInScreen(navigationActions: NavigationActions) {
       })
 }
 
+/**
+ * A composable function that creates a button for signing in with Google.
+ *
+ * @param onSignInClick A lambda function to be called when the button is clicked.
+ */
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
@@ -135,7 +143,8 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
                   contentDescription = "Google Logo",
                   modifier =
                       Modifier.size(30.dp) // Size of the Google logo
-                          .padding(end = 8.dp))
+                          .padding(end = 8.dp)
+                          .testTag("googleLogo"))
 
               // Text for the button
               Text(
@@ -147,6 +156,13 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       }
 }
 
+/**
+ * Creates a launcher for Firebase authentication using Google Sign-In.
+ *
+ * @param onAuthComplete Callback function to be invoked when authentication is successful.
+ * @param onAuthError Callback function to be invoked when authentication fails.
+ * @return A `ManagedActivityResultLauncher` that can be used to launch the Google Sign-In intent.
+ */
 @Composable
 fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,
