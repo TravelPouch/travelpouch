@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.ui.overview
 
 import android.icu.util.GregorianCalendar
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -133,49 +134,53 @@ fun AddTravelScreen(
               Spacer(modifier = Modifier.height(16.dp))
 
               // Save Button
-              Button(
-                  onClick = {
+            Button(
+                onClick = {
                     val startCalendar = parseDate(startDate)
                     val endCalendar = parseDate(endDate)
 
                     val location = createLocation(latitude, longitude, locationName)
 
+                    Log.d("AddTravelScreen", "Start date: $startDate, End date: $endDate")
+                    Log.d("AddTravelScreen", "Location - Name: $locationName, Latitude: $latitude, Longitude: $longitude")
+
                     // Check if date parsing was successful
                     if (startCalendar == null || endCalendar == null) {
-                      Toast.makeText(
-                              context,
-                              "Invalid date format. Please use DD/MM/YYYY.",
-                              Toast.LENGTH_SHORT)
-                          .show()
+                        Log.e("AddTravelScreen", "Invalid date format")
+                        Toast.makeText(
+                            context,
+                            "Invalid date format. Please use DD/MM/YYYY.",
+                            Toast.LENGTH_SHORT)
+                            .show()
 
-                      // Check if location is valid
+                        // Check if location is valid
                     } else if (location == null) {
-                      Toast.makeText(
-                              context,
-                              "Invalid location format. Ensure latitude is between -90 and 90 and longitude is between -180 and 180.",
-                              Toast.LENGTH_SHORT)
-                          .show()
+                        Log.e("AddTravelScreen", "Invalid location format")
+                        Toast.makeText(
+                            context,
+                            "Invalid location format. Ensure latitude is between -90 and 90 and longitude is between -180 and 180.",
+                            Toast.LENGTH_SHORT)
+                            .show()
                     } else {
+                        Log.d("AddTravelScreen", "All inputs are valid, proceeding to add travel")
+                        listTravelViewModel.addTravel(
+                            TravelContainer(
+                                fsUid = listTravelViewModel.getNewUid(),
+                                title = title,
+                                description = description,
+                                startTime = Timestamp(startCalendar.time),
+                                endTime = Timestamp(endCalendar.time),
+                                location = location,
+                                allAttachments = emptyMap(),
+                                allParticipants =
+                                mapOf(
+                                    Participant(fsUid = listTravelViewModel.getNewUid()) to Role.OWNER))
+                        )
 
-                      listTravelViewModel.addTravel(
-                          TravelContainer(
-                              fsUid = listTravelViewModel.getNewUid(),
-                              title = title,
-                              description = description,
-                              startTime = Timestamp(startCalendar.time),
-                              endTime = Timestamp(endCalendar.time),
-                              location = location,
-                              allAttachments = emptyMap(),
-                              allParticipants =
-                                  mapOf(
-                                      // Add by default the owner of the travel
-                                      Participant(fsUid = listTravelViewModel.getNewUid()) to
-                                          Role.OWNER)))
-
-                      navigationActions.goBack()
-                      return@Button
+                        navigationActions.goBack()
+                        return@Button
                     }
-                  },
+                },
                   modifier =
                       Modifier.fillMaxWidth().semantics {
                         testTag = "travelSaveButton"
