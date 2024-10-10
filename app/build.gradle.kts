@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
     id("jacoco")
+    alias(libs.plugins.gms)
 }
 
 android {
@@ -127,6 +128,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.auth.ktx)
@@ -134,16 +136,31 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
-    androidTestImplementation(platform(libs.compose.bom))
-        testImplementation(libs.mockito.core)
-        testImplementation(libs.mockito.kotlin)
-        androidTestImplementation(libs.mockito.android)
-        androidTestImplementation(libs.mockito.kotlin)
 
-        androidTestImplementation(libs.mockk)
-        androidTestImplementation(libs.mockk.android)
-        androidTestImplementation(libs.mockk.agent)
-        testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    // Firebase
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.ui.auth)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.auth)
+
+    // Testing Unit
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk.agent)
+    testImplementation(libs.json)
+
+    // Test UI
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
+    androidTestImplementation(libs.kaspresso)
 
 
     // ------------- Jetpack Compose ------------------
@@ -172,6 +189,13 @@ dependencies {
 
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+
+    // Test UI
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin)
 }
 
 tasks.withType<Test> {
