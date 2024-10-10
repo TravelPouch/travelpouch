@@ -57,6 +57,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("inputTravelLatitude").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelLongitude").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelStartDate").assertIsDisplayed()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("inputTravelEndDate").assertIsDisplayed()
   }
 
@@ -180,6 +181,8 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("inputTravelLongitude").performTextInput("2.3522")
     composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("10/10/2024")
     composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("20/10/2024")
+
+    composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
     // Simulate clicking the save button
