@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
@@ -44,7 +45,14 @@ fun TravelPouchApp() {
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { Greeting() }
+      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+    }
+
+    navigation(
+        startDestination = Screen.GREETING,
+        route = Route.GREETING,
+    ) {
+      composable(Screen.GREETING) { Greeting() }
     }
   }
 }
