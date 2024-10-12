@@ -218,7 +218,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").assertIsNotEnabled()
   }
 
-    // Helper function to input text into a text field
+  // Helper function to input text into a text field
   fun inputText(testTag: String, text: String) {
     composeTestRule.onNodeWithTag(testTag).performTextClearance()
     composeTestRule.onNodeWithTag(testTag).performTextInput(text)
