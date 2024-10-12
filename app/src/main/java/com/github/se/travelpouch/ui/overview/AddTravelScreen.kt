@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
@@ -84,7 +86,11 @@ fun AddTravelScreen(
       },
       content = { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp).padding(paddingValues),
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(16.dp)
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               // Title Input
               OutlinedTextField(
@@ -100,8 +106,10 @@ fun AddTravelScreen(
                   onValueChange = { description = it },
                   label = { Text("Description") },
                   placeholder = { Text("Describe your travel") },
-                  modifier =
-                      Modifier.fillMaxWidth().height(200.dp).testTag("inputTravelDescription"))
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelDescription"),
+                  maxLines = 5, // Allow the text field to grow up to 5 lines
+                  minLines = 3 // Ensure the text field shows at least 3 lines
+                  )
 
               // Location Input
               // Location Name Input
