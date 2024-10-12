@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.ListTravelViewModel
@@ -49,16 +50,16 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelTitle").assertTextEquals("Create a new travel")
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("travelSaveButton").assertTextEquals("Save")
-    composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().assertTextEquals("Save")
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("inputTravelTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelDescription").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLocationName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLatitude").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLongitude").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelStartDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelEndDate").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelTitle").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelDescription").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocationName").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLatitude").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLongitude").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelStartDate").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelEndDate").performScrollTo().assertIsDisplayed()
   }
 
   @Test
@@ -78,7 +79,7 @@ class AddTravelScreenTest {
     inputText("inputTravelLatitude", "48.8566")
     inputText("inputTravelLongitude", "2.3522")
 
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
     verify(travelRepository, never()).addTravel(any(), any(), any())
@@ -101,7 +102,7 @@ class AddTravelScreenTest {
     inputText("inputTravelLatitude", "48.8566")
     inputText("inputTravelLongitude", "2.3522")
 
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
     verify(travelRepository, never()).addTravel(any(), any(), any())
@@ -124,7 +125,7 @@ class AddTravelScreenTest {
     inputText("inputTravelLatitude", "48.8566")
     inputText("inputTravelLongitude", "2.3522")
 
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
     verify(travelRepository, never()).addTravel(any(), any(), any())
@@ -147,7 +148,7 @@ class AddTravelScreenTest {
     inputText("inputTravelLatitude", "48.8566")
     inputText("inputTravelLongitude", "2.3522")
 
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
     verify(travelRepository, never()).addTravel(any(), any(), any())
@@ -171,7 +172,7 @@ class AddTravelScreenTest {
     inputText("inputTravelLongitude", "2.3522")
 
     // Simulate clicking the save button
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel due to invalid location
     verify(travelRepository, never()).addTravel(any(), any(), any())
@@ -197,7 +198,7 @@ class AddTravelScreenTest {
     composeTestRule.waitForIdle() // Ensures inputs are registered
 
     // Simulate clicking the save button
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is called to add a travel
     verify(travelRepository).addTravel(any(), any(), any())
@@ -224,7 +225,7 @@ class AddTravelScreenTest {
 
   // Helper function to input text into a text field
   fun inputText(testTag: String, text: String) {
-    composeTestRule.onNodeWithTag(testTag).performTextClearance()
-    composeTestRule.onNodeWithTag(testTag).performTextInput(text)
+    composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextClearance()
+    composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextInput(text)
   }
 }
