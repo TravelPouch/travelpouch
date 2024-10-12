@@ -3,17 +3,40 @@ package com.github.se.travelpouch.ui.overview
 import android.icu.util.GregorianCalendar
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.model.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.travelpouch.model.ListTravelViewModel
+import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.Participant
+import com.github.se.travelpouch.model.Role
+import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 
@@ -28,12 +51,11 @@ import com.google.firebase.Timestamp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTravelScreen(
-    listTravelViewModel: ListTravelViewModel,
+    listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
     navigationActions: NavigationActions
 ) {
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
-  var selectedLocation by remember { mutableStateOf<Location?>(null) }
   var startDate by remember { mutableStateOf("") }
   var endDate by remember { mutableStateOf("") }
   val context = LocalContext.current
@@ -43,8 +65,7 @@ fun AddTravelScreen(
   var longitude by remember { mutableStateOf("") }
 
   Scaffold(
-      modifier =
-          Modifier.fillMaxSize().semantics { testTag = "addTravelScreen" }, // Tag for entire screen
+      modifier = Modifier.fillMaxSize().testTag("addTravelScreen"), // Tag for entire screen
       topBar = {
         TopAppBar(
             title = {
@@ -53,7 +74,7 @@ fun AddTravelScreen(
             navigationIcon = {
               IconButton(
                   onClick = { navigationActions.goBack() },
-                  modifier = Modifier.semantics { testTag = "goBackButton" } // Tag for back button
+                  modifier = Modifier.testTag("goBackButton") // Tag for back button
                   ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -71,11 +92,7 @@ fun AddTravelScreen(
                   onValueChange = { title = it },
                   label = { Text("Title") },
                   placeholder = { Text("Name your travel") },
-                  modifier =
-                      Modifier.fillMaxWidth().semantics {
-                        testTag = "inputTravelTitle"
-                      } // Tag for title input
-                  )
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelTitle"))
 
               // Description Input
               OutlinedTextField(
@@ -84,10 +101,7 @@ fun AddTravelScreen(
                   label = { Text("Description") },
                   placeholder = { Text("Describe your travel") },
                   modifier =
-                      Modifier.fillMaxWidth().height(200.dp).semantics {
-                        testTag = "inputTravelDescription"
-                      } // Tag for description input
-                  )
+                      Modifier.fillMaxWidth().height(200.dp).testTag("inputTravelDescription"))
 
               // Location Input
               // Location Name Input
@@ -96,8 +110,7 @@ fun AddTravelScreen(
                   onValueChange = { locationName = it },
                   label = { Text("Location Name") },
                   placeholder = { Text("Enter location name") },
-                  modifier =
-                      Modifier.fillMaxWidth().semantics { testTag = "inputTravelLocationName" })
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLocationName"))
 
               // Latitude Input
               OutlinedTextField(
@@ -105,7 +118,7 @@ fun AddTravelScreen(
                   onValueChange = { latitude = it },
                   label = { Text("Latitude") },
                   placeholder = { Text("Enter latitude (e.g. 48.8566)") },
-                  modifier = Modifier.fillMaxWidth().semantics { testTag = "inputTravelLatitude" })
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLatitude"))
 
               // Longitude Input
               OutlinedTextField(
@@ -113,7 +126,7 @@ fun AddTravelScreen(
                   onValueChange = { longitude = it },
                   label = { Text("Longitude") },
                   placeholder = { Text("Enter longitude (e.g. 2.3522)") },
-                  modifier = Modifier.fillMaxWidth().semantics { testTag = "inputTravelLongitude" })
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLongitude"))
 
               // Start Date Input
               OutlinedTextField(
@@ -121,11 +134,7 @@ fun AddTravelScreen(
                   onValueChange = { startDate = it },
                   label = { Text("Start Date") },
                   placeholder = { Text("DD/MM/YYYY") },
-                  modifier =
-                      Modifier.fillMaxWidth().semantics {
-                        testTag = "inputTravelStartDate"
-                      } // Tag for start date input
-                  )
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelStartDate"))
 
               // End Date Input
               OutlinedTextField(
@@ -133,11 +142,7 @@ fun AddTravelScreen(
                   onValueChange = { endDate = it },
                   label = { Text("End Date") },
                   placeholder = { Text("DD/MM/YYYY") },
-                  modifier =
-                      Modifier.fillMaxWidth().semantics {
-                        testTag = "inputTravelEndDate"
-                      } // Tag for end date input
-                  )
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelEndDate"))
 
               Spacer(modifier = Modifier.height(16.dp))
 
@@ -209,10 +214,7 @@ fun AddTravelScreen(
                       }
                     }
                   },
-                  modifier =
-                      Modifier.fillMaxWidth().semantics {
-                        testTag = "travelSaveButton"
-                      }, // Tag for save button
+                  modifier = Modifier.fillMaxWidth().testTag("travelSaveButton"),
                   enabled =
                       title.isNotBlank() &&
                           locationName.isNotBlank() &&

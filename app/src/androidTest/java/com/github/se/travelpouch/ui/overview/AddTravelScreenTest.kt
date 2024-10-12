@@ -183,6 +183,8 @@ class AddTravelScreenTest {
     // Set up the content for the test
     composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
 
+    composeTestRule.waitForIdle() // Ensures inputs are registered
+
     // Input valid travel details
     inputText("inputTravelTitle", "Trip to Paris")
     inputText("inputTravelDescription", "A fun trip to Paris")
@@ -191,6 +193,8 @@ class AddTravelScreenTest {
     inputText("inputTravelLocationName", "Paris")
     inputText("inputTravelLatitude", "48.8566")
     inputText("inputTravelLongitude", "2.3522")
+
+    composeTestRule.waitForIdle() // Ensures inputs are registered
 
     // Simulate clicking the save button
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
