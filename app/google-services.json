@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "957707141132",
+    "project_id": "travelpouch-7d692",
+    "storage_bucket": "travelpouch-7d692.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:957707141132:android:0e63d324f9299e65aaee29",
+        "android_client_info": {
+          "package_name": "com.github.se.travelpouch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "957707141132-o46ncfb7vn2k7tr5fj38lb850o6ongcq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.travelpouch",
+            "certificate_hash": "9f507c5886c3669ee6991926a30b2f6b8fd0f786"
+          }
+        },
+        {
+          "client_id": "957707141132-2v8jj506iqnt0rjl5gbs23ldbbpg4s93.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhL0UabzWCobqQETXtCBwwp5ep0YO6c9k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "957707141132-2v8jj506iqnt0rjl5gbs23ldbbpg4s93.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
