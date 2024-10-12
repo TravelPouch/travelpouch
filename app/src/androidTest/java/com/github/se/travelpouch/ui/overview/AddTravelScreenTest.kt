@@ -50,6 +50,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelTitle").assertTextEquals("Create a new travel")
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelSaveButton").assertTextEquals("Save")
+    composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("inputTravelTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelDescription").assertIsDisplayed()
@@ -57,7 +58,6 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("inputTravelLatitude").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelLongitude").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelStartDate").assertIsDisplayed()
-    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("inputTravelEndDate").assertIsDisplayed()
   }
 
@@ -65,14 +65,18 @@ class AddTravelScreenTest {
   fun doesNotSubmitWithInvalidStartDate() {
     composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
 
-    composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("Trip to Paris")
+    // Input valid title and description
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
 
-    // Input invalid date
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("notadate")
+    // Input invalid dates
+    inputText("inputTravelStartDate", "notadate")
+    inputText("inputTravelEndDate", "20/10/2024")
 
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("20/10/2024")
+    // Input valid location
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "48.8566")
+    inputText("inputTravelLongitude", "2.3522")
 
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
 
@@ -84,14 +88,18 @@ class AddTravelScreenTest {
   fun doesNotSubmitWithEndInvalidDate() {
     composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
 
-    composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("Trip to Paris")
+    // Input valid title and description
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
 
-    // Input invalid date
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("20/10/2024")
+    // Input invalid dates
+    inputText("inputTravelStartDate", "10/10/2024")
+    inputText("inputTravelEndDate", "notadate")
 
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("notadate")
+    // Input valid location
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "48.8566")
+    inputText("inputTravelLongitude", "2.3522")
 
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
 
@@ -103,14 +111,18 @@ class AddTravelScreenTest {
   fun doesNotSubmitWithInvalidStartAndEndDate() {
     composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
 
-    composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("Trip to Paris")
+    // Input valid title and description
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
 
-    // Input invalid date
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("notadate")
+    // Input valid dates
+    inputText("inputTravelStartDate", "notadate")
+    inputText("inputTravelEndDate", "notadate")
 
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("notadate")
+    // Input valid location
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "48.8566")
+    inputText("inputTravelLongitude", "2.3522")
 
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
 
@@ -122,14 +134,18 @@ class AddTravelScreenTest {
   fun doesNotSubmitWithNonNumericDate() {
     composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
 
-    composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("Trip to Paris")
+    // Input valid title and description
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
 
-    // Input invalid date
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("notadate/10/2024")
+    // Input invalid dates
+    inputText("inputTravelStartDate", "notadate/10/2024")
+    inputText("inputTravelEndDate", "notadate/10/2024")
 
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("notadate/10/2024")
+    // Input valid location
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "48.8566")
+    inputText("inputTravelLongitude", "2.3522")
 
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
 
@@ -142,23 +158,17 @@ class AddTravelScreenTest {
     composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
 
     // Input valid title and description
-    composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("Trip to Paris")
-    composeTestRule.onNodeWithTag("inputTravelDescription").performTextInput("A fun trip to Paris")
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
 
     // Input valid dates
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("10/10/2024")
+    inputText("inputTravelStartDate", "10/10/2024")
+    inputText("inputTravelEndDate", "20/10/2024")
 
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("20/10/2024")
-
-    // Input an invalid latitude (non-numeric)
-    composeTestRule.onNodeWithTag("inputTravelLatitude").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelLatitude").performTextInput("invalid_latitude")
-
-    // Input a valid longitude
-    composeTestRule.onNodeWithTag("inputTravelLongitude").performTextClearance()
-    composeTestRule.onNodeWithTag("inputTravelLongitude").performTextInput("2.3522")
+    // Input invalid location
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "invalid_latitude")
+    inputText("inputTravelLongitude", "2.3522")
 
     // Simulate clicking the save button
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
@@ -174,17 +184,14 @@ class AddTravelScreenTest {
     composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
 
     // Input valid travel details
-    composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("Trip to Paris")
-    composeTestRule.onNodeWithTag("inputTravelDescription").performTextInput("A fun trip to Paris")
-    composeTestRule.onNodeWithTag("inputTravelLocationName").performTextInput("Paris")
-    composeTestRule.onNodeWithTag("inputTravelLatitude").performTextInput("48.8566")
-    composeTestRule.onNodeWithTag("inputTravelLongitude").performTextInput("2.3522")
-    composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("10/10/2024")
-    composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("20/10/2024")
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
+    inputText("inputTravelStartDate", "10/10/2024")
+    inputText("inputTravelEndDate", "20/10/2024")
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "48.8566")
+    inputText("inputTravelLongitude", "2.3522")
 
-    composeTestRule.waitForIdle()
-
-    composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
     // Simulate clicking the save button
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
 
@@ -209,5 +216,11 @@ class AddTravelScreenTest {
 
     // Initially, the save button should be disabled
     composeTestRule.onNodeWithTag("travelSaveButton").assertIsNotEnabled()
+  }
+
+    // Helper function to input text into a text field
+  fun inputText(testTag: String, text: String) {
+    composeTestRule.onNodeWithTag(testTag).performTextClearance()
+    composeTestRule.onNodeWithTag(testTag).performTextInput(text)
   }
 }
