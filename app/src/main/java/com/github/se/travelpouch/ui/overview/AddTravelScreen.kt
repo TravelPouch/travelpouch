@@ -17,6 +17,14 @@ import com.github.se.travelpouch.model.*
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 
+/**
+ * The AddTravelScreen composable function displays the UI for adding a new travel entry to the list
+ * of travels in the app. It includes input fields for the title, description, location name,
+ * latitude, longitude, start date, and end date.
+ *
+ * @param listTravelViewModel: The ViewModel that manages the list of travels in the app.
+ * @param navigationActions: The navigation actions to handle navigation within the app.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTravelScreen(
@@ -234,6 +242,7 @@ fun parseDate(dateString: String): GregorianCalendar? {
   }
 }
 
+// Function to create a Location object from latitude, longitude, and name
 fun createLocation(latitudeStr: String, longitudeStr: String, name: String): Location? {
   val latitude = latitudeStr.toDoubleOrNull()
   val longitude = longitudeStr.toDoubleOrNull()
