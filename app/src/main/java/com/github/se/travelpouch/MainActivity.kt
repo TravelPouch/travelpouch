@@ -1,7 +1,6 @@
 package com.github.se.travelpouch
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +28,6 @@ import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : ComponentActivity() {
@@ -65,15 +63,15 @@ fun TravelPouchApp() {
   val participants: MutableMap<Participant, Role> = HashMap()
   participants[Participant(user1ID)] = Role.OWNER
   val travelContainer =
-    TravelContainer(
-      user2ID,
-      "Test Title",
-      "Test Description",
-      Timestamp(1234567890L - 1, 0),
-      Timestamp(1234567890L, 0),
-      location,
-      attachments,
-      participants)
+      TravelContainer(
+          user2ID,
+          "Test Title",
+          "Test Description",
+          Timestamp(1234567890L - 1, 0),
+          Timestamp(1234567890L, 0),
+          location,
+          attachments,
+          participants)
   val cooked = LocalContext.current
   val sigma by listTravelViewModel.travels.collectAsState()
   println("${sigma.size}")
@@ -85,7 +83,7 @@ fun TravelPouchApp() {
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { EditTravelSettingsScreen(listTravelViewModel,navigationActions) }
+      composable(Screen.AUTH) { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
     }
   }
 }
