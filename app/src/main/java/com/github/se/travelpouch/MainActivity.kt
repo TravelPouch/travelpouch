@@ -72,12 +72,10 @@ fun TravelPouchApp() {
           location,
           attachments,
           participants)
-  val cooked = LocalContext.current
   val sigma by listTravelViewModel.travels.collectAsState()
   println("${sigma.size}")
   listTravelViewModel.addTravel(travelContainer)
   listTravelViewModel.selectTravel(travelContainer)
-
   NavHost(navController = navController, startDestination = Route.AUTH) {
     navigation(
         startDestination = Screen.AUTH,

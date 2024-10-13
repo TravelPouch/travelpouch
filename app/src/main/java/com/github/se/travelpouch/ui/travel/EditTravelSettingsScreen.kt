@@ -208,8 +208,7 @@ fun EditTravelSettingsScreen(
                       allAttachments = selectedTravel!!.allAttachments,
                       allParticipants = selectedTravel!!.allParticipants,
                   )
-              listTravelViewModel.updateTravel(
-                  newTodo,
+              listTravelViewModel.updateTravel(newTodo)
                   //                            onSuccess = {
                   //                                navigationActions.goBack()
                   //                                Toast.makeText(
@@ -221,7 +220,6 @@ fun EditTravelSettingsScreen(
                   //                                Toast.makeText(context, "Error: ${it.message}",
                   // Toast.LENGTH_SHORT).show()
                   //                            }
-              )
               Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
             } catch (e: ParseException) {
               Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()

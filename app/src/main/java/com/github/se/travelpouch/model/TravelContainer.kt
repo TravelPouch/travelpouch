@@ -2,6 +2,10 @@ package com.github.se.travelpouch.model
 
 import com.google.firebase.Timestamp
 
+
+typealias fsUid = String
+
+
 /**
  * Data class representing a travel container.
  *
@@ -17,7 +21,7 @@ import com.google.firebase.Timestamp
  *   at all times unless the travel container is deleted.
  */
 data class TravelContainer(
-    val fsUid: String, // Firestore UID
+    val fsUid: fsUid, // Firestore UID
     val title: String,
     val description: String, // can be a blank string
     val startTime: Timestamp,
@@ -75,7 +79,7 @@ data class TravelContainer(
  * @param fsUid Firestore UID to check.
  * @return True if the UID is valid, false otherwise.
  */
-fun isValidUid(fsUid: String): Boolean {
+fun isValidUid(fsUid: fsUid): Boolean {
   return fsUid.isNotBlank() && fsUid.matches(Regex("^[a-zA-Z0-9]{20}$"))
 }
 
@@ -85,7 +89,7 @@ fun isValidUid(fsUid: String): Boolean {
  * @property fsUid Firestore UID of the participant.
  */
 data class Participant(
-    val fsUid: String, // Firestore UID
+    val fsUid: fsUid, // Firestore UID
 ) {
   init {
     require(isValidUid(fsUid)) { "Invalid fsUid format" }
