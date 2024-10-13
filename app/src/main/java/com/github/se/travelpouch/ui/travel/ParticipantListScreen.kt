@@ -92,8 +92,11 @@ fun ParticipantListScreen(
 
             LazyColumn(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
                 participants.value.entries.forEach { participant ->
+                    val UserInfo = listTravelViewModel.getParticipantFromfsUid(participant.key.fsUid)
+                    val name = UserInfo?.name ?: "Unknown"
+                    val email = UserInfo?.email ?: "Unknown Email"
+                    val role = participant.value.name
                     item {
-
                         Row(
                             modifier = Modifier.fillMaxWidth().clickable {
                                 Toast.makeText(context, "Participant clicked", Toast.LENGTH_SHORT)
@@ -108,15 +111,21 @@ fun ParticipantListScreen(
                                 modifier = Modifier.padding(10.dp)
                             )
                             Text(
-                                text = participant.key.fsUid,
+                                text = name,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(10.dp)
                             )
                             Text(
-                                text = participant.value.name,
+                                text = email,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(10.dp)
                             )
+                            Text(
+                                text = role,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(10.dp)
+                            )
+
                         }
                         HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
                     }

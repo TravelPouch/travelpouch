@@ -58,10 +58,11 @@ fun TravelPouchApp() {
   val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
   val attachments: MutableMap<String, String> = HashMap()
   attachments["Attachment1"] = "UID1"
-  val user1ID = listTravelViewModel.getNewUid()
+  val user1ID = "IN1fAs7cN4v8h1igUrSb"
   val user2ID = listTravelViewModel.getNewUid()
   val participants: MutableMap<Participant, Role> = HashMap()
   participants[Participant(user1ID)] = Role.OWNER
+
   val travelContainer =
       TravelContainer(
           "DFZft6Z95ABnRQ3YZQ2d",
