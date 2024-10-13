@@ -225,6 +225,8 @@ fun AddTravelScreen(
 
                         // Optionally navigate back after successful addition
                         navigationActions.goBack()
+
+                        return@Button // Early return only from the button's onClick
                       } catch (e: Exception) {
                         Log.e("AddTravelScreen", "Error adding travel: $e")
                         Toast.makeText(
