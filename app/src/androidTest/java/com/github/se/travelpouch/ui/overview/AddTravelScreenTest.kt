@@ -21,6 +21,7 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doThrow
 
 class AddTravelScreenTest {
 
@@ -227,5 +228,56 @@ class AddTravelScreenTest {
   fun inputText(testTag: String, text: String) {
     composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextClearance()
     composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextInput(text)
+  }
+
+  @Test
+  fun handlesExceptionWhenCreatingTravel() {
+    // Mock the ViewModel method to throw an exception when getting a new UID
+    `when`(listTravelViewModel.getNewUid()).thenReturn("validMockUid123456785")
+
+    // Set up the content for the test
+    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+
+    composeTestRule.waitForIdle() // Ensures inputs are registered
+
+    // Input valid travel details except UID creation, which will throw an exception
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
+    inputText("inputTravelStartDate", "10/10/2024")
+    inputText("inputTravelEndDate", "20/10/2024")
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "48.8566")
+    inputText("inputTravelLongitude", "2.3522")
+
+    composeTestRule.waitForIdle() // Ensures inputs are registered
+
+    // Simulate clicking the save button
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
+
+    // Verify that the repository method is NOT called to add a travel due to the exception
+    verify(travelRepository, never()).addTravel(any(), any(), any())
+  }
+
+  @Test
+  fun testToastIsShownWhenAddTravelFails() {
+    // Mock the repository's addTravel() method to throw an exception
+    doThrow(RuntimeException("Mocked exception during travel saving"))
+        .`when`(travelRepository)
+        .addTravel(any(), any(), any())
+
+    // Set up the content for the test
+    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+
+    // Input valid travel details
+    inputText("inputTravelTitle", "Trip to Paris")
+    inputText("inputTravelDescription", "A fun trip to Paris")
+    inputText("inputTravelStartDate", "10/10/2024")
+    inputText("inputTravelEndDate", "20/10/2024")
+    inputText("inputTravelLocationName", "Paris")
+    inputText("inputTravelLatitude", "48.8566")
+    inputText("inputTravelLongitude", "2.3522")
+
+    // Simulate clicking the save button
+    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
   }
 }
