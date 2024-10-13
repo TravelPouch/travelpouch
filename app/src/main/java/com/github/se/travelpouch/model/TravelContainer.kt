@@ -101,19 +101,16 @@ data class UserInfo(
     val name: String,
     val userTravelList: List<fsUid>,
     val email: String,
-    val profilePicturefsUid: fsUid,
 ) {
   init {
     require(isValidUid(fsUid)) { "Invalid fsUid format for fsUid" }
-    require(isValidUid(profilePicturefsUid)) { "Invalid fsUid format for profilePicturefsUid" }
   }
   fun toMap(): Map<String, Any> {
     return mapOf(
         "fsUid" to fsUid,
         "name" to name,
         "userTravelList" to userTravelList,
-        "email" to email,
-        "profilePicturefsUid" to profilePicturefsUid)
+        "email" to email)
   }
 }
 
