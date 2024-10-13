@@ -136,30 +136,10 @@ class OverviewScreenTest {
     val travelContainers = listOf(travelParis, travelNYC)
 
     // Act
-    composeTestRule.setContent {
-      MapScreen(navigationActions = navigationActions, travelContainers = travelContainers)
-    }
+    composeTestRule.setContent { MapScreen(travelContainers = travelContainers) }
 
     // Assert
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    // Note: Direct verification of markers on the map might not be possible with Compose UI tests.
-    // However, ensuring the map displays when travelContainers are provided is sufficient.
   }
-
-  //    Not needed for now as the navigation is not implemented
-
-  //  @Test
-  //  fun createTravelButtonCallsAction() {
-  //    // Arrange
-  //    composeTestRule.setContent {
-  //      OverviewScreen(navigationActions = navigationActions, travelContainers = emptyList())
-  //    }
-  //
-  //    // Act
-  //    composeTestRule.onNodeWithTag("createTravelFab").performClick()
-  //
-  //    // Assert
-  //     verify(navigationActions).navigateTo(screen = Screen.ADD_TRAVEL)
-  //  }
 }
