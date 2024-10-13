@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +26,7 @@ import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
+import com.github.se.travelpouch.ui.travel.ParticipantListScreen
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -64,7 +64,7 @@ fun TravelPouchApp() {
   participants[Participant(user1ID)] = Role.OWNER
   val travelContainer =
       TravelContainer(
-          user2ID,
+          "DFZft6Z95ABnRQ3YZQ2d",
           "Test Title",
           "Test Description",
           Timestamp(1234567890L - 1, 0),
@@ -74,14 +74,15 @@ fun TravelPouchApp() {
           participants)
   val sigma by listTravelViewModel.travels.collectAsState()
   println("${sigma.size}")
-  listTravelViewModel.addTravel(travelContainer)
+  //listTravelViewModel.addTravel(travelContainer)
   listTravelViewModel.selectTravel(travelContainer)
-  NavHost(navController = navController, startDestination = Route.AUTH) {
+  NavHost(navController = navController, startDestination = Route.TRAVEL) {
     navigation(
-        startDestination = Screen.AUTH,
-        route = Route.AUTH,
+        startDestination = Screen.EDIT,
+        route = Route.TRAVEL,
     ) {
-      composable(Screen.AUTH) { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.EDIT) { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.PARTICIPANT_LIST) { ParticipantListScreen(listTravelViewModel, navigationActions) }
     }
   }
 }

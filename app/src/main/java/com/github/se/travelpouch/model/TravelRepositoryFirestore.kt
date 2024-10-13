@@ -15,7 +15,7 @@ class TravelRepositoryFirestore(
 ) : TravelRepository {
 
   private val collectionPath = "travels"
-
+  private val userCollectionPath = "userslist"
   /**
    * Initializes the repository by adding an authentication state listener. The listener triggers
    * the onSuccess callback if the user is authenticated.
@@ -37,6 +37,33 @@ class TravelRepositoryFirestore(
    */
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
+  }
+
+    /**
+     * Retrieves a participant from the Firestore database by its identifier.
+     * @param fsUid The identifier of the participant to retrieve.
+     * @param onSuccess The callback to call with the participant if the operation is successful.
+     * @param onFailure The callback to call with the exception if the operation fails.
+     */
+    override fun getParticipantFromfsUid(
+      fsUid: fsUid,
+      onSuccess: (UserInfo) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid")
+        db.collection(userCollectionPath).document(fsUid).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user =
+                    task.result?.let { userEntry ->  UserInfo(fsUid,"placeholder", listOf(fsUid),"placeholder",fsUid) }
+                        ?: throw Exception("User not found on Firestore")
+                onSuccess(user)
+            } else {
+                task.exception?.let { e ->
+                    Log.e("TravelRepositoryFirestore", "Error getting user", e)
+                    onFailure(e)
+                }
+            }
+        }
   }
 
   /**
@@ -182,6 +209,19 @@ class TravelRepositoryFirestore(
           allParticipants = allParticipants!!)
     } catch (e: Exception) {
       Log.e("TravelRepositoryFirestore", "Error converting document to TravelContainer", e)
+      null
+    }
+  }
+
+  private fun documentToUserInfo(document: DocumentSnapshot): UserInfo? {
+    return try {
+      val fsUid = document.id
+      val name = document.getString("name")
+      val email = document.getString("email")
+      val userTravelList = document.get("listoftravellinked") as? List<String>
+      UserInfo(fsUid, name ?: "", listOf(fsUid), email ?: "", phone ?: "", profilePic ?: "")
+    } catch (e: Exception) {
+      Log.e("TravelRepositoryFirestore", "Error converting document to UserInfo", e)
       null
     }
   }
