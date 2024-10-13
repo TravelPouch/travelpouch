@@ -187,8 +187,10 @@ fun AddTravelScreen(
                     } else {
                       Log.d("AddTravelScreen", "All inputs are valid, proceeding to add travel")
 
+                      // Try to create the TravelContainer object
+                      val travelContainer: TravelContainer?
                       try {
-                        val travelContainer =
+                        travelContainer =
                             TravelContainer(
                                 fsUid = listTravelViewModel.getNewUid(),
                                 title = title,
@@ -202,6 +204,19 @@ fun AddTravelScreen(
                                         Participant(fsUid = listTravelViewModel.getNewUid()) to
                                             Role.OWNER))
 
+                        Log.d("AddTravelScreen", "TravelContainer created successfully.")
+                      } catch (e: Exception) {
+                        Log.e("AddTravelScreen", "Error creating travel: $e")
+                        Toast.makeText(
+                                context,
+                                "Error creating travel. Please try again.",
+                                Toast.LENGTH_SHORT)
+                            .show()
+                        return@Button // Return early since we can't proceed if creation failed
+                      }
+
+                      // Try to save the TravelContainer using the ViewModel
+                      try {
                         // Call the ViewModel method to add the travel data
                         listTravelViewModel.addTravel(travelContainer)
 
@@ -210,8 +225,6 @@ fun AddTravelScreen(
 
                         // Optionally navigate back after successful addition
                         navigationActions.goBack()
-
-                        return@Button
                       } catch (e: Exception) {
                         Log.e("AddTravelScreen", "Error adding travel: $e")
                         Toast.makeText(
