@@ -96,6 +96,27 @@ data class Participant(
   }
 }
 
+data class UserInfo(
+    val fsUid: fsUid,
+    val name: String,
+    val userTravelList: List<fsUid>,
+    val email: String,
+    val profilePicturefsUid: fsUid,
+) {
+  init {
+    require(isValidUid(fsUid)) { "Invalid fsUid format for fsUid" }
+    require(isValidUid(profilePicturefsUid)) { "Invalid fsUid format for profilePicturefsUid" }
+  }
+  fun toMap(): Map<String, Any> {
+    return mapOf(
+        "fsUid" to fsUid,
+        "name" to name,
+        "userTravelList" to userTravelList,
+        "email" to email,
+        "profilePicturefsUid" to profilePicturefsUid)
+  }
+}
+
 /** Enum class representing the role of a participant. */
 enum class Role {
   OWNER,

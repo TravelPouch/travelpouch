@@ -42,6 +42,7 @@ import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.google.firebase.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -127,6 +128,7 @@ fun EditTravelSettingsScreen(
                 contentDescription = "Participants",
                 modifier =
                     Modifier.padding(end = 8.dp).clickable {
+                        navigationActions.navigateTo(PARTICIPANT_LIST)
                       Toast.makeText(context, "Icon clicked", Toast.LENGTH_SHORT).show()
                     })
             TextField(

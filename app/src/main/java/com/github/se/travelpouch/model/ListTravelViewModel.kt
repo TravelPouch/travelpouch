@@ -31,6 +31,10 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
     return repository.getNewUid()
   }
 
+  fun getParticipantFromfsUid(fsUid: fsUid): UserInfo{
+
+  }
+
   /** Gets all Travel documents. */
   fun getTravels() {
     repository.getTravels(
