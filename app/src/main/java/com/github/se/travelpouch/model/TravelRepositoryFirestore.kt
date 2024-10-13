@@ -47,15 +47,14 @@ class TravelRepositoryFirestore(
      */
     override fun getParticipantFromfsUid(
       fsUid: fsUid,
-      onSuccess: (UserInfo) -> Unit,
+      onSuccess: (UserInfo?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid")
         db.collection(userCollectionPath).document(fsUid).get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val user =
-                    task.result?.let { userEntry ->  UserInfo(fsUid,"placeholder", listOf(fsUid),"placeholder",fsUid) }
-                        ?: throw Exception("User not found on Firestore")
+                Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid success")
+                val user = task.result?.let { userEntry -> documentToUserInfo(userEntry) }
                 onSuccess(user)
             } else {
                 task.exception?.let { e ->
@@ -219,7 +218,7 @@ class TravelRepositoryFirestore(
       val name = document.getString("name")
       val email = document.getString("email")
       val userTravelList = document.get("listoftravellinked") as? List<String>
-      UserInfo(fsUid, name ?: "", listOf(fsUid), email ?: "", phone ?: "", profilePic ?: "")
+      UserInfo(fsUid, name!!, userTravelList?: emptyList(), email!!)
     } catch (e: Exception) {
       Log.e("TravelRepositoryFirestore", "Error converting document to UserInfo", e)
       null
