@@ -83,7 +83,7 @@ fun EditTravelSettingsScreen(
       floatingActionButton = {
         Row(
             modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(150.dp)) {
+            horizontalArrangement = Arrangement.spacedBy(100.dp)) {
               FloatingActionButton(
                   onClick = {
                     Toast.makeText(context, "Add User clicked", Toast.LENGTH_SHORT).show()
@@ -93,10 +93,10 @@ fun EditTravelSettingsScreen(
                   }
               FloatingActionButton(
                   onClick = {
-                    Toast.makeText(context, "Import Email clicked", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Import Email clicked to clipboard", Toast.LENGTH_SHORT).show()
                   },
                   modifier = Modifier.testTag("importEmailFab")) {
-                    Text("Import Email")
+                    Text("Import Email to Clipboard")
                   }
             }
       },
