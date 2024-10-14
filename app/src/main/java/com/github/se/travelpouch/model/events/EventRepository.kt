@@ -49,15 +49,12 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    task.addOnCompleteListener { result ->
-      if (result.isSuccessful) {
-        onSuccess()
-      } else {
-        result.exception?.let { e ->
-          Log.e("TodosRepositoryFirestore", "Error performing Firestore operation", e)
-          onFailure(e)
+    task.addOnSuccessListener {
+            onSuccess()
+        }.addOnFailureListener { e ->
+            Log.e("EventRepositoryFirestore", "Error performing Firestore operation", e)
+            onFailure(e)
         }
-      }
     }
   }
 
