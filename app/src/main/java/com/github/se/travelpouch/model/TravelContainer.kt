@@ -2,9 +2,7 @@ package com.github.se.travelpouch.model
 
 import com.google.firebase.Timestamp
 
-
 typealias fsUid = String
-
 
 /**
  * Data class representing a travel container.
@@ -105,12 +103,10 @@ data class UserInfo(
   init {
     require(isValidUid(fsUid)) { "Invalid fsUid format for fsUid" }
   }
+
   fun toMap(): Map<String, Any> {
     return mapOf(
-        "fsUid" to fsUid,
-        "name" to name,
-        "userTravelList" to userTravelList,
-        "email" to email)
+        "fsUid" to fsUid, "name" to name, "userTravelList" to userTravelList, "email" to email)
   }
 }
 

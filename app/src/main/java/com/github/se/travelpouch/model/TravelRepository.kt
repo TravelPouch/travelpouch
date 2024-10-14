@@ -4,7 +4,11 @@ interface TravelRepository {
 
   fun getNewUid(): String
 
-  fun getParticipantFromfsUid(fsUid: fsUid, onSuccess: (UserInfo?) -> Unit, onFailure: (Exception) -> Unit)
+  fun getParticipantFromfsUid(
+      fsUid: fsUid,
+      onSuccess: (UserInfo?) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
 
   fun init(onSuccess: () -> Unit)
 
