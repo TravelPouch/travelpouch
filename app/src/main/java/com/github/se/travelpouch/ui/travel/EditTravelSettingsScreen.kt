@@ -101,39 +101,40 @@ fun EditTravelSettingsScreen(
             }
       },
       floatingActionButtonPosition = FabPosition.End,
-  ) {
-      padding ->
-      if (selectedTravel != null) {
-          val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-          val titleText = remember { mutableStateOf(selectedTravel!!.title) }
-          val descriptionText = remember { mutableStateOf(selectedTravel!!.description) }
-          val startTime = remember {
-              mutableStateOf(formatter.format(selectedTravel!!.startTime.toDate()))
-          }
-          val location: MutableState<Location> = remember { mutableStateOf(selectedTravel!!.location) }
-          val endTimeText = remember {
-              mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate()))
-          }
-          val participants = remember {
-              mutableStateOf(
-                  selectedTravel!!.allParticipants.mapKeys { it.key.fsUid }.keys.joinToString(", "))
-          }
+  ) { padding ->
+    if (selectedTravel != null) {
+      val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+      val titleText = remember { mutableStateOf(selectedTravel!!.title) }
+      val descriptionText = remember { mutableStateOf(selectedTravel!!.description) }
+      val startTime = remember {
+        mutableStateOf(formatter.format(selectedTravel!!.startTime.toDate()))
+      }
+      val location: MutableState<Location> = remember { mutableStateOf(selectedTravel!!.location) }
+      val endTimeText = remember {
+        mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate()))
+      }
+      val participants = remember {
+        mutableStateOf(
+            selectedTravel!!.allParticipants.mapKeys { it.key.fsUid }.keys.joinToString(", "))
+      }
 
-          Column(modifier = Modifier.padding(padding), Arrangement.Center, Alignment.CenterHorizontally) {
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.padding(bottom = 8.dp,end = 8.dp)) {
+      Column(
+          modifier = Modifier.padding(padding), Arrangement.Center, Alignment.CenterHorizontally) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp, end = 8.dp)) {
                   Icon(
                       imageVector = Icons.Default.Person,
                       contentDescription = "Participants",
                       modifier =
-                      Modifier.padding(end = 8.dp).clickable {
-                          navigationActions.navigateTo(PARTICIPANT_LIST)
-                          Toast.makeText(context, "Icon clicked", Toast.LENGTH_SHORT).show()
-                      })
+                          Modifier.padding(end = 8.dp).clickable {
+                            listTravelViewModel.fetchAllParticipantsInfo()
+                            navigationActions.navigateTo(PARTICIPANT_LIST)
+                            Toast.makeText(context, "Icon clicked", Toast.LENGTH_SHORT).show()
+                          })
                   TextField(
                       value =
-                      "${selectedTravel!!.allParticipants.size} participants: ${participants.value}",
+                          "${selectedTravel!!.allParticipants.size} participants: ${participants.value}",
                       onValueChange = {},
                       modifier = Modifier.weight(1f).testTag("inputParticipants"),
                       label = { Text("Participants") },
@@ -142,118 +143,120 @@ fun EditTravelSettingsScreen(
                       singleLine = true,
                       readOnly = true,
                       trailingIcon = {
-                          if (participants.value.length > 20) {
-                              Text("...")
-                          }
+                        if (participants.value.length > 20) {
+                          Text("...")
+                        }
                       })
-              }
+                }
 
-              OutlinedTextField(
-                  value = titleText.value,
-                  onValueChange = { keystroke -> titleText.value = keystroke },
-                  modifier = Modifier.testTag("inputTodoTitle"),
-                  label = { Text("Title") },
-                  placeholder = { Text("Name the Travel") })
-              OutlinedTextField(
-                  value = descriptionText.value,
-                  onValueChange = { keystroke -> descriptionText.value = keystroke },
-                  modifier = Modifier.testTag("inputTodoDescription"),
-                  label = { Text("Description") },
-                  placeholder = { Text("Describe the Travel") })
-              OutlinedTextField(
-                  value =
-                  "${location.value.name}: N${location.value.latitude}, E${location.value.longitude}",
-                  onValueChange = {},
-                  modifier = Modifier.testTag("inputTodoLocation"),
-                  label = { Text("Location") },
-                  placeholder = { Text("Enter a location") })
-              OutlinedTextField(
-                  value = startTime.value,
-                  onValueChange = { keystroke -> startTime.value = keystroke },
-                  modifier = Modifier.testTag("inputTodoAssignee"),
-                  label = { Text("StartTime") },
-                  placeholder = { Text("StartTime") })
-              OutlinedTextField(
-                  value = endTimeText.value,
-                  onValueChange = { keystroke -> endTimeText.value = keystroke },
-                  modifier = Modifier.testTag("inputTodoDate"),
-                  label = { Text("EndTime") },
-                  placeholder = { Text("--/--/--") })
+            OutlinedTextField(
+                value = titleText.value,
+                onValueChange = { keystroke -> titleText.value = keystroke },
+                modifier = Modifier.testTag("inputTodoTitle"),
+                label = { Text("Title") },
+                placeholder = { Text("Name the Travel") })
+            OutlinedTextField(
+                value = descriptionText.value,
+                onValueChange = { keystroke -> descriptionText.value = keystroke },
+                modifier = Modifier.testTag("inputTodoDescription"),
+                label = { Text("Description") },
+                placeholder = { Text("Describe the Travel") })
+            OutlinedTextField(
+                value =
+                    "${location.value.name}: N${location.value.latitude}, E${location.value.longitude}",
+                onValueChange = {},
+                modifier = Modifier.testTag("inputTodoLocation"),
+                label = { Text("Location") },
+                placeholder = { Text("Enter a location") })
+            OutlinedTextField(
+                value = startTime.value,
+                onValueChange = { keystroke -> startTime.value = keystroke },
+                modifier = Modifier.testTag("inputTodoAssignee"),
+                label = { Text("StartTime") },
+                placeholder = { Text("StartTime") })
+            OutlinedTextField(
+                value = endTimeText.value,
+                onValueChange = { keystroke -> endTimeText.value = keystroke },
+                modifier = Modifier.testTag("inputTodoDate"),
+                label = { Text("EndTime") },
+                placeholder = { Text("--/--/--") })
 
-              Button(
-                  onClick = {
-                      try {
-                          val fsUid = selectedTravel!!.fsUid
-                          val dateFormat =
-                              SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-                                  isLenient = false // strict date format
-                              }
-                          val date = dateFormat.parse(endTimeText.value)
-                          val calendar =
-                              GregorianCalendar().apply {
-                                  time = date!!
-                                  set(Calendar.HOUR_OF_DAY, 0)
-                                  set(Calendar.MINUTE, 0)
-                                  set(Calendar.SECOND, 0)
-                              }
-                          val timestamp = Timestamp(calendar.time)
-                          // val location =
-                          //    Location(name = "Placeholder", latitude = 69.0, longitude = 42.0)
-                          val newTodo =
-                              TravelContainer(
-                                  fsUid = fsUid,
-                                  title = titleText.value,
-                                  description = descriptionText.value,
-                                  startTime = selectedTravel!!.startTime,
-                                  endTime = Timestamp.now(),
-                                  location = selectedTravel!!.location,
-                                  allAttachments = selectedTravel!!.allAttachments,
-                                  allParticipants = selectedTravel!!.allParticipants,
-                              )
-                          listTravelViewModel.updateTravel(newTodo)
-                          //                            onSuccess = {
-                          //                                navigationActions.goBack()
-                          //                                Toast.makeText(
-                          //                                    context, "Saved todo successfully to
-                          // firebase", Toast.LENGTH_SHORT)
-                          //                                    .show()
-                          //                            },
-                          //                            onFailure = {
-                          //                                Toast.makeText(context, "Error: ${it.message}",
-                          // Toast.LENGTH_SHORT).show()
-                          //                            }
-                          Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
-                      } catch (e: ParseException) {
-                          Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
-                      } catch (e: Exception) {
-                          Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                      }
-                  },
-                  modifier = Modifier.testTag("travelSave")) {
+            Button(
+                onClick = {
+                  try {
+                    val fsUid = selectedTravel!!.fsUid
+                    val dateFormat =
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+                          isLenient = false // strict date format
+                        }
+                    val date = dateFormat.parse(endTimeText.value)
+                    val calendar =
+                        GregorianCalendar().apply {
+                          time = date!!
+                          set(Calendar.HOUR_OF_DAY, 0)
+                          set(Calendar.MINUTE, 0)
+                          set(Calendar.SECOND, 0)
+                        }
+                    val timestamp = Timestamp(calendar.time)
+                    // val location =
+                    //    Location(name = "Placeholder", latitude = 69.0, longitude = 42.0)
+                    val newTodo =
+                        TravelContainer(
+                            fsUid = fsUid,
+                            title = titleText.value,
+                            description = descriptionText.value,
+                            startTime = selectedTravel!!.startTime,
+                            endTime = Timestamp.now(),
+                            location = selectedTravel!!.location,
+                            allAttachments = selectedTravel!!.allAttachments,
+                            allParticipants = selectedTravel!!.allParticipants,
+                        )
+                    listTravelViewModel.updateTravel(newTodo)
+                    //                            onSuccess = {
+                    //                                navigationActions.goBack()
+                    //                                Toast.makeText(
+                    //                                    context, "Saved todo successfully to
+                    // firebase", Toast.LENGTH_SHORT)
+                    //                                    .show()
+                    //                            },
+                    //                            onFailure = {
+                    //                                Toast.makeText(context, "Error:
+                    // ${it.message}",
+                    // Toast.LENGTH_SHORT).show()
+                    //                            }
+                    Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
+                  } catch (e: ParseException) {
+                    Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
+                  } catch (e: Exception) {
+                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                  }
+                },
+                modifier = Modifier.testTag("travelSave")) {
                   Text("Save")
-              }
+                }
 
-              Button(
-                  onClick = {
-                      navigationActions.goBack()
-                      listTravelViewModel.deleteTravelById(selectedTravel!!.fsUid)
-                      Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
-                  },
-                  colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = Color.Transparent, contentColor = Color.Red),
-                  shape = RoundedCornerShape(8.dp),
-                  modifier = Modifier.testTag("travelDelete").fillMaxWidth().padding(vertical = 8.dp)) {
+            Button(
+                onClick = {
+                  navigationActions.goBack()
+                  listTravelViewModel.deleteTravelById(selectedTravel!!.fsUid)
+                  Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
+                },
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent, contentColor = Color.Red),
+                shape = RoundedCornerShape(8.dp),
+                modifier =
+                    Modifier.testTag("travelDelete").fillMaxWidth().padding(vertical = 8.dp)) {
                   Text(
                       // text = "🗑  Delete",
                       text = "Delete",
                       fontWeight = FontWeight.Bold)
-              }
+                }
           }
-      } else {
-          Text(
-              "No ToDo to be edited was selected. If you read this message an error has occurred.",
-              modifier = Modifier.padding(15.dp).testTag("noTravelSelected"))
-      }
+    } else {
+      Text(
+          "No ToDo to be edited was selected. If you read this message an error has occurred.",
+          modifier = Modifier.padding(15.dp).testTag("noTravelSelected"))
+    }
   }
 }

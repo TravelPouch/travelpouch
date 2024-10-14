@@ -58,7 +58,7 @@ fun TravelPouchApp() {
   val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
   val attachments: MutableMap<String, String> = HashMap()
   attachments["Attachment1"] = "UID1"
-  val user1ID = "IN1fAs7cN4v8h1igUrSb"
+  val user1ID = "rythwEmprFhOOgsANXnv"
   val user2ID = listTravelViewModel.getNewUid()
   val participants: MutableMap<Participant, Role> = HashMap()
   participants[Participant(user1ID)] = Role.OWNER
@@ -75,7 +75,7 @@ fun TravelPouchApp() {
           participants)
   val sigma by listTravelViewModel.travels.collectAsState()
   println("${sigma.size}")
-  //listTravelViewModel.addTravel(travelContainer)
+  // listTravelViewModel.addTravel(travelContainer)
   listTravelViewModel.selectTravel(travelContainer)
   NavHost(navController = navController, startDestination = Route.TRAVEL) {
     navigation(
@@ -83,7 +83,9 @@ fun TravelPouchApp() {
         route = Route.TRAVEL,
     ) {
       composable(Screen.EDIT) { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
-      composable(Screen.PARTICIPANT_LIST) { ParticipantListScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.PARTICIPANT_LIST) {
+        ParticipantListScreen(listTravelViewModel, navigationActions)
+      }
     }
   }
 }
