@@ -25,6 +25,10 @@ class TimelineTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
+    /**
+     * events_test is a mocking of the list of event that is normally returned by firebase. Thus,
+     * when calling getEvents, it is this list that is being returned.
+     */
   val events_test =
       listOf(
           Event(

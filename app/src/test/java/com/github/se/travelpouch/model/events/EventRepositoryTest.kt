@@ -1,10 +1,16 @@
 package com.github.se.travelpouch.model.events
 
+import android.annotation.SuppressLint
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -16,8 +22,11 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -56,7 +65,6 @@ class EventRepositoryTest {
     }
 
     eventRepositoryFirestore = EventRepositoryFirebase(mockFirestore)
-
     mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
 
     `when`(mockDocumentSnapshot.id).thenReturn("1")
@@ -103,13 +111,13 @@ class EventRepositoryTest {
   fun addEvent_shouldCallFirestoreCollection() {
     `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
 
-    // This test verifies that when we add a new ToDo, the Firestore `collection()` method is
+    // This test verifies that when we add a new event, the Firestore `collection()` method is
     // called.
     eventRepositoryFirestore.addEvent(event, onSuccess = {}, onFailure = {})
 
     shadowOf(Looper.getMainLooper()).idle()
 
-    // Ensure Firestore collection method was called to reference the "ToDos" collection
+    // Ensure Firestore collection method was called to reference the "events" collection
     verify(mockDocumentReference).set(any())
   }
 
@@ -124,4 +132,5 @@ class EventRepositoryTest {
     val result = privateFunc.invoke(eventRepositoryFirestore, *parameters)
     assertThat(result, `is`(event))
   }
+
 }
