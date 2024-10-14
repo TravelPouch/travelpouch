@@ -13,16 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
  * repository.
  *
  * @param repository (EventRepository) : the repository that is used as a logic between Firebase and
- * events
+ *   events
  */
 class EventViewModel(private val repository: EventRepository) : ViewModel() {
 
   private val events_ = MutableStateFlow<List<Event>>(emptyList())
   val events: StateFlow<List<Event>> = events_.asStateFlow()
 
-  /**
-   * The initialisation function of the class
-   */
+  /** The initialisation function of the class */
   init {
     repository.init { getEvents() }
   }
@@ -36,9 +34,7 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
     return repository.getNewUid()
   }
 
-  /**
-   * This function updates the list of events stored on firebase.
-   */
+  /** This function updates the list of events stored on firebase. */
   fun getEvents() {
     repository.getEvents(onSuccess = { events_.value = it }, onFailure = {})
   }

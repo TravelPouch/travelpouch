@@ -2,7 +2,6 @@ package com.github.se.travelpouch.model.events
 
 import com.google.firebase.Timestamp
 
-
 /**
  * A class representing the events of a travel, like the uploading of new documents, joining of new
  * participants and creation of a travel.
@@ -14,7 +13,7 @@ import com.google.firebase.Timestamp
  * @param description (String) : the description of the event
  * @param uidParticipant (String?) : the uid of the participant that triggered the event
  * @param listUploadedDocuments (Map<String, Int>) : the list of all the documents uploaded during
- * this event. We use a map because it is safer to store on firebase than an array.
+ *   this event. We use a map because it is safer to store on firebase than an array.
  */
 data class Event(
     val uid: String,
@@ -26,9 +25,7 @@ data class Event(
     val listUploadedDocuments: Map<String, Int>?
 )
 
-/**
- * The enum class representing the type of event that can occur.
- */
+/** The enum class representing the type of event that can occur. */
 enum class EventType {
   START_OF_JOURNEY,
   NEW_PARTICIPANT,

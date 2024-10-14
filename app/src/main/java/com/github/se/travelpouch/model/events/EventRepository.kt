@@ -15,13 +15,12 @@ import com.google.firebase.firestore.FirebaseFirestore
  */
 class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventRepository {
 
-  /**
-   * The path to the collection of events of the travel
-   */
+  /** The path to the collection of events of the travel */
   private val collectionPath = "events"
 
   /**
    * This function returns an unused unique identifier for a new event.
+   *
    * @return (String) : an unused unique identifier
    */
   override fun getNewUid(): String {
@@ -46,22 +45,22 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    * a function is applied on the list of events retrieved, otherwise a failure function is called.
    *
    * @param onSuccess (List<Event>) -> Unit): The function called when the retrieving of the events
-   * went successfully.
+   *   went successfully.
    * @param onFailure ((Exception) -> Unit): The function called when the retrieving of the events
-   * fails.
+   *   fails.
    */
   override fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
     Log.d("EventRepository", "getEvents")
     db.collection(collectionPath)
-      .get()
-      .addOnSuccessListener { result ->
-        val events = result?.mapNotNull { documentToEvent(it) } ?: emptyList()
-        onSuccess(events)
-      }
-      .addOnFailureListener { e ->
-        Log.e("EventRepository", "Error getting documents", e)
-        onFailure(e)
-      }
+        .get()
+        .addOnSuccessListener { result ->
+          val events = result?.mapNotNull { documentToEvent(it) } ?: emptyList()
+          onSuccess(events)
+        }
+        .addOnFailureListener { e ->
+          Log.e("EventRepository", "Error getting documents", e)
+          onFailure(e)
+        }
   }
 
   /**
@@ -69,9 +68,9 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    *
    * @param event (Event) : the event we want to add on Firebase
    * @param onSuccess (() -> Unit) : the function called when the event is correctly added to the
-   * database
+   *   database
    * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during the
-   * adding an event to the database
+   *   adding an event to the database
    */
   override fun addEvent(event: Event, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     performFirestoreOperation(
@@ -85,21 +84,21 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    *
    * @param task (Task<Void>) : a task to perform
    * @param onSuccess (() -> Unit) : the function called when the event is correctly added to the
-   * database
+   *   database
    * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during the
-   * adding an event to the database
+   *   adding an event to the database
    */
   private fun performFirestoreOperation(
       task: Task<Void>,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    task.addOnSuccessListener {
-      onSuccess()
-    }.addOnFailureListener { e ->
-      Log.e("EventRepositoryFirestore", "Error performing Firestore operation", e)
-      onFailure(e)
-    }
+    task
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { e ->
+          Log.e("EventRepositoryFirestore", "Error performing Firestore operation", e)
+          onFailure(e)
+        }
   }
 
   /**
@@ -107,9 +106,8 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    * occurs.
    *
    * @param document (DocumentSnapshot) : The document from Firebase
-   *
    * @return (Event?) : If the conversion goes without a problem an event is return. Otherwise, null
-   * is returned.
+   *   is returned.
    */
   private fun documentToEvent(document: DocumentSnapshot): Event? {
     return try {

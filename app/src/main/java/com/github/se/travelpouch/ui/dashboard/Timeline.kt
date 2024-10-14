@@ -33,7 +33,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.events.Event
 import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.events.EventViewModel
-import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -61,7 +60,6 @@ data class CircleParameters(val radius: Dp, val backgroundColor: Color)
  * @param brush (Brush) : the way the line is drawn
  */
 data class LineParameters(val strokeWidth: Dp, val brush: Brush)
-
 
 /**
  * The Timeline screen, representing the all the events that occurred during a travel, like the
@@ -164,7 +162,6 @@ fun TimelineItem(event: Event, modifier: Modifier) {
  * This function maps the type of the event to a color.
  *
  * @param type (EventType) : the type of the event
- *
  * @return (Color) : The colour of the event type
  */
 fun mapEventTypeToColor(type: EventType): Color {
@@ -178,18 +175,18 @@ fun mapEventTypeToColor(type: EventType): Color {
 
 /**
  * This is a wrapper function that displays simultaneously the card of the event, with a circle of
- * the same colour next to it. Moreover, this function prepares the drawing of a gradient line between
- * two events, if the event we are currently drawing is not the last one on the list.
+ * the same colour next to it. Moreover, this function prepares the drawing of a gradient line
+ * between two events, if the event we are currently drawing is not the last one on the list.
  *
  * @param contentStartOffset (Dp) : The padding from the left of the screen
  * @param spacerBetweenNodes (Dp) : the spacing to apply between nodes
- * @param circleParameters (CircleParameters) : The parameters to apply when drawing a circle
- * for this wrapper
+ * @param circleParameters (CircleParameters) : The parameters to apply when drawing a circle for
+ *   this wrapper
  * @param lineParameters (LineParameters?) : the parameters to apply when drawing the line between
- * two nodes. If the node we are considering is the last of a list, this parameter should be set to
- * null
+ *   two nodes. If the node we are considering is the last of a list, this parameter should be set
+ *   to null
  * @param content (@Composable BoxScope.(modifier: Modifier) -> Unit) : a composable function
- * representing what this wrapper should draw in addition tp the circle and the line
+ *   representing what this wrapper should draw in addition tp the circle and the line
  */
 @Composable
 fun TimelineNode(
@@ -222,26 +219,23 @@ fun TimelineNode(
       }
 }
 
-/**
- * The parameters of the line between two nodes. The colour of the line evolves as a gradient.
- */
+/** The parameters of the line between two nodes. The colour of the line evolves as a gradient. */
 object LineParametersDefaults {
 
   private val defaultStrokeWidth = 3.dp
 
-    /**
-     * This function is a sort of constructor to set the default parameters of the line to be
-     * drawn between two nodes
-     *
-     * @param strokeWidth (Dp) : the width of the line
-     * @param startColor (Color) : the starting colour of the line
-     * @param endColor (Color) : the ending color of the line
-     * @param startY (Float) : the starting y-coordinate when drawing the line
-     * @param endY (Float) : the y-coordinate at which the line is ended
-     *
-     * @return (LineParameters) : the parameters of the lines to be drawn
-     */
-    fun linearGradient(
+  /**
+   * This function is a sort of constructor to set the default parameters of the line to be drawn
+   * between two nodes
+   *
+   * @param strokeWidth (Dp) : the width of the line
+   * @param startColor (Color) : the starting colour of the line
+   * @param endColor (Color) : the ending color of the line
+   * @param startY (Float) : the starting y-coordinate when drawing the line
+   * @param endY (Float) : the y-coordinate at which the line is ended
+   * @return (LineParameters) : the parameters of the lines to be drawn
+   */
+  fun linearGradient(
       strokeWidth: Dp = defaultStrokeWidth,
       startColor: Color,
       endColor: Color,
@@ -254,22 +248,19 @@ object LineParametersDefaults {
   }
 }
 
-/**
- * The parameters of the circle
- */
+/** The parameters of the circle */
 object CircleParametersDefaults {
 
   private val defaultCircleRadius = 12.dp
 
-    /**
-     * This function is a sort of constructor that returns the default parameters of the
-     * drawing of the circle.
-     *
-     * @param radius (Dp) : the default radius of the circle to be drawn
-     * @param backgroundColor (Color) : the colour of the circle to be drawn
-     *
-     * @return (CircleParameters) : the parameters of the circle to be drawn
-     */
+  /**
+   * This function is a sort of constructor that returns the default parameters of the drawing of
+   * the circle.
+   *
+   * @param radius (Dp) : the default radius of the circle to be drawn
+   * @param backgroundColor (Color) : the colour of the circle to be drawn
+   * @return (CircleParameters) : the parameters of the circle to be drawn
+   */
   fun circleParameters(radius: Dp = defaultCircleRadius, backgroundColor: Color = Cyan) =
       CircleParameters(radius, backgroundColor)
 }

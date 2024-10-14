@@ -11,14 +11,15 @@ interface EventRepository {
    * a function is applied on the list of events retrieved, otherwise a failure function is called.
    *
    * @param onSuccess (List<Event>) -> Unit): The function called when the retrieving of the events
-   * went successfully.
+   *   went successfully.
    * @param onFailure ((Exception) -> Unit): The function called when the retrieving of the events
-   * fails.
+   *   fails.
    */
   fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit)
 
   /**
    * This function returns an unused unique identifier for a new event.
+   *
    * @return (String) : an unused unique identifier
    */
   fun getNewUid(): String
@@ -28,9 +29,9 @@ interface EventRepository {
    *
    * @param event (Event) : the event we want to add on Firebase
    * @param onSuccess (() -> Unit) : the function called when the event is correctly added to the
-   * database
+   *   database
    * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during the
-   * adding an event to the database
+   *   adding an event to the database
    */
   fun addEvent(event: Event, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 

@@ -1,16 +1,10 @@
 package com.github.se.travelpouch.model.events
 
-import android.annotation.SuppressLint
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -22,11 +16,8 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -132,5 +123,4 @@ class EventRepositoryTest {
     val result = privateFunc.invoke(eventRepositoryFirestore, *parameters)
     assertThat(result, `is`(event))
   }
-
 }
