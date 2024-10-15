@@ -93,7 +93,8 @@ fun EditTravelSettingsScreen(
                   }
               FloatingActionButton(
                   onClick = {
-                    Toast.makeText(context, "Import Email clicked to clipboard", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Import Email clicked to clipboard", Toast.LENGTH_SHORT)
+                        .show()
                   },
                   modifier = Modifier.testTag("importEmailFab")) {
                     Text("Import Email to Clipboard")
