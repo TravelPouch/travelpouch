@@ -56,13 +56,14 @@ fun ChangeRoleDialog(
 }
 
 /**
- * A composable function that displays a dialog with options to change the role of a participant
- * or remove the participant from the travel.
+ * A composable function that displays a dialog with options to change the role of a participant or
+ * remove the participant from the travel.
  *
  * @param selectedTravel The currently selected travel container.
  * @param participant The participant whose role is to be changed or who is to be removed.
  * @param changeRoleAction A callback function to handle the action of changing the role.
- * @param removeParticipantAction A callback function to handle the action of removing the participant.
+ * @param removeParticipantAction A callback function to handle the action of removing the
+ *   participant.
  */
 @Composable
 fun RoleEntryDialog(
@@ -75,7 +76,7 @@ fun RoleEntryDialog(
       text = "Role : ${selectedTravel!!.allParticipants[Participant(participant.key)]!!.name}",
       fontWeight = FontWeight.Bold,
       modifier = Modifier.padding(8.dp))
-    // we just expand the other dialog
+  // we just expand the other dialog
   Button(onClick = { changeRoleAction(true) }) { Text("Change Role") }
 
   Button(

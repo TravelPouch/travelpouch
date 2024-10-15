@@ -27,7 +27,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   val participants: StateFlow<Map<fsUid, UserInfo>> = participants_.asStateFlow()
 
   private var lastFetchedTravel: TravelContainer? = null
-  private var lastFetchedParticipants: Set<fsUid> = emptySet()
+  private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
 
   init {
     repository.init { getTravels() }
@@ -119,11 +119,16 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
     selectedTravel_.value = travel
     participants_.value = emptyMap()
   }
-
+  /**
+   * Fetches information for all participants of the selected travel.
+   *
+   * This function checks if the participants' information for the currently selected travel has
+   * already been fetched. If not, it clears the previous participants' data and fetches the
+   * information for each participant in the selected travel.
+   */
   fun fetchAllParticipantsInfo() {
     val tempTravel = selectedTravel_.value
-    val currentParticipants =
-        tempTravel?.allParticipants?.keys?.map { it.fsUid }?.toSet() ?: emptySet()
+    val currentParticipants = tempTravel?.allParticipants?.mapKeys { it.key.fsUid } ?: emptyMap()
 
     if (tempTravel != lastFetchedTravel || currentParticipants != lastFetchedParticipants) {
       lastFetchedTravel = tempTravel

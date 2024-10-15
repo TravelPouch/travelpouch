@@ -5,7 +5,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 
 /**
- * A composable function that displays a text string, truncating it if it exceeds a specified length.
+ * A composable function that displays a text string, truncating it if it exceeds a specified
+ * length.
  *
  * @param text The text to display.
  * @param maxLength The maximum length of the text before truncation.
