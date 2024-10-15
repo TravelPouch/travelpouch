@@ -53,7 +53,9 @@ class TravelRepositoryFirestore(
   ) {
     Log.d("TravelRepositoryFirestore", "addTravel")
     performFirestoreOperation(
-        db.collection(collectionPath).document(travel.fsUid).set(travel), onSuccess, onFailure)
+        db.collection(collectionPath).document(travel.fsUid).set(travel.toMap()),
+        onSuccess,
+        onFailure)
   }
 
   /**
@@ -70,7 +72,9 @@ class TravelRepositoryFirestore(
   ) {
     Log.d("TravelRepositoryFirestore", "updateTravel")
     performFirestoreOperation(
-        db.collection(collectionPath).document(travel.fsUid).set(travel), onSuccess, onFailure)
+        db.collection(collectionPath).document(travel.fsUid).set(travel.toMap()),
+        onSuccess,
+        onFailure)
   }
 
   /**
@@ -149,8 +153,8 @@ class TravelRepositoryFirestore(
       val fsUid = document.id
       val title = document.getString("title")
       val description = document.getString("description")
-      val startTime = document.getTimestamp("startDate")
-      val endTime = document.getTimestamp("endDate")
+      val startTime = document.getTimestamp("startTime")
+      val endTime = document.getTimestamp("endTime")
       val locationData = document["location"] as? Map<*, *>
       val location =
           Location(

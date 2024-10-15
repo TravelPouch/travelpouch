@@ -2,6 +2,9 @@ package com.github.se.travelpouch.model
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +23,17 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
 
   init {
     repository.init { getTravels() }
+  }
+
+  // create factory
+  companion object {
+    val Factory: ViewModelProvider.Factory =
+        object : ViewModelProvider.Factory {
+          @Suppress("UNCHECKED_CAST")
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ListTravelViewModel(TravelRepositoryFirestore(Firebase.firestore)) as T
+          }
+        }
   }
 
   /**

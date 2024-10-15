@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
-    id("jacoco")
+    jacoco
     alias(libs.plugins.gms)
 }
 

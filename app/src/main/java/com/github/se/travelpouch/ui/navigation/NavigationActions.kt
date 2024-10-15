@@ -4,10 +4,12 @@ import androidx.navigation.NavHostController
 
 object Route {
   const val AUTH = "Auth"
+  const val OVERVIEW = "Overview"
 }
 
 object Screen {
   const val AUTH = "Auth Screen"
+  const val ADD_TRAVEL = "AddTravel Screen"
 }
 
 open class NavigationActions(
