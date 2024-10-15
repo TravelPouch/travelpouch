@@ -3,15 +3,10 @@ package com.github.se.travelpouch.screen
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.TravelContainerMock
 import com.github.se.travelpouch.ui.overview.MapContent
 import com.github.se.travelpouch.ui.overview.MapScreen
-import com.google.firebase.Timestamp
-import java.util.Date
 import org.junit.Rule
 import org.junit.Test
 
@@ -44,37 +39,6 @@ class MapContentTest {
     // Assert
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     // Cannot directly assert on markers, but the code paths for adding markers should be executed.
-  }
-
-  @Test
-  fun testMapContent_WithNullLocations() {
-    // Arrange
-    val startTime = Timestamp(Date())
-    val endTime = Timestamp(Date(startTime.toDate().time + 86400000))
-    val participant = Participant(fsUid = TravelContainerMock.generateAutoId())
-    val participants = mapOf(participant to Role.OWNER)
-    val attachments = mapOf<String, String>()
-
-    val travelContainerWithNullLocation =
-        TravelContainer(
-            fsUid = TravelContainerMock.generateAutoId(),
-            title = "Travel without location",
-            description = "This travel has no location",
-            startTime = startTime,
-            endTime = endTime,
-            location = // TODO
-            Location(12.34, 56.78, Timestamp(1234567890L, 0), "EPFL"),
-            allAttachments = attachments,
-            allParticipants = participants)
-
-    val travelContainers = listOf(travelContainerWithNullLocation)
-
-    // Act
-    composeTestRule.setContent { MapContent(travelContainers = travelContainers) }
-
-    // Assert
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    // This test ensures that the code handles null locations gracefully.
   }
 
   @Test
