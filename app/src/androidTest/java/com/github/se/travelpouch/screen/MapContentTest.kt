@@ -47,9 +47,7 @@ class MapContentTest {
     val travelContainers = TravelContainerMock.createMockTravelContainersList(size = 1)
 
     // Act
-    composeTestRule.setContent {
-      MapScreen(navigationActions = null, travelContainers = travelContainers)
-    }
+    composeTestRule.setContent { MapScreen(travelContainers = travelContainers) }
 
     // Assert
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()

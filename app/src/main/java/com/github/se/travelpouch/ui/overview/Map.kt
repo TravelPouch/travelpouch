@@ -1,42 +1,40 @@
 package com.github.se.travelpouch.ui.overview
 
-// import com.github.se.bootcamp.model.todo.ListToDosViewModel
-// import com.github.se.bootcamp.ui.navigation.BottomNavigationMenu
-// import com.github.se.bootcamp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
-// import com.github.se.bootcamp.ui.navigation.NavigationActions
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 
+/**
+ * Composable function that displays the map screen with a list of travel containers.
+ *
+ * @param travelContainers List of travel containers to be displayed on the map.
+ */
 @Composable
-fun MapScreen(
-    navigationActions: NavigationActions? = null,
-    travelContainers: List<TravelContainer>
-) {
+fun MapScreen(travelContainers: List<TravelContainer>) {
   Scaffold(
       modifier = Modifier.testTag("overviewScreen"),
-      //        bottomBar = {
-      //            BottomNavigationMenu(
-      //                onTabSelect = { route -> navigationActions.navigateTo(route) },
-      //                tabList = LIST_TOP_LEVEL_DESTINATION,
-      //                selectedItem = navigationActions.currentRoute())
-      //        },
       content = { paddingValues ->
         MapContent(modifier = Modifier.padding(paddingValues), travelContainers = travelContainers)
       })
 }
 
+/**
+ * Composable function that displays the map content with markers for each travel container.
+ *
+ * @param modifier Modifier for customizing the layout.
+ * @param travelContainers List of travel containers to be displayed as markers on the map.
+ */
 @Composable
 fun MapContent(modifier: Modifier = Modifier, travelContainers: List<TravelContainer>) {
   val markers = travelContainers.filter { true }
@@ -59,11 +57,34 @@ fun MapContent(modifier: Modifier = Modifier, travelContainers: List<TravelConta
         markers.forEach { travelContainer ->
           val location = travelContainer.location
           val position = LatLng(location.latitude, location.longitude)
-          val markerState = rememberMarkerState(position = position)
-          Marker(
-              state = markerState,
+          SimpleMarker(
+              position = position,
               title = travelContainer.title,
               snippet = travelContainer.description)
         }
       }
 }
+
+// credit to https://dev.to/bubenheimer/effective-map-composables-non-draggable-markers-2b2
+/**
+ * Composable function that displays a simple marker on the map.
+ *
+ * @param position The position of the marker.
+ * @param title Optional title for the marker.
+ * @param snippet Optional snippet for the marker.
+ */
+@Composable
+fun SimpleMarker(position: LatLng, title: String? = null, snippet: String? = null) {
+  val state = rememberUpdatedMarkerState(position)
+  Marker(state = state, title = title, snippet = snippet)
+}
+
+/**
+ * Composable function that remembers and updates the marker state.
+ *
+ * @param newPosition The new position of the marker.
+ * @return The updated marker state.
+ */
+@Composable
+fun rememberUpdatedMarkerState(newPosition: LatLng) =
+    remember { MarkerState(position = newPosition) }.apply { position = newPosition }
