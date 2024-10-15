@@ -59,6 +59,7 @@ import kotlinx.coroutines.tasks.await
 fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
 
+  // launcher for Firebase authentication
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
