@@ -213,6 +213,13 @@ class TravelRepositoryFirestore(
     }
   }
 
+  /**
+   * Converts a Firestore document to a UserInfo object.
+   *
+   * @param document The Firestore document to convert.
+   * @return A UserInfo object if the conversion is successful, or null if any required field is
+   *   missing or an error occurs.
+   */
   private fun documentToUserInfo(document: DocumentSnapshot): UserInfo? {
     return try {
       val fsUid = document.id
