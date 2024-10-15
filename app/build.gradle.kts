@@ -41,7 +41,7 @@ android {
     }
 
     testCoverage {
-        jacocoVersion = "0.8.8"
+        jacocoVersion = "0.8.3"
     }
 
     buildFeatures {
@@ -202,7 +202,6 @@ tasks.withType<Test> {
     configure<JacocoTaskExtension> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
-        version = "0.8.3"
     }
 }
 
