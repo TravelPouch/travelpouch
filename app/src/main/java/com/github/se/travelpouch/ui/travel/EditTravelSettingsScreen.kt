@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.ui.travel
 
 import android.annotation.SuppressLint
+import android.icu.util.GregorianCalendar
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,11 +27,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,9 +47,17 @@ import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.google.firebase.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 // parts of this file was generated using Github Copilot
+
+/**
+ * A composable function that displays the Edit Travel Settings screen.
+ *
+ * @param listTravelViewModel The ViewModel that holds the state and logic for the travel list.
+ * @param navigationActions The navigation actions to handle navigation events.
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +90,7 @@ fun EditTravelSettingsScreen(
       floatingActionButton = {
         Row(
             modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(100.dp)) {
+            horizontalArrangement = Arrangement.spacedBy(150.dp)) {
               FloatingActionButton(
                   onClick = {
                     Toast.makeText(context, "Add User clicked", Toast.LENGTH_SHORT).show()
@@ -108,112 +117,171 @@ fun EditTravelSettingsScreen(
       val startTime = remember {
         mutableStateOf(formatter.format(selectedTravel!!.startTime.toDate()))
       }
-      val location: MutableState<Location> = remember { mutableStateOf(selectedTravel!!.location) }
+      val locationName = remember { mutableStateOf(selectedTravel!!.location.name) }
+      val latitude = remember { mutableStateOf(selectedTravel!!.location.latitude.toString()) }
+      val longitude = remember { mutableStateOf(selectedTravel!!.location.longitude.toString()) }
       val endTimeText = remember {
         mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate()))
       }
 
-      Column(
-          modifier = Modifier.padding(padding), Arrangement.Top, Alignment.CenterHorizontally) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(padding)) {
-                  Icon(
-                      imageVector = Icons.Default.Person,
-                      contentDescription = "Participants",
-                      modifier =
-                          Modifier.padding(start=50.dp,end = 8.dp).size(50.dp).clickable {
-                            listTravelViewModel.fetchAllParticipantsInfo()
-                            navigationActions.navigateTo(PARTICIPANT_LIST)
-                            Toast.makeText(context, "Icon clicked", Toast.LENGTH_SHORT).show()
-                          })
-                  Text(
-                      "${selectedTravel!!.allParticipants.size} participants",
-                      modifier = Modifier.weight(1f).testTag("inputParticipants"))
+      Column(modifier = Modifier.padding(padding), Arrangement.Top, Alignment.CenterHorizontally) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(8.dp)) {
+              Icon(
+                  imageVector = Icons.Default.Person,
+                  contentDescription = "Participants",
+                  modifier =
+                      Modifier.padding(start = 50.dp, end = 8.dp).size(50.dp).clickable {
+                        listTravelViewModel.fetchAllParticipantsInfo()
+                        navigationActions.navigateTo(PARTICIPANT_LIST)
+                        Toast.makeText(context, "Icon clicked", Toast.LENGTH_SHORT).show()
+                      })
+              Text(
+                  "${selectedTravel!!.allParticipants.size} participants",
+                  modifier = Modifier.weight(1f).testTag("inputParticipants"))
+            }
+
+        OutlinedTextField(
+            value = titleText.value,
+            onValueChange = { keystroke -> titleText.value = keystroke },
+            modifier = Modifier.testTag("inputTodoTitle"),
+            label = { Text("Title") },
+            placeholder = { Text("Name the Travel") })
+        OutlinedTextField(
+            value = descriptionText.value,
+            onValueChange = { keystroke -> descriptionText.value = keystroke },
+            modifier = Modifier.testTag("inputTodoDescription"),
+            label = { Text("Description") },
+            placeholder = { Text("Describe the Travel") })
+
+        OutlinedTextField(
+            value = locationName.value,
+            onValueChange = { locationName.value = it },
+            label = { Text("Location Name") },
+            placeholder = { Text("Enter location name") },
+            modifier = Modifier.testTag("inputTravelLocationName"))
+
+        // Latitude Input
+        OutlinedTextField(
+            value = latitude.value,
+            onValueChange = { latitude.value = it },
+            label = { Text("Latitude") },
+            placeholder = { Text("Enter latitude (e.g. 48.8566)") },
+            modifier = Modifier.testTag("inputTravelLatitude"))
+
+        // Longitude Input
+        OutlinedTextField(
+            value = longitude.value,
+            onValueChange = { longitude.value = it },
+            label = { Text("Longitude") },
+            placeholder = { Text("Enter longitude (e.g. 2.3522)") },
+            modifier = Modifier.testTag("inputTravelLongitude"))
+        OutlinedTextField(
+            value = startTime.value,
+            onValueChange = { keystroke -> startTime.value = keystroke },
+            modifier = Modifier.testTag("inputTodoAssignee"),
+            label = { Text("StartTime") },
+            placeholder = { Text("StartTime") })
+        OutlinedTextField(
+            value = endTimeText.value,
+            onValueChange = { keystroke -> endTimeText.value = keystroke },
+            modifier = Modifier.testTag("inputTodoDate"),
+            label = { Text("EndTime") },
+            placeholder = { Text("--/--/--") })
+
+        Button(
+            onClick = {
+              try {
+                val fsUid = selectedTravel!!.fsUid
+                var newLocation = selectedTravel!!.location
+                try {
+                  newLocation =
+                      Location(
+                          latitude = latitude.value.toDouble(),
+                          longitude = longitude.value.toDouble(),
+                          name = locationName.value,
+                          insertTime = Timestamp.now())
+                } catch (e: NumberFormatException) {
+                  Toast.makeText(
+                          context,
+                          "Error: latitude and longitude must be numbers",
+                          Toast.LENGTH_SHORT)
+                      .show()
+                } catch (e: IllegalArgumentException) {
+                  Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
 
-            OutlinedTextField(
-                value = titleText.value,
-                onValueChange = { keystroke -> titleText.value = keystroke },
-                modifier = Modifier.testTag("inputTodoTitle"),
-                label = { Text("Title") },
-                placeholder = { Text("Name the Travel") })
-            OutlinedTextField(
-                value = descriptionText.value,
-                onValueChange = { keystroke -> descriptionText.value = keystroke },
-                modifier = Modifier.testTag("inputTodoDescription"),
-                label = { Text("Description") },
-                placeholder = { Text("Describe the Travel") })
-            OutlinedTextField(
-                value =
-                    "${location.value.name}: N${location.value.latitude}, E${location.value.longitude}",
-                onValueChange = {},
-                modifier = Modifier.testTag("inputTodoLocation"),
-                label = { Text("Location") },
-                placeholder = { Text("Enter a location") })
-            OutlinedTextField(
-                value = startTime.value,
-                onValueChange = { keystroke -> startTime.value = keystroke },
-                modifier = Modifier.testTag("inputTodoAssignee"),
-                label = { Text("StartTime") },
-                placeholder = { Text("StartTime") })
-            OutlinedTextField(
-                value = endTimeText.value,
-                onValueChange = { keystroke -> endTimeText.value = keystroke },
-                modifier = Modifier.testTag("inputTodoDate"),
-                label = { Text("EndTime") },
-                placeholder = { Text("--/--/--") })
+                val newStart = parseDateToTimestamp(startTime.value)
+                val newEnd = parseDateToTimestamp(endTimeText.value)
 
-            Button(
-                onClick = {
-                  try {
-                    val fsUid = selectedTravel!!.fsUid
-                    val newTodo =
-                        TravelContainer(
-                            fsUid = fsUid,
-                            title = titleText.value,
-                            description = descriptionText.value,
-                            startTime = selectedTravel!!.startTime,
-                            endTime = Timestamp.now(),
-                            location = selectedTravel!!.location,
-                            allAttachments = selectedTravel!!.allAttachments,
-                            allParticipants = selectedTravel!!.allParticipants,
-                        )
-                    listTravelViewModel.updateTravel(newTodo)
-                    Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
-                  } catch (e: ParseException) {
-                    Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
-                  } catch (e: Exception) {
-                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                  }
-                },
-                modifier = Modifier.testTag("travelSave")) {
-                  Text("Save")
-                }
+                val newTodo =
+                    TravelContainer(
+                        fsUid = fsUid,
+                        title = titleText.value,
+                        description = descriptionText.value,
+                        startTime = newStart,
+                        endTime = newEnd,
+                        location = newLocation,
+                        allAttachments = selectedTravel!!.allAttachments,
+                        allParticipants = selectedTravel!!.allParticipants,
+                    )
+                listTravelViewModel.updateTravel(newTodo)
+                Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
+              } catch (e: ParseException) {
+                Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
+              } catch (e: Exception) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+              }
+            },
+            modifier = Modifier.testTag("travelSave")) {
+              Text("Save")
+            }
 
-            Button(
-                onClick = {
-                  navigationActions.goBack()
-                  listTravelViewModel.deleteTravelById(selectedTravel!!.fsUid)
-                  Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
-                },
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent, contentColor = Color.Red),
-                shape = RoundedCornerShape(8.dp),
-                modifier =
-                    Modifier.testTag("travelDelete").fillMaxWidth().padding(vertical = 8.dp)) {
-                  Text(
-                      // text = "🗑  Delete",
-                      text = "Delete",
-                      fontWeight = FontWeight.Bold)
-                }
-          }
+        Button(
+            onClick = {
+              navigationActions.goBack()
+              listTravelViewModel.deleteTravelById(selectedTravel!!.fsUid)
+              Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
+            },
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent, contentColor = Color.Red),
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.testTag("travelDelete").fillMaxWidth().padding(vertical = 8.dp)) {
+              Text(
+                  // text = "🗑  Delete",
+                  text = "Delete",
+                  fontWeight = FontWeight.Bold)
+            }
+      }
     } else {
       Text(
           "No ToDo to be edited was selected. If you read this message an error has occurred.",
           modifier = Modifier.padding(15.dp).testTag("noTravelSelected"))
     }
   }
+}
+/**
+ * Parses a date string in the format "dd/MM/yyyy" to a `Timestamp`.
+ *
+ * @param dateString The date string to be parsed.
+ * @return A `Timestamp` representing the parsed date.
+ * @throws ParseException If the date string is not in the expected format.
+ */
+fun parseDateToTimestamp(dateString: String): Timestamp {
+  val dateFormat =
+      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+        isLenient = false // strict date format
+      }
+  val date = dateFormat.parse(dateString)
+  val datetime =
+      GregorianCalendar().apply {
+        time = date
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+      }
+  return Timestamp(datetime.time)
 }
