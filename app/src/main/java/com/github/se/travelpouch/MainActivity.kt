@@ -5,12 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -24,6 +24,7 @@ import com.github.se.travelpouch.model.TravelRepositoryFirestore
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.overview.AddTravelScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
@@ -52,9 +53,8 @@ fun TravelPouchApp() {
   val travelRepository = TravelRepositoryFirestore(db)
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val listTravelViewModel = ListTravelViewModel(travelRepository)
-  // Add a travel to the list
-  // TESTING
+  val listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory)
+
   val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
   val attachments: MutableMap<String, String> = HashMap()
   attachments["Attachment1"] = "UID1"
@@ -75,22 +75,19 @@ fun TravelPouchApp() {
           participants)
   val sigma by listTravelViewModel.travels.collectAsState()
   println("${sigma.size}")
-  // listTravelViewModel.addTravel(travelContainer)
+  
   listTravelViewModel.selectTravel(travelContainer)
-  NavHost(navController = navController, startDestination = Route.TRAVEL) {
+
+  NavHost(navController = navController, startDestination = Route.OVERVIEW) {
     navigation(
-        startDestination = Screen.EDIT,
-        route = Route.TRAVEL,
+        startDestination = Screen.ADD_TRAVEL,
+        route = Route.OVERVIEW,
     ) {
+      composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
       composable(Screen.EDIT) { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
       composable(Screen.PARTICIPANT_LIST) {
         ParticipantListScreen(listTravelViewModel, navigationActions)
       }
     }
   }
-}
-
-@Composable
-fun Greeting() {
-  Text(text = "Hello", modifier = Modifier.testTag("GreetingText"))
 }

@@ -6,12 +6,14 @@ object Route {
   const val AUTH = "Auth"
   const val TRAVEL = "Edit"
   const val PARTICIPANT_LIST = "Participant List"
+  const val OVERVIEW = "Overview"
 }
 
 object Screen {
   const val AUTH = "Auth Screen"
   const val EDIT = "Edit Screen"
   const val PARTICIPANT_LIST = "Participant List Screen"
+  const val ADD_TRAVEL = "AddTravel Screen"
 }
 
 open class NavigationActions(
