@@ -75,7 +75,6 @@ fun TravelPouchApp() {
           participants)
   val sigma by listTravelViewModel.travels.collectAsState()
   println("${sigma.size}")
-
   listTravelViewModel.selectTravel(travelContainer)
 
   NavHost(navController = navController, startDestination = Route.OVERVIEW) {

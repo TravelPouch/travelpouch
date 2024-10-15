@@ -88,6 +88,7 @@ fun ParticipantListScreen(
       LazyColumn(modifier = Modifier.padding(paddingValues).fillMaxWidth()) {
         participants.entries.forEach { participantEntry ->
           item {
+            // display all participants in travel
             ParticipantRow(
                 participant = participantEntry,
                 selectedTravel = selectedTravel!!,
@@ -154,7 +155,6 @@ fun ParticipantListScreen(
                     listTravelViewModel.updateTravel(updatedContainer)
                     listTravelViewModel.selectTravel(updatedContainer)
                     listTravelViewModel.fetchAllParticipantsInfo()
-                    // TODO: THIS IS BROKEN, WE LOSE ALL USERS AHHH
                     setExpanded(false)
                   })
             }
@@ -173,6 +173,33 @@ fun ParticipantListScreen(
                       selectedTravel,
                       participant,
                       { newRole ->
+                        val oldRole = selectedTravel!!.allParticipants[Participant(participant.key)]
+                        if (oldRole == newRole) {
+                          setExpandedRoleDialog(false)
+                          setExpanded(false)
+                          return@ChangeRoleDialog
+                        }
+                        // we have an actual role change
+                        if (oldRole == Role.OWNER &&
+                            selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
+                                1) {
+                          Toast.makeText(
+                                  context,
+                                  "You're trying to change the role of the only owner of the travel. Please name another owner before changing the role.",
+                                  Toast.LENGTH_LONG)
+                              .show()
+                          setExpandedRoleDialog(false)
+                          setExpanded(false)
+                          return@ChangeRoleDialog
+                        }
+                        // we have a legal role change
+                        val participantMap = selectedTravel!!.allParticipants.toMutableMap()
+                        participantMap[Participant(participant.key)] = newRole
+                        val updatedContainer =
+                            selectedTravel!!.copy(allParticipants = participantMap.toMap())
+                        listTravelViewModel.updateTravel(updatedContainer)
+                        listTravelViewModel.selectTravel(updatedContainer)
+                        listTravelViewModel.fetchAllParticipantsInfo()
                         setExpandedRoleDialog(false)
                         setExpanded(false)
                       })

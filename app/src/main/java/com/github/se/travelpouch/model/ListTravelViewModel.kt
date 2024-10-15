@@ -117,7 +117,6 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    */
   fun selectTravel(travel: TravelContainer) {
     selectedTravel_.value = travel
-    participants_.value = emptyMap()
   }
   /**
    * Fetches information for all participants of the selected travel.
