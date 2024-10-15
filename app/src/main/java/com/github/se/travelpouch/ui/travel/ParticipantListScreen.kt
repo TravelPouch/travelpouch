@@ -143,10 +143,9 @@ fun ParticipantListScreen(
                                 "You're trying to remove the owner of the travel. Please name another owner before removing.",
                                 Toast.LENGTH_LONG)
                             .show()
-                          setExpanded(false)
+                        setExpanded(false)
                         return@RoleEntryDialog
                       }
-
                     }
                     val participantMap = selectedTravel!!.allParticipants.toMutableMap()
                     participantMap.remove(Participant(participant.key))
@@ -156,7 +155,7 @@ fun ParticipantListScreen(
                     listTravelViewModel.selectTravel(updatedContainer)
                     listTravelViewModel.fetchAllParticipantsInfo()
                     // TODO: THIS IS BROKEN, WE LOSE ALL USERS AHHH
-                      setExpanded(false)
+                    setExpanded(false)
                   })
             }
           }
