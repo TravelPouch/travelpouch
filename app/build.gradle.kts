@@ -41,7 +41,7 @@ android {
     }
 
     testCoverage {
-        jacocoVersion = "0.8.3"
+        jacocoVersion = "0.8.12"
     }
 
     buildFeatures {
