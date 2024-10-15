@@ -13,6 +13,13 @@ import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.UserInfo
 import com.github.se.travelpouch.model.fsUid
 
+/**
+ * A composable function that displays a dialog for changing the role of a participant.
+ *
+ * @param selectedTravel The currently selected travel container.
+ * @param participant The participant whose role is to be changed.
+ * @param onRoleChange A callback function to handle the role change.
+ */
 @Composable
 fun ChangeRoleDialog(
     selectedTravel: TravelContainer?,
@@ -48,23 +55,33 @@ fun ChangeRoleDialog(
       }
 }
 
+/**
+ * A composable function that displays a dialog with options to change the role of a participant
+ * or remove the participant from the travel.
+ *
+ * @param selectedTravel The currently selected travel container.
+ * @param participant The participant whose role is to be changed or who is to be removed.
+ * @param changeRoleAction A callback function to handle the action of changing the role.
+ * @param removeParticipantAction A callback function to handle the action of removing the participant.
+ */
 @Composable
 fun RoleEntryDialog(
     selectedTravel: TravelContainer?,
     participant: Map.Entry<fsUid, UserInfo>,
     changeRoleAction: (Boolean) -> Unit,
-    removeParticipantAction: (Boolean) -> Unit
+    removeParticipantAction: () -> Unit
 ) {
   Text(
       text = "Role : ${selectedTravel!!.allParticipants[Participant(participant.key)]!!.name}",
       fontWeight = FontWeight.Bold,
       modifier = Modifier.padding(8.dp))
+    // we just expand the other dialog
   Button(onClick = { changeRoleAction(true) }) { Text("Change Role") }
 
   Button(
       onClick = {
         // Handle Remove participant
-        removeParticipantAction(false)
+        removeParticipantAction()
       }) {
         Text("Remove participant")
       }

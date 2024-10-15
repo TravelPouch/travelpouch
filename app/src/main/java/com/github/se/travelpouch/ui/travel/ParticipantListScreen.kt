@@ -128,7 +128,7 @@ fun ParticipantListScreen(
                   selectedTravel = selectedTravel,
                   participant = participant,
                   changeRoleAction = setExpandedRoleDialog,
-                  removeParticipantAction = setExpanded)
+                  removeParticipantAction = {setExpanded(false)})
             }
           }
         }
