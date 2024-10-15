@@ -202,6 +202,7 @@ tasks.withType<Test> {
     configure<JacocoTaskExtension> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
+        version = "0.8.3"
     }
 }
 
