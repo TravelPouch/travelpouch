@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,7 +24,6 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -46,8 +46,6 @@ import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.google.firebase.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.GregorianCalendar
 import java.util.Locale
 
 // parts of this file was generated using Github Copilot
@@ -114,40 +112,25 @@ fun EditTravelSettingsScreen(
       val endTimeText = remember {
         mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate()))
       }
-      val participants = remember {
-        mutableStateOf(
-            selectedTravel!!.allParticipants.mapKeys { it.key.fsUid }.keys.joinToString(", "))
-      }
 
       Column(
-          modifier = Modifier.padding(padding), Arrangement.Center, Alignment.CenterHorizontally) {
+          modifier = Modifier.padding(padding), Arrangement.Top, Alignment.CenterHorizontally) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp, end = 8.dp)) {
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(padding)) {
                   Icon(
                       imageVector = Icons.Default.Person,
                       contentDescription = "Participants",
                       modifier =
-                          Modifier.padding(end = 8.dp).clickable {
+                          Modifier.padding(start=50.dp,end = 8.dp).size(50.dp).clickable {
                             listTravelViewModel.fetchAllParticipantsInfo()
                             navigationActions.navigateTo(PARTICIPANT_LIST)
                             Toast.makeText(context, "Icon clicked", Toast.LENGTH_SHORT).show()
                           })
-                  TextField(
-                      value =
-                          "${selectedTravel!!.allParticipants.size} participants: ${participants.value}",
-                      onValueChange = {},
-                      modifier = Modifier.weight(1f).testTag("inputParticipants"),
-                      label = { Text("Participants") },
-                      placeholder = { Text("Participants") },
-                      maxLines = 1,
-                      singleLine = true,
-                      readOnly = true,
-                      trailingIcon = {
-                        if (participants.value.length > 20) {
-                          Text("...")
-                        }
-                      })
+                  Text(
+                      "${selectedTravel!!.allParticipants.size} participants",
+                      modifier = Modifier.weight(1f).testTag("inputParticipants"))
                 }
 
             OutlinedTextField(

@@ -32,13 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.UserInfo
 import com.github.se.travelpouch.model.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -53,7 +51,6 @@ fun ParticipantListScreen(
   val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
   val participants by listTravelViewModel.participants.collectAsState()
 
-  val context = LocalContext.current
   val (expanded, setExpanded) = remember { mutableStateOf(false) }
   val (expandedRoleDialog, setExpandedRoleDialog) = remember { mutableStateOf(false) }
   val (selectedParticipant, setSelectedParticipant) =
@@ -127,20 +124,11 @@ fun ParticipantListScreen(
                         modifier = Modifier.padding(5.dp))
                   }
 
-              Text(
-                  text =
-                      "Role : ${selectedTravel!!.allParticipants[Participant(participant.key)]!!.name}",
-                  fontWeight = FontWeight.Bold,
-                  modifier = Modifier.padding(8.dp))
-              Button(onClick = { setExpandedRoleDialog(true) }) { Text("Change Role") }
-
-              Button(
-                  onClick = {
-                    // Handle Remove participant
-                    setExpanded(false)
-                  }) {
-                    Text("Remove participant")
-                  }
+              RoleEntryDialog(
+                  selectedTravel = selectedTravel,
+                  participant = participant,
+                  changeRoleAction = setExpandedRoleDialog,
+                  removeParticipantAction = setExpanded)
             }
           }
         }
@@ -153,39 +141,13 @@ fun ParticipantListScreen(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center) {
-                  Text(
-                      "Select a Role",
-                      fontWeight = FontWeight.Bold,
-                      modifier = Modifier.padding(8.dp))
-                  Text(
-                      "Current Role: ${selectedTravel!!.allParticipants[Participant(participant.key)]!!.name}",
-                      modifier = Modifier.padding(8.dp))
-                  Button(
-                      onClick = {
-                        // Handle OWNER selection
-                        setExpanded(false)
+                  ChangeRoleDialog(
+                      selectedTravel,
+                      participant,
+                      { newRole ->
                         setExpandedRoleDialog(false)
-                      }) {
-                        Text("OWNER")
-                      }
-
-                  Button(
-                      onClick = {
-                        // Handle ORGANISER selection
                         setExpanded(false)
-                        setExpandedRoleDialog(false)
-                      }) {
-                        Text("ORGANISER")
-                      }
-
-                  Button(
-                      onClick = {
-                        // Handle PARTICIPANT selection
-                        setExpanded(false)
-                        setExpandedRoleDialog(false)
-                      }) {
-                        Text("PARTICIPANT")
-                      }
+                      })
                 }
           }
         }
