@@ -40,12 +40,11 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   }
 
   private fun getParticipantFromfsUid(fsUid: fsUid) {
-    // TODO: refactor this
     repository.getParticipantFromfsUid(
         fsUid = fsUid,
         onSuccess = { user ->
           user?.let {
-            participants_.value = participants_.value + (fsUid to user)
+            participants_.value += (fsUid to user)
             Log.d("ListTravelViewModel", "${user.name} is not null")
           } ?: Log.d("ListTravelViewModel", "$fsUid is null")
         },

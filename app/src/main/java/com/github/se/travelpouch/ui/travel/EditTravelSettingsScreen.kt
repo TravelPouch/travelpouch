@@ -186,21 +186,6 @@ fun EditTravelSettingsScreen(
                 onClick = {
                   try {
                     val fsUid = selectedTravel!!.fsUid
-                    val dateFormat =
-                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-                          isLenient = false // strict date format
-                        }
-                    val date = dateFormat.parse(endTimeText.value)
-                    val calendar =
-                        GregorianCalendar().apply {
-                          time = date!!
-                          set(Calendar.HOUR_OF_DAY, 0)
-                          set(Calendar.MINUTE, 0)
-                          set(Calendar.SECOND, 0)
-                        }
-                    val timestamp = Timestamp(calendar.time)
-                    // val location =
-                    //    Location(name = "Placeholder", latitude = 69.0, longitude = 42.0)
                     val newTodo =
                         TravelContainer(
                             fsUid = fsUid,
@@ -213,18 +198,6 @@ fun EditTravelSettingsScreen(
                             allParticipants = selectedTravel!!.allParticipants,
                         )
                     listTravelViewModel.updateTravel(newTodo)
-                    //                            onSuccess = {
-                    //                                navigationActions.goBack()
-                    //                                Toast.makeText(
-                    //                                    context, "Saved todo successfully to
-                    // firebase", Toast.LENGTH_SHORT)
-                    //                                    .show()
-                    //                            },
-                    //                            onFailure = {
-                    //                                Toast.makeText(context, "Error:
-                    // ${it.message}",
-                    // Toast.LENGTH_SHORT).show()
-                    //                            }
                     Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
                   } catch (e: ParseException) {
                     Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
