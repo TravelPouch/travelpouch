@@ -59,10 +59,10 @@ fun TravelPouchApp() {
   val attachments: MutableMap<String, String> = HashMap()
   attachments["Attachment1"] = "UID1"
   val user1ID = "rythwEmprFhOOgsANXnv"
-  val user2ID = listTravelViewModel.getNewUid()
+  val user2ID = "sigmasigmasigmasigma"
   val participants: MutableMap<Participant, Role> = HashMap()
   participants[Participant(user1ID)] = Role.OWNER
-
+  participants[Participant(user2ID)] = Role.PARTICIPANT
   val travelContainer =
       TravelContainer(
           "DFZft6Z95ABnRQ3YZQ2d",

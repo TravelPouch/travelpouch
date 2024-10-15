@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.travel
 
 import TruncatedText
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,11 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.travelpouch.model.ListTravelViewModel
+import com.github.se.travelpouch.model.Participant
+import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.UserInfo
 import com.github.se.travelpouch.model.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -48,6 +52,7 @@ fun ParticipantListScreen(
     listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
 ) {
+  val context = LocalContext.current
   val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
   val participants by listTravelViewModel.participants.collectAsState()
 
@@ -128,7 +133,31 @@ fun ParticipantListScreen(
                   selectedTravel = selectedTravel,
                   participant = participant,
                   changeRoleAction = setExpandedRoleDialog,
-                  removeParticipantAction = { setExpanded(false) })
+                  removeParticipantAction = {
+                    if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
+                        Role.OWNER) {
+                      if (selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
+                          1) {
+                        Toast.makeText(
+                                context,
+                                "You're trying to remove the owner of the travel. Please name another owner before removing.",
+                                Toast.LENGTH_LONG)
+                            .show()
+                          setExpanded(false)
+                        return@RoleEntryDialog
+                      }
+
+                    }
+                    val participantMap = selectedTravel!!.allParticipants.toMutableMap()
+                    participantMap.remove(Participant(participant.key))
+                    val updatedContainer =
+                        selectedTravel!!.copy(allParticipants = participantMap.toMap())
+                    listTravelViewModel.updateTravel(updatedContainer)
+                    listTravelViewModel.selectTravel(updatedContainer)
+                    listTravelViewModel.fetchAllParticipantsInfo()
+                    // TODO: THIS IS BROKEN, WE LOSE ALL USERS AHHH
+                      setExpanded(false)
+                  })
             }
           }
         }
