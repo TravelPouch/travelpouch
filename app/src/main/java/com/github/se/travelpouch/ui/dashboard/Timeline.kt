@@ -16,7 +16,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -33,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.events.Event
 import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -73,7 +73,7 @@ data class LineParameters(val strokeWidth: Dp, val brush: Brush)
 fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)) {
 
   var itemMoreRightOfScreen = false
-  val events = eventsViewModel.events.collectAsState()
+  // val events = eventsViewModel.events.collectAsState()
 
   // TODO : To test this class manually, de-comment the list event_test and replace all the
   // occurrences of
@@ -81,29 +81,29 @@ fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventVi
   // the
   // TODO : project is well advanced, this will be deleted.
 
-  //    val events_test =
-  //        listOf(
-  //            Event(
-  //                "1",
-  //                EventType.NEW_DOCUMENT,
-  //                Timestamp(0, 0),
-  //                "eventTitle",
-  //                "eventDescription",
-  //                null,
-  //                null),
-  //            Event("2", EventType.START_OF_JOURNEY, Timestamp(0, 0), "it", "it", null, null),
-  //            Event("3", EventType.NEW_PARTICIPANT, Timestamp(0, 0), "it", "it", null, null),
-  //            Event("3", EventType.OTHER_EVENT, Timestamp(0, 0), "it", "it", null, null))
+  val events_test =
+      listOf(
+          Event(
+              "1",
+              EventType.NEW_DOCUMENT,
+              Timestamp(0, 0),
+              "eventTitle",
+              "eventDescription",
+              null,
+              null),
+          Event("2", EventType.START_OF_JOURNEY, Timestamp(0, 0), "it", "it", null, null),
+          Event("3", EventType.NEW_PARTICIPANT, Timestamp(0, 0), "it", "it", null, null),
+          Event("3", EventType.OTHER_EVENT, Timestamp(0, 0), "it", "it", null, null))
 
   Scaffold(
       modifier = Modifier.testTag("timelineScreen"),
   ) {
-    if (events.value.isNotEmpty()) {
+    if (events_test.isNotEmpty()) {
       LazyColumn(
           modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("timelineColumn"),
           contentPadding = PaddingValues(vertical = 16.dp),
       ) {
-        val size = events.value.size
+        val size = events_test.size
 
         item {
           Box(
@@ -116,9 +116,9 @@ fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventVi
               }
         }
         items(size) { index ->
-          val color = mapEventTypeToColor(events.value[index].eventType)
+          val color = mapEventTypeToColor(events_test[index].eventType)
           val nextColor =
-              if (index < size - 1) mapEventTypeToColor(events.value[index + 1].eventType) else null
+              if (index < size - 1) mapEventTypeToColor(events_test[index + 1].eventType) else null
 
           TimelineNode(
               contentStartOffset =
@@ -134,7 +134,7 @@ fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventVi
                       LineParametersDefaults.linearGradient(
                           startColor = color, endColor = nextColor)
                   else null) { modifier ->
-                TimelineItem(events.value[index], modifier)
+                TimelineItem(events_test[index], modifier)
               }
 
           itemMoreRightOfScreen = !itemMoreRightOfScreen
