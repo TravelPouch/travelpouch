@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.ui.overview
+package com.github.se.travelpouch.ui.home
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -47,7 +47,7 @@ fun MapContent(modifier: Modifier = Modifier, travelContainers: List<TravelConta
           CameraPosition.fromLatLngZoom(
               LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
     } else {
-      position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 1f)
+      position = CameraPosition.fromLatLngZoom(LatLng(46.520564452328664, 6.567825512303322), 15f)
     }
   }
 

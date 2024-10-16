@@ -5,14 +5,16 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.TravelContainerMock
+import com.github.se.travelpouch.ui.home.MapScreen
+import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.overview.MapScreen
-import com.github.se.travelpouch.ui.overview.OverviewScreen
 import com.google.firebase.Timestamp
 import java.util.Date
 import org.junit.Before
@@ -20,7 +22,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 
-class OverviewScreenTest {
+class TravelListScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -33,61 +35,46 @@ class OverviewScreenTest {
 
   @Test
   fun displayTextWhenEmpty() {
-    // Arrange
-    val travelContainers = emptyList<TravelContainer>()
 
     // Act
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, travelContainers = travelContainers)
+      val listTravelViewModel: ListTravelViewModel =
+          viewModel(factory = ListTravelViewModel.Factory)
+      TravelListScreen(
+          navigationActions = navigationActions, travelContainers = listTravelViewModel)
     }
 
     // Assert
     composeTestRule.onNodeWithTag("emptyTravelPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 
   @Test
   fun hasRequiredComponents() {
-    // Arrange
-    val travelContainers = emptyList<TravelContainer>()
-
     // Act
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, travelContainers = travelContainers)
+      val listTravelViewModel: ListTravelViewModel =
+          viewModel(factory = ListTravelViewModel.Factory)
+      TravelListScreen(
+          navigationActions = navigationActions, travelContainers = listTravelViewModel)
     }
 
     // Assert
-    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 
   @Test
   fun displayTravelListWhenNotEmpty() {
-    // Arrange
-    val startTime = Timestamp(Date())
-    val endTime = Timestamp(Date(startTime.toDate().time + 86400000)) // One day later
-    val location =
-        Location(latitude = 48.8566, longitude = 2.3522, insertTime = startTime, name = "Paris")
-    val participant = Participant(fsUid = TravelContainerMock.generateAutoId())
-    val participants = mapOf(participant to Role.OWNER)
-    val attachments = mapOf<String, String>()
-    val travelContainer =
-        TravelContainer(
-            fsUid = TravelContainerMock.generateAutoId(),
-            title = "Trip to Paris",
-            description = "A wonderful trip to Paris",
-            startTime = startTime,
-            endTime = endTime,
-            location = location,
-            allAttachments = attachments,
-            allParticipants = participants)
-    val travelContainers = listOf(travelContainer)
 
     // Act
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, travelContainers = travelContainers)
+      val listTravelViewModel: ListTravelViewModel =
+          viewModel(factory = ListTravelViewModel.Factory)
+      TravelListScreen(
+          navigationActions = navigationActions, travelContainers = listTravelViewModel)
     }
 
     // Assert
@@ -139,7 +126,7 @@ class OverviewScreenTest {
     composeTestRule.setContent { MapScreen(travelContainers = travelContainers) }
 
     // Assert
-    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 }

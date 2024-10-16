@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.ui.overview
+package com.github.se.travelpouch.ui.home
 
 // import com.github.se.travelpouch.ui.navigation.NavigationActions
 import android.annotation.SuppressLint
@@ -23,25 +23,35 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import java.util.Locale
 
 /**
- * Composable function for the Overview screen.
+ * Composable function for the travels overview screen.
  *
  * @param navigationActions Actions for navigation.
  * @param travelContainers List of travel containers to display.
  */
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter") // TODO useful?
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun OverviewScreen(navigationActions: NavigationActions, travelContainers: List<TravelContainer>) {
+fun TravelListScreen(navigationActions: NavigationActions, travelContainers: ListTravelViewModel) {
+  // Fetch travels when the screen is launched
+  LaunchedEffect(Unit) {
+    travelContainers.getTravels()
+    // sleep the thread for 1 second to allow the data to be fetched
+  }
+  // travelContainers.getTravels()
+  val travelList = travelContainers.travels.collectAsState().value
 
   Scaffold(
       modifier = Modifier.testTag("overviewScreen"),
@@ -55,15 +65,14 @@ fun OverviewScreen(navigationActions: NavigationActions, travelContainers: List<
         Column {
           // Add the map to display the travels
           MapContent(
-              modifier = Modifier.fillMaxWidth().height(300.dp),
-              travelContainers = travelContainers)
+              modifier = Modifier.fillMaxWidth().height(300.dp), travelContainers = travelList)
 
-          if (travelContainers.isNotEmpty()) {
+          if (travelList.isNotEmpty()) {
             LazyColumn(
                 contentPadding = PaddingValues(vertical = 8.dp),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
-                  items(travelContainers.size) { index ->
-                    TravelItem(travelContainer = travelContainers[index]) {
+                  items(travelList.size) { index ->
+                    TravelItem(travelContainer = travelList[index]) {
                       // Handle item click
                     }
                   }

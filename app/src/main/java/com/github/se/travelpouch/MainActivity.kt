@@ -14,10 +14,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.ListTravelViewModel
+import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.overview.AddTravelScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -47,7 +47,7 @@ fun TravelPouchApp() {
         startDestination = Screen.ADD_TRAVEL,
         route = Route.OVERVIEW,
     ) {
-      composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.ADD_TRAVEL) { TravelListScreen(navigationActions, listTravelViewModel) }
     }
   }
 }

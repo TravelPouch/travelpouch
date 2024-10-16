@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.ui.overview
+package com.github.se.travelpouch.ui.home
 
 import android.icu.util.GregorianCalendar
 import android.util.Log

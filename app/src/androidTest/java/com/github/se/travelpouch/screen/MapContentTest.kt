@@ -5,8 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.TravelContainerMock
-import com.github.se.travelpouch.ui.overview.MapContent
-import com.github.se.travelpouch.ui.overview.MapScreen
+import com.github.se.travelpouch.ui.home.MapContent
+import com.github.se.travelpouch.ui.home.MapScreen
 import org.junit.Rule
 import org.junit.Test
 
