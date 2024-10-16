@@ -30,36 +30,25 @@ import com.github.se.travelpouch.R
  */
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .height(48.dp)
-            .testTag("loginButtonRow")
-    ) {
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Center,
+      modifier = Modifier.fillMaxWidth().padding(8.dp).height(48.dp).testTag("loginButtonRow")) {
         Button(
             onClick = onSignInClick,
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             shape = RoundedCornerShape(50),
             border = BorderStroke(1.dp, Color.LightGray),
-            modifier = Modifier.fillMaxWidth().testTag("loginButton")
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.google_logo),
-                contentDescription = "Google Logo",
-                modifier = Modifier
-                    .size(30.dp)
-                    .padding(end = 8.dp)
-                    .testTag("googleLogo")
-            )
-            Text(
-                text = "Sign in with Google",
-                color = Color.Gray,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
+            modifier = Modifier.fillMaxWidth().testTag("loginButton")) {
+              Image(
+                  painter = painterResource(id = R.drawable.google_logo),
+                  contentDescription = "Google Logo",
+                  modifier = Modifier.size(30.dp).padding(end = 8.dp).testTag("googleLogo"))
+              Text(
+                  text = "Sign in with Google",
+                  color = Color.Gray,
+                  fontSize = 16.sp,
+                  fontWeight = FontWeight.Medium)
+            }
+      }
 }
