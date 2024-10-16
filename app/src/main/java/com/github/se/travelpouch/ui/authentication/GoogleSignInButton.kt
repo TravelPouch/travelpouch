@@ -30,35 +30,36 @@ import com.github.se.travelpouch.R
  */
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
-  Button(
-      onClick = onSignInClick,
-      colors = ButtonDefaults.buttonColors(containerColor = Color.White), // Button color
-      shape = RoundedCornerShape(50), // Circular edges for the button
-      border = BorderStroke(1.dp, Color.LightGray),
-      modifier =
-          Modifier.padding(8.dp)
-              .height(48.dp) // Adjust height as needed
-              .testTag("loginButton")) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()) {
-              // Load the Google logo from resources
-              Image(
-                  painter =
-                      painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
-                  contentDescription = "Google Logo",
-                  modifier =
-                      Modifier.size(30.dp) // Size of the Google logo
-                          .padding(end = 8.dp)
-                          .testTag("googleLogo"))
-
-              // Text for the button
-              Text(
-                  text = "Sign in with Google",
-                  color = Color.Gray, // Text color
-                  fontSize = 16.sp, // Font size
-                  fontWeight = FontWeight.Medium)
-            }
-      }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .height(48.dp)
+            .testTag("loginButtonRow")
+    ) {
+        Button(
+            onClick = onSignInClick,
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            shape = RoundedCornerShape(50),
+            border = BorderStroke(1.dp, Color.LightGray),
+            modifier = Modifier.fillMaxWidth().testTag("loginButton")
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.google_logo),
+                contentDescription = "Google Logo",
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
+                    .testTag("googleLogo")
+            )
+            Text(
+                text = "Sign in with Google",
+                color = Color.Gray,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
 }
