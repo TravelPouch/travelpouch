@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 
-class SignInTest {
+class SignInViewTest {
 
   val mockNavigationActions = mock(NavigationActions::class.java)
 
