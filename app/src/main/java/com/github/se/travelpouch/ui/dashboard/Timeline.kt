@@ -40,9 +40,9 @@ import java.util.GregorianCalendar
 // https://medium.com/proandroiddev/a-step-by-step-guide-to-building-a-timeline-component-with-jetpack-compose-358a596847cb
 
 enum class Paddings(val padding: Dp) {
-  SPACER_BETWEEN_NODES(32.dp),
-  SPACER_LESS_RIGHT(32.dp),
-  SPACER_MORE_RIGHT(96.dp)
+    SPACER_BETWEEN_NODES(32.dp),
+    SPACER_LESS_RIGHT(32.dp),
+    SPACER_MORE_RIGHT(96.dp)
 }
 
 /**
@@ -72,83 +72,83 @@ data class LineParameters(val strokeWidth: Dp, val brush: Brush)
 @Composable
 fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)) {
 
-  var itemMoreRightOfScreen = false
-  // val events = eventsViewModel.events.collectAsState()
+    var itemMoreRightOfScreen = false
+    // val events = eventsViewModel.events.collectAsState()
 
-  // TODO : To test this class manually, de-comment the list event_test and replace all the
-  // occurrences of
-  // TODO : events.value by event_tests. Then comment the line 77. This comment is temporary, once
-  // the
-  // TODO : project is well advanced, this will be deleted.
+    // TODO : To test this class manually, de-comment the list event_test and replace all the
+    // occurrences of
+    // TODO : events.value by event_tests. Then comment the line 77. This comment is temporary, once
+    // the
+    // TODO : project is well advanced, this will be deleted.
 
-  val events_test =
-      listOf(
-          Event(
-              "1",
-              EventType.NEW_DOCUMENT,
-              Timestamp(0, 0),
-              "eventTitle",
-              "eventDescription",
-              null,
-              null),
-          Event("2", EventType.START_OF_JOURNEY, Timestamp(0, 0), "it", "it", null, null),
-          Event("3", EventType.NEW_PARTICIPANT, Timestamp(0, 0), "it", "it", null, null),
-          Event("3", EventType.OTHER_EVENT, Timestamp(0, 0), "it", "it", null, null))
+    val events_test =
+        listOf(
+            Event(
+                "1",
+                EventType.NEW_DOCUMENT,
+                Timestamp(0, 0),
+                "eventTitle",
+                "eventDescription",
+                null,
+                null),
+            Event("2", EventType.START_OF_JOURNEY, Timestamp(0, 0), "it", "it", null, null),
+            Event("3", EventType.NEW_PARTICIPANT, Timestamp(0, 0), "it", "it", null, null),
+            Event("3", EventType.OTHER_EVENT, Timestamp(0, 0), "it", "it", null, null))
 
-  Scaffold(
-      modifier = Modifier.testTag("timelineScreen"),
-  ) {
-    if (events_test.isNotEmpty()) {
-      LazyColumn(
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("timelineColumn"),
-          contentPadding = PaddingValues(vertical = 16.dp),
-      ) {
-        val size = events_test.size
+    Scaffold(
+        modifier = Modifier.testTag("timelineScreen"),
+    ) {
+        if (events_test.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("timelineColumn"),
+                contentPadding = PaddingValues(vertical = 16.dp),
+            ) {
+                val size = events_test.size
 
-        item {
-          Box(
-              modifier = Modifier.fillMaxSize().padding(20.dp),
-              contentAlignment = Alignment.Center) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(20.dp),
+                        contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Your travel Milestone",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.testTag("screenTitle"))
+                    }
+                }
+                items(size) { index ->
+                    val color = mapEventTypeToColor(events_test[index].eventType)
+                    val nextColor =
+                        if (index < size - 1) mapEventTypeToColor(events_test[index + 1].eventType) else null
+
+                    TimelineNode(
+                        contentStartOffset =
+                        if (itemMoreRightOfScreen) {
+                            Paddings.SPACER_MORE_RIGHT.padding
+                        } else {
+                            Paddings.SPACER_LESS_RIGHT.padding
+                        },
+                        spacerBetweenNodes = Paddings.SPACER_BETWEEN_NODES.padding,
+                        circleParameters = CircleParametersDefaults.circleParameters(backgroundColor = color),
+                        lineParameters =
+                        if (nextColor != null)
+                            LineParametersDefaults.linearGradient(
+                                startColor = color, endColor = nextColor)
+                        else null) { modifier ->
+                        TimelineItem(events_test[index], modifier)
+                    }
+
+                    itemMoreRightOfScreen = !itemMoreRightOfScreen
+                }
+            }
+        } else {
+            Box(modifier = Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Your travel Milestone",
+                    text = "Loading...",
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.testTag("screenTitle"))
-              }
+                    modifier = Modifier.testTag("loadingText"))
+            }
         }
-        items(size) { index ->
-          val color = mapEventTypeToColor(events_test[index].eventType)
-          val nextColor =
-              if (index < size - 1) mapEventTypeToColor(events_test[index + 1].eventType) else null
-
-          TimelineNode(
-              contentStartOffset =
-                  if (itemMoreRightOfScreen) {
-                    Paddings.SPACER_MORE_RIGHT.padding
-                  } else {
-                    Paddings.SPACER_LESS_RIGHT.padding
-                  },
-              spacerBetweenNodes = Paddings.SPACER_BETWEEN_NODES.padding,
-              circleParameters = CircleParametersDefaults.circleParameters(backgroundColor = color),
-              lineParameters =
-                  if (nextColor != null)
-                      LineParametersDefaults.linearGradient(
-                          startColor = color, endColor = nextColor)
-                  else null) { modifier ->
-                TimelineItem(events_test[index], modifier)
-              }
-
-          itemMoreRightOfScreen = !itemMoreRightOfScreen
-        }
-      }
-    } else {
-      Box(modifier = Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
-        Text(
-            text = "Loading...",
-            textAlign = TextAlign.Center,
-            modifier = Modifier.testTag("loadingText"))
-      }
     }
-  }
 }
 
 /**
@@ -159,9 +159,9 @@ fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventVi
  */
 @Composable
 fun TimelineItem(event: Event, modifier: Modifier) {
-  Card(
-      modifier = modifier.width(250.dp).height(100.dp).testTag("eventCard"),
-      colors = CardDefaults.cardColors(containerColor = mapEventTypeToColor(event.eventType))) {
+    Card(
+        modifier = modifier.width(250.dp).height(100.dp).testTag("eventCard"),
+        colors = CardDefaults.cardColors(containerColor = mapEventTypeToColor(event.eventType))) {
         Text(event.eventType.toString(), modifier = Modifier.testTag("eventType"))
         Text(event.title, modifier = Modifier.testTag("eventTitle"))
 
@@ -170,12 +170,12 @@ fun TimelineItem(event: Event, modifier: Modifier) {
 
         Text(
             "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
-          calendar.get(
-              Calendar.YEAR
-          )
-      }",
+                calendar.get(
+                    Calendar.YEAR
+                )
+            }",
             modifier = Modifier.testTag("eventDate"))
-      }
+    }
 }
 
 /**
@@ -185,12 +185,12 @@ fun TimelineItem(event: Event, modifier: Modifier) {
  * @return (Color) : The colour of the event type
  */
 fun mapEventTypeToColor(type: EventType): Color {
-  return when (type) {
-    EventType.OTHER_EVENT -> Color.LightGray.copy(alpha = 0.3f)
-    EventType.NEW_DOCUMENT -> Color.Green.copy(alpha = 0.3f)
-    EventType.START_OF_JOURNEY -> Color.Blue.copy(alpha = 0.3f)
-    EventType.NEW_PARTICIPANT -> Color.Red.copy(alpha = 0.3f)
-  }
+    return when (type) {
+        EventType.OTHER_EVENT -> Color.LightGray.copy(alpha = 0.3f)
+        EventType.NEW_DOCUMENT -> Color.Green.copy(alpha = 0.3f)
+        EventType.START_OF_JOURNEY -> Color.Blue.copy(alpha = 0.3f)
+        EventType.NEW_PARTICIPANT -> Color.Red.copy(alpha = 0.3f)
+    }
 }
 
 /**
@@ -216,10 +216,10 @@ fun TimelineNode(
     lineParameters: LineParameters?,
     content: @Composable BoxScope.(modifier: Modifier) -> Unit
 ) {
-  Box(
-      modifier =
-          Modifier.wrapContentSize()
-              .drawBehind {
+    Box(
+        modifier =
+        Modifier.wrapContentSize()
+            .drawBehind {
                 val circleRadiusInPx = circleParameters.radius.toPx()
                 drawCircle(
                     color = circleParameters.backgroundColor,
@@ -227,60 +227,60 @@ fun TimelineNode(
                     center = Offset(circleRadiusInPx, circleRadiusInPx))
 
                 lineParameters?.let {
-                  drawLine(
-                      brush = lineParameters.brush,
-                      start = Offset(x = circleRadiusInPx, y = circleRadiusInPx * 2),
-                      end = Offset(x = circleRadiusInPx, y = this.size.height),
-                      strokeWidth = lineParameters.strokeWidth.toPx())
+                    drawLine(
+                        brush = lineParameters.brush,
+                        start = Offset(x = circleRadiusInPx, y = circleRadiusInPx * 2),
+                        end = Offset(x = circleRadiusInPx, y = this.size.height),
+                        strokeWidth = lineParameters.strokeWidth.toPx())
                 }
-              }
-              .testTag("boxContainingEvent")) {
+            }
+            .testTag("boxContainingEvent")) {
         content(Modifier.padding(start = contentStartOffset, bottom = spacerBetweenNodes))
-      }
+    }
 }
 
 /** The parameters of the line between two nodes. The colour of the line evolves as a gradient. */
 object LineParametersDefaults {
 
-  private val defaultStrokeWidth = 3.dp
+    private val defaultStrokeWidth = 3.dp
 
-  /**
-   * This function is a sort of constructor to set the default parameters of the line to be drawn
-   * between two nodes
-   *
-   * @param strokeWidth (Dp) : the width of the line
-   * @param startColor (Color) : the starting colour of the line
-   * @param endColor (Color) : the ending color of the line
-   * @param startY (Float) : the starting y-coordinate when drawing the line
-   * @param endY (Float) : the y-coordinate at which the line is ended
-   * @return (LineParameters) : the parameters of the lines to be drawn
-   */
-  fun linearGradient(
-      strokeWidth: Dp = defaultStrokeWidth,
-      startColor: Color,
-      endColor: Color,
-      startY: Float = 0.0f,
-      endY: Float = Float.POSITIVE_INFINITY
-  ): LineParameters {
-    val brush =
-        Brush.verticalGradient(colors = listOf(startColor, endColor), startY = startY, endY = endY)
-    return LineParameters(strokeWidth, brush)
-  }
+    /**
+     * This function is a sort of constructor to set the default parameters of the line to be drawn
+     * between two nodes
+     *
+     * @param strokeWidth (Dp) : the width of the line
+     * @param startColor (Color) : the starting colour of the line
+     * @param endColor (Color) : the ending color of the line
+     * @param startY (Float) : the starting y-coordinate when drawing the line
+     * @param endY (Float) : the y-coordinate at which the line is ended
+     * @return (LineParameters) : the parameters of the lines to be drawn
+     */
+    fun linearGradient(
+        strokeWidth: Dp = defaultStrokeWidth,
+        startColor: Color,
+        endColor: Color,
+        startY: Float = 0.0f,
+        endY: Float = Float.POSITIVE_INFINITY
+    ): LineParameters {
+        val brush =
+            Brush.verticalGradient(colors = listOf(startColor, endColor), startY = startY, endY = endY)
+        return LineParameters(strokeWidth, brush)
+    }
 }
 
 /** The parameters of the circle */
 object CircleParametersDefaults {
 
-  private val defaultCircleRadius = 12.dp
+    private val defaultCircleRadius = 12.dp
 
-  /**
-   * This function is a sort of constructor that returns the default parameters of the drawing of
-   * the circle.
-   *
-   * @param radius (Dp) : the default radius of the circle to be drawn
-   * @param backgroundColor (Color) : the colour of the circle to be drawn
-   * @return (CircleParameters) : the parameters of the circle to be drawn
-   */
-  fun circleParameters(radius: Dp = defaultCircleRadius, backgroundColor: Color = Cyan) =
-      CircleParameters(radius, backgroundColor)
+    /**
+     * This function is a sort of constructor that returns the default parameters of the drawing of
+     * the circle.
+     *
+     * @param radius (Dp) : the default radius of the circle to be drawn
+     * @param backgroundColor (Color) : the colour of the circle to be drawn
+     * @return (CircleParameters) : the parameters of the circle to be drawn
+     */
+    fun circleParameters(radius: Dp = defaultCircleRadius, backgroundColor: Color = Cyan) =
+        CircleParameters(radius, backgroundColor)
 }
