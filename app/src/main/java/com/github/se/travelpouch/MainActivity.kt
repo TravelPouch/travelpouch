@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
         ) {
-          TravelPouchApp()
+          // TravelPouchApp()
         }
       }
     }
@@ -75,7 +75,8 @@ fun TravelPouchApp() {
           participants)
   val sigma by listTravelViewModel.travels.collectAsState()
   println("${sigma.size}")
-  listTravelViewModel.selectTravel(travelContainer)
+  listTravelViewModel.selectTravel(
+      travelContainer) // this causes strange overwrite, shouldn't happen IRL
 
   NavHost(navController = navController, startDestination = Route.OVERVIEW) {
     navigation(

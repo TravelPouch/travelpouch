@@ -62,16 +62,18 @@ fun ParticipantListScreen(
       remember { mutableStateOf<Map.Entry<fsUid, UserInfo>?>(null) }
 
   Scaffold(
-      modifier = Modifier.testTag("listScreen"),
+      modifier = Modifier.testTag("participantListScreen"),
       topBar = {
         MediumTopAppBar(
+            modifier = Modifier.testTag("participantListSettingTopBar"),
             colors =
                 TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
             title = {
-              Text("Participant Settings", modifier = Modifier.testTag("participantSettingText"))
+              Text(
+                  "Participant Settings", modifier = Modifier.testTag("participantListSettingText"))
             },
             navigationIcon = {
               Button(
@@ -85,124 +87,125 @@ fun ParticipantListScreen(
       },
   ) { paddingValues ->
     if (selectedTravel != null) {
-      LazyColumn(modifier = Modifier.padding(paddingValues).fillMaxWidth()) {
-        participants.entries.forEach { participantEntry ->
-          item {
-            // display all participants in travel
-            ParticipantRow(
-                participant = participantEntry,
-                selectedTravel = selectedTravel!!,
-                onClick = {
-                  setSelectedParticipant(participantEntry)
-                  setExpanded(true)
-                })
-            HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
+      LazyColumn(
+          modifier = Modifier.padding(paddingValues).fillMaxWidth().testTag("participantColumn")) {
+            participants.entries.forEach { participantEntry ->
+              item {
+                // display all participants in travel
+                ParticipantRow(
+                    participant = participantEntry,
+                    selectedTravel = selectedTravel!!,
+                    onClick = {
+                      setSelectedParticipant(participantEntry)
+                      setExpanded(true)
+                    })
+                HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
+              }
+            }
           }
-        }
-      }
     } else {
       Text(
           "No Travel is selected or the selected travel no longer exists.",
-          modifier = Modifier.padding(15.dp).testTag("noTravelSelected"))
+          modifier = Modifier.padding(paddingValues).testTag("noTravelSelected"))
     }
 
     selectedParticipant?.let { participant ->
       if (expanded) {
         Dialog(onDismissRequest = { setExpanded(false) }) {
-          Box(Modifier.size(2000.dp, 200.dp).background(Color.White)) {
-            Column(modifier = Modifier.padding(8.dp)) {
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Localized description",
-                        modifier = Modifier.padding(5.dp))
-                    TruncatedText(
-                        text = participant.value.name,
-                        fontWeight = FontWeight.Bold,
-                        maxLength = 20,
-                        modifier = Modifier.padding(5.dp))
-                    TruncatedText(
-                        text = participant.value.email,
-                        maxLength = 20,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(5.dp))
-                  }
-
-              RoleEntryDialog(
-                  selectedTravel = selectedTravel,
-                  participant = participant,
-                  changeRoleAction = setExpandedRoleDialog,
-                  removeParticipantAction = {
-                    if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
-                        Role.OWNER) {
-                      if (selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
-                          1) {
-                        Toast.makeText(
-                                context,
-                                "You're trying to remove the owner of the travel. Please name another owner before removing.",
-                                Toast.LENGTH_LONG)
-                            .show()
-                        setExpanded(false)
-                        return@RoleEntryDialog
+          Box(
+              Modifier.size(2000.dp, 200.dp)
+                  .background(Color.White)
+                  .testTag("participantDialogBox")) {
+                Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
+                  Row(
+                      modifier = Modifier.testTag("participantDialogRow"),
+                      verticalAlignment = Alignment.CenterVertically,
+                      horizontalArrangement = Arrangement.SpaceBetween) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.padding(5.dp).testTag("participantDialogIcon"))
+                        TruncatedText(
+                            text = participant.value.name,
+                            fontWeight = FontWeight.Bold,
+                            maxLength = 20,
+                            modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
+                        TruncatedText(
+                            text = participant.value.email,
+                            maxLength = 20,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
                       }
-                    }
-                    val participantMap = selectedTravel!!.allParticipants.toMutableMap()
-                    participantMap.remove(Participant(participant.key))
-                    val updatedContainer =
-                        selectedTravel!!.copy(allParticipants = participantMap.toMap())
-                    listTravelViewModel.updateTravel(updatedContainer)
-                    listTravelViewModel.selectTravel(updatedContainer)
-                    listTravelViewModel.fetchAllParticipantsInfo()
-                    setExpanded(false)
-                  })
-            }
-          }
-        }
-      }
 
-      if (expandedRoleDialog) {
-        Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
-          Box(Modifier.size(800.dp, 250.dp).background(Color.White)) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
-                  ChangeRoleDialog(
-                      selectedTravel,
-                      participant,
-                      { newRole ->
-                        val oldRole = selectedTravel!!.allParticipants[Participant(participant.key)]
-                        if (oldRole == newRole) {
-                          setExpandedRoleDialog(false)
-                          setExpanded(false)
-                          return@ChangeRoleDialog
+                  RoleEntryDialog(
+                      selectedTravel = selectedTravel,
+                      participant = participant,
+                      changeRoleAction = setExpandedRoleDialog,
+                      removeParticipantAction = {
+                        if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
+                            Role.OWNER) {
+                          if (selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
+                              1) {
+                            Toast.makeText(
+                                    context,
+                                    "You're trying to remove the owner of the travel. Please name another owner before removing.",
+                                    Toast.LENGTH_LONG)
+                                .show()
+                            setExpanded(false)
+                            return@RoleEntryDialog
+                          }
                         }
-                        // we have an actual role change
-                        if (oldRole == Role.OWNER &&
-                            selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
-                                1) {
-                          Toast.makeText(
-                                  context,
-                                  "You're trying to change the role of the only owner of the travel. Please name another owner before changing the role.",
-                                  Toast.LENGTH_LONG)
-                              .show()
-                          setExpandedRoleDialog(false)
-                          setExpanded(false)
-                          return@ChangeRoleDialog
-                        }
-                        // we have a legal role change
                         val participantMap = selectedTravel!!.allParticipants.toMutableMap()
-                        participantMap[Participant(participant.key)] = newRole
+                        participantMap.remove(Participant(participant.key))
                         val updatedContainer =
                             selectedTravel!!.copy(allParticipants = participantMap.toMap())
                         listTravelViewModel.updateTravel(updatedContainer)
                         listTravelViewModel.selectTravel(updatedContainer)
                         listTravelViewModel.fetchAllParticipantsInfo()
-                        setExpandedRoleDialog(false)
                         setExpanded(false)
                       })
+                }
+              }
+        }
+      }
+
+      if (expandedRoleDialog) {
+        Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
+          Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("roleDialogBox")) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+                  ChangeRoleDialog(selectedTravel, participant) { newRole ->
+                    val oldRole = selectedTravel!!.allParticipants[Participant(participant.key)]
+                    if (oldRole == newRole) {
+                      setExpandedRoleDialog(false)
+                      setExpanded(false)
+                      return@ChangeRoleDialog
+                    }
+                    // we have an actual role change
+                    if (oldRole == Role.OWNER &&
+                        selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) == 1) {
+                      Toast.makeText(
+                              context,
+                              "You're trying to change the role of the only owner of the travel. Please name another owner before changing the role.",
+                              Toast.LENGTH_LONG)
+                          .show()
+                      setExpandedRoleDialog(false)
+                      setExpanded(false)
+                      return@ChangeRoleDialog
+                    }
+                    // we have a legal role change
+                    val participantMap = selectedTravel!!.allParticipants.toMutableMap()
+                    participantMap[Participant(participant.key)] = newRole
+                    val updatedContainer =
+                        selectedTravel!!.copy(allParticipants = participantMap.toMap())
+                    listTravelViewModel.updateTravel(updatedContainer)
+                    listTravelViewModel.selectTravel(updatedContainer)
+                    setExpandedRoleDialog(false)
+                    setExpanded(false)
+                    listTravelViewModel.fetchAllParticipantsInfo()
+                  }
                 }
           }
         }

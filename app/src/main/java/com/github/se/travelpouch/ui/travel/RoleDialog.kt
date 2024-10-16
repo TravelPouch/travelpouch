@@ -5,6 +5,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.Participant
@@ -26,11 +27,15 @@ fun ChangeRoleDialog(
     participant: Map.Entry<fsUid, UserInfo>,
     onRoleChange: (Role) -> Unit,
 ) {
-  Text("Select a Role", fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+  Text(
+      "Select a Role",
+      fontWeight = FontWeight.Bold,
+      modifier = Modifier.padding(8.dp).testTag("roleDialogTitle"))
   Text(
       "Current Role: ${selectedTravel!!.allParticipants[Participant(participant.key)]!!.name}",
-      modifier = Modifier.padding(8.dp))
+      modifier = Modifier.padding(8.dp).testTag("roleDialogCurrentRole"))
   Button(
+      modifier = Modifier.testTag("ownerButton"),
       onClick = {
         // Handle OWNER selection
         onRoleChange(Role.OWNER)
@@ -39,6 +44,7 @@ fun ChangeRoleDialog(
       }
 
   Button(
+      modifier = Modifier.testTag("organizerButton"),
       onClick = {
         // Handle ORGANISER selection
         onRoleChange(Role.ORGANIZER)
@@ -47,6 +53,7 @@ fun ChangeRoleDialog(
       }
 
   Button(
+      modifier = Modifier.testTag("participantButton"),
       onClick = {
         // Handle PARTICIPANT selection
         onRoleChange(Role.PARTICIPANT)
@@ -75,11 +82,14 @@ fun RoleEntryDialog(
   Text(
       text = "Role : ${selectedTravel!!.allParticipants[Participant(participant.key)]!!.name}",
       fontWeight = FontWeight.Bold,
-      modifier = Modifier.padding(8.dp))
+      modifier = Modifier.padding(8.dp).testTag("participantDialogRole"))
   // we just expand the other dialog
-  Button(onClick = { changeRoleAction(true) }) { Text("Change Role") }
+  Button(onClick = { changeRoleAction(true) }, modifier = Modifier.testTag("changeRoleButton")) {
+    Text("Change Role")
+  }
 
   Button(
+      modifier = Modifier.testTag("removeParticipantButton"),
       onClick = {
         // Handle Remove participant
         removeParticipantAction()

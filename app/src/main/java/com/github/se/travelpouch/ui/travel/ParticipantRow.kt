@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.Participant
@@ -31,7 +32,7 @@ fun ParticipantRow(
 
   Row(
       modifier =
-          Modifier.fillMaxWidth().clickable {
+          Modifier.fillMaxWidth().testTag("participantRow").clickable {
             onClick()
             Toast.makeText(context, "Participant clicked", Toast.LENGTH_SHORT).show()
           },
@@ -40,18 +41,18 @@ fun ParticipantRow(
         Icon(
             imageVector = Icons.Default.Person,
             contentDescription = "Localized description",
-            modifier = Modifier.padding(10.dp))
+            modifier = Modifier.padding(10.dp).testTag("participantIcon"))
         Text(
             text = participant.value.name,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp))
+            modifier = Modifier.padding(10.dp).testTag("participantName"))
         Text(
             text = participant.value.email,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp))
+            modifier = Modifier.padding(10.dp).testTag("participantEmail"))
         Text(
             text = selectedTravel.allParticipants[Participant(participant.key)]!!.name,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp))
+            modifier = Modifier.padding(10.dp).testTag("participantRole"))
       }
 }
