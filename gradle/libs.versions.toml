@@ -8,6 +8,7 @@ material = "1.12.0"
 composeBom = "2024.09.03"
 composeActivity = "1.9.2"
 composeViewModel = "2.8.6"
+composeIconsExtended = "1.0.0"
 lifecycleRuntimeKtx = "2.8.6"
 json = "20240303"
 mockitoAndroid = "5.13.0"
@@ -62,6 +63,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "composeIconsExtended" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 compose-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
