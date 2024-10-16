@@ -55,10 +55,10 @@ fun SignInScreen(navigationActions: NavigationActions) {
   // The main container for the screen
   // A surface container using the 'background' color from the theme
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("loginScreenScaffold"),
       content = { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().padding(padding).testTag("loginScreenColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -67,13 +67,13 @@ fun SignInScreen(navigationActions: NavigationActions) {
               painter =
                   painterResource(id = R.drawable.travelpouch_logo), // Ensure this drawable exists
               contentDescription = "App Logo",
-              modifier = Modifier.size(250.dp).testTag("loginLogo"))
+              modifier = Modifier.size(250.dp).testTag("appLogo"))
 
           Spacer(modifier = Modifier.height(16.dp))
 
           // Welcome Text
           Text(
-              modifier = Modifier.testTag("loginTitle"),
+              modifier = Modifier.testTag("welcomText"),
               text = "Welcome",
               style =
                   MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
