@@ -22,8 +22,8 @@ interface DocumentRepository {
 //        onSuccess: () -> Unit,
 //        onFailure: (Exception) -> Unit
 //    )
-//
-//    fun deleteDocumentById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+
+    fun deleteDocumentById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 }
 
 class DocumentRepositoryFirestore(
@@ -70,6 +70,23 @@ class DocumentRepositoryFirestore(
             } else {
                 task.exception?.let { e ->
                     Log.e("DocumentRepositoryFirestore", "Error adding document", e)
+                    onFailure(e)
+                }
+            }
+        }
+    }
+
+    override fun deleteDocumentById(
+        id: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection(collectionPath).document(id).delete().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                onSuccess()
+            } else {
+                task.exception?.let { e ->
+                    Log.e("DocumentRepositoryFirestore", "Error deleting document", e)
                     onFailure(e)
                 }
             }

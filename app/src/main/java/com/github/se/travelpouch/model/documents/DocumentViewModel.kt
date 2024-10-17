@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.asStateFlow
 open class DocumentViewModel(private val repository: DocumentRepository) : ViewModel() {
     private val _documents = MutableStateFlow<List<DocumentContainer>>(emptyList())
     val documents: StateFlow<List<DocumentContainer>> = _documents.asStateFlow()
+    private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
+    var selectedDocument: StateFlow<DocumentContainer?> = _selectedDocument.asStateFlow()
 
     init {
         repository.init { getDocuments() }
@@ -35,6 +37,7 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
 
     /** Gets all Documents. */
     fun getDocuments() {
+        Log.d("DocumentViewModel", "Getting Documents")
         repository.getDocuments(
             onSuccess = { _documents.value = it },
             onFailure = { Log.e("DocumentsViewModel", "Failed to get Documents", it) })
@@ -61,16 +64,23 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
 //            onSuccess = { getDocuments() },
 //            onFailure = { Log.e("DocumentsViewModel", "Failed to update Document", it) })
 //    }
-//
-//    /**
-//     * Deletes a Document by its ID.
-//     *
-//     * @param id The ID of the Document to be deleted.
-//     */
-//    fun deleteDocumentById(id: String) {
-//        repository.deleteDocumentById(id,
-//            onSuccess = { getDocuments() },
-//            onFailure = { Log.e("DocumentsViewModel", "Failed to delete Document", it) })
-//    }
+
+    /**
+     * Deletes a Document by its ID.
+     *
+     * @param id The ID of the Document to be deleted.
+     */
+    fun deleteDocumentById(id: String) {
+        repository.deleteDocumentById(id,
+            onSuccess = { getDocuments() },
+            onFailure = { Log.e("DocumentsViewModel", "Failed to delete Document", it) })
+    }
+
+    /**
+     * Defines selected document for the preview
+     */
+    fun selectDocument(document: DocumentContainer) {
+        _selectedDocument.value = document
+    }
 
 }

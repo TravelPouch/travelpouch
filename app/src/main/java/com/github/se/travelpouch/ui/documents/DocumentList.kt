@@ -20,10 +20,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.CameraAlt
@@ -31,12 +35,17 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,6 +56,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -65,25 +76,49 @@ import java.util.Locale
 /**
  * Composable function for displaying a list of documents.
  *
- * @param documentContainer The document container to display.
+ * @param documentViewModel the document view model to use.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentList(
     documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory),
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    onNavigateToDocumentPreview: () -> Unit
 ) {
-    val documentList = documentViewModel.documents.collectAsState().value
+    val documents = documentViewModel.documents.collectAsState()
     documentViewModel.getDocuments()
 
     Scaffold(
         modifier = Modifier.testTag("documentListScreen"),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Travel's documents",
+                        modifier = Modifier.semantics { testTag = "documentListTitle" })
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navigationActions.goBack() },
+                        modifier = Modifier.testTag("goBackButton") // Tag for back button
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                })
+        },
         floatingActionButton = {
             var toggled by remember { mutableStateOf(false) }
 
             Column(horizontalAlignment = Alignment.End) {
 
                 if (toggled) {
-                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.Bottom
+                    ) {
                         ExtendedFloatingActionButton(
                             text = { Text("Import from local files") },
                             icon = {
@@ -116,7 +151,7 @@ fun DocumentList(
                             },
                         ) {
                             Icon(
-                                Icons.Default.Close,
+                                Icons.Default.ArrowDropDown,
                                 contentDescription = "Add Document"
                             )
                         }
@@ -140,45 +175,58 @@ fun DocumentList(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(paddingValue)
         ) {
-            // Date and Title Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = {
-                    documentViewModel.createDocument(
-                        NewDocumentContainer(
-                            title = "New Document AAAABBBB",
-                            travelRef = Firebase.firestore.document("travels/ujqUGbYn2A8NXdNGGJ0D"),
-                            fileFormat = DocumentFileFormat.PDF,
-                            fileSize = 0,
-                            addedAt = Timestamp.now(),
-                            visibility = DocumentVisibility.ME
-                        )
-                    )
-                }) {
-                    Text(text = "Create doc", style = MaterialTheme.typography.bodyMedium)
-                }
+//            // Date and Title Row
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Button(onClick = {
+//                    documentViewModel.createDocument(
+//                        NewDocumentContainer(
+//                            title = "New Document AAAABBBB",
+//                            travelRef = Firebase.firestore.document("travels/ujqUGbYn2A8NXdNGGJ0D"),
+//                            fileFormat = DocumentFileFormat.PDF,
+//                            fileSize = 0,
+//                            addedAt = Timestamp.now(),
+//                            visibility = DocumentVisibility.ME
+//                        )
+//                    )
+//                }) {
+//                    Text(text = "Create doc", style = MaterialTheme.typography.bodyMedium)
+//                }
+//
+//                Button(onClick = {
+//                    documentViewModel.getDocuments()
+//                }) {
+//                    Text(text = "Load docs", style = MaterialTheme.typography.bodyMedium)
+//                }
+//            }
+//
+//            Spacer(modifier = Modifier.height(4.dp))
 
-                Button(onClick = {
-                    documentViewModel.getDocuments()
-                }) {
-                    Text(text = "Load docs", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            LazyColumn(
-                contentPadding = PaddingValues(vertical = 8.dp),
+            var isRefreshing by remember { mutableStateOf(false) }
+            val pullToRefreshState = rememberPullToRefreshState()
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 150.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .pullToRefresh(
+                        isRefreshing = isRefreshing,
+                        state = pullToRefreshState,
+                        onRefresh = {
+                            isRefreshing = true
+                            documentViewModel.getDocuments()
+                            isRefreshing = false
+                        }
+                    )
             ) {
-                items(documentList.size) { index ->
-                    DocumentListItem(documentList[index])
+                items(documents.value.size) { index ->
+                    DocumentListItem(documents.value[index], onClick = {
+                        documentViewModel.selectDocument(documents.value[index])
+                        onNavigateToDocumentPreview()
+                    })
                 }
             }
 

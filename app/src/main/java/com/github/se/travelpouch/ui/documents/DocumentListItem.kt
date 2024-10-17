@@ -1,15 +1,24 @@
 package com.github.se.travelpouch.ui.documents
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.FileOpen
+import androidx.compose.material.icons.filled.FilePresent
+import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +30,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.documents.DocumentContainer
+import com.github.se.travelpouch.model.documents.DocumentFileFormat
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -30,16 +41,16 @@ import java.util.Locale
  * @param documentContainer The document container to display.
  */
 @Composable
-fun DocumentListItem(documentContainer: DocumentContainer) {
+fun DocumentListItem(documentContainer: DocumentContainer, onClick: () -> Unit) {
     Card(
         modifier =
         Modifier.testTag("documentListItem")
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable(onClick = {}),
+            .fillMaxSize()
+            .padding(4.dp)
+            .clickable(onClick = onClick),
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-            // Date and Title Row
+        Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
                     text =
@@ -47,26 +58,19 @@ fun DocumentListItem(documentContainer: DocumentContainer) {
                         .format(documentContainer.addedAt.toDate()),
                     style = MaterialTheme.typography.bodySmall)
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = documentContainer.fileFormat.toString(),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold)
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
-                }
+                Text(
+                    text = documentContainer.fileFormat.toString(),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Box(modifier = Modifier.height(200.dp).width(150.dp).background(MaterialTheme.colorScheme.onPrimary)) {
 
-            // Description
+            }
+
             Text(text = documentContainer.title, style = MaterialTheme.typography.bodyMedium)
-
-//            // Location Name
-//            Text(
-//                text = travelContainer.location.name,
-//                style = MaterialTheme.typography.bodySmall,
-//                color = Color.Gray)
         }
+
+
     }
 }

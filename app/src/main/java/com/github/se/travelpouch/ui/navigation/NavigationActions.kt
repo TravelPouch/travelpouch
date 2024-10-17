@@ -14,6 +14,8 @@ object Screen {
   const val EDIT = "Edit Screen"
   const val PARTICIPANT_LIST = "Participant List Screen"
   const val ADD_TRAVEL = "AddTravel Screen"
+  const val DOCUMENT_LIST = "DocumentList Screen"
+  const val DOCUMENT_PREVIEW = "DocumentPreview Screen"
   const val OVERVIEW = "Overview Screen"
 }
 
