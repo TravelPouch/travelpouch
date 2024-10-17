@@ -67,85 +67,86 @@ fun AddActivityScreen(activityModelView: ActivityViewModel) {
   Scaffold(
       modifier = Modifier.testTag("AddActivityScreen"),
       topBar = {
-          TopAppBar(
-              title = { Text("Travel", Modifier.testTag("travelTitle")) },
-              navigationIcon = {
-                  IconButton(onClick = {}, modifier = Modifier.testTag("goBackButton")) {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                          contentDescription = "Back")
-                  }
-              })
-      }
-  ) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)) {
-          OutlinedTextField(
-              value = title,
-              onValueChange = { title = it },
-              label = { Text("Title") },
-              placeholder = { Text("Title") },
-              modifier = Modifier.testTag("titleField"))
-
-          OutlinedTextField(
-              value = description,
-              onValueChange = { description = it },
-              label = { Text("Description") },
-              placeholder = { Text("Description") },
-              modifier = Modifier.testTag("descriptionField"))
-
-          OutlinedTextField(
-              value = dateText,
-              onValueChange = {
-                if (it.isDigitsOnly() && it.length <= 8) {
-                  dateText = it
-                }
-              },
-              label = { Text("Date") },
-              placeholder = { Text("01/01/1970") },
-              visualTransformation = DateVisualTransformation(),
-              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-              modifier = Modifier.testTag("dateField"))
-
-          OutlinedTextField(
-              value = location,
-              onValueChange = {},
-              label = { Text("Location") },
-              placeholder = { Text("Location") },
-              modifier = Modifier.testTag("locationField"))
-
-          Button(
-              enabled =
-                  location.isNotBlank() &&
-                      title.isNotBlank() &&
-                      description.isNotBlank() &&
-                      dateText.isNotBlank(),
-              onClick = {
-                try {
-                  val finalDate = convertStringToDate(dateText, dateFormat, gregorianCalendar)
-
-                  val activity =
-                      Activity(
-                          activityModelView.getNewUid(),
-                          title,
-                          description,
-                          placeholerLocation,
-                          finalDate,
-                          mapOf())
-
-                  activityModelView.addActivity(activity, context)
-                } catch (e: java.text.ParseException) {
-                  Toast.makeText(
-                          context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
-                      .show()
-                }
-              },
-              modifier = Modifier.testTag("saveButton")) {
-                Text("Save")
+        TopAppBar(
+            title = { Text("Travel", Modifier.testTag("travelTitle")) },
+            navigationIcon = {
+              IconButton(onClick = {}, modifier = Modifier.testTag("goBackButton")) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                    contentDescription = "Back")
               }
-        }
-  }
+            })
+      }) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+              OutlinedTextField(
+                  value = title,
+                  onValueChange = { title = it },
+                  label = { Text("Title") },
+                  placeholder = { Text("Title") },
+                  modifier = Modifier.testTag("titleField"))
+
+              OutlinedTextField(
+                  value = description,
+                  onValueChange = { description = it },
+                  label = { Text("Description") },
+                  placeholder = { Text("Description") },
+                  modifier = Modifier.testTag("descriptionField"))
+
+              OutlinedTextField(
+                  value = dateText,
+                  onValueChange = {
+                    if (it.isDigitsOnly() && it.length <= 8) {
+                      dateText = it
+                    }
+                  },
+                  label = { Text("Date") },
+                  placeholder = { Text("01/01/1970") },
+                  visualTransformation = DateVisualTransformation(),
+                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                  modifier = Modifier.testTag("dateField"))
+
+              OutlinedTextField(
+                  value = location,
+                  onValueChange = {},
+                  label = { Text("Location") },
+                  placeholder = { Text("Location") },
+                  modifier = Modifier.testTag("locationField"))
+
+              Button(
+                  enabled =
+                      location.isNotBlank() &&
+                          title.isNotBlank() &&
+                          description.isNotBlank() &&
+                          dateText.isNotBlank(),
+                  onClick = {
+                    try {
+                      val finalDate = convertStringToDate(dateText, dateFormat, gregorianCalendar)
+
+                      val activity =
+                          Activity(
+                              activityModelView.getNewUid(),
+                              title,
+                              description,
+                              placeholerLocation,
+                              finalDate,
+                              mapOf())
+
+                      activityModelView.addActivity(activity, context)
+                    } catch (e: java.text.ParseException) {
+                      Toast.makeText(
+                              context,
+                              "Invalid format, date must be DD/MM/YYYY.",
+                              Toast.LENGTH_SHORT)
+                          .show()
+                    }
+                  },
+                  modifier = Modifier.testTag("saveButton")) {
+                    Text("Save")
+                  }
+            }
+      }
 }
 
 /**
