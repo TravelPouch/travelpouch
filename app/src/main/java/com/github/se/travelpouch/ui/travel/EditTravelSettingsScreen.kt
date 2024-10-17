@@ -285,11 +285,11 @@ fun EditTravelSettingsScreen(
  */
 fun parseDateToTimestamp(dateString: String): Timestamp {
   val dateFormat =
-      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+      SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).apply {
         isLenient = false // strict date format
       }
   val date = dateFormat.parse(dateString)
-  val calendar = GregorianCalendar(Locale.getDefault())
+  val calendar = GregorianCalendar(Locale.FRENCH)
   val datetime =
       calendar.apply {
         time = date!!
