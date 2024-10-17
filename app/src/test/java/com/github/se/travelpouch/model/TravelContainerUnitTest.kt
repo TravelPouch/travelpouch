@@ -69,13 +69,13 @@ class TravelContainerUnitTest {
     assertEquals("Test Description", map["description"])
     assertEquals(attachments, map["allAttachments"])
 
-    val locationMap = map["location"] as Map<*, *>?
+    val locationMap = map["location"] as Map<String, Any>?
     assertEquals(12.34, locationMap!!["latitude"])
     assertEquals(56.78, locationMap["longitude"])
     assertEquals(Timestamp(1234567890L, 0), locationMap["insertTime"])
     assertEquals("Test Location", locationMap["name"])
 
-    val participantsMap = map["allParticipants"] as Map<*, *>?
+    val participantsMap = map["allParticipants"] as Map<String, Any>?
     assertEquals("OWNER", participantsMap!![user1ID])
   }
 
