@@ -14,6 +14,12 @@ mockitoAndroid = "5.13.0"
 gms = "4.4.2"
 navigationCompose = "2.8.2"
 
+# Google Service and Maps
+playServicesAuth = "21.2.0"
+playServicesMaps = "19.0.0"
+mapsCompose = "4.3.3"
+mapsComposeUtils = "4.3.0"
+
 # Testing Unit
 junit = "4.13.2"
 mockitoCore = "5.13.0"
@@ -78,6 +84,12 @@ firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", 
 firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+
+#GOOGLE SERVICES & MAPS
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
+maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 
 #MOCKITO
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
