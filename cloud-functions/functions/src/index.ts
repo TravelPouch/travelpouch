@@ -194,8 +194,6 @@ function getAccessToken(): Promise<string> {
     client_secret: CLIENT_SECRET.value(),
   };
 
-  logger.debug(body);
-
   const request: RequestInfo = new Request("https://oauth2.googleapis.com/token", {
     method: "POST",
     body: JSON.stringify(body),
@@ -208,7 +206,7 @@ function getAccessToken(): Promise<string> {
   return fetch(request)
     .then((res) => res.json())
     .then((res) => {
-      logger.debug("Access token", res);
+      logger.debug("Access token fetched");
       return res.access_token;
     });
 }
