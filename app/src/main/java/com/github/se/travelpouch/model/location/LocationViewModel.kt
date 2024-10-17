@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.location
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.github.se.travelpouch.model.Location
@@ -30,16 +31,17 @@ class LocationViewModel(val repository: LocationRepository) : ViewModel() {
         }
   }
 
-  /**
-   * Sets the search query and updates location suggestions.
-   *
-   * @param query The search query string.
-   */
   fun setQuery(query: String) {
     query_.value = query
 
     if (query.isNotEmpty()) {
-      repository.search(query, { locationSuggestions_.value = it }, {})
+      repository.search(
+          query,
+          { locationSuggestions_.value = it },
+          { error ->
+            // Log the error with additional details for more granularity
+            Log.e("LocationViewModel", "Error fetching location suggestions: $error")
+          })
     }
   }
 }

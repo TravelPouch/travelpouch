@@ -60,8 +60,8 @@ class NominatimLocationRepository(val client: OkHttpClient) : LocationRepository
         Request.Builder()
             .url(url)
             .header(
-                "User-Agent", "YourAppName/1.0 (your-email@example.com)") // Set a proper User-Agent
-            .header("Referer", "https://yourapp.com") // Optionally add a Referer
+                "User-Agent",
+                "TravelPouchApp/1.0 (travelpouchswent@gmail.com)") // Set a proper User-Agent
             .build()
     client
         .newCall(request)
