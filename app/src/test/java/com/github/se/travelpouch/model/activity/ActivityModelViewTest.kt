@@ -14,7 +14,7 @@ import org.mockito.kotlin.anyOrNull
 
 class ActivityModelViewTest {
   private lateinit var repository: ActivityRepository
-  private lateinit var activityViewModel: ActivityModelView
+  private lateinit var activityViewModel: ActivityViewModel
   private lateinit var mockContext: Context
 
   val activity =
@@ -29,7 +29,7 @@ class ActivityModelViewTest {
   @Before
   fun setUp() {
     repository = mock(ActivityRepository::class.java)
-    activityViewModel = ActivityModelView(repository)
+    activityViewModel = ActivityViewModel(repository)
     mockContext = mock(Context::class.java)
   }
 

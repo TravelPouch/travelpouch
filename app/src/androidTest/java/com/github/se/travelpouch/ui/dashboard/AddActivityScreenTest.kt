@@ -12,8 +12,8 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
-import com.github.se.travelpouch.model.activity.ActivityModelView
 import com.github.se.travelpouch.model.activity.ActivityRepository
+import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
@@ -26,7 +26,7 @@ import org.mockito.kotlin.never
 
 class AddActivityScreenTest {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
-  private lateinit var mockActivityModelView: ActivityModelView
+  private lateinit var mockActivityModelView: ActivityViewModel
 
   val activity =
       Activity(
@@ -42,7 +42,7 @@ class AddActivityScreenTest {
   @Before
   fun setUp() {
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
-    mockActivityModelView = ActivityModelView(mockActivityRepositoryFirebase)
+    mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
 
     `when`(mockActivityModelView.getNewUid()).thenReturn("uid")
   }

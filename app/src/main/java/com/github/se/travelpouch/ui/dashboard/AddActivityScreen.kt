@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
-import com.github.se.travelpouch.model.activity.ActivityModelView
+import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -39,7 +39,7 @@ import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddActivityScreen(activityModelView: ActivityModelView) {
+fun AddActivityScreen(activityModelView: ActivityViewModel) {
   val dateFormat =
       SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
         isLenient = false // strict date format

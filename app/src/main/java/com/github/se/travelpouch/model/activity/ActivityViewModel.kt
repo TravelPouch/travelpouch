@@ -13,7 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : ViewModel() {
+/**
+ * This class represents the view model of the activities
+ * @property activityRepositoryFirebase (ActivityRepository) : the repository of the activites
+ */
+class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : ViewModel() {
 
   // create factory
   companion object {
@@ -21,7 +25,7 @@ class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : Vi
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ActivityModelView(ActivityRepositoryFirebase(Firebase.firestore)) as T
+            return ActivityViewModel(ActivityRepositoryFirebase(Firebase.firestore)) as T
           }
         }
   }
@@ -30,15 +34,8 @@ class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : Vi
   val activities: StateFlow<List<Activity>> = activities_.asStateFlow()
 
   private val selectedActivity_ =
-      MutableStateFlow<Activity>(
-          Activity(
-              "uid",
-              "title",
-              "description",
-              Location(0.0, 0.0, Timestamp(0, 0), "location"),
-              Timestamp(0, 0),
-              null))
-  val selectedActivity: StateFlow<Activity> = selectedActivity_.asStateFlow()
+      MutableStateFlow<Activity?>(null)
+  val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
   private val onFailureTag = "ActivityViewModel"
 
@@ -62,11 +59,11 @@ class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : Vi
   fun addActivity(activity: Activity, context: Context) {
     activityRepositoryFirebase.addActivity(
         activity,
-        {
+        onSuccess = {
           getAllActivities()
           Toast.makeText(context, "Activity saved", Toast.LENGTH_SHORT).show()
         },
-        {
+        onFailure = {
           Log.e(onFailureTag, "Failed to add an activity", it)
           Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
         })
@@ -80,11 +77,11 @@ class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : Vi
   fun updateActivity(activity: Activity, context: Context) {
     activityRepositoryFirebase.updateActivity(
         activity,
-        {
+        onSuccess = {
           getAllActivities()
           Toast.makeText(context, "Activity updated", Toast.LENGTH_SHORT).show()
         },
-        {
+        onFailure = {
           Log.e(onFailureTag, "Failed to update an activity", it)
           Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
         })
@@ -98,11 +95,11 @@ class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : Vi
   fun deleteActivityById(activity: Activity, context: Context) {
     activityRepositoryFirebase.deleteActivityById(
         activity.uid,
-        {
+        onSuccess = {
           getAllActivities()
           Toast.makeText(context, "Activity deleted", Toast.LENGTH_SHORT).show()
         },
-        {
+        onFailure = {
           Log.e(onFailureTag, "Failed to delete an activity", it)
           Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
         })

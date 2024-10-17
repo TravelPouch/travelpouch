@@ -8,7 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
-import com.github.se.travelpouch.model.activity.ActivityModelView
+import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -20,7 +20,7 @@ import org.mockito.kotlin.any
 
 class TravelActivityScreen {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
-  private lateinit var mockActivityModelView: ActivityModelView
+  private lateinit var mockActivityModelView: ActivityViewModel
 
   val activites_test =
       listOf(
@@ -44,7 +44,7 @@ class TravelActivityScreen {
   @Before
   fun setUp() {
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
-    mockActivityModelView = ActivityModelView(mockActivityRepositoryFirebase)
+    mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
   }
 
   @Test

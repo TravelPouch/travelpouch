@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
-import com.github.se.travelpouch.model.activity.ActivityModelView
+import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import java.util.Calendar
 import java.util.GregorianCalendar
@@ -55,7 +55,7 @@ data class BottomNavigationItem(val title: String, val icon: ImageVector)
 @Composable
 fun TravelActivitiesScreen(
     navigationActions: NavigationActions? = null,
-    activityModelView: ActivityModelView
+    activityModelView: ActivityViewModel
 ) {
   // todo: to manually test this function, you need to follow these steps:
   // comment line 77, decomment the lines 60 to 75, set activityModelView to null, and replace
