@@ -19,7 +19,6 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.overview.AddTravelScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
