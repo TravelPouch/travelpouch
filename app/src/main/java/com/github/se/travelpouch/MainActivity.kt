@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -110,4 +111,13 @@ fun TravelPouchApp() {
             composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
         }
     }
+}
+
+@Composable
+fun Greeting() {
+  Surface(
+      modifier = Modifier.fillMaxSize().testTag("GreetingScreenContainer"),
+  ) {
+    Text(text = "This is the Greeting Screen")
+  }
 }
