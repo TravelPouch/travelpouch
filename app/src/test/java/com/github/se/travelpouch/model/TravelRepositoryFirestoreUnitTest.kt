@@ -714,4 +714,29 @@ class TravelRepositoryFirestoreUnitTest {
     travelRepositoryFirestore2.updateTravel(
         travelContainer2, { updateLatch.countDown() }, { fail("Should not call onFailure") })
   }
+
+  @Test
+  fun testDocumentToUserInfo() {
+    val document: DocumentSnapshot = mock()
+    val fsUid = generateAutoId()
+    whenever(document.id).thenReturn(fsUid)
+    whenever(document.getString("fsUid")).thenReturn(fsUid)
+    whenever(document.getString("name")).thenReturn("Test User")
+    whenever(document.get("listoftravellinked")).thenReturn(listOf(fsUid, fsUid))
+    whenever(document.getString("email")).thenReturn("testuser@example.com")
+
+    val method =
+        travelRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToUserInfo", DocumentSnapshot::class.java)
+    method.isAccessible = true
+
+    val result = method.invoke(travelRepositoryFirestore, document) as UserInfo?
+
+    assertNotNull(result)
+    assertEquals(fsUid, result?.fsUid)
+    assertEquals("Test User", result?.name)
+    assertEquals(listOf(fsUid, fsUid), result?.userTravelList)
+    assertEquals("testuser@example.com", result?.email)
+  }
 }
