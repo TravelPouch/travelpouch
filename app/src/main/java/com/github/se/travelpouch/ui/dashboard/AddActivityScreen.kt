@@ -9,10 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +44,7 @@ import java.util.Locale
  *
  * @param activityModelView (ActivityViewModel) : the view model for an activity
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AddActivityScreen(activityModelView: ActivityViewModel) {
@@ -57,7 +64,20 @@ fun AddActivityScreen(activityModelView: ActivityViewModel) {
 
   val placeholerLocation = Location(0.0, 0.0, Timestamp(0, 0), "name")
 
-  Scaffold(modifier = Modifier.testTag("AddActivityScreen")) {
+  Scaffold(
+      modifier = Modifier.testTag("AddActivityScreen"),
+      topBar = {
+          TopAppBar(
+              title = { Text("Travel", Modifier.testTag("travelTitle")) },
+              navigationIcon = {
+                  IconButton(onClick = {}, modifier = Modifier.testTag("goBackButton")) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                          contentDescription = "Back")
+                  }
+              })
+      }
+  ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
