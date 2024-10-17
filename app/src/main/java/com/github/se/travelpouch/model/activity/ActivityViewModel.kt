@@ -5,9 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.se.travelpouch.model.Location
 import com.google.firebase.Firebase
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * This class represents the view model of the activities
+ *
  * @property activityRepositoryFirebase (ActivityRepository) : the repository of the activites
  */
 class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : ViewModel() {
@@ -33,8 +32,7 @@ class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : Vi
   private val activities_ = MutableStateFlow<List<Activity>>(emptyList())
   val activities: StateFlow<List<Activity>> = activities_.asStateFlow()
 
-  private val selectedActivity_ =
-      MutableStateFlow<Activity?>(null)
+  private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
   private val onFailureTag = "ActivityViewModel"
