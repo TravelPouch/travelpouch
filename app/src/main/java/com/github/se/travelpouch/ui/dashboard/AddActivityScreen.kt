@@ -33,6 +33,7 @@ import androidx.core.text.isDigitsOnly
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -47,106 +48,124 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddActivityScreen(activityModelView: ActivityViewModel) {
-  val dateFormat =
-      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-        isLenient = false // strict date format
-      }
+fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: ActivityViewModel) {
+    val dateFormat =
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+            isLenient = false // strict date format
+        }
 
-  val gregorianCalendar = GregorianCalendar()
+    val gregorianCalendar = GregorianCalendar()
 
-  var title by remember { mutableStateOf("") }
-  var description by remember { mutableStateOf("") }
-  var dateText by remember { mutableStateOf("") }
-  var location by remember { mutableStateOf("Placeholder") }
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var dateText by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("Placeholder") }
 
-  val context = LocalContext.current
+    val context = LocalContext.current
 
-  val placeholerLocation = Location(0.0, 0.0, Timestamp(0, 0), "name")
+    val placeholerLocation = Location(0.0, 0.0, Timestamp(0, 0), "name")
 
-  Scaffold(
-      modifier = Modifier.testTag("AddActivityScreen"),
-      topBar = {
-        TopAppBar(
-            title = { Text("Travel", Modifier.testTag("travelTitle")) },
-            navigationIcon = {
-              IconButton(onClick = {}, modifier = Modifier.testTag("goBackButton")) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
-            })
-      }) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)) {
-              OutlinedTextField(
-                  value = title,
-                  onValueChange = { title = it },
-                  label = { Text("Title") },
-                  placeholder = { Text("Title") },
-                  modifier = Modifier.testTag("titleField"))
-
-              OutlinedTextField(
-                  value = description,
-                  onValueChange = { description = it },
-                  label = { Text("Description") },
-                  placeholder = { Text("Description") },
-                  modifier = Modifier.testTag("descriptionField"))
-
-              OutlinedTextField(
-                  value = dateText,
-                  onValueChange = {
-                    if (it.isDigitsOnly() && it.length <= 8) {
-                      dateText = it
+    Scaffold(
+        modifier = Modifier.testTag("AddActivityScreen"),
+        topBar = {
+            TopAppBar(
+                title = { Text("Add Activity", Modifier.testTag("travelTitle")) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navigationActions.goBack()
+                    }, modifier = Modifier.testTag("goBackButton")) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
-                  },
-                  label = { Text("Date") },
-                  placeholder = { Text("01/01/1970") },
-                  visualTransformation = DateVisualTransformation(),
-                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                  modifier = Modifier.testTag("dateField"))
+                })
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Title") },
+                    placeholder = { Text("Title") },
+                    modifier = Modifier.testTag("titleField")
+                )
 
-              OutlinedTextField(
-                  value = location,
-                  onValueChange = {},
-                  label = { Text("Location") },
-                  placeholder = { Text("Location") },
-                  modifier = Modifier.testTag("locationField"))
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    placeholder = { Text("Description") },
+                    modifier = Modifier.testTag("descriptionField")
+                )
 
-              Button(
-                  enabled =
-                      location.isNotBlank() &&
-                          title.isNotBlank() &&
-                          description.isNotBlank() &&
-                          dateText.isNotBlank(),
-                  onClick = {
-                    try {
-                      val finalDate = convertStringToDate(dateText, dateFormat, gregorianCalendar)
+                OutlinedTextField(
+                    value = dateText,
+                    onValueChange = {
+                        if (it.isDigitsOnly() && it.length <= 8) {
+                            dateText = it
+                        }
+                    },
+                    label = { Text("Date") },
+                    placeholder = { Text("01/01/1970") },
+                    visualTransformation = DateVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.testTag("dateField")
+                )
 
-                      val activity =
-                          Activity(
-                              activityModelView.getNewUid(),
-                              title,
-                              description,
-                              placeholerLocation,
-                              finalDate,
-                              mapOf())
+                OutlinedTextField(
+                    value = location,
+                    onValueChange = {},
+                    label = { Text("Location") },
+                    placeholder = { Text("Location") },
+                    modifier = Modifier.testTag("locationField")
+                )
 
-                      activityModelView.addActivity(activity, context)
-                    } catch (e: java.text.ParseException) {
-                      Toast.makeText(
-                              context,
-                              "Invalid format, date must be DD/MM/YYYY.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-                    }
-                  },
-                  modifier = Modifier.testTag("saveButton")) {
+                Button(
+                    enabled =
+                    location.isNotBlank() &&
+                            title.isNotBlank() &&
+                            description.isNotBlank() &&
+                            dateText.isNotBlank(),
+                    onClick = {
+                        try {
+                            val finalDate =
+                                convertStringToDate(dateText, dateFormat, gregorianCalendar)
+
+                            val activity =
+                                Activity(
+                                    activityModelView.getNewUid(),
+                                    title,
+                                    description,
+                                    placeholerLocation,
+                                    finalDate,
+                                    mapOf()
+                                )
+
+                            activityModelView.addActivity(activity, context)
+                        } catch (e: java.text.ParseException) {
+                            Toast.makeText(
+                                context,
+                                "Invalid format, date must be DD/MM/YYYY.",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
+                    },
+                    modifier = Modifier.testTag("saveButton")
+                ) {
                     Text("Save")
-                  }
+                }
             }
-      }
+        }
+    )
 }
 
 /**
@@ -163,17 +182,20 @@ fun convertStringToDate(
     dateFormat: SimpleDateFormat,
     gregorianCalendar: GregorianCalendar
 ): Timestamp {
-  val finalDateString =
-      stringDate.substring(0, 2) + "/" + stringDate.substring(2, 4) + "/" + stringDate.substring(4)
+    val finalDateString =
+        stringDate.substring(0, 2) + "/" + stringDate.substring(
+            2,
+            4
+        ) + "/" + stringDate.substring(4)
 
-  val date = dateFormat.parse(finalDateString)
-  val calendar =
-      gregorianCalendar.apply {
-        time = date!!
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-      }
+    val date = dateFormat.parse(finalDateString)
+    val calendar =
+        gregorianCalendar.apply {
+            time = date!!
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
 
-  return Timestamp(calendar.time)
+    return Timestamp(calendar.time)
 }
