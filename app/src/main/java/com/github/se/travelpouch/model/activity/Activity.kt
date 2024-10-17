@@ -9,5 +9,5 @@ data class Activity(
     val description: String,
     val location: Location,
     val date: Timestamp,
-    val documentsNeeded: Map<String, Int>
+    val documentsNeeded: Map<String, Int>?
 )

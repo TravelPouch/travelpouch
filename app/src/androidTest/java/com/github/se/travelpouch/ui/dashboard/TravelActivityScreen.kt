@@ -1,0 +1,92 @@
+package com.github.se.travelpouch.ui.dashboard
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.activity.Activity
+import com.github.se.travelpouch.model.activity.ActivityModelView
+import com.github.se.travelpouch.model.activity.ActivityRepository
+import com.google.firebase.Timestamp
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
+
+class TravelActivityScreen {
+  private lateinit var mockActivityRepositoryFirebase: ActivityRepository
+  private lateinit var mockActivityModelView: ActivityModelView
+
+  val activites_test =
+      listOf(
+          Activity(
+              "1",
+              "title1",
+              "description1",
+              Location(0.0, 0.0, Timestamp(0, 0), "lcoation1"),
+              Timestamp(0, 0),
+              mapOf<String, Int>()),
+          Activity(
+              "2",
+              "title2",
+              "description2",
+              Location(0.0, 0.0, Timestamp(0, 0), "lcoation2"),
+              Timestamp(0, 0),
+              mapOf<String, Int>()))
+
+  @get:Rule val composeTestRule = createComposeRule()
+
+  @Before
+  fun setUp() {
+    mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
+    mockActivityModelView = ActivityModelView(mockActivityRepositoryFirebase)
+  }
+
+  @Test
+  fun verifiesEverythingIsDisplayed() {
+    composeTestRule.setContent { TravelActivitiesScreen(activityModelView = mockActivityModelView) }
+
+    `when`(mockActivityRepositoryFirebase.getActivity(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(activites_test)
+    }
+
+    composeTestRule.onNodeWithTag("travelActivitiesScreen").isDisplayed()
+    composeTestRule.onNodeWithTag("travelTitle").isDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").isDisplayed()
+    composeTestRule.onNodeWithTag("settingsButton").isDisplayed()
+    composeTestRule.onNodeWithTag("eventTimelineButton").isDisplayed()
+    composeTestRule.onNodeWithTag("navigationBarTravel").isDisplayed()
+    composeTestRule.onNodeWithTag("addActivityButton").isDisplayed()
+  }
+
+  @Test
+  fun verifiesEmptyPromptWhenEmptyList() {
+    composeTestRule.setContent { TravelActivitiesScreen(activityModelView = mockActivityModelView) }
+
+    `when`(mockActivityRepositoryFirebase.getActivity(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf())
+    }
+
+    composeTestRule.onNodeWithTag("emptyTravel").isDisplayed()
+    composeTestRule
+        .onNodeWithTag("emptyTravel")
+        .assertTextEquals("No activities planned for this trip")
+  }
+
+  @Test
+  fun verifyActivityCardWorksCorrectly() {
+    val activity = activites_test[0]
+
+    composeTestRule.setContent { ActivityItem(activity) }
+
+    composeTestRule.onNodeWithTag("activityItem").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.title)
+    composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.location.name)
+    composeTestRule.onNodeWithTag("activityItem").assertTextContains("1/1/1970")
+  }
+}
