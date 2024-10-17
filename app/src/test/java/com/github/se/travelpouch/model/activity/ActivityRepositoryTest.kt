@@ -92,7 +92,7 @@ class ActivityRepositoryTest {
     `when`(mockToDoQuerySnapshot.documents).thenReturn(listOf())
 
     // Call the method under test
-    activityRepositoryFirestore.getActivity(
+    activityRepositoryFirestore.getAllActivities(
         onSuccess = {
 
           // Do nothing; we just want to verify that the 'documents' field was accessed

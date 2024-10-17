@@ -51,7 +51,7 @@ class TravelActivityScreen {
   fun verifiesEverythingIsDisplayed() {
     composeTestRule.setContent { TravelActivitiesScreen(activityModelView = mockActivityModelView) }
 
-    `when`(mockActivityRepositoryFirebase.getActivity(any(), any())).then {
+    `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(activites_test)
     }
 
@@ -68,7 +68,7 @@ class TravelActivityScreen {
   fun verifiesEmptyPromptWhenEmptyList() {
     composeTestRule.setContent { TravelActivitiesScreen(activityModelView = mockActivityModelView) }
 
-    `when`(mockActivityRepositoryFirebase.getActivity(any(), any())).then {
+    `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf())
     }
 
