@@ -72,6 +72,7 @@ class ListTravelViewModelTest {
         .getTravels(anyOrNull(), anyOrNull())
 
     listTravelViewModel.getTravels()
+
     verify(travelRepository).getTravels(anyOrNull(), anyOrNull())
 
     assertThat(listTravelViewModel.travels.value, `is`(travelList))
@@ -288,11 +289,11 @@ class ListTravelViewModelTest {
     doAnswer { invocation ->
           val onFailure = invocation.getArgument(2) as (Exception) -> Unit
           onFailure(exception)
+
           null
         }
         .whenever(travelRepository)
         .deleteTravelById(anyOrNull(), anyOrNull(), anyOrNull())
-
     mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
       logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
 
