@@ -110,12 +110,11 @@ class EditTravelSettingsScreenTest {
     // composeTestRule.onNodeWithTag("inputTravelLongitude").assertIsDisplayed()
     // composeTestRule.onNodeWithTag("inputTravelStartTime").assertIsDisplayed()
     // composeTestRule.onNodeWithTag("inputTravelEndTime").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("travelDeleteButton").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("addUserFab").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("importEmailFab").performScrollTo().assertIsDisplayed()
-
+    composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("travelDeleteButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserFab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("importEmailFab").assertIsDisplayed()
   }
 
   @Test
