@@ -86,6 +86,7 @@ class ParticipantListScreenTest {
         .onNodeWithTag("noTravelSelected")
         .assertIsDisplayed()
         .assertTextContains("No Travel is selected or the selected travel no longer exists.")
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
   }
 
   @Test
@@ -156,13 +157,240 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("ownerButton").performClick()
     composeTestRule.onNodeWithTag("participantDialogBox").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("roleDialogBox").assertIsNotDisplayed()
-    // val firstagain = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
-    //
-    // firstagain.assertExists().assertIsDisplayed()
-    // firstagain.performScrollTo().performClick()
-    // composeTestRule.onNodeWithTag("participantDialogRole").assertIsDisplayed().assertTextContains("Role : OWNER")
-    // composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed().performClick()
-    //  composeTestRule.onNodeWithTag("participantDialogBox").assertIsNotDisplayed()
+  }
 
+  @Test
+  fun testNonEmptyViewChangeRoleFailed() {
+    val container = createContainer()
+    // Add participants directly
+    val participant1 =
+        UserInfo(
+            container.allParticipants.keys.toList()[0].fsUid,
+            "User One",
+            listOf("travel1"),
+            "user1@example.com")
+    val participant2 =
+        UserInfo(
+            container.allParticipants.keys.toList()[1].fsUid,
+            "User Two",
+            listOf("travel2"),
+            "user2@example.com")
+    listTravelViewModel.selectTravel(container)
+
+    // this hack was generated using Github Copilot
+    val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
+    participants_field.isAccessible = true
+    val participantFlow =
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+    participantFlow.value =
+        mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
+
+    // Set the content of the screen
+    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
+    // listTravelViewModel.addParticipant(participant1)
+    // listTravelViewModel.addParticipant(participant2)
+
+    // Check if all elements are displayed
+    composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+
+    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    first.assertExists().assertIsDisplayed()
+    second.assertExists().assertIsDisplayed()
+    second.performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("participantDialogBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogRow").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogEmail").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("participantDialogRole")
+        .assertIsDisplayed()
+        .assertTextContains("Role : OWNER")
+    composeTestRule.onNodeWithTag("changeRoleButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("changeRoleButton").performClick()
+    composeTestRule.onNodeWithTag("roleDialogBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("roleDialogTitle").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("roleDialogCurrentRole")
+        .assertIsDisplayed()
+        .assertTextContains("Current Role: OWNER")
+    composeTestRule.onNodeWithTag("ownerButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("organizerButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("organizerButton").performClick()
+    composeTestRule.onNodeWithTag("participantDialogBox").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("roleDialogBox").assertIsNotDisplayed()
+    composeTestRule.onAllNodesWithTag("participantRow").onFirst().performScrollTo().performClick()
+  }
+
+  @Test
+  fun testNonEmptyViewChangeRoleToSameRole() {
+    val container = createContainer()
+    // Add participants directly
+    val participant1 =
+        UserInfo(
+            container.allParticipants.keys.toList()[0].fsUid,
+            "User One",
+            listOf("travel1"),
+            "user1@example.com")
+    val participant2 =
+        UserInfo(
+            container.allParticipants.keys.toList()[1].fsUid,
+            "User Two",
+            listOf("travel2"),
+            "user2@example.com")
+    listTravelViewModel.selectTravel(container)
+
+    // this hack was generated using Github Copilot
+    val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
+    participants_field.isAccessible = true
+    val participantFlow =
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+    participantFlow.value =
+        mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
+
+    // Set the content of the screen
+    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
+    // listTravelViewModel.addParticipant(participant1)
+    // listTravelViewModel.addParticipant(participant2)
+
+    // Check if all elements are displayed
+    composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+
+    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    first.assertExists().assertIsDisplayed()
+    second.assertExists().assertIsDisplayed()
+    second.performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("participantDialogBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogRow").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantDialogEmail").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("participantDialogRole")
+        .assertIsDisplayed()
+        .assertTextContains("Role : OWNER")
+    composeTestRule.onNodeWithTag("changeRoleButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("changeRoleButton").performClick()
+    composeTestRule.onNodeWithTag("roleDialogBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("roleDialogTitle").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("roleDialogCurrentRole")
+        .assertIsDisplayed()
+        .assertTextContains("Current Role: OWNER")
+    composeTestRule.onNodeWithTag("ownerButton").assertIsDisplayed().performClick()
+  }
+
+  @Test
+  fun testNonEmptyViewRemoveParticipant() {
+    val container = createContainer()
+    // Add participants directly
+    val participant1 =
+        UserInfo(
+            container.allParticipants.keys.toList()[0].fsUid,
+            "User One",
+            listOf("travel1"),
+            "user1@example.com")
+    val participant2 =
+        UserInfo(
+            container.allParticipants.keys.toList()[1].fsUid,
+            "User Two",
+            listOf("travel2"),
+            "user2@example.com")
+    listTravelViewModel.selectTravel(container)
+
+    // this hack was generated using Github Copilot
+    val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
+    participants_field.isAccessible = true
+    val participantFlow =
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+    participantFlow.value =
+        mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
+
+    // Set the content of the screen
+    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
+    // listTravelViewModel.addParticipant(participant1)
+    // listTravelViewModel.addParticipant(participant2)
+
+    // Check if all elements are displayed
+    composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+
+    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    first.assertExists().assertIsDisplayed()
+    second.assertExists().assertIsDisplayed()
+    first.performScrollTo().performClick()
+    composeTestRule
+        .onNodeWithTag("participantDialogRole")
+        .assertIsDisplayed()
+        .assertTextContains("Role : PARTICIPANT")
+    composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed().performClick()
+  }
+
+  @Test
+  fun testNonEmptyViewRemoveParticipantFail() {
+    val container = createContainer()
+    // Add participants directly
+    val participant1 =
+        UserInfo(
+            container.allParticipants.keys.toList()[0].fsUid,
+            "User One",
+            listOf("travel1"),
+            "user1@example.com")
+    val participant2 =
+        UserInfo(
+            container.allParticipants.keys.toList()[1].fsUid,
+            "User Two",
+            listOf("travel2"),
+            "user2@example.com")
+    listTravelViewModel.selectTravel(container)
+
+    // this hack was generated using Github Copilot
+    val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
+    participants_field.isAccessible = true
+    val participantFlow =
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+    participantFlow.value =
+        mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
+
+    // Set the content of the screen
+    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
+
+    // Check if all elements are displayed
+    composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+
+    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    first.assertExists().assertIsDisplayed()
+    second.assertExists().assertIsDisplayed()
+    second.performScrollTo().performClick()
+    composeTestRule
+        .onNodeWithTag("participantDialogRole")
+        .assertIsDisplayed()
+        .assertTextContains("Role : OWNER")
+    composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed().performClick()
+    composeTestRule.onAllNodesWithTag("participantRow").onFirst().performScrollTo().performClick()
   }
 }

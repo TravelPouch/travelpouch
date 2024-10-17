@@ -163,6 +163,7 @@ fun ParticipantListScreen(
                         listTravelViewModel.selectTravel(updatedContainer)
                         listTravelViewModel.fetchAllParticipantsInfo()
                         setExpanded(false)
+                        Toast.makeText(context, "Participant removed", Toast.LENGTH_LONG).show()
                       })
                 }
               }
