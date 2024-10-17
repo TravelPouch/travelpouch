@@ -1,41 +1,19 @@
 package com.github.se.travelpouch.model.activity
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.se.travelpouch.model.Location
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : ViewModel() {
-
-  private val activities_ = MutableStateFlow<List<Activity>>(emptyList())
-  val activities: StateFlow<List<Activity>> = activities_.asStateFlow()
-
-  fun init() {
-    activityRepositoryFirebase.init { getActivities() }
-  }
-
-  fun getActivities() {
-    activityRepositoryFirebase.getActivity(onSuccess = { activities_.value = it }, onFailure = {})
-  }
-
-  fun addActivity(activity: Activity) {
-    activityRepositoryFirebase.addActivity(activity, { getActivities() }, {})
-  }
-
-  fun updateActivity(activity: Activity) {
-    activityRepositoryFirebase.updateActivity(activity, { getActivities() }, {})
-  }
-
-  fun deleteActivityById(activity: Activity) {
-    activityRepositoryFirebase.deleteActivityById(activity.uid, { getActivities() }, {})
-  }
-
-  fun getNewUid(): String {
-    return activityRepositoryFirebase.getNewUid()
-  }
 
   // create factory
   companion object {
@@ -46,5 +24,105 @@ class ActivityModelView(val activityRepositoryFirebase: ActivityRepository) : Vi
             return ActivityModelView(ActivityRepositoryFirebase(Firebase.firestore)) as T
           }
         }
+  }
+
+  private val activities_ = MutableStateFlow<List<Activity>>(emptyList())
+  val activities: StateFlow<List<Activity>> = activities_.asStateFlow()
+
+  private val selectedActivity_ =
+      MutableStateFlow<Activity>(
+          Activity(
+              "uid",
+              "title",
+              "description",
+              Location(0.0, 0.0, Timestamp(0, 0), "location"),
+              Timestamp(0, 0),
+              null))
+  val selectedActivity: StateFlow<Activity> = selectedActivity_.asStateFlow()
+
+  private val onFailureTag = "ActivityViewModel"
+
+  /** This is the initialisation function of the model view */
+  fun init() {
+    activityRepositoryFirebase.init { getAllActivities() }
+  }
+
+  /** This function gets all the activities from the database */
+  fun getAllActivities() {
+    activityRepositoryFirebase.getAllActivities(
+        onSuccess = { activities_.value = it },
+        onFailure = { Log.e(onFailureTag, "Failed to get all activities", it) })
+  }
+
+  /**
+   * This function adds an activity to the database
+   *
+   * @param activity (Activity) : the activity to add to the database
+   */
+  fun addActivity(activity: Activity, context: Context) {
+    activityRepositoryFirebase.addActivity(
+        activity,
+        {
+          getAllActivities()
+          Toast.makeText(context, "Activity saved", Toast.LENGTH_SHORT).show()
+        },
+        {
+          Log.e(onFailureTag, "Failed to add an activity", it)
+          Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
+        })
+  }
+
+  /**
+   * This function updates an activity in the database
+   *
+   * @param activity (Activity) : the activity to update in the database
+   */
+  fun updateActivity(activity: Activity, context: Context) {
+    activityRepositoryFirebase.updateActivity(
+        activity,
+        {
+          getAllActivities()
+          Toast.makeText(context, "Activity updated", Toast.LENGTH_SHORT).show()
+        },
+        {
+          Log.e(onFailureTag, "Failed to update an activity", it)
+          Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
+        })
+  }
+
+  /**
+   * This function deletes an activity from the database
+   *
+   * @param activity (Activity) : the activity to delete from the database
+   */
+  fun deleteActivityById(activity: Activity, context: Context) {
+    activityRepositoryFirebase.deleteActivityById(
+        activity.uid,
+        {
+          getAllActivities()
+          Toast.makeText(context, "Activity deleted", Toast.LENGTH_SHORT).show()
+        },
+        {
+          Log.e(onFailureTag, "Failed to delete an activity", it)
+          Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
+        })
+  }
+
+  /**
+   * This function gives us an unused uniques identifier
+   *
+   * @return (String) : an unused uniques identifier
+   */
+  fun getNewUid(): String {
+    return activityRepositoryFirebase.getNewUid()
+  }
+
+  /**
+   * This function selects an activity.
+   *
+   * @param activity (Activity): the activity that was selected
+   */
+  fun selectActivity(activity: Activity) {
+    selectedActivity_.value = activity
   }
 }

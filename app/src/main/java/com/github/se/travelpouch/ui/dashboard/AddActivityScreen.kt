@@ -40,6 +40,12 @@ import java.util.Locale
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AddActivityScreen(activityModelView: ActivityModelView) {
+  val dateFormat =
+      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+        isLenient = false // strict date format
+      }
+
+  val gregorianCalendar = GregorianCalendar()
 
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
@@ -96,27 +102,7 @@ fun AddActivityScreen(activityModelView: ActivityModelView) {
                       dateText.isNotBlank(),
               onClick = {
                 try {
-
-                  val finalDateString =
-                      dateText.substring(0, 2) +
-                          "/" +
-                          dateText.substring(2, 4) +
-                          "/" +
-                          dateText.substring(4)
-
-                  val dateFormat =
-                      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-                        isLenient = false // strict date format
-                      }
-                  val date = dateFormat.parse(finalDateString)
-                  val calendar =
-                      GregorianCalendar().apply {
-                        time = date!!
-                        set(Calendar.HOUR_OF_DAY, 0)
-                        set(Calendar.MINUTE, 0)
-                        set(Calendar.SECOND, 0)
-                      }
-                  val finalDate = Timestamp(calendar.time)
+                  val finalDate = convertStringToDate(dateText, dateFormat, gregorianCalendar)
 
                   val activity =
                       Activity(
@@ -127,9 +113,7 @@ fun AddActivityScreen(activityModelView: ActivityModelView) {
                           finalDate,
                           mapOf())
 
-                  activityModelView.addActivity(activity)
-
-                  Toast.makeText(context, "Activity saved", Toast.LENGTH_SHORT).show()
+                  activityModelView.addActivity(activity, context)
                 } catch (e: java.text.ParseException) {
                   Toast.makeText(
                           context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
@@ -141,6 +125,26 @@ fun AddActivityScreen(activityModelView: ActivityModelView) {
               }
         }
   }
+}
+
+fun convertStringToDate(
+    stringDate: String,
+    dateFormat: SimpleDateFormat,
+    gregorianCalendar: GregorianCalendar
+): Timestamp {
+  val finalDateString =
+      stringDate.substring(0, 2) + "/" + stringDate.substring(2, 4) + "/" + stringDate.substring(4)
+
+  val date = dateFormat.parse(finalDateString)
+  val calendar =
+      gregorianCalendar.apply {
+        time = date!!
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+      }
+
+  return Timestamp(calendar.time)
 }
 
 class DateVisualTransformation : VisualTransformation {

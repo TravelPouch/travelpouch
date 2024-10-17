@@ -9,12 +9,16 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * This class represents the repository that communicates with Firebase to store, retrieve, delete
+ * and update activities.
+ */
 class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRepository {
 
   private val collectionPath = "activities"
 
   /**
-   * This function returns an unused unique identifier for a new event.
+   * This function gives us an unused unique identifier.
    *
    * @return (String) : an unused unique identifier
    */
@@ -23,9 +27,9 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
   }
 
   /**
-   * The initialisation function of the repository.
+   * The initialisation function of the repository
    *
-   * @param (() -> Unit) : the function to apply when the authentication goes without a trouble
+   * @param onSuccess (() -> Unit) : the function to call when the initialisation is successful
    */
   override fun init(onSuccess: () -> Unit) {
     Firebase.auth.addAuthStateListener {
@@ -35,6 +39,14 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
     }
   }
 
+  /**
+   * This function updates an activity already present in the database.
+   *
+   * @param activity (Activity) : the activity to update in Firebase
+   * @param onSuccess (() -> Unit) : the function to apply when the activity is successfully updated
+   * @param onFailure ((Exception) -> Unit) : the function to apply when an error occurs during the
+   *   update of an activity
+   */
   override fun updateActivity(
       activity: Activity,
       onSuccess: () -> Unit,
@@ -45,6 +57,16 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
         db.collection(collectionPath).document(activity.uid).set(activity), onSuccess, onFailure)
   }
 
+  /**
+   * This function deletes an activity from the database based on its identifier.
+   *
+   * @param id (String) : the identifier on which we base ourselves to delete an activity from the
+   *   firebase
+   * @param onSuccess (() -> Unit) : the function to call when the deletion of the activity is
+   *   successful
+   * @param onFailure ((Exception) -> Unit) : the function to call when an error occurs during the
+   *   deletion of an activity
+   */
   override fun deleteActivityById(
       id: String,
       onSuccess: () -> Unit,
@@ -56,15 +78,17 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
   }
 
   /**
-   * This function retrieves all the events of a travel from the database. If the operation succeeds
-   * a function is applied on the list of events retrieved, otherwise a failure function is called.
+   * This function allows us to retrieve all the activities from Firebase.
    *
-   * @param onSuccess (List<Event>) -> Unit): The function called when the retrieving of the events
-   *   went successfully.
-   * @param onFailure ((Exception) -> Unit): The function called when the retrieving of the events
-   *   fails.
+   * @param onSuccess ((List<Activity>) -> Unit) : the function to apply when the retrieving goes
+   *   without any problem
+   * @param onFailure ((Exception) -> Unit) : the function to apply when an error occurs during the
+   *   fetching of the activities from the database
    */
-  override fun getActivity(onSuccess: (List<Activity>) -> Unit, onFailure: (Exception) -> Unit) {
+  override fun getAllActivities(
+      onSuccess: (List<Activity>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     Log.d("ActivityRepository", "getEvents")
     db.collection(collectionPath)
         .get()
@@ -79,13 +103,13 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
   }
 
   /**
-   * This function adds an event to the collection of events in Firebase.
+   * This function adds a new activity to the Firebase database.
    *
-   * @param event (Event) : the event we want to add on Firebase
-   * @param onSuccess (() -> Unit) : the function called when the event is correctly added to the
-   *   database
-   * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during the
-   *   adding an event to the database
+   * @param activity (Activity) : the activity to add in Firebase
+   * @param onSuccess (() -> Unit) : the function to call when we successfully add an activity to
+   *   the database
+   * @param onFailure ((Exception) -> Unit) : the function to call when an error occurs during the
+   *   adding of an activity to the database
    */
   override fun addActivity(
       activity: Activity,
@@ -121,12 +145,12 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
   }
 
   /**
-   * This function converts a document got from Firebase to an event. It returns null if an error
+   * This function converts a document got from Firebase to an activity. It returns null if an error
    * occurs.
    *
    * @param document (DocumentSnapshot) : The document from Firebase
-   * @return (Event?) : If the conversion goes without a problem an event is return. Otherwise, null
-   *   is returned.
+   * @return (Activity?) : If the conversion goes without a problem an event is return. Otherwise,
+   *   null is returned.
    */
   private fun documentToActivity(document: DocumentSnapshot): Activity? {
     return try {
@@ -134,7 +158,9 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
       val title = document.getString("title")
       val description = document.getString("description")
       val date = document.getTimestamp("date")
-      val documents = document.get("documentsNeeded") as? Map<String, Int>
+      val documentsNeededData = document["documentsNeeded"] as? Map<*, *>
+      val documentsNeeded =
+          documentsNeededData?.map { (key, value) -> key as String to value as Int }?.toMap()
       val locationData = document.get("location") as? Map<*, *>
       val location =
           locationData?.let {
@@ -150,7 +176,7 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
           title = title!!,
           description = description!!,
           date = date!!,
-          documentsNeeded = documents,
+          documentsNeeded = documentsNeeded,
           location = location!!)
     } catch (e: Exception) {
       Log.e("ActivityRepository", "Error converting document to Activity", e)

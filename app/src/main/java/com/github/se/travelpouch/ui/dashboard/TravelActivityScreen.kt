@@ -36,15 +36,30 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import java.util.Calendar
 import java.util.GregorianCalendar
 
+/**
+ * This class represents the item for the bottom navigation.
+ *
+ * @property title (String) : the title of the destination in the bottom navigation
+ * @property icon (ImageVector) : the image of the destination.
+ */
 data class BottomNavigationItem(val title: String, val icon: ImageVector)
 
+/**
+ * This function describes how the list of activities of the travel is displayed.
+ *
+ * @param navigationActions (NavigationActions?) : the navigation actions that describes how to go
+ *   from a screen to another.
+ * @param activityModelView (ActivityModelView) : the model view for an activity
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TravelActivitiesScreen(
     navigationActions: NavigationActions? = null,
     activityModelView: ActivityModelView
 ) {
-
+  // todo: to manually test this function, you need to follow these steps:
+  // comment line 77, decomment the lines 60 to 75, set activityModelView to null, and replace
+  // all the occurrences of listOfActivites.value by activities_test
   //  val activites_test =
   //      listOf(
   //          Activity(
@@ -130,6 +145,12 @@ fun TravelActivitiesScreen(
       }
 }
 
+/**
+ * This function displays the date of an activity, its title and its location in a card.
+ *
+ * @param activity (Activity) : the activity to display
+ * @param onClick (() -> Unit) : the function to apply when we click on an activity.
+ */
 @Composable
 fun ActivityItem(activity: Activity, onClick: () -> Unit = {}) {
   val calendar = GregorianCalendar()

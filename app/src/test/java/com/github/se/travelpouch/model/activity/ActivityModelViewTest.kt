@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.activity
 
+import android.content.Context
 import com.github.se.travelpouch.model.Location
 import com.google.firebase.Timestamp
 import org.hamcrest.CoreMatchers.`is`
@@ -14,6 +15,7 @@ import org.mockito.kotlin.anyOrNull
 class ActivityModelViewTest {
   private lateinit var repository: ActivityRepository
   private lateinit var activityViewModel: ActivityModelView
+  private lateinit var mockContext: Context
 
   val activity =
       Activity(
@@ -28,17 +30,18 @@ class ActivityModelViewTest {
   fun setUp() {
     repository = mock(ActivityRepository::class.java)
     activityViewModel = ActivityModelView(repository)
+    mockContext = mock(Context::class.java)
   }
 
   @Test
   fun getActivitiesTest() {
-    activityViewModel.getActivities()
-    verify(repository).getActivity(anyOrNull(), anyOrNull())
+    activityViewModel.getAllActivities()
+    verify(repository).getAllActivities(anyOrNull(), anyOrNull())
   }
 
   @Test
   fun addActivitiesTest() {
-    activityViewModel.addActivity(activity)
+    activityViewModel.addActivity(activity, mockContext)
     verify(repository).addActivity(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
@@ -50,13 +53,13 @@ class ActivityModelViewTest {
 
   @Test
   fun deleteActivitesByIdTest() {
-    activityViewModel.deleteActivityById(activity)
+    activityViewModel.deleteActivityById(activity, mockContext)
     verify(repository).deleteActivityById(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
   fun updateActivityTest() {
-    activityViewModel.updateActivity(activity)
+    activityViewModel.updateActivity(activity, mockContext)
     verify(repository).updateActivity(anyOrNull(), anyOrNull(), anyOrNull())
   }
 }
