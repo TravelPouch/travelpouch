@@ -21,11 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import com.github.se.travelpouch.model.Location
@@ -145,59 +141,4 @@ fun convertStringToDate(
       }
 
   return Timestamp(calendar.time)
-}
-
-class DateVisualTransformation : VisualTransformation {
-  override fun filter(text: AnnotatedString): TransformedText {
-    val transfomedText =
-        text
-            .toString()
-            .mapIndexed { index, c ->
-              when (index) {
-                1 -> "$c/"
-                3 -> "$c/"
-                else -> c
-              }
-            }
-            .joinToString("")
-
-    return TransformedText(
-        text = AnnotatedString(text = transfomedText), offsetMapping = DateOffsetMapping())
-  }
-}
-
-// 00 00 0000
-
-class DateOffsetMapping : OffsetMapping {
-  override fun originalToTransformed(offset: Int): Int {
-    return when (offset) {
-      0 -> 0
-      1 -> 1
-      2 -> 3
-      3 -> 4
-      4 -> 6
-      5 -> 7
-      6 -> 8
-      7 -> 9
-      8 -> 10
-      else -> 10
-    }
-  }
-
-  override fun transformedToOriginal(offset: Int): Int {
-    return when (offset) {
-      0 -> 0
-      1 -> 1
-      2 -> 2
-      3 -> 2
-      4 -> 3
-      5 -> 4
-      6 -> 4
-      7 -> 5
-      8 -> 6
-      9 -> 7
-      10 -> 8
-      else -> 8
-    }
-  }
 }

@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
@@ -57,25 +59,7 @@ fun TravelActivitiesScreen(
     navigationActions: NavigationActions? = null,
     activityModelView: ActivityViewModel
 ) {
-  // todo: to manually test this function, you need to follow these steps:
-  // comment line 77, decomment the lines 60 to 75, set activityModelView to null, and replace
-  // all the occurrences of listOfActivites.value by activities_test
-  //  val activites_test =
-  //      listOf(
-  //          Activity(
-  //              "1",
-  //              "title1",
-  //              "description1",
-  //              Location(0.0, 0.0, Timestamp(0, 0), "lcoation1"),
-  //              Timestamp(0, 0),
-  //              mapOf<String, Int>()),
-  //          Activity(
-  //              "2",
-  //              "title2",
-  //              "description2",
-  //              Location(0.0, 0.0, Timestamp(0, 0), "lcoation2"),
-  //              Timestamp(0, 0),
-  //              mapOf<String, Int>()))
+  val context = LocalContext.current
 
   val listOfActivities = activityModelView.activities.collectAsState()
   val listOfDestinations =
@@ -138,7 +122,11 @@ fun TravelActivitiesScreen(
                 }
               } else {
                 items(listOfActivities.value.size) { idx ->
-                  ActivityItem(listOfActivities.value[idx])
+                  ActivityItem(
+                      listOfActivities.value[idx],
+                      onClick = {
+                        Toast.makeText(context, "Activity clicked", Toast.LENGTH_SHORT).show()
+                      })
                 }
               }
             }
