@@ -194,9 +194,7 @@ class TravelContainerUnitTest {
   fun testInvalidParticipantUid() {
 
     var exception: Exception =
-        assertThrows(IllegalArgumentException::class.java) {
-          Participant("")
-        }
+        assertThrows(IllegalArgumentException::class.java) { Participant("") }
     assertEquals("Invalid fsUid format", exception.message)
 
     exception =
