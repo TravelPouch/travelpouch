@@ -57,7 +57,7 @@ fun TravelListScreen(
   val travelList = listTravelViewModel.travels.collectAsState().value
 
   Scaffold(
-      modifier = Modifier.testTag("overviewScreen"),
+      modifier = Modifier.testTag("TravelListScreen"),
       floatingActionButton = {
         FloatingActionButton(
             onClick = { navigationActions.navigateTo(Screen.ADD_TRAVEL) },
