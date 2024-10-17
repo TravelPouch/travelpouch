@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.home
 
-// import com.github.se.travelpouch.ui.navigation.NavigationActions
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.clickable
@@ -34,30 +33,35 @@ import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 import java.util.Locale
 
 /**
  * Composable function for the travels overview screen.
  *
  * @param navigationActions Actions for navigation.
- * @param travelContainers List of travel containers to display.
+ * @param listTravelViewModel List of travels as a viewmodel, to display.
  */
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun TravelListScreen(navigationActions: NavigationActions, travelContainers: ListTravelViewModel) {
+fun TravelListScreen(
+    navigationActions: NavigationActions,
+    listTravelViewModel: ListTravelViewModel
+) {
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
-    travelContainers.getTravels()
+    listTravelViewModel.getTravels()
     // sleep the thread for 1 second to allow the data to be fetched
   }
   // travelContainers.getTravels()
-  val travelList = travelContainers.travels.collectAsState().value
+  val travelList = listTravelViewModel.travels.collectAsState().value
 
   Scaffold(
       modifier = Modifier.testTag("overviewScreen"),
       floatingActionButton = {
         FloatingActionButton(
-            onClick = { /* Handle FAB click */}, modifier = Modifier.testTag("createTravelFab")) {
+            onClick = { navigationActions.navigateTo(Screen.ADD_TRAVEL) },
+            modifier = Modifier.testTag("createTravelFab")) {
               Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
       },
