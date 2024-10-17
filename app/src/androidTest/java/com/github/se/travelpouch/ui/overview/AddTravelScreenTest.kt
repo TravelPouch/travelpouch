@@ -10,9 +10,13 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.ListTravelViewModel
+import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.TravelRepository
+import com.github.se.travelpouch.model.location.LocationRepository
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,9 +29,27 @@ import org.mockito.kotlin.doThrow
 
 class AddTravelScreenTest {
 
+  class FakeLocationRepository : LocationRepository {
+
+    val location =
+        listOf(
+            Location(48.8566, 2.3522, Timestamp.now(), "Paris"),
+            Location(34.0522, -118.2437, Timestamp.now(), "Los Angeles"),
+            Location(51.5074, -0.1278, Timestamp.now(), "London"))
+
+    override fun search(
+        query: String,
+        onSuccess: (List<Location>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+      onSuccess(location)
+    }
+  }
+
   private lateinit var travelRepository: TravelRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listTravelViewModel: ListTravelViewModel
+  private lateinit var locationViewModel: LocationViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -37,6 +59,8 @@ class AddTravelScreenTest {
     travelRepository = mock(TravelRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listTravelViewModel = ListTravelViewModel(travelRepository)
+    // Use a real LocationViewModel with a fake repository
+    locationViewModel = LocationViewModel(FakeLocationRepository())
 
     // Mock the current route to be the add travel screen
     `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
@@ -56,16 +80,16 @@ class AddTravelScreenTest {
 
     composeTestRule.onNodeWithTag("inputTravelTitle").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelDescription").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLocationName").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLatitude").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLongitude").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelStartDate").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelEndDate").performScrollTo().assertIsDisplayed()
   }
 
   @Test
   fun doesNotSubmitWithInvalidStartDate() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+    }
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -76,9 +100,10 @@ class AddTravelScreenTest {
     inputText("inputTravelEndDate", "20/10/2024")
 
     // Input valid location
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "48.8566")
-    inputText("inputTravelLongitude", "2.3522")
+    inputText("inputTravelLocation", "Paris")
+    composeTestRule
+        .onNodeWithTag("suggestion_${locationViewModel.locationSuggestions.value[0].name}")
+        .performClick()
 
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
@@ -88,7 +113,9 @@ class AddTravelScreenTest {
 
   @Test
   fun doesNotSubmitWithEndInvalidDate() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+    }
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -99,10 +126,7 @@ class AddTravelScreenTest {
     inputText("inputTravelEndDate", "notadate")
 
     // Input valid location
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "48.8566")
-    inputText("inputTravelLongitude", "2.3522")
-
+    inputText("inputTravelLocation", "Paris")
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
@@ -111,7 +135,9 @@ class AddTravelScreenTest {
 
   @Test
   fun doesNotSubmitWithInvalidStartAndEndDate() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+    }
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -122,9 +148,10 @@ class AddTravelScreenTest {
     inputText("inputTravelEndDate", "notadate")
 
     // Input valid location
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "48.8566")
-    inputText("inputTravelLongitude", "2.3522")
+    inputText("inputTravelLocation", "Paris")
+    composeTestRule
+        .onNodeWithTag("suggestion_${locationViewModel.locationSuggestions.value[0].name}")
+        .performClick()
 
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
@@ -134,7 +161,9 @@ class AddTravelScreenTest {
 
   @Test
   fun doesNotSubmitWithNonNumericDate() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+    }
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -145,9 +174,10 @@ class AddTravelScreenTest {
     inputText("inputTravelEndDate", "notadate/10/2024")
 
     // Input valid location
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "48.8566")
-    inputText("inputTravelLongitude", "2.3522")
+    inputText("inputTravelLocation", "Paris")
+    composeTestRule
+        .onNodeWithTag("suggestion_${locationViewModel.locationSuggestions.value[0].name}")
+        .performClick()
 
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
@@ -156,34 +186,12 @@ class AddTravelScreenTest {
   }
 
   @Test
-  fun doesNotSubmitWithFalseLocation() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
-
-    // Input valid title and description
-    inputText("inputTravelTitle", "Trip to Paris")
-    inputText("inputTravelDescription", "A fun trip to Paris")
-
-    // Input valid dates
-    inputText("inputTravelStartDate", "10/10/2024")
-    inputText("inputTravelEndDate", "20/10/2024")
-
-    // Input invalid location
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "invalid_latitude")
-    inputText("inputTravelLongitude", "2.3522")
-
-    // Simulate clicking the save button
-    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
-
-    // Verify that the repository method is not called to add a travel due to invalid location
-    verify(travelRepository, never()).addTravel(any(), any(), any())
-  }
-
-  @Test
   fun submitTravelWithValidData() {
 
     // Set up the content for the test
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+    }
 
     composeTestRule.waitForIdle() // Ensures inputs are registered
 
@@ -192,9 +200,11 @@ class AddTravelScreenTest {
     inputText("inputTravelDescription", "A fun trip to Paris")
     inputText("inputTravelStartDate", "10/10/2024")
     inputText("inputTravelEndDate", "20/10/2024")
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "48.8566")
-    inputText("inputTravelLongitude", "2.3522")
+    inputText("inputTravelLocation", "Paris")
+
+    composeTestRule
+        .onNodeWithTag("suggestion_${locationViewModel.locationSuggestions.value[0].name}")
+        .performClick()
 
     composeTestRule.waitForIdle() // Ensures inputs are registered
 
@@ -224,40 +234,6 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").assertIsNotEnabled()
   }
 
-  // Helper function to input text into a text field
-  fun inputText(testTag: String, text: String) {
-    composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextClearance()
-    composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextInput(text)
-  }
-
-  @Test
-  fun handlesExceptionWhenCreatingTravel() {
-    // Mock the ViewModel method to throw an exception when getting a new UID
-    `when`(listTravelViewModel.getNewUid()).thenReturn("validMockUid123456785")
-
-    // Set up the content for the test
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
-
-    composeTestRule.waitForIdle() // Ensures inputs are registered
-
-    // Input valid travel details except UID creation, which will throw an exception
-    inputText("inputTravelTitle", "Trip to Paris")
-    inputText("inputTravelDescription", "A fun trip to Paris")
-    inputText("inputTravelStartDate", "10/10/2024")
-    inputText("inputTravelEndDate", "20/10/2024")
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "48.8566")
-    inputText("inputTravelLongitude", "2.3522")
-
-    composeTestRule.waitForIdle() // Ensures inputs are registered
-
-    // Simulate clicking the save button
-    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
-
-    // Verify that the repository method is NOT called to add a travel due to the exception
-    verify(travelRepository, never()).addTravel(any(), any(), any())
-  }
-
   @Test
   fun testToastIsShownWhenAddTravelFails() {
     // Mock the repository's addTravel() method to throw an exception
@@ -266,18 +242,27 @@ class AddTravelScreenTest {
         .addTravel(any(), any(), any())
 
     // Set up the content for the test
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+    }
 
     // Input valid travel details
     inputText("inputTravelTitle", "Trip to Paris")
     inputText("inputTravelDescription", "A fun trip to Paris")
     inputText("inputTravelStartDate", "10/10/2024")
     inputText("inputTravelEndDate", "20/10/2024")
-    inputText("inputTravelLocationName", "Paris")
-    inputText("inputTravelLatitude", "48.8566")
-    inputText("inputTravelLongitude", "2.3522")
+    inputText("inputTravelLocation", "Paris")
+    composeTestRule
+        .onNodeWithTag("suggestion_${locationViewModel.locationSuggestions.value[0].name}")
+        .performClick()
 
     // Simulate clicking the save button
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
+  }
+
+  // Helper function to input text into a text field
+  fun inputText(testTag: String, text: String) {
+    composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextClearance()
+    composeTestRule.onNodeWithTag(testTag).performScrollTo().performTextInput(text)
   }
 }
