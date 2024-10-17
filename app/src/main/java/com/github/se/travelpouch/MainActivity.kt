@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,7 +19,10 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.overview.AddTravelScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
+import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
+import com.github.se.travelpouch.ui.travel.ParticipantListScreen
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +51,12 @@ fun TravelPouchApp() {
         startDestination = Screen.ADD_TRAVEL,
         route = Route.OVERVIEW,
     ) {
-      composable(Screen.ADD_TRAVEL) { TravelListScreen(navigationActions, listTravelViewModel) }
+      composable(Screen.OVERVIEW) { TravelListScreen(navigationActions, listTravelViewModel) }
+      composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.EDIT) { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.PARTICIPANT_LIST) {
+        ParticipantListScreen(listTravelViewModel, navigationActions)
+      }
     }
   }
 }
