@@ -1,10 +1,12 @@
 name: Android Build
 
 on:
-  push:
-    branches:
-      - M1  # This is for your M1 release branch
   workflow_dispatch:
+    inputs:
+      name:
+        description: "Ex: milestone name"
+        default: "Mn"
+        required: true
 
 jobs:
   build:
@@ -30,5 +32,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
-        name: M1-APK
+        name: "${{ github.event.inputs.name }}-APK"
         path: app/build/outputs/apk/release/app-release.apk
