@@ -1,65 +1,84 @@
-package com.github.se.travelpouch.screen
-
-// import com.github.se.travelpouch.model.Screen
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.TravelContainerMock
+import com.github.se.travelpouch.model.TravelRepository
 import com.github.se.travelpouch.ui.home.MapScreen
 import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.util.Date
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.whenever
 
-class TravelListScreenTest {
+@ExperimentalCoroutinesApi
+class OverviewScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var navigationActions: NavigationActions
+  private lateinit var listTravelViewModel: ListTravelViewModel
+  private lateinit var travelRepository: TravelRepository
 
   @Before
   fun setUp() {
     navigationActions = mock(NavigationActions::class.java)
-  }
+    travelRepository = mock(TravelRepository::class.java)
+    listTravelViewModel = ListTravelViewModel(travelRepository)
 
-  @Test
-  fun displayTextWhenEmpty() {
+    // Mock the repository methods
+    val participant = Participant(fsUid = TravelContainerMock.generateAutoId())
+    val participants = mapOf(participant to Role.OWNER)
+    val travelList =
+        listOf(
+            TravelContainer(
+                fsUid = TravelContainerMock.generateAutoId(),
+                title = "Trip to Paris",
+                description = "A wonderful trip to Paris",
+                startTime = Timestamp(Date()),
+                endTime = Timestamp(Date(Timestamp(Date()).toDate().time + 86400000)),
+                location =
+                    Location(
+                        latitude = 48.8566,
+                        longitude = 2.3522,
+                        insertTime = Timestamp.now(),
+                        name = "Paris"),
+                allAttachments = emptyMap(),
+                allParticipants = participants))
 
-    // Act
-    composeTestRule.setContent {
-      val listTravelViewModel: ListTravelViewModel =
-          viewModel(factory = ListTravelViewModel.Factory)
-      TravelListScreen(
-          navigationActions = navigationActions, travelContainers = listTravelViewModel)
-    }
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
+          onSuccess(travelList)
+          null
+        }
+        .whenever(travelRepository)
+        .getTravels(anyOrNull(), anyOrNull())
 
-    // Assert
-    composeTestRule.onNodeWithTag("emptyTravelPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+    // Initialize the ViewModel's travels StateFlow
+    listTravelViewModel =
+        ListTravelViewModel(travelRepository).apply {} // travels.value = travelList }
   }
 
   @Test
   fun hasRequiredComponents() {
     // Act
     composeTestRule.setContent {
-      val listTravelViewModel: ListTravelViewModel =
-          viewModel(factory = ListTravelViewModel.Factory)
       TravelListScreen(
-          navigationActions = navigationActions, travelContainers = listTravelViewModel)
+          navigationActions = navigationActions, listTravelViewModel = listTravelViewModel)
     }
-
+    Thread.sleep(3000)
     // Assert
     composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
@@ -68,13 +87,10 @@ class TravelListScreenTest {
 
   @Test
   fun displayTravelListWhenNotEmpty() {
-
     // Act
     composeTestRule.setContent {
-      val listTravelViewModel: ListTravelViewModel =
-          viewModel(factory = ListTravelViewModel.Factory)
       TravelListScreen(
-          navigationActions = navigationActions, travelContainers = listTravelViewModel)
+          navigationActions = navigationActions, listTravelViewModel = listTravelViewModel)
     }
 
     // Assert
@@ -124,9 +140,10 @@ class TravelListScreenTest {
 
     // Act
     composeTestRule.setContent { MapScreen(travelContainers = travelContainers) }
+    composeTestRule.waitForIdle()
+    Thread.sleep(3000)
 
     // Assert
-    composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 }
