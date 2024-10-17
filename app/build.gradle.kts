@@ -163,6 +163,9 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
 
+    // Networking with OkHttp
+    implementation(libs.okhttp)
+
     // Testing Unit
     testImplementation(libs.junit)
     androidTestImplementation(libs.mockk)
