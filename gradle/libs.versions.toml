@@ -31,6 +31,9 @@ firebaseFirestore = "25.1.0"
 firebaseUiAuth = "8.0.0"
 firebaseCommonKtx = "21.0.0"
 
+# Networking
+okhttp = "4.12.0"
+
 
 # Testing UI
 espressoCore = "3.6.1"
@@ -92,6 +95,9 @@ json = { module = "org.json:json", version.ref = "json" }
 
 # Testing UI
 androidx-espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espressoCore" }
+
+# Networking
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
