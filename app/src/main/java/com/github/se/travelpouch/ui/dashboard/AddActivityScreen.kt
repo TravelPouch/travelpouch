@@ -33,6 +33,11 @@ import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.Locale
 
+/**
+ * This function describes how the the screen to add an activity
+ *
+ * @param activityModelView (ActivityViewModel) : the view model for an activity
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AddActivityScreen(activityModelView: ActivityViewModel) {
@@ -123,6 +128,15 @@ fun AddActivityScreen(activityModelView: ActivityViewModel) {
   }
 }
 
+/**
+ * This function converts a String date to a Timestamp using the dd/mm/yyyy format.
+ *
+ * @param stringDate (String) : the string to convert to a date
+ * @param dateFormat (SimpleDateFormat) : the format to use to convert the string to a timestamp
+ * @param gregorianCalendar (GregorianCalendar) : the calendar to use to set the date
+ * @return (Timestamp) : the timestamp got from the string
+ * @throws (Exception) : If the formatting fails an exception is thrown
+ */
 fun convertStringToDate(
     stringDate: String,
     dateFormat: SimpleDateFormat,

@@ -5,7 +5,14 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 
+/** This class is a date visual transformer for an date entry in a text field */
 class DateVisualTransformation : VisualTransformation {
+  /**
+   * This function describes how the string is transformed.
+   *
+   * @param text (AnnotatedString) : the string to transform
+   * @return (TransformedText) : the resulting text
+   */
   override fun filter(text: AnnotatedString): TransformedText {
     val transformedText =
         text
@@ -24,7 +31,16 @@ class DateVisualTransformation : VisualTransformation {
   }
 }
 
+/**
+ * This class describes how the offset works between the original string and the modified string.
+ */
 private class DateOffsetMapping : OffsetMapping {
+  /**
+   * This function describes the mapping from an original index to a resulting string.
+   *
+   * @param offset (Int) : the offset in the original string
+   * @return (Int) : the offset in the resulting string
+   */
   override fun originalToTransformed(offset: Int): Int {
     return when (offset) {
       0 -> 0
@@ -40,6 +56,12 @@ private class DateOffsetMapping : OffsetMapping {
     }
   }
 
+  /**
+   * This function describes the mapping from an index of a resulting string to the original string.
+   *
+   * @param offset (Int) : the offset in the resulting string
+   * @return (Int) : the offset in the original string
+   */
   override fun transformedToOriginal(offset: Int): Int {
     return when (offset) {
       0 -> 0
