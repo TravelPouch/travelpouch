@@ -75,7 +75,7 @@ class TravelContainerUnitTest {
     assertEquals(Timestamp(1234567890L, 0), locationMap["insertTime"])
     assertEquals("Test Location", locationMap["name"])
 
-    val participantsMap = map["allParticipants"] as Map<String, String>?
+    val participantsMap = map["allParticipants"] as Map<String, Any>?
     assertEquals("OWNER", participantsMap!![user1ID])
   }
 
@@ -194,35 +194,33 @@ class TravelContainerUnitTest {
   fun testInvalidParticipantUid() {
 
     var exception: Exception =
-        assertThrows(IllegalArgumentException::class.java) {
-          val participant1 = Participant("")
-        }
+        assertThrows(IllegalArgumentException::class.java) { Participant("") }
     assertEquals("Invalid fsUid format", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant2 = Participant("fsUid1234567890123456")
+          Participant("fsUid1234567890123456")
           // 21 characters is too long
         }
     assertEquals("Invalid fsUid format", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant3 = Participant("fsUid12345678901234")
+          Participant("fsUid12345678901234")
           // 19 characters is too short
         }
     assertEquals("Invalid fsUid format", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant3 = Participant("fsUid12345678901-234")
+          Participant("fsUid12345678901-234")
           // contains a non-alphanumeric character
         }
     assertEquals("Invalid fsUid format", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant3 = Participant("?sUid1234567890123456")
+          Participant("?sUid1234567890123456")
           // verifies it starts with alphanumeric
           //
         }
@@ -230,7 +228,7 @@ class TravelContainerUnitTest {
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant3 = Participant("sUid1234567890123456____")
+          Participant("sUid1234567890123456____")
           // verifies it ends after 20 alphanumeric characters
           //
         }
@@ -242,7 +240,7 @@ class TravelContainerUnitTest {
 
     var exception: Exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(12.34, 56.78, Timestamp(1234567890L, 0), "")
+          Location(12.34, 56.78, Timestamp(1234567890L, 0), "")
           // blank location name
         }
     assertEquals("Location name cannot be blank", exception.message)
@@ -257,67 +255,67 @@ class TravelContainerUnitTest {
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(-90.0001, 56.78, Timestamp(1234567890L, 0), "hello")
+          Location(-90.0001, 56.78, Timestamp(1234567890L, 0), "hello")
           // too negative latitude
         }
     assertEquals("Latitude must be between -90.0 and 90.0", exception.message)
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(90.0001, 56.78, Timestamp(1234567890L, 0), "hello")
+          Location(90.0001, 56.78, Timestamp(1234567890L, 0), "hello")
           // too positive latitude
         }
     assertEquals("Latitude must be between -90.0 and 90.0", exception.message)
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(Double.MIN_VALUE, 56.78, Timestamp(1234567890L, 0), "hello")
+          Location(Double.MIN_VALUE, 56.78, Timestamp(1234567890L, 0), "hello")
           // edge case
         }
     assertEquals("Latitude must be between -90.0 and 90.0", exception.message)
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(Double.MAX_VALUE, 56.78, Timestamp(1234567890L, 0), "hello")
+          Location(Double.MAX_VALUE, 56.78, Timestamp(1234567890L, 0), "hello")
           // edge case
         }
     assertEquals("Latitude must be between -90.0 and 90.0", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(Double.NaN, 56.78, Timestamp(1234567890L, 0), "hello")
+          Location(Double.NaN, 56.78, Timestamp(1234567890L, 0), "hello")
           // Nan cases
         }
     assertEquals("Latitude must be between -90.0 and 90.0", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(12.34, -180.0001, Timestamp(1234567890L, 0), "hello")
+          Location(12.34, -180.0001, Timestamp(1234567890L, 0), "hello")
           // longitude too negative
         }
     assertEquals("Longitude must be between -180.0 and 180.0", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(12.34, 180.0001, Timestamp(1234567890L, 0), "hello")
+          Location(12.34, 180.0001, Timestamp(1234567890L, 0), "hello")
           // longitude too positive
         }
     assertEquals("Longitude must be between -180.0 and 180.0", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(12.34, Double.MAX_VALUE, Timestamp(1234567890L, 0), "hello")
+          Location(12.34, Double.MAX_VALUE, Timestamp(1234567890L, 0), "hello")
           // edge case
         }
     assertEquals("Longitude must be between -180.0 and 180.0", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(12.34, Double.MIN_VALUE, Timestamp(1234567890L, 0), "hello")
+          Location(12.34, Double.MIN_VALUE, Timestamp(1234567890L, 0), "hello")
           // edge case
         }
     assertEquals("Longitude must be between -180.0 and 180.0", exception.message)
 
     exception =
         assertThrows(IllegalArgumentException::class.java) {
-          val participant = Location(12.34, Double.NaN, Timestamp(1234567890L, 0), "hello")
+          Location(12.34, Double.NaN, Timestamp(1234567890L, 0), "hello")
           // Nan cases
         }
     assertEquals("Longitude must be between -180.0 and 180.0", exception.message)
