@@ -31,10 +31,10 @@ class EditTravelSettingsScreenTest {
   // Helper function to input text into a text field
   fun inputText(testTag: String, previousText: String, text: String) {
     composeTestRule.onNodeWithTag(testTag).performScrollTo()
-    composeTestRule.onNodeWithTag(testTag).assertTextContains(previousText)
+    composeTestRule.onNodeWithTag(testTag).assertIsDisplayed().assertTextContains(previousText)
     composeTestRule.onNodeWithTag(testTag).performTextClearance()
     composeTestRule.onNodeWithTag(testTag).performTextInput(text)
-    composeTestRule.onNodeWithTag(testTag).assertTextContains(text)
+    composeTestRule.onNodeWithTag(testTag).assertIsDisplayed().assertTextContains(text)
   }
 
   fun createContainer(): TravelContainer {
