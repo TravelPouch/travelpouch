@@ -30,7 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -224,7 +223,7 @@ fun EditTravelSettingsScreen(
                     val newStart = parseDateToTimestamp(startTime.value)
                     val newEnd = parseDateToTimestamp(endTimeText.value)
 
-                    val newTodo =
+                    val newTravel =
                         TravelContainer(
                             fsUid = fsUid,
                             title = titleText.value,
@@ -235,7 +234,7 @@ fun EditTravelSettingsScreen(
                             allAttachments = selectedTravel!!.allAttachments,
                             allParticipants = selectedTravel!!.allParticipants,
                         )
-                    listTravelViewModel.updateTravel(newTodo)
+                    listTravelViewModel.updateTravel(newTravel)
                     Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
                   } catch (e: ParseException) {
                     Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()

@@ -231,3 +231,26 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
 }
+
+tasks.register("beforeCommitCheck") {
+    dependsOn("ktfmtFormat", "ktfmtCheck")
+}
+
+tasks.named("ktfmtCheck") {
+    mustRunAfter("ktfmtFormat")
+}
+
+tasks.named("ktfmtCheckAndroidTest") {
+    dependsOn("ktfmtFormatAndroidTest")
+    mustRunAfter("ktfmtFormatAndroidTest")
+}
+
+tasks.named("ktfmtCheckMain") {
+    dependsOn("ktfmtFormatMain")
+    mustRunAfter("ktfmtFormatMain")
+}
+
+tasks.named("ktfmtCheckTest") {
+    dependsOn("ktfmtFormatTest")
+    mustRunAfter("ktfmtFormatTest")
+}
