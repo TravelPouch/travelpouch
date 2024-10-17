@@ -4,17 +4,22 @@ import android.icu.util.GregorianCalendar
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,38 +39,45 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 
 /**
  * The AddTravelScreen composable function displays the UI for adding a new travel entry to the list
- * of travels in the app. It includes input fields for the title, description, location name,
- * latitude, longitude, start date, and end date.
+ * of travels in the app. It includes input fields for the title, description, location name, start
+ * date, and end date.
  *
  * @param listTravelViewModel: The ViewModel that manages the list of travels in the app.
  * @param navigationActions: The navigation actions to handle navigation within the app.
+ * @param locationViewModel: The ViewModel that manages the location search functionality.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTravelScreen(
     listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
 ) {
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   var startDate by remember { mutableStateOf("") }
   var endDate by remember { mutableStateOf("") }
-  val context = LocalContext.current
 
-  var locationName by remember { mutableStateOf("") }
-  var latitude by remember { mutableStateOf("") }
-  var longitude by remember { mutableStateOf("") }
+  var selectedLocation by remember { mutableStateOf<Location?>(null) }
+  val locationQuery by locationViewModel.query.collectAsState()
+  var showDropdown by remember { mutableStateOf(false) }
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+
+  val context = LocalContext.current
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("addTravelScreen"), // Tag for entire screen
@@ -112,29 +125,62 @@ fun AddTravelScreen(
                   )
 
               // Location Input
-              // Location Name Input
-              OutlinedTextField(
-                  value = locationName,
-                  onValueChange = { locationName = it },
-                  label = { Text("Location Name") },
-                  placeholder = { Text("Enter location name") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLocationName"))
 
-              // Latitude Input
-              OutlinedTextField(
-                  value = latitude,
-                  onValueChange = { latitude = it },
-                  label = { Text("Latitude") },
-                  placeholder = { Text("Enter latitude (e.g. 48.8566)") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLatitude"))
+              // Location Input with dropdown
+              Box(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = locationQuery,
+                    onValueChange = {
+                      locationViewModel.setQuery(it)
+                      showDropdown = true // Show dropdown when user starts typing
+                    },
+                    label = { Text("Location") },
+                    placeholder = { Text("Enter an Address or Location") },
+                    modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
 
-              // Longitude Input
-              OutlinedTextField(
-                  value = longitude,
-                  onValueChange = { longitude = it },
-                  label = { Text("Longitude") },
-                  placeholder = { Text("Enter longitude (e.g. 2.3522)") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLongitude"))
+                // Dropdown to show location suggestions
+                DropdownMenu(
+                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                    onDismissRequest = { showDropdown = false },
+                    properties = PopupProperties(focusable = false),
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .heightIn(
+                                max = 200.dp) // Set max height to make it scrollable if more than 3
+
+                    // items
+                    ) {
+                      locationSuggestions.filterNotNull().take(3).forEach { location ->
+                        DropdownMenuItem(
+                            text = {
+                              Text(
+                                  text =
+                                      location.name.take(30) +
+                                          if (location.name.length > 30) "..."
+                                          else "", // Limit name length and add ellipsis
+                                  maxLines = 1 // Ensure name doesn't overflow
+                                  )
+                            },
+                            onClick = {
+                              locationViewModel.setQuery(location.name)
+                              selectedLocation = location // Store the selected location object
+                              showDropdown = false // Close dropdown on selection
+                            },
+                            modifier =
+                                Modifier.padding(8.dp)
+                                    .testTag("suggestion_${location.name}") // Tag each suggestion
+                            )
+                        Divider() // Separate items with a divider
+                      }
+
+                      if (locationSuggestions.size > 3) {
+                        DropdownMenuItem(
+                            text = { Text("More...") },
+                            onClick = { /* Optionally show more results */},
+                            modifier = Modifier.padding(8.dp).testTag("moreSuggestions"))
+                      }
+                    }
+              }
 
               // Start Date Input
               OutlinedTextField(
@@ -160,12 +206,10 @@ fun AddTravelScreen(
                     val startCalendar = parseDate(startDate)
                     val endCalendar = parseDate(endDate)
 
-                    val location = createLocation(latitude, longitude, locationName)
-
                     Log.d("AddTravelScreen", "Start date: $startDate, End date: $endDate")
                     Log.d(
                         "AddTravelScreen",
-                        "Location - Name: $locationName, Latitude: $latitude, Longitude: $longitude")
+                        "Location - Name: ${selectedLocation?.name}, Latitude: ${selectedLocation?.latitude}, Longitude: ${selectedLocation?.longitude}")
 
                     // Check if date parsing was successful
                     if (startCalendar == null || endCalendar == null) {
@@ -173,15 +217,6 @@ fun AddTravelScreen(
                       Toast.makeText(
                               context,
                               "Invalid date format. Please use DD/MM/YYYY.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-
-                      // Check if location is valid
-                    } else if (location == null) {
-                      Log.e("AddTravelScreen", "Invalid location format")
-                      Toast.makeText(
-                              context,
-                              "Invalid location format. Ensure latitude is between -90 and 90 and longitude is between -180 and 180.",
                               Toast.LENGTH_SHORT)
                           .show()
                     } else {
@@ -197,7 +232,8 @@ fun AddTravelScreen(
                                 description = description,
                                 startTime = Timestamp(startCalendar.time),
                                 endTime = Timestamp(endCalendar.time),
-                                location = location,
+                                location =
+                                    selectedLocation ?: Location(0.0, 0.0, Timestamp.now(), " "),
                                 allAttachments = emptyMap(),
                                 allParticipants =
                                     mapOf(
@@ -240,9 +276,7 @@ fun AddTravelScreen(
                   modifier = Modifier.fillMaxWidth().testTag("travelSaveButton"),
                   enabled =
                       title.isNotBlank() &&
-                          locationName.isNotBlank() &&
-                          latitude.isNotBlank() &&
-                          longitude.isNotBlank() &&
+                          selectedLocation != null &&
                           startDate.isNotBlank() &&
                           endDate.isNotBlank()) {
                     Text("Save")
@@ -265,22 +299,4 @@ fun parseDate(dateString: String): GregorianCalendar? {
   } else {
     null // Return null if the date format is incorrect
   }
-}
-
-// Function to create a Location object from latitude, longitude, and name
-fun createLocation(latitudeStr: String, longitudeStr: String, name: String): Location? {
-  val latitude = latitudeStr.toDoubleOrNull()
-  val longitude = longitudeStr.toDoubleOrNull()
-
-  // Check if latitude and longitude are valid numbers and within valid ranges
-  if (latitude == null || latitude !in -90.0..90.0) {
-    return null // Return null for invalid latitude
-  }
-  if (longitude == null || longitude !in -180.0..180.0) {
-    return null // Return null for invalid longitude
-  }
-
-  // Return the Location object if everything is valid
-  return Location(
-      latitude = latitude, longitude = longitude, insertTime = Timestamp.now(), name = name)
 }
