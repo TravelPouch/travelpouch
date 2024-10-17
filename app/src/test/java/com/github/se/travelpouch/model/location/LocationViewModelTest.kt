@@ -21,19 +21,19 @@ class LocationViewModelTest {
 
   @Test
   fun testSetQuery_updatesQueryValue() = runTest {
-    // Quand on appelle setQuery avec une chaîne de caractères
+    // When setQuery is called with a string
     viewModel.setQuery("Paris")
 
-    // Vérification que la valeur du query a bien été mise à jour
+    // Verify that the query value has been updated correctly
     assertEquals("Paris", viewModel.query.first())
   }
 
   @Test
   fun testSetQuery_withEmptyQuery_doesNotSearch() = runTest {
-    // Quand on appelle setQuery avec une chaîne vide
+    // When setQuery is called with an empty string
     viewModel.setQuery("")
 
-    // Vérifie que la méthode search n'est jamais appelée
+    // Verify that the search method is never called
     verify(mockRepository, never()).search(anyString(), anyOrNull(), anyOrNull())
   }
 }

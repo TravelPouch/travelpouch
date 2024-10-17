@@ -28,18 +28,43 @@ class NominatimLocationRepositoryTest {
   @Test
   fun testSearch_successfulResponse() {
     // Mocking the response body
-    val responseBody = "[{\"lat\": 48.8566, \"lon\": 2.3522, \"display_name\": \"Paris, France\"}]"
+    val responseBody =
+        """
+        [
+            {
+              "place_id": 82297359,
+              "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+              "osm_type": "relation",
+              "osm_id": 71525,
+              "lat": "48.8534951",
+              "lon": "2.3483915",
+              "class": "boundary",
+              "type": "administrative",
+              "place_rank": 12,
+              "importance": 0.884566363022883,
+              "addresstype": "city",
+              "name": "Paris",
+              "display_name": "Paris, Île-de-France, France métropolitaine, France",
+              "boundingbox": [
+                "48.8155755",
+                "48.9021560",
+                "2.2241220",
+                "2.4697602"
+              ]
+            }
+        ]
+        """
+            .trimIndent()
+
     val mockResponse = mock(Response::class.java)
     val mockResponseBody = responseBody.toResponseBody("application/json".toMediaTypeOrNull())
-
-    // Creating a real request to avoid null issues
 
     // Mock behavior of OkHttpClient and Call
     `when`(mockClient.newCall(any())).thenReturn(mockCall)
     `when`(mockResponse.isSuccessful).thenReturn(true)
     `when`(mockResponse.body).thenReturn(mockResponseBody)
 
-    // Simulate the successful response
+    // Simulating the successful response
     doAnswer { invocation ->
           val callback = invocation.arguments[0] as Callback
           callback.onResponse(mockCall, mockResponse)
@@ -58,26 +83,17 @@ class NominatimLocationRepositoryTest {
     assertTrue(failureException == null)
     // assertTrue(locations?.isNotEmpty() == true)
     val location = locations!![0]
-    assertEquals(48.8566, location.latitude)
-    assertEquals(2.3522, location.longitude)
-    assertEquals("Paris, France", location.name)
+    assertEquals(48.8534951, location.latitude)
+    assertEquals(2.3483915, location.longitude)
+    assertEquals("Paris, Île-de-France, France métropolitaine, France", location.name)
   }
 
   @Test
   fun testSearch_failureResponse() {
-    // Mocking the response body
-    val responseBody = "[{\"lat\": 48.8566, \"lon\": 2.3522, \"display_name\": \"Paris, France\"}]"
-    val mockResponse = mock(Response::class.java)
-    val mockResponseBody = responseBody.toResponseBody("application/json".toMediaTypeOrNull())
-
-    // Creating a real request to avoid null issues
-
     // Mock behavior of OkHttpClient and Call
     `when`(mockClient.newCall(any())).thenReturn(mockCall)
-    `when`(mockResponse.isSuccessful).thenReturn(true)
-    `when`(mockResponse.body).thenReturn(mockResponseBody)
 
-    // Simulate the successful response
+    // Simulating a failed connection
     doAnswer { invocation ->
           val callback = invocation.arguments[0] as Callback
           callback.onFailure(mockCall, IOException("Failed to connect"))
@@ -93,9 +109,9 @@ class NominatimLocationRepositoryTest {
     repository.search("Paris", { result -> locations = result }, { e -> failureException = e })
 
     // Assert results
-    assertTrue(locations == null) // Aucun emplacement ne doit être retourné
-    assertTrue(failureException is IOException) // Vérifie que l'exception est une IOException
-    assertEquals("Failed to connect", failureException?.message) // Vérifie le message d'erreur
+    assertTrue(locations == null) // No locations should be returned
+    assertTrue(failureException is IOException) // Ensures the exception is an IOException
+    assertEquals("Failed to connect", failureException?.message) // Checks the error message
   }
 
   @Test
@@ -106,7 +122,7 @@ class NominatimLocationRepositoryTest {
     `when`(mockResponse.isSuccessful).thenReturn(false)
     `when`(mockClient.newCall(any())).thenReturn(mockCall)
 
-    // Simuler que enqueue appelle la méthode onResponse du Callback
+    // Simulate enqueue calling the onResponse method of the Callback
     doAnswer { invocation ->
           val callback = invocation.arguments[0] as Callback
           callback.onResponse(mockCall, mockResponse)
@@ -118,11 +134,11 @@ class NominatimLocationRepositoryTest {
     // Callback results
     var failureException: Exception? = null
 
-    // Appel de la méthode search
+    // Calling the search method
     repository.search("Paris", {}, { e -> failureException = e })
 
-    // Vérification
-    assertTrue(failureException != null) // L'exception devrait être non nulle
+    // Verification
+    assertTrue(failureException != null) // The exception should not be null
   }
 
   @Test
@@ -130,14 +146,14 @@ class NominatimLocationRepositoryTest {
     // Mocking the response
     val mockResponse = mock(Response::class.java)
 
-    // Simuler la réponse non réussie avec un body null
+    // Simulate a successful response with a null body
     `when`(mockResponse.isSuccessful).thenReturn(true)
-    `when`(mockResponse.body).thenReturn(null) // Le corps de la réponse est null
+    `when`(mockResponse.body).thenReturn(null) // The response body is null
 
-    // Simuler le comportement du client et du Call
+    // Mock behavior of OkHttpClient and Call
     `when`(mockClient.newCall(any())).thenReturn(mockCall)
 
-    // Simuler que enqueue appelle la méthode onResponse du Callback
+    // Simulate enqueue calling the onResponse method of the Callback
     doAnswer { invocation ->
           val callback = invocation.arguments[0] as Callback
           callback.onResponse(mockCall, mockResponse)
@@ -150,12 +166,12 @@ class NominatimLocationRepositoryTest {
     var locations: List<Location>? = null
     var failureException: Exception? = null
 
-    // Appel de la méthode search
+    // Calling the search method
     repository.search("Paris", { result -> locations = result }, { e -> failureException = e })
 
-    // Vérification
-    assertTrue(locations != null) // La liste de locations doit être non nulle
-    assertTrue(locations!!.isEmpty()) // La liste doit être vide si le body est null
-    assertTrue(failureException == null) // Aucune exception ne doit être levée
+    // Verification
+    assertTrue(locations != null) // The locations list should not be null
+    assertTrue(locations!!.isEmpty()) // The list should be empty if the body is null
+    assertTrue(failureException == null) // No exception should be thrown
   }
 }
