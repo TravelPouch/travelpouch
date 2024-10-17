@@ -65,7 +65,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
           // App Logo Image
           Image(
               painter =
-                  painterResource(id = R.drawable.travelpouch_logo), // Ensure this drawable exists
+                  painterResource(id = R.drawable.travelpouch_logo),
               contentDescription = "App Logo",
               modifier = Modifier.size(250.dp).testTag("appLogo"))
 
