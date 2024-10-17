@@ -126,9 +126,10 @@ fun EditTravelSettingsScreen(
       }
 
       Column(
-          modifier = Modifier.padding(padding).testTag("editTravelColumn").verticalScroll(
-              rememberScrollState()
-          ),
+          modifier =
+              Modifier.padding(padding)
+                  .testTag("editTravelColumn")
+                  .verticalScroll(rememberScrollState()),
           Arrangement.Top,
           Alignment.CenterHorizontally) {
             Row(
