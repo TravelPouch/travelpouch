@@ -7,6 +7,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.ListTravelViewModel
@@ -29,6 +30,7 @@ import org.mockito.kotlin.doNothing
 class EditTravelSettingsScreenTest {
   // Helper function to input text into a text field
   fun inputText(testTag: String, previousText: String, text: String) {
+    composeTestRule.onNodeWithTag(testTag).performScrollTo()
     composeTestRule.onNodeWithTag(testTag).assertTextContains(previousText)
     composeTestRule.onNodeWithTag(testTag).performTextClearance()
     composeTestRule.onNodeWithTag(testTag).performTextInput(text)
