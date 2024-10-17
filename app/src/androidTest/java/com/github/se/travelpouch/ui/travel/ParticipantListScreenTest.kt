@@ -42,7 +42,7 @@ class ParticipantListScreenTest {
             "DFZft6Z95ABnRQ3YZQ2d",
             "Test Title",
             "Test Description",
-            Timestamp(1234567890L - 1, 0),
+            Timestamp(1234567890L + 3600, 0),
             Timestamp(1234567890L + 200_000L, 0),
             location,
             attachments,
