@@ -16,6 +16,7 @@ object Screen {
   const val EDIT = "Edit Screen"
   const val PARTICIPANT_LIST = "Participant List Screen"
   const val ADD_TRAVEL = "AddTravel Screen"
+  const val OVERVIEW = "Overview Screen"
 }
 
 open class NavigationActions(
