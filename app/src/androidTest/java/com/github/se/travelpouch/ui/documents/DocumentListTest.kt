@@ -69,7 +69,7 @@ class DocumentListTest {
       it.getArgument<(List<DocumentContainer>) -> Unit>(0)(list_documents)
     }
 
-    composeTestRule.setContent { DocumentList(mockDocumentViewModel, navigationActions, {}) }
+    composeTestRule.setContent { DocumentListScreen(mockDocumentViewModel, navigationActions, {}) }
 
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("documentListTitle").assertIsDisplayed()
