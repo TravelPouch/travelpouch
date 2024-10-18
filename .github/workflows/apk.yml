@@ -7,6 +7,12 @@ on:
         description: "Ex: milestone name"
         default: "Mn"
         required: true
+  push:
+    tags:
+      - 'v*'
+        
+permissions:
+  contents: write-all
 
 jobs:
   build:
