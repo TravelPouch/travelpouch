@@ -53,3 +53,10 @@ jobs:
           name: "${{ github.event.inputs.name }}-Debug-APK"
           #path: app/build/outputs/apk/release/*.apk
           path: app/build/outputs/apk/debug/*.apk
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: ${{ github.run_number}}
+          release_name: Release ${{ github.run_number}}
