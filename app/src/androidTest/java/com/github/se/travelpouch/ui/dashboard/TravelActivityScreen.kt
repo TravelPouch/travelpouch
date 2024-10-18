@@ -10,6 +10,7 @@ import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
@@ -21,6 +22,7 @@ import org.mockito.kotlin.any
 class TravelActivityScreen {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityModelView: ActivityViewModel
+  private lateinit var navigationActions: NavigationActions
 
   val activites_test =
       listOf(
@@ -43,13 +45,16 @@ class TravelActivityScreen {
 
   @Before
   fun setUp() {
+    navigationActions = mock(NavigationActions::class.java)
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
     mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
   }
 
   @Test
   fun verifiesEverythingIsDisplayed() {
-    composeTestRule.setContent { TravelActivitiesScreen(activityModelView = mockActivityModelView) }
+    composeTestRule.setContent {
+      TravelActivitiesScreen(navigationActions, activityModelView = mockActivityModelView)
+    }
 
     `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(activites_test)
@@ -66,7 +71,9 @@ class TravelActivityScreen {
 
   @Test
   fun verifiesEmptyPromptWhenEmptyList() {
-    composeTestRule.setContent { TravelActivitiesScreen(activityModelView = mockActivityModelView) }
+    composeTestRule.setContent {
+      TravelActivitiesScreen(navigationActions, activityModelView = mockActivityModelView)
+    }
 
     `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf())

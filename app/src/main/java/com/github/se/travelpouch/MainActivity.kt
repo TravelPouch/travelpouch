@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -18,6 +17,7 @@ import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
@@ -57,11 +57,13 @@ fun TravelPouchApp() {
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
 
-  NavHost(navController = navController, startDestination = Route.OVERVIEW) {
+  NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
-        startDestination = Screen.TRAVEL_LIST,
-        route = Route.OVERVIEW,
+        startDestination = Screen.AUTH,
+        route = Route.DEFAULT,
     ) {
+      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+
       composable(Screen.TRAVEL_LIST) { TravelListScreen(navigationActions, listTravelViewModel) }
       composable(Screen.TRAVEL_ACTIVITIES) {
         TravelActivitiesScreen(navigationActions, activityModelView)
@@ -83,14 +85,5 @@ fun TravelPouchApp() {
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
     }
-  }
-}
-
-@Composable
-fun Greeting() {
-  Surface(
-      modifier = Modifier.fillMaxSize().testTag("GreetingScreenContainer"),
-  ) {
-    Text(text = "This is the Greeting Screen")
   }
 }

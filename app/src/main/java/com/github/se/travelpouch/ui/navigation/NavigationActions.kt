@@ -3,11 +3,7 @@ package com.github.se.travelpouch.ui.navigation
 import androidx.navigation.NavHostController
 
 object Route {
-  const val AUTH = "Auth"
-  const val GREETING = "Greeting"
-  const val TRAVEL = "Edit"
-  const val PARTICIPANT_LIST = "Participant List"
-  const val OVERVIEW = "Overview"
+  const val DEFAULT = "Default"
 }
 
 object Screen {
