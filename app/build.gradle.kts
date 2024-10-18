@@ -38,10 +38,21 @@ android {
             useSupportLibrary = true
         }
     }
+    signingConfigs {
+        // Ensure debug signing config exists or create a new one
+        create("release") {
+            storeFile = file(System.getProperty("user.home") + "/test-release.keystore") // Use custom keystore here
+            storePassword = "testpass" // Change this to your keystore password
+            keyAlias = "testalias" // Alias used in the keystore
+            keyPassword = "testpass" // Key password
+        }
+    }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
