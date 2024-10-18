@@ -24,7 +24,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class OverviewScreenTest {
+class TravelListScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 

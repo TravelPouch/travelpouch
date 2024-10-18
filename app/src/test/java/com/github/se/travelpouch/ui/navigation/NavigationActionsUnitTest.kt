@@ -9,7 +9,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
-class NavigationActionsTest {
+class NavigationActionsUnitTest {
 
   private lateinit var navigationDestination: NavDestination
   private lateinit var navHostController: NavHostController

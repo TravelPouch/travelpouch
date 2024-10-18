@@ -47,7 +47,7 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentList(
+fun DocumentListScreen(
     documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory),
     navigationActions: NavigationActions,
     onNavigateToDocumentPreview: () -> Unit

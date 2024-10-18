@@ -10,7 +10,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 
-class EventModelViewTest {
+class EventModelViewUnitTest {
 
   private lateinit var repository: EventRepository
   private lateinit var eventViewModel: EventViewModel

@@ -59,7 +59,7 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   var dateText by remember { mutableStateOf("") }
-  var location by remember { mutableStateOf("Placeholder") }
+  val location by remember { mutableStateOf("Placeholder") }
 
   val context = LocalContext.current
 

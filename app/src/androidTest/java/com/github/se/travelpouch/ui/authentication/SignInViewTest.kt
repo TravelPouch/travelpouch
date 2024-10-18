@@ -44,7 +44,5 @@ class SignInViewTest {
   fun signInScreen_googleSignInButtonClick_triggersSignIn() {
     composeTestRule.setContent { SignInScreen(navigationActions = mockNavigationActions) }
     composeTestRule.onNodeWithTag("loginButtonRow").performClick()
-    // Verify that the sign-in intent was launched
-    // This will depend on how you mock or verify the launcher
   }
 }

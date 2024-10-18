@@ -23,7 +23,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapScreen(travelContainers: List<TravelContainer>) {
   Scaffold(
-      modifier = Modifier.testTag("overviewScreen"),
+      modifier = Modifier.testTag("listTravelScreen"),
       content = { paddingValues ->
         MapContent(modifier = Modifier.padding(paddingValues), travelContainers = travelContainers)
       })

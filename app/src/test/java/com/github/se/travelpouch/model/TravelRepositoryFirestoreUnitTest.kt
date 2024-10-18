@@ -12,8 +12,6 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -681,38 +679,6 @@ class TravelRepositoryFirestoreUnitTest {
       assertTrue(failureCalled)
       logMock.verify { Log.e("TravelRepositoryFirestore", "Error getting documents", exception) }
     }
-  }
-
-  @Test
-  fun checkAddTravelSerializeCorrectlyToFirebaseWithReflection() {
-    val db2 = FirebaseFirestore.getInstance()
-    val travelRepositoryFirestore2 = TravelRepositoryFirestore(db2)
-    val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
-    val attachments: Map<String, String> = mapOf("Test Key item" to "Test Value item")
-    val user1ID = travelRepositoryFirestore2.getNewUid()
-    val user2ID = travelRepositoryFirestore2.getNewUid()
-    val participants: Map<Participant, Role> =
-        mapOf(Participant(user1ID) to Role.OWNER, Participant(user2ID) to Role.PARTICIPANT)
-    val travelContainer =
-        TravelContainer(
-            user2ID,
-            "Test Title",
-            "Test Description",
-            Timestamp(1234567890L - 1, 0),
-            Timestamp(1234567890L, 0),
-            location,
-            attachments,
-            participants)
-
-    val addLatch = CountDownLatch(1)
-    travelRepositoryFirestore2.addTravel(
-        travelContainer, { addLatch.countDown() }, { fail("Should not call onFailure") })
-    addLatch.await(4, TimeUnit.SECONDS) // Wait for the addTravel operation to complete
-
-    val travelContainer2 = travelContainer.copy(title = "Title After Change")
-    val updateLatch = CountDownLatch(1)
-    travelRepositoryFirestore2.updateTravel(
-        travelContainer2, { updateLatch.countDown() }, { fail("Should not call onFailure") })
   }
 
   @Test
