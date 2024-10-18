@@ -61,98 +61,92 @@ fun TravelActivitiesScreen(
     navigationActions: NavigationActions,
     activityModelView: ActivityViewModel
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    val listOfActivities = activityModelView.activities.collectAsState()
-    val listOfDestinations =
-        listOf(
-            BottomNavigationItem("Activities", Icons.Default.Home),
-            BottomNavigationItem("Map", Icons.Default.Place)
-        )
+  val listOfActivities = activityModelView.activities.collectAsState()
+  val listOfDestinations =
+      listOf(
+          BottomNavigationItem("Activities", Icons.Default.Home),
+          BottomNavigationItem("Map", Icons.Default.Place))
 
-    Scaffold(
-        modifier = Modifier.testTag("travelActivitiesScreen"),
-        topBar = {
-            TopAppBar(
-                title = { Text("Travel", Modifier.testTag("travelTitle")) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navigationActions.goBack()
-                    }, modifier = Modifier.testTag("goBackButton")) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS)
-                    }, modifier = Modifier.testTag("settingsButton")) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-                    }
+  Scaffold(
+      modifier = Modifier.testTag("travelActivitiesScreen"),
+      topBar = {
+        TopAppBar(
+            title = { Text("Travel", Modifier.testTag("travelTitle")) },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
+            },
+            actions = {
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
+                  modifier = Modifier.testTag("settingsButton")) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                  }
 
-                    IconButton(onClick = {
-                        navigationActions.navigateTo(Screen.TIMELINE)
-                    }, modifier = Modifier.testTag("eventTimelineButton")) {
-                        Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
-                    }
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.TIMELINE) },
+                  modifier = Modifier.testTag("eventTimelineButton")) {
+                    Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
+                  }
 
-                    IconButton(onClick = {
-                        navigationActions.navigateTo(Screen.DOCUMENT_LIST)
-                    }, modifier = Modifier.testTag("documentListButton")) {
-                        Icon(imageVector = Icons.Default.Folder, contentDescription = null)
-                    }
-                })
-        },
-        bottomBar = {
-            NavigationBar(modifier = Modifier.testTag("navigationBarTravel")) {
-                listOfDestinations.forEach {
-                    NavigationBarItem(
-                        onClick = {},
-                        icon = { Icon(it.icon, contentDescription = null) },
-                        selected = false,
-                        label = { Text(it.title) },
-                        modifier = Modifier.testTag("navigationBarItem")
-                    )
-                }
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.DOCUMENT_LIST) },
+                  modifier = Modifier.testTag("documentListButton")) {
+                    Icon(imageVector = Icons.Default.Folder, contentDescription = null)
+                  }
+            })
+      },
+      bottomBar = {
+        NavigationBar(modifier = Modifier.testTag("navigationBarTravel")) {
+          listOfDestinations.forEach {
+            NavigationBarItem(
+                onClick = {},
+                icon = { Icon(it.icon, contentDescription = null) },
+                selected = false,
+                label = { Text(it.title) },
+                modifier = Modifier.testTag("navigationBarItem"))
+          }
+        }
+      },
+      floatingActionButton = {
+        FloatingActionButton(
+            onClick = { navigationActions.navigateTo(Screen.ADD_ACTIVITY) },
+            modifier = Modifier.testTag("addActivityButton")) {
+              Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navigationActions.navigateTo(Screen.ADD_ACTIVITY)
-            }, modifier = Modifier.testTag("addActivityButton")) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
-            }
-        }) { pd ->
+      }) { pd ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(vertical = 8.dp),
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(pd)
-                .testTag("activityColumn")
-        ) {
-            if (listOfActivities.value.isEmpty()) {
+                Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(pd)
+                    .testTag("activityColumn")) {
+              if (listOfActivities.value.isEmpty()) {
                 item {
-                    Text(
-                        text = "No activities planned for this trip",
-                        modifier = Modifier.testTag("emptyTravel")
-                    )
+                  Text(
+                      text = "No activities planned for this trip",
+                      modifier = Modifier.testTag("emptyTravel"))
                 }
-            } else {
+              } else {
                 items(listOfActivities.value.size) { idx ->
-                    ActivityItem(
-                        listOfActivities.value[idx],
-                        onClick = {
-                            Toast.makeText(context, "Activity clicked", Toast.LENGTH_SHORT).show()
-                        })
+                  ActivityItem(
+                      listOfActivities.value[idx],
+                      onClick = {
+                        Toast.makeText(context, "Activity clicked", Toast.LENGTH_SHORT).show()
+                      })
                 }
+              }
             }
-        }
-    }
+      }
 }
 
 /**
@@ -163,21 +157,17 @@ fun TravelActivitiesScreen(
  */
 @Composable
 fun ActivityItem(activity: Activity, onClick: () -> Unit = {}) {
-    val calendar = GregorianCalendar()
-    calendar.time = activity.date.toDate()
+  val calendar = GregorianCalendar()
+  calendar.time = activity.date.toDate()
 
-    Card(modifier = Modifier
-        .testTag("activityItem")
-        .clickable(onClick = onClick)
-        .fillMaxSize()) {
-        Text(activity.title)
-        Text(activity.location.name)
-        Text(
-            "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
+  Card(modifier = Modifier.testTag("activityItem").clickable(onClick = onClick).fillMaxSize()) {
+    Text(activity.title)
+    Text(activity.location.name)
+    Text(
+        "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
                 calendar.get(
                     Calendar.YEAR
                 )
-            }"
-        )
-    }
+            }")
+  }
 }

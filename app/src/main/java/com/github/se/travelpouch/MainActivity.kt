@@ -32,82 +32,55 @@ import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            SampleAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier
-                      .fillMaxSize()
-                      .testTag("MainScreenContainer"),
-                ) {
-                    TravelPouchApp()
-                }
-            }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      SampleAppTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
+        ) {
+          TravelPouchApp()
         }
+      }
     }
+  }
 }
 
 @Composable
 fun TravelPouchApp() {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
-    val listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory)
-    val documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory)
-    val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
-    val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
+  val listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory)
+  val documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory)
+  val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
+  val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
 
-    NavHost(navController = navController, startDestination = Route.OVERVIEW) {
-        navigation(
-            startDestination = Screen.TRAVEL_LIST,
-            route = Route.OVERVIEW,
-        ) {
-            composable(Screen.TRAVEL_LIST) {
-                TravelListScreen(
-                    navigationActions,
-                    listTravelViewModel
-                )
-            }
-            composable(Screen.TRAVEL_ACTIVITIES) {
-                TravelActivitiesScreen(
-                    navigationActions,
-                    activityModelView
-                )
-            }
-            composable(Screen.ADD_ACTIVITY) {
-                AddActivityScreen(
-                    navigationActions,
-                    activityModelView
-                )
-            }
-            composable(Screen.ADD_TRAVEL) {
-                AddTravelScreen(
-                    listTravelViewModel,
-                    navigationActions
-                )
-            }
-            composable(Screen.EDIT_TRAVEL_SETTINGS) {
-                EditTravelSettingsScreen(
-                    listTravelViewModel,
-                    navigationActions
-                )
-            }
-            composable(Screen.PARTICIPANT_LIST) {
-                ParticipantListScreen(listTravelViewModel, navigationActions)
-            }
-            composable(Screen.DOCUMENT_LIST) {
-                DocumentList(documentViewModel, navigationActions, onNavigateToDocumentPreview = {
-                    navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW)
-                })
-            }
-            composable(Screen.DOCUMENT_PREVIEW) {
-                DocumentPreview(
-                    documentViewModel,
-                    navigationActions
-                )
-            }
-            composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
-        }
+  NavHost(navController = navController, startDestination = Route.OVERVIEW) {
+    navigation(
+        startDestination = Screen.TRAVEL_LIST,
+        route = Route.OVERVIEW,
+    ) {
+      composable(Screen.TRAVEL_LIST) { TravelListScreen(navigationActions, listTravelViewModel) }
+      composable(Screen.TRAVEL_ACTIVITIES) {
+        TravelActivitiesScreen(navigationActions, activityModelView)
+      }
+      composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
+      composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.EDIT_TRAVEL_SETTINGS) {
+        EditTravelSettingsScreen(listTravelViewModel, navigationActions)
+      }
+      composable(Screen.PARTICIPANT_LIST) {
+        ParticipantListScreen(listTravelViewModel, navigationActions)
+      }
+      composable(Screen.DOCUMENT_LIST) {
+        DocumentList(
+            documentViewModel,
+            navigationActions,
+            onNavigateToDocumentPreview = { navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW) })
+      }
+      composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
+      composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
     }
+  }
 }
