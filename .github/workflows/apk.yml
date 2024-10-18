@@ -12,7 +12,7 @@ on:
       - 'v*'
         
 permissions:
-  contents: write-all
+  contents: write
 
 jobs:
   build:
