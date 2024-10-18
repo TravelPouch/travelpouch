@@ -82,31 +82,37 @@ fun DocumentList(
           if (toggled) {
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
               ExtendedFloatingActionButton(
-                  text = { Text("Import from local files") },
+                  text = {
+                    Text(
+                        "Import from local files",
+                        modifier = Modifier.testTag("importLocalFileButtonText"))
+                  },
                   icon = { Icon(Icons.Default.UploadFile, contentDescription = "Add Document") },
-                  onClick = {})
+                  onClick = {},
+                  modifier = Modifier.testTag("importLocalFileButton"))
 
               Spacer(modifier = Modifier.height(8.dp))
 
               ExtendedFloatingActionButton(
-                  text = { Text("Scan with camera") },
+                  text = {
+                    Text("Scan with camera", modifier = Modifier.testTag("scanCamButtonText"))
+                  },
                   icon = { Icon(Icons.Default.CameraAlt, contentDescription = "Add Document") },
-                  onClick = {})
+                  onClick = {},
+                  modifier = Modifier.testTag("scanCamButton"))
 
               Spacer(modifier = Modifier.height(8.dp))
 
               FloatingActionButton(
-                  onClick = { toggled = !toggled },
-              ) {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = "Add Document")
-              }
+                  onClick = { toggled = !toggled }, modifier = Modifier.testTag("dropDownButton")) {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Add Document")
+                  }
             }
           } else {
             FloatingActionButton(
-                onClick = { toggled = !toggled },
-            ) {
-              Icon(Icons.Default.Add, contentDescription = "Add Document")
-            }
+                onClick = { toggled = !toggled }, modifier = Modifier.testTag("plusButton")) {
+                  Icon(Icons.Default.Add, contentDescription = "Add Document")
+                }
           }
         }
       }) { paddingValue ->

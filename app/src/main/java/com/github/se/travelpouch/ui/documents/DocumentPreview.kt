@@ -47,7 +47,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
             title = {
               Text(
                   documentContainer.title,
-                  modifier = Modifier.semantics { testTag = "documentTitle" })
+                  modifier = Modifier.semantics { testTag = "documentTitleTopBarApp" })
             },
             navigationIcon = {
               IconButton(
@@ -76,7 +76,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
         Text(
             text = documentContainer.title,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(8.dp))
+            modifier = Modifier.padding(8.dp).testTag("documentTitle"))
       }
     }
   }
