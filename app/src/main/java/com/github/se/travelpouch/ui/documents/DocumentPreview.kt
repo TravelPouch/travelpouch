@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.documents
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
@@ -26,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.google.firebase.storage.FirebaseStorage
 
 /**
  * Composable function for previewing a document.
@@ -37,6 +43,13 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: NavigationActions) {
   val documentContainer: DocumentContainer =
       documentViewModel.selectedDocument.collectAsState().value!!
+  var imageUri by remember { mutableStateOf("") }
+
+  FirebaseStorage.getInstance()
+      .getReference(documentContainer.ref.id)
+      .downloadUrl
+      .addOnSuccessListener { uri -> imageUri = uri.toString() }
+      .addOnFailureListener { Log.e("DocumentPreview", "Failed to get image uri", it) }
 
   Scaffold(
       modifier = Modifier.testTag("documentListScreen"),
@@ -71,10 +84,29 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
   ) { paddingValue ->
     Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
       Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.inversePrimary)) {
-        Text(
-            text = documentContainer.title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(8.dp).testTag("documentTitle"))
+        Column(modifier = Modifier.fillMaxWidth()) {
+          Text(
+              text = documentContainer.title,
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier.padding(8.dp).testTag("documentTitle"))
+          Text(
+              text = "Preview not yet implemented",
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier.padding(8.dp))
+          Text(
+              text = imageUri,
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.padding(8.dp))
+
+          // TODO: replace the text with the real AsyncImage
+          //      if (imageUri.isNotEmpty()) {
+          //        AsyncImage(
+          //            model = "$imageUri&file.jpg",
+          //            contentDescription = null,
+          //            contentScale = ContentScale.FillBounds,
+          //            modifier = Modifier.fillMaxSize())
+          //      }
+        }
       }
     }
   }

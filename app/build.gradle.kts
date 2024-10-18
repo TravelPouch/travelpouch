@@ -145,6 +145,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.play.services.mlkit.document.scanner)
+    implementation(libs.firebase.functions.ktx)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
@@ -203,6 +206,8 @@ dependencies {
     implementation(libs.compose.activity)
     // Integration with ViewModels
     implementation(libs.compose.viewmodel)
+    // Coil
+    implementation(libs.coil)
     // Android Studio Preview support
     implementation(libs.compose.preview)
     debugImplementation(libs.compose.tooling)
