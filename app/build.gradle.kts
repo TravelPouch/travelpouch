@@ -1,9 +1,12 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
-    jacoco
+    id("jacoco")
     alias(libs.plugins.gms)
 }
 
@@ -12,7 +15,18 @@ android {
     compileSdk = 34
     compileSdk = 34
 
+    // Load the API key from local.properties
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
+    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+
     defaultConfig {
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
         applicationId = "com.github.se.travelpouch"
         minSdk = 28
         targetSdk = 34
@@ -136,6 +150,12 @@ dependencies {
     globalTestImplementation(libs.androidx.espresso.core)
 
 
+    // Google Service and Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
+    implementation(libs.play.services.auth)
+
     // Firebase
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
@@ -152,6 +172,7 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
+    testImplementation (libs.mockk.v1120)
 
     // Test UI
     androidTestImplementation(libs.androidx.junit)
@@ -163,6 +184,8 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.kaspresso)
+    androidTestImplementation(libs.androidx.espresso.intents)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 
 
     // ------------- Jetpack Compose ------------------

@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model
 
 import com.google.firebase.Timestamp
+import java.util.Date
 
 typealias fsUid = String
 
@@ -67,6 +68,7 @@ data class TravelContainer(
         "allParticipants" to allParticipants.mapKeys { it.key.fsUid }.mapValues { it.value.name })
   }
 }
+
 /**
  * Function to check if a Firestore UID is valid. Firestore UID must be 20 characters long and
  * contain only alphanumeric characters.
@@ -140,5 +142,111 @@ data class Location(
       "Longitude must be between -180.0 and 180.0"
     }
     require(name.isNotBlank()) { "Location name cannot be blank" }
+  }
+}
+
+/*
+ * Mock data generator for TravelContainer.
+ */
+object TravelContainerMock {
+
+  /**
+   * Generates a random alphanumeric string of length 20.
+   *
+   * @return A randomly generated alphanumeric string.
+   */
+  fun generateAutoId(): String {
+    val chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return (1..20).map { chars.random() }.joinToString("")
+  }
+
+  /**
+   * Creates a mock TravelContainer object with default or provided values.
+   *
+   * @param fsUid The unique identifier for the travel container. Defaults to a generated ID.
+   * @param title The title of the travel container. Defaults to "Mock Travel".
+   * @param description The description of the travel container. Defaults to "This is a mock travel
+   *   container".
+   * @param startTime The start time of the travel container. Defaults to the current timestamp.
+   * @param endTime The end time of the travel container. Defaults to one day after the current
+   *   timestamp.
+   * @param location The location of the travel container. Defaults to EPFL coordinates.
+   * @param allAttachments A map of attachment names to their UIDs. Defaults to a single mock
+   *   attachment.
+   * @param allParticipants A map of participants to their roles. Defaults to a single owner
+   *   participant.
+   * @return A mock TravelContainer object.
+   */
+  fun createMockTravelContainer(
+      fsUid: String = generateAutoId(),
+      title: String = "Mock Travel",
+      description: String = "This is a mock travel container",
+      startTime: Timestamp = Timestamp.now(),
+      endTime: Timestamp = Timestamp(Date(Timestamp.now().toDate().time + 86400000)), // Add one day
+      location: Location = Location(46.5191, 6.5668, Timestamp.now(), "EPFL"),
+      allAttachments: Map<String, String> = mapOf("Attachment1" to "mockAttachmentUid1"),
+      allParticipants: Map<Participant, Role> = mapOf(Participant(generateAutoId()) to Role.OWNER)
+  ): TravelContainer {
+    return TravelContainer(
+        fsUid = fsUid,
+        title = title,
+        description = description,
+        startTime = startTime,
+        endTime = endTime,
+        location = location,
+        allAttachments = allAttachments,
+        allParticipants = allParticipants)
+  }
+
+  /**
+   * Creates a list of mock TravelContainer objects.
+   *
+   * @param size The number of mock TravelContainer objects to create.
+   * @param fsUidGenerator A function to generate unique identifiers for the travel containers.
+   *   Defaults to generateAutoId.
+   * @param titleGenerator A function to generate titles for the travel containers. Defaults to
+   *   "Mock Travel {index}".
+   * @param descriptionGenerator A function to generate descriptions for the travel containers.
+   *   Defaults to "This is mock travel container {index}".
+   * @param startTimeGenerator A function to generate start times for the travel containers.
+   *   Defaults to the current timestamp.
+   * @param endTimeGenerator A function to generate end times for the travel containers. Defaults to
+   *   one day after the start time.
+   * @param locationGenerator A function to generate locations for the travel containers. Defaults
+   *   to EPFL coordinates.
+   * @param allAttachmentsGenerator A function to generate attachment maps for the travel
+   *   containers. Defaults to a single mock attachment.
+   * @param allParticipantsGenerator A function to generate participant maps for the travel
+   *   containers. Defaults to a single owner participant.
+   * @return A list of mock TravelContainer objects.
+   */
+  fun createMockTravelContainersList(
+      size: Int,
+      fsUidGenerator: () -> String = ::generateAutoId,
+      titleGenerator: (Int) -> String = { "Mock Travel $it" },
+      descriptionGenerator: (Int) -> String = { "This is mock travel container $it" },
+      startTimeGenerator: (Int) -> Timestamp = { Timestamp.now() },
+      endTimeGenerator: (Int) -> Timestamp = { index ->
+        Timestamp(Date(startTimeGenerator(index).toDate().time + 86400000)) // Add one day
+      },
+      locationGenerator: (Int) -> Location = { Location(46.5191, 6.5668, Timestamp.now(), "EPFL") },
+      allAttachmentsGenerator: (Int) -> Map<String, String> = { index ->
+        mapOf("Attachment$index" to "mockAttachmentUid$index")
+      },
+      allParticipantsGenerator: (Int) -> Map<Participant, Role> = {
+        mapOf(Participant(generateAutoId()) to Role.OWNER)
+      }
+  ): List<TravelContainer> {
+    return (1..size).map { index ->
+      createMockTravelContainer(
+          fsUid = fsUidGenerator(),
+          title = titleGenerator(index),
+          description = descriptionGenerator(index),
+          startTime = startTimeGenerator(index),
+          endTime = endTimeGenerator(index),
+          location = locationGenerator(index),
+          allAttachments = allAttachmentsGenerator(index),
+          allParticipants = allParticipantsGenerator(index))
+    }
   }
 }

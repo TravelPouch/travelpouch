@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.ui.overview
+package com.github.se.travelpouch.ui.home
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled

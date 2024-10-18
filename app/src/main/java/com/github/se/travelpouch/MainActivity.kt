@@ -5,8 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,10 +15,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.ListTravelViewModel
+import com.github.se.travelpouch.ui.authentication.SignInScreen
+import com.github.se.travelpouch.ui.home.AddTravelScreen
+import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.overview.AddTravelScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
@@ -45,16 +47,33 @@ fun TravelPouchApp() {
   val navigationActions = NavigationActions(navController)
   val listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory)
 
-  NavHost(navController = navController, startDestination = Route.OVERVIEW) {
+  NavHost(navController = navController, startDestination = Route.AUTH) {
     navigation(
-        startDestination = Screen.ADD_TRAVEL,
+        startDestination = Screen.AUTH,
+        route = Route.AUTH,
+    ) {
+      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+    }
+
+    navigation(
+        startDestination = Screen.OVERVIEW,
         route = Route.OVERVIEW,
     ) {
+      composable(Screen.OVERVIEW) { TravelListScreen(navigationActions, listTravelViewModel) }
       composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
       composable(Screen.EDIT) { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
       composable(Screen.PARTICIPANT_LIST) {
         ParticipantListScreen(listTravelViewModel, navigationActions)
       }
     }
+  }
+}
+
+@Composable
+fun Greeting() {
+  Surface(
+      modifier = Modifier.fillMaxSize().testTag("GreetingScreenContainer"),
+  ) {
+    Text(text = "This is the Greeting Screen")
   }
 }
