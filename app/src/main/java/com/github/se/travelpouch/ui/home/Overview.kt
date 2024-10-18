@@ -77,6 +77,7 @@ fun TravelListScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
                   items(travelList.size) { index ->
                     TravelItem(travelContainer = travelList[index]) {
+                      listTravelViewModel.selectTravel(travelList[index])
                       navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                     }
                   }
