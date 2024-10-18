@@ -37,12 +37,9 @@ class NavigationActionsTest {
   @Test
   fun currentRouteCallsController() {
     `when`(navHostController.currentDestination).thenReturn(navigationDestination)
-    `when`(navigationDestination.route).thenReturn(Route.AUTH)
+    `when`(navigationDestination.route).thenReturn(Route.DEFAULT)
 
-    // Appeler la méthode currentRoute
     val currentRoute = navigationActions.currentRoute()
-
-    // Vérifier que la route actuelle est bien "Auth"
-    assertEquals("Auth", currentRoute)
+    assertEquals(Route.DEFAULT, currentRoute)
   }
 }
