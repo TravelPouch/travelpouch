@@ -49,6 +49,14 @@ jobs:
       - name: Build APK Debug
         run: ./gradlew assembleDebug
 
+      - name: Extract SHA-1 Fingerprint from Debug Keystore
+        run: |
+            keytool -list -v \
+              -keystore $HOME/.android/debug.keystore \
+              -alias androiddebugkey \
+              -storepass android \
+              -keypass android | grep 'SHA1'
+
       - name: List APK files
         run: |
           find app/build/outputs/apk -type f
