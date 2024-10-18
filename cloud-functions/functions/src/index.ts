@@ -13,7 +13,9 @@ import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
 
 import {defineSecret} from "firebase-functions/params";
-import {getFirestore} from "firebase-admin/firestore";
+import {DocumentReference, getFirestore, Timestamp}
+  from "firebase-admin/firestore";
+import {getStorage} from "firebase-admin/storage";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -33,8 +35,9 @@ const ACCEPTED_MIME_TYPES = [
   "image/png",
 ];
 
-
 initializeApp();
+
+const ADDRESS_TO_ID = /^<?travelpouchswent\+(.*)@gmail.com>?$/;
 
 interface Body {
   message: {
@@ -94,10 +97,24 @@ interface Message {
 
 interface DestAttachments {
   destination: string,
-  attachmentsId: string[]
+  attachments: {
+    id: string,
+    format: string,
+    title: string,
+    size: number
+  }[]
 }
 
 type FileContent = string
+
+interface Document {
+  addedAt: Timestamp,
+  fileFormat: string,
+  fileSize: number,
+  title: string,
+  travelRef: DocumentReference,
+  visibility: string
+}
 
 /**
  * This error is used for parsing errors
@@ -129,12 +146,17 @@ export const gmailDocuments = onRequest(
         logger.debug(destAttachments);
 
         for (const destAttachment of
-          destAttachments.attachmentsId) {
-          logger.debug(
-            await getAttachment(
-              newMessageId,
-              destAttachment,
-              accessToken));
+          destAttachments.attachments) {
+          const contentBase64 = await getAttachment(
+            newMessageId,
+            destAttachment.id,
+            accessToken);
+          storeFile(
+            contentBase64,
+            destAttachment.format,
+            destAttachment.title,
+            destAttachments.destination,
+            destAttachment.size);
         }
       }
     } catch (e) {
@@ -311,10 +333,16 @@ function messageToDestAttachment(message: Message): DestAttachments {
 
   return {
     destination: headersFiltered[0].value,
-    attachmentsId: searchAcceptedMimeTypes(message.payload)
-      .map((p) => p.body?.attachmentId)
-      .filter((p) => p != null)
-      .map((p) => p as string),
+    attachments: searchAcceptedMimeTypes(message.payload)
+      .filter((p) => p.body?.attachmentId != null)
+      .map((p) => {
+        return {
+          id: p.body.attachmentId as string,
+          format: p.mimeType,
+          title: p.filename,
+          size: p.body.size,
+        };
+      }),
   };
 }
 
@@ -343,4 +371,47 @@ function getAttachment(
     .then((res) => {
       return res?.data;
     });
+}
+
+/**
+ * Store a file in the cloud
+ * @param {string} contentBase64url
+ *  The content of the file to sotre in base64url encoding
+ * @param {string} format The mime type of the file
+ * @param {string} title The name of the file
+ * @param {string} destination The destination address of the mail
+ * @param {number} size The size of the file in bytes
+ */
+async function storeFile(
+  contentBase64url: string,
+  format: string,
+  title: string,
+  destination: string,
+  size: number) {
+  const fs = getFirestore();
+  logger.debug(destination, ADDRESS_TO_ID.exec(destination));
+  const travelId = ADDRESS_TO_ID.exec(destination)?.at(1);
+  if (travelId == null) {
+    return;
+  }
+  const reference = fs.collection("travels")
+    .doc(travelId);
+  const document = await fs.collection("documents").add({
+    addedAt: Timestamp.now(),
+    fileFormat: format,
+    fileSize: size,
+    title,
+    travelRef: reference,
+    visibility: "ME",
+  } as Document);
+
+  const storage = getStorage();
+  const bucket = storage.bucket();
+  const file = bucket.file(document.id);
+  await file.save(Buffer.from(contentBase64url, "base64url"));
+
+  logger.debug("Uploaded the ", format,
+    " ", title,
+    " of size ", size,
+    " with id ", document.id);
 }
