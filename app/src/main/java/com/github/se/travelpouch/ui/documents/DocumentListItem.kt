@@ -49,12 +49,14 @@ fun DocumentListItem(documentContainer: DocumentContainer, onClick: () -> Unit) 
                     text =
                         SimpleDateFormat("dd/MM/yyyy hh:mm:ss", Locale.getDefault())
                             .format(documentContainer.addedAt.toDate()),
-                    style = MaterialTheme.typography.bodySmall)
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.testTag("dateDocumentText"))
 
                 Text(
                     text = documentContainer.fileFormat.toString(),
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold)
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.testTag("fileFormatText"))
               }
 
           Box(
@@ -63,7 +65,10 @@ fun DocumentListItem(documentContainer: DocumentContainer, onClick: () -> Unit) 
                       .width(150.dp)
                       .background(MaterialTheme.colorScheme.onPrimary)) {}
 
-          Text(text = documentContainer.title, style = MaterialTheme.typography.bodyMedium)
+          Text(
+              text = documentContainer.title,
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.testTag("DocumentTitle"))
         }
   }
 }
