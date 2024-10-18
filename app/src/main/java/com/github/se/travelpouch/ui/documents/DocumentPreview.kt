@@ -1,7 +1,10 @@
 package com.github.se.travelpouch.ui.documents
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -55,7 +58,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
             title = {
               Text(
                   documentContainer.title,
-                  modifier = Modifier.semantics { testTag = "documentTitle" })
+                  modifier = Modifier.semantics { testTag = "documentTitleTopBarApp" })
             },
             navigationIcon = {
               IconButton(
@@ -80,23 +83,31 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
       },
   ) { paddingValue ->
     Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
-      Text(
-          text = "Preview not yet implemented",
-          style = MaterialTheme.typography.bodyLarge,
-          modifier = Modifier.padding(8.dp))
-      Text(
-          text = imageUri,
-          style = MaterialTheme.typography.bodyMedium,
-          modifier = Modifier.padding(8.dp))
+      Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.inversePrimary)) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+          Text(
+              text = documentContainer.title,
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier.padding(8.dp).testTag("documentTitle"))
+          Text(
+              text = "Preview not yet implemented",
+              style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier.padding(8.dp))
+          Text(
+              text = imageUri,
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.padding(8.dp))
 
-      // TODO: replace the text with the real AsyncImage
-      //      if (imageUri.isNotEmpty()) {
-      //        AsyncImage(
-      //            model = "$imageUri&file.jpg",
-      //            contentDescription = null,
-      //            contentScale = ContentScale.FillBounds,
-      //            modifier = Modifier.fillMaxSize())
-      //      }
+          // TODO: replace the text with the real AsyncImage
+          //      if (imageUri.isNotEmpty()) {
+          //        AsyncImage(
+          //            model = "$imageUri&file.jpg",
+          //            contentDescription = null,
+          //            contentScale = ContentScale.FillBounds,
+          //            modifier = Modifier.fillMaxSize())
+          //      }
+        }
+      }
     }
   }
 }
