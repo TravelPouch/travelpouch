@@ -37,7 +37,6 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
 
   /** Gets all Documents. */
   fun getDocuments() {
-    Log.d("DocumentViewModel", "Getting Documents")
     repository.getDocuments(
         onSuccess = { _documents.value = it },
         onFailure = { Log.e("DocumentsViewModel", "Failed to get Documents", it) })
