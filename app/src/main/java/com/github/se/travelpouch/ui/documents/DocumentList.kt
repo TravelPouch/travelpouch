@@ -1,5 +1,13 @@
 package com.github.se.travelpouch.ui.documents
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -32,13 +40,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toFile
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.google.android.gms.common.util.Base64Utils
+import com.google.firebase.Timestamp
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.SCANNER_MODE_FULL
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 
 /**
  * Composable function for displaying a list of documents.
@@ -54,6 +71,44 @@ fun DocumentList(
 ) {
   val documents = documentViewModel.documents.collectAsState()
   documentViewModel.getDocuments()
+
+  val functions = FirebaseFunctions.getInstance("europe-west9")
+  val context = LocalContext.current
+  val scannerOptions =
+      GmsDocumentScannerOptions.Builder()
+          .setScannerMode(SCANNER_MODE_FULL)
+          .setGalleryImportAllowed(true)
+          .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_PDF)
+          .build()
+  val scanner = GmsDocumentScanning.getClient(scannerOptions)
+  val scannerLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.StartIntentSenderForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+              val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(it.data)
+              Log.d("DocumentList", "Scanning result: $scanningResult")
+              scanningResult?.pdf?.let { pdf ->
+                val bytes = pdf.uri.toFile().readBytes()
+                val bytes64 = Base64Utils.encodeUrlSafe(bytes)
+                val scanTimestamp = Timestamp.now().seconds
+                functions
+                    .getHttpsCallable("storeDocument")
+                    .call(
+                        mapOf(
+                            "content" to bytes64,
+                            "fileFormat" to "application/pdf",
+                            "title" to "Scan ${scanTimestamp}.pdf",
+                            "travelId" to "$scanTimestamp",
+                            "fileSize" to bytes.size,
+                            "visibility" to "PARTICIPANTS"))
+                    .continueWith { task ->
+                      val result = task.result?.data
+                      Log.d("DocumentList", "Function storeDocument result: $result")
+                      documentViewModel.getDocuments()
+                    }
+              }
+            }
+          }
 
   Scaffold(
       modifier = Modifier.testTag("documentListScreen"),
@@ -90,8 +145,15 @@ fun DocumentList(
 
               ExtendedFloatingActionButton(
                   text = { Text("Scan with camera") },
-                  icon = { Icon(Icons.Default.CameraAlt, contentDescription = "Add Document") },
-                  onClick = {})
+                  icon = {
+                    Icon(Icons.Default.DocumentScanner, contentDescription = "Add Document")
+                  },
+                  onClick = {
+                    scanner.getStartScanIntent(context.findActivity()!!).addOnSuccessListener {
+                        intentSender ->
+                      scannerLauncher.launch(IntentSenderRequest.Builder(intentSender).build())
+                    }
+                  })
 
               Spacer(modifier = Modifier.height(8.dp))
 
@@ -137,3 +199,11 @@ fun DocumentList(
         }
       }
 }
+
+/** Utility function to find the activity from a context. */
+fun Context.findActivity(): ComponentActivity? =
+    when (this) {
+      is ComponentActivity -> this
+      is ContextWrapper -> baseContext.findActivity()
+      else -> null
+    }
