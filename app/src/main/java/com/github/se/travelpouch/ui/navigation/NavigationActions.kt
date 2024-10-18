@@ -3,20 +3,20 @@ package com.github.se.travelpouch.ui.navigation
 import androidx.navigation.NavHostController
 
 object Route {
-  const val AUTH = "Auth"
-  const val GREETING = "Greeting"
-  const val TRAVEL = "Edit"
-  const val PARTICIPANT_LIST = "Participant List"
-  const val OVERVIEW = "Overview"
+  const val DEFAULT = "Default"
 }
 
 object Screen {
   const val AUTH = "Auth Screen"
-  const val GREETING = "Greeting Screen"
-  const val EDIT = "Edit Screen"
+  const val TRAVEL_LIST = "TravelList Screen"
+  const val EDIT_TRAVEL_SETTINGS = "Edit Screen"
   const val PARTICIPANT_LIST = "Participant List Screen"
   const val ADD_TRAVEL = "AddTravel Screen"
-  const val OVERVIEW = "Overview Screen"
+  const val DOCUMENT_LIST = "DocumentList Screen"
+  const val DOCUMENT_PREVIEW = "DocumentPreview Screen"
+  const val TRAVEL_ACTIVITIES = "TravelActivities Screen"
+  const val ADD_ACTIVITY = "AddActivity Screen"
+  const val TIMELINE = "Timeline Screen"
 }
 
 open class NavigationActions(

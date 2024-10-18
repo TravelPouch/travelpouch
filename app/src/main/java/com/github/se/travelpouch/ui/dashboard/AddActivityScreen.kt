@@ -33,6 +33,7 @@ import androidx.core.text.isDigitsOnly
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -47,7 +48,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddActivityScreen(activityModelView: ActivityViewModel) {
+fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: ActivityViewModel) {
   val dateFormat =
       SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
         isLenient = false // strict date format
@@ -68,17 +69,24 @@ fun AddActivityScreen(activityModelView: ActivityViewModel) {
       modifier = Modifier.testTag("AddActivityScreen"),
       topBar = {
         TopAppBar(
-            title = { Text("Travel", Modifier.testTag("travelTitle")) },
+            title = { Text("Add Activity", Modifier.testTag("travelTitle")) },
             navigationIcon = {
-              IconButton(onClick = {}, modifier = Modifier.testTag("goBackButton")) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
             })
-      }) {
+      },
+      content = { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(16.dp)
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
               OutlinedTextField(
                   value = title,
@@ -146,7 +154,7 @@ fun AddActivityScreen(activityModelView: ActivityViewModel) {
                     Text("Save")
                   }
             }
-      }
+      })
 }
 
 /**

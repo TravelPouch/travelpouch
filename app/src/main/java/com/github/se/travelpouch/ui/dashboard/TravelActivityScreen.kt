@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -56,7 +58,7 @@ data class BottomNavigationItem(val title: String, val icon: ImageVector)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TravelActivitiesScreen(
-    navigationActions: NavigationActions? = null,
+    navigationActions: NavigationActions,
     activityModelView: ActivityViewModel
 ) {
   val context = LocalContext.current
@@ -73,20 +75,32 @@ fun TravelActivitiesScreen(
         TopAppBar(
             title = { Text("Travel", Modifier.testTag("travelTitle")) },
             navigationIcon = {
-              IconButton(onClick = {}, modifier = Modifier.testTag("goBackButton")) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
             },
             actions = {
-              IconButton(onClick = {}, modifier = Modifier.testTag("settingsButton")) {
-                Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-              }
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
+                  modifier = Modifier.testTag("settingsButton")) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                  }
 
-              IconButton(onClick = {}, modifier = Modifier.testTag("eventTimelineButton")) {
-                Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
-              }
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.TIMELINE) },
+                  modifier = Modifier.testTag("eventTimelineButton")) {
+                    Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
+                  }
+
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.DOCUMENT_LIST) },
+                  modifier = Modifier.testTag("documentListButton")) {
+                    Icon(imageVector = Icons.Default.Folder, contentDescription = null)
+                  }
             })
       },
       bottomBar = {
@@ -102,9 +116,11 @@ fun TravelActivitiesScreen(
         }
       },
       floatingActionButton = {
-        FloatingActionButton(onClick = {}, modifier = Modifier.testTag("addActivityButton")) {
-          Icon(imageVector = Icons.Default.Add, contentDescription = null)
-        }
+        FloatingActionButton(
+            onClick = { navigationActions.navigateTo(Screen.ADD_ACTIVITY) },
+            modifier = Modifier.testTag("addActivityButton")) {
+              Icon(imageVector = Icons.Default.Add, contentDescription = null)
+            }
       }) { pd ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -148,6 +164,10 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}) {
     Text(activity.title)
     Text(activity.location.name)
     Text(
-        "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}")
+        "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
+                calendar.get(
+                    Calendar.YEAR
+                )
+            }")
   }
 }

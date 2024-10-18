@@ -45,7 +45,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(Screen.GREETING)
+            navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")

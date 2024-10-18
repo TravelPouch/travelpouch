@@ -14,6 +14,7 @@ import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
@@ -27,6 +28,7 @@ import org.mockito.kotlin.never
 class AddActivityScreenTest {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityModelView: ActivityViewModel
+  private lateinit var navigationActions: NavigationActions
 
   val activity =
       Activity(
@@ -41,6 +43,7 @@ class AddActivityScreenTest {
 
   @Before
   fun setUp() {
+    navigationActions = mock(NavigationActions::class.java)
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
     mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
 
@@ -49,7 +52,7 @@ class AddActivityScreenTest {
 
   @Test
   fun everythingIsDisplayed() {
-    composeTestRule.setContent { AddActivityScreen(mockActivityModelView) }
+    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
 
     composeTestRule.onNodeWithTag("AddActivityScreen").isDisplayed()
     composeTestRule.onNodeWithTag("titleField").isDisplayed()
@@ -73,7 +76,7 @@ class AddActivityScreenTest {
 
   @Test
   fun doesNotSaveWhenFieldsAreEmpty() {
-    composeTestRule.setContent { AddActivityScreen(mockActivityModelView) }
+    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
 
     completeAllFields(composeTestRule)
     // todo: add a test for location. Not now because location defined later.
@@ -101,7 +104,7 @@ class AddActivityScreenTest {
 
   @Test
   fun doesSaveWhenFieldsAreFull() {
-    composeTestRule.setContent { AddActivityScreen(mockActivityModelView) }
+    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
     completeAllFields(composeTestRule)
     composeTestRule.onNodeWithTag("saveButton").performClick()
     verify(mockActivityRepositoryFirebase).addActivity(anyOrNull(), anyOrNull(), anyOrNull())
@@ -109,7 +112,7 @@ class AddActivityScreenTest {
 
   @Test
   fun dateFormattingWorksCorrectly() {
-    composeTestRule.setContent { AddActivityScreen(mockActivityModelView) }
+    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("00000000")
     val result =
@@ -119,7 +122,7 @@ class AddActivityScreenTest {
 
   @Test
   fun doesNotSaveWhenDateIsWrong() {
-    composeTestRule.setContent { AddActivityScreen(mockActivityModelView) }
+    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
     completeAllFields(composeTestRule)
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("00000000")
@@ -131,7 +134,7 @@ class AddActivityScreenTest {
 
   @Test
   fun noCharacterAllowedInDateField() {
-    composeTestRule.setContent { AddActivityScreen(mockActivityModelView) }
+    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("mdkdk")
     var result =
@@ -149,7 +152,7 @@ class AddActivityScreenTest {
 
   @Test
   fun limitOfEightCharactersInDateField() {
-    composeTestRule.setContent { AddActivityScreen(mockActivityModelView) }
+    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("01234567")
     composeTestRule.onNodeWithTag("dateField").performTextInput("8")
