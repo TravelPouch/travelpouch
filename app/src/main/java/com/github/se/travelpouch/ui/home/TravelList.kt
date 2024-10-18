@@ -37,7 +37,7 @@ import com.github.se.travelpouch.ui.navigation.Screen
 import java.util.Locale
 
 /**
- * Composable function for the travels overview screen.
+ * Composable function for the travels list screen.
  *
  * @param navigationActions Actions for navigation.
  * @param listTravelViewModel List of travels as a viewmodel, to display.

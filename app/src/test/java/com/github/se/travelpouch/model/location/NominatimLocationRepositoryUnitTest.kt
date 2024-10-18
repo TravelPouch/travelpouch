@@ -3,15 +3,20 @@ import com.github.se.travelpouch.model.location.NominatimLocationRepository
 import java.io.IOException
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 
-class NominatimLocationRepositoryTest {
+class NominatimLocationRepositoryUnitTest {
 
   private lateinit var mockClient: OkHttpClient
   private lateinit var repository: NominatimLocationRepository

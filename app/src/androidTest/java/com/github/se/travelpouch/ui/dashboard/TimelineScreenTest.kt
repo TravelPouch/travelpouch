@@ -18,7 +18,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 
-class TimelineTest {
+class TimelineScreenTest {
 
   private lateinit var mockEventRepository: EventRepository
   private lateinit var mockEventViewModel: EventViewModel

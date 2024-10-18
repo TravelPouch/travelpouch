@@ -205,7 +205,7 @@ fun EditTravelSettingsScreen(
                 onClick = {
                   try {
                     val fsUid = selectedTravel!!.fsUid
-                    var newLocation = selectedTravel!!.location
+                    val newLocation: Location
                     try {
                       newLocation =
                           Location(

@@ -28,7 +28,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
 @RunWith(RobolectricTestRunner::class)
-class ActivityRepositoryTest {
+class ActivityRepositoryUnitTest {
   @Mock private lateinit var mockFirestore: FirebaseFirestore
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference

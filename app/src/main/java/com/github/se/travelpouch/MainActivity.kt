@@ -21,7 +21,7 @@ import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
-import com.github.se.travelpouch.ui.documents.DocumentList
+import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
 import com.github.se.travelpouch.ui.home.AddTravelScreen
 import com.github.se.travelpouch.ui.home.TravelListScreen
@@ -77,7 +77,7 @@ fun TravelPouchApp() {
         ParticipantListScreen(listTravelViewModel, navigationActions)
       }
       composable(Screen.DOCUMENT_LIST) {
-        DocumentList(
+        DocumentListScreen(
             documentViewModel,
             navigationActions,
             onNavigateToDocumentPreview = { navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW) })
