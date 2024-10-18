@@ -12,7 +12,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 
-class ActivityModelViewTest {
+class ActivityModelViewUnitTest {
   private lateinit var repository: ActivityRepository
   private lateinit var activityViewModel: ActivityViewModel
   private lateinit var mockContext: Context

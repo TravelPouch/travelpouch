@@ -5,10 +5,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 import org.mockito.kotlin.anyOrNull
 
-class LocationViewModelTest {
+class LocationViewModelUnitTest {
 
   private lateinit var mockRepository: LocationRepository
   private lateinit var viewModel: LocationViewModel

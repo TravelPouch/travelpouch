@@ -75,26 +75,6 @@ fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventVi
   var itemMoreRightOfScreen = false
   val events = eventsViewModel.events.collectAsState()
 
-  // TODO : To test this class manually, de-comment the list event_test and replace all the
-  // occurrences of
-  // TODO : events.value by event_tests. Then comment the line 77. This comment is temporary, once
-  // the
-  // TODO : project is well advanced, this will be deleted.
-
-  //    val events_test =
-  //        listOf(
-  //            Event(
-  //                "1",
-  //                EventType.NEW_DOCUMENT,
-  //                Timestamp(0, 0),
-  //                "eventTitle",
-  //                "eventDescription",
-  //                null,
-  //                null),
-  //            Event("2", EventType.START_OF_JOURNEY, Timestamp(0, 0), "it", "it", null, null),
-  //            Event("3", EventType.NEW_PARTICIPANT, Timestamp(0, 0), "it", "it", null, null),
-  //            Event("3", EventType.OTHER_EVENT, Timestamp(0, 0), "it", "it", null, null))
-
   Scaffold(
       modifier = Modifier.testTag("timelineScreen"),
   ) {

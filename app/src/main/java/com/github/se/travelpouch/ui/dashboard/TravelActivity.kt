@@ -105,12 +105,19 @@ fun TravelActivitiesScreen(
       },
       bottomBar = {
         NavigationBar(modifier = Modifier.testTag("navigationBarTravel")) {
-          listOfDestinations.forEach {
+          listOfDestinations.forEach { destination ->
             NavigationBarItem(
-                onClick = {},
-                icon = { Icon(it.icon, contentDescription = null) },
+                onClick = {
+                  when (destination.title) {
+                    "Activities" -> navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    "Map" ->
+                        navigationActions.navigateTo(
+                            Screen.TRAVEL_ACTIVITIES) // Todo: navigate to map screen
+                  }
+                },
+                icon = { Icon(destination.icon, contentDescription = null) },
                 selected = false,
-                label = { Text(it.title) },
+                label = { Text(destination.title) },
                 modifier = Modifier.testTag("navigationBarItem"))
           }
         }
