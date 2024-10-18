@@ -7,13 +7,15 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {onRequest} from "firebase-functions/v2/https";
+import {onCall, onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 
 import {initializeApp} from "firebase-admin/app";
 
 import {defineSecret} from "firebase-functions/params";
-import {getFirestore} from "firebase-admin/firestore";
+import {DocumentReference, getFirestore, Timestamp}
+  from "firebase-admin/firestore";
+import {getStorage} from "firebase-admin/storage";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -33,16 +35,26 @@ const ACCEPTED_MIME_TYPES = [
   "image/png",
 ];
 
-
 initializeApp();
 
-interface Body {
+const ADDRESS_TO_ID = /^<?travelpouchswent\+(.*)@gmail.com>?$/;
+
+interface BodyGmail {
   message: {
     data: string,
     messageId: number,
     publishTime: Date
   }
   subscription: string
+}
+
+interface BodyStore {
+  fileFormat: string,
+  fileSize: number,
+  title: string,
+  travelId: string,
+  visibility: string,
+  content: string
 }
 
 interface DataHistoryId {
@@ -94,10 +106,24 @@ interface Message {
 
 interface DestAttachments {
   destination: string,
-  attachmentsId: string[]
+  attachments: {
+    id: string,
+    format: string,
+    title: string,
+    size: number
+  }[]
 }
 
 type FileContent = string
+
+interface Document {
+  addedAt: Timestamp,
+  fileFormat: string,
+  fileSize: number,
+  title: string,
+  travelRef: DocumentReference,
+  visibility: string
+}
 
 /**
  * This error is used for parsing errors
@@ -112,7 +138,7 @@ export const gmailDocuments = onRequest(
   async (req, res) => {
     logger.debug(req.headers);
     try {
-      const newHistoryId = parseBody(req.body);
+      const newHistoryId = parseBodyGmail(req.body);
       const accessTokenPromise = getAccessToken();
       const historyId = (await updateVars({historyId: newHistoryId}))
         .historyId;
@@ -129,12 +155,23 @@ export const gmailDocuments = onRequest(
         logger.debug(destAttachments);
 
         for (const destAttachment of
-          destAttachments.attachmentsId) {
-          logger.debug(
-            await getAttachment(
-              newMessageId,
-              destAttachment,
-              accessToken));
+          destAttachments.attachments) {
+          const contentBase64 = await getAttachment(
+            newMessageId,
+            destAttachment.id,
+            accessToken);
+
+          const travelId =
+            ADDRESS_TO_ID.exec(destAttachments.destination)?.at(1);
+          if (travelId == null) {
+            return;
+          }
+          storeFile(
+            contentBase64,
+            destAttachment.format,
+            destAttachment.title,
+            travelId,
+            destAttachment.size);
         }
       }
     } catch (e) {
@@ -144,6 +181,63 @@ export const gmailDocuments = onRequest(
     res.json({result: "Ok"});
   }
 );
+
+export const storeDocument = onCall(
+  {region: "europe-west9"},
+  async (req) => {
+    // if (!req?.auth) {
+    //   return { message: "Authentication Required!", code: 401 };
+    // }
+    try {
+      logger.debug(req.data);
+      const body = parseBodyStore(req.data);
+      await storeFile(body.content, body.fileFormat,
+        body.title, body.travelId, body.fileSize);
+    } catch (e) {
+      logger.error("some error occured", e);
+      return {message: "Ohhhhhh nooo", code: 500};
+    }
+
+    return {message: "Oooooookayyy", code: 200};
+  }
+);
+
+/**
+ * Store a file in the cloud
+ * @param {string} contentBase64url
+ *  The content of the file to sotre in base64url encoding
+ * @param {string} format The mime type of the file
+ * @param {string} title The name of the file
+ * @param {string} travelId The id of the travel linked
+ * @param {number} size The size of the file in bytes
+ */
+async function storeFile(
+  contentBase64url: string,
+  format: string,
+  title: string,
+  travelId: string,
+  size: number) {
+  const fs = getFirestore();
+  const reference = fs.collection("travels")
+    .doc(travelId);
+  const document = await fs.collection("documents").add({
+    addedAt: Timestamp.now(),
+    fileFormat: format,
+    fileSize: size,
+    title,
+    travelRef: reference,
+    visibility: "ME",
+  } as Document);
+
+  const storage = getStorage();
+  const bucket = storage.bucket();
+  const file = bucket.file(document.id);
+  await file.save(Buffer.from(contentBase64url, "base64url"));
+
+  logger.debug("Uploaded the", format, title,
+    "of size", size,
+    "with id", document.id);
+}
 
 /**
  * Get the old version of the vars and replace it by the newVars
@@ -165,11 +259,30 @@ async function updateVars(newVars: MailProcessingVars)
 }
 
 /**
+ * Check the coerance of the body
+ * @param {BodyStore} body The body to check
+ * @return {BodyStore} the body checked
+ */
+function parseBodyStore(body: BodyStore): BodyStore {
+  if (body?.fileFormat == null ||
+      body.fileSize == null ||
+      body.title == null ||
+      body.travelId == null ||
+      body.visibility == null ||
+      body.content == null
+  ) {
+    throw new ParseError;
+  }
+
+  return body;
+}
+
+/**
  * Parse the body to extract the historyId given by pub/sub
- * @param {Body} body the body of the request
+ * @param {BodyGmail} body the body of the request
  * @return {number} the historyId
  */
-function parseBody(body: Body): number {
+function parseBodyGmail(body: BodyGmail): number {
   logger.debug(body);
   if (body?.message?.data != null) {
     const content: DataHistoryId = JSON.parse(atob(body.message.data));
@@ -311,10 +424,16 @@ function messageToDestAttachment(message: Message): DestAttachments {
 
   return {
     destination: headersFiltered[0].value,
-    attachmentsId: searchAcceptedMimeTypes(message.payload)
-      .map((p) => p.body?.attachmentId)
-      .filter((p) => p != null)
-      .map((p) => p as string),
+    attachments: searchAcceptedMimeTypes(message.payload)
+      .filter((p) => p.body?.attachmentId != null)
+      .map((p) => {
+        return {
+          id: p.body.attachmentId as string,
+          format: p.mimeType,
+          title: p.filename,
+          size: p.body.size,
+        };
+      }),
   };
 }
 
