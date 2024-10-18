@@ -111,38 +111,6 @@ fun DocumentList(
         }
       }) { paddingValue ->
         Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
-          //            // Date and Title Row
-          //            Row(
-          //                modifier = Modifier.fillMaxWidth(),
-          //                horizontalArrangement = Arrangement.SpaceBetween
-          //            ) {
-          //                Button(onClick = {
-          //                    documentViewModel.createDocument(
-          //                        NewDocumentContainer(
-          //                            title = "New Document AAAABBBB",
-          //                            travelRef =
-          // Firebase.firestore.document("travels/ujqUGbYn2A8NXdNGGJ0D"),
-          //                            fileFormat = DocumentFileFormat.PDF,
-          //                            fileSize = 0,
-          //                            addedAt = Timestamp.now(),
-          //                            visibility = DocumentVisibility.ME
-          //                        )
-          //                    )
-          //                }) {
-          //                    Text(text = "Create doc", style =
-          // MaterialTheme.typography.bodyMedium)
-          //                }
-          //
-          //                Button(onClick = {
-          //                    documentViewModel.getDocuments()
-          //                }) {
-          //                    Text(text = "Load docs", style =
-          // MaterialTheme.typography.bodyMedium)
-          //                }
-          //            }
-          //
-          //            Spacer(modifier = Modifier.height(4.dp))
-
           var isRefreshing by remember { mutableStateOf(false) }
           val pullToRefreshState = rememberPullToRefreshState()
           LazyVerticalGrid(
@@ -166,12 +134,6 @@ fun DocumentList(
                       })
                 }
               }
-
-          //            // Location Name
-          //            Text(
-          //                text = travelContainer.location.name,
-          //                style = MaterialTheme.typography.bodySmall,
-          //                color = Color.Gray)
         }
       }
 }

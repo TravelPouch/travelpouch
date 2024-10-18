@@ -7,6 +7,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
+/** Interface for the DocumentRepository. */
 interface DocumentRepository {
   fun init(onSuccess: () -> Unit)
 
@@ -18,15 +19,15 @@ interface DocumentRepository {
       onFailure: (Exception) -> Unit
   )
 
-  //    fun updateDocument(
-  //        document: DocumentContainer,
-  //        onSuccess: () -> Unit,
-  //        onFailure: (Exception) -> Unit
-  //    )
-
   fun deleteDocumentById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 }
 
+/**
+ * Firestore implementation of the DocumentRepository.
+ *
+ * @property db The Firestore database instance.
+ * @property firebaseAuth The Firebase authentication instance.
+ */
 class DocumentRepositoryFirestore(
     private val db: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth = Firebase.auth
@@ -41,6 +42,12 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Fetches all documents from the Firestore database.
+   *
+   * @param onSuccess Callback function to be called when the documents are fetched successfully.
+   * @param onFailure Callback function to be called when an error occurs.
+   */
   override fun getDocuments(
       onSuccess: (List<DocumentContainer>) -> Unit,
       onFailure: (Exception) -> Unit
@@ -59,6 +66,14 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Adds a new document to the Firestore database using the simpler version of a DocumentContainer
+   * without the ref/uid.
+   *
+   * @param document The document to be added.
+   * @param onSuccess Callback function to be called when the document is added successfully.
+   * @param onFailure Callback function to be called when an error occurs.
+   */
   override fun createDocument(
       document: NewDocumentContainer,
       onSuccess: () -> Unit,
@@ -76,6 +91,13 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Deletes a document from the Firestore database.
+   *
+   * @param id The id of the document to be deleted.
+   * @param onSuccess Callback function to be called when the document is deleted successfully.
+   * @param onFailure Callback function to be called when an error occurs.
+   */
   override fun deleteDocumentById(
       id: String,
       onSuccess: () -> Unit,
@@ -93,6 +115,12 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Extracts the DocumentFileFormat from a DocumentSnapshot representing a TravelPouch Document.
+   *
+   * @param snapshot The firebase DocumentSnapshot to be added.
+   * @throws IllegalArgumentException if the document is not formatted properly.
+   */
   private fun fileFormatFromSnapshot(snapshot: DocumentSnapshot): DocumentFileFormat? {
     return when (snapshot.getString("fileFormat")) {
       "image/jpeg" -> DocumentFileFormat.JPEG
@@ -102,6 +130,12 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Converts a DocumentFileFormat to a String for database storage.
+   *
+   * @param document The firebase document to be added.
+   * @throws IllegalArgumentException if the document is not formatted properly.
+   */
   private fun fileFormatToString(fileFormat: DocumentFileFormat): String {
     return when (fileFormat) {
       DocumentFileFormat.JPEG -> "image/jpeg"
@@ -110,6 +144,12 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Extracts the DocumentVisibility from a DocumentSnapshot representing a TravelPouch Document.
+   *
+   * @param snapshot The firebase DocumentSnapshot to be added.
+   * @throws IllegalArgumentException if the document is not formatted properly.
+   */
   private fun visibilityFromSnapshot(snapshot: DocumentSnapshot): DocumentVisibility? {
     return when (snapshot.getString("visibility")) {
       "ME" -> DocumentVisibility.ME
@@ -119,6 +159,12 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Converts a DocumentVisibility to a String for database storage.
+   *
+   * @param visibility The firebase document to be added.
+   * @throws IllegalArgumentException if the document is not formatted properly.
+   */
   private fun visibilityToString(visibility: DocumentVisibility): String {
     return when (visibility) {
       DocumentVisibility.ME -> "ME"
@@ -151,6 +197,11 @@ class DocumentRepositoryFirestore(
     }
   }
 
+  /**
+   * Converts a NewDocumentContainer to a Map for database storage.
+   *
+   * @param document The firebase document to be added.
+   */
   private fun toMap(document: NewDocumentContainer): Map<String, Any?> {
     return mapOf(
         "title" to document.title,
