@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {onRequest} from "firebase-functions/v2/https";
+import {onCall, onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 
 import {initializeApp} from "firebase-admin/app";
@@ -182,18 +182,23 @@ export const gmailDocuments = onRequest(
   }
 );
 
-export const storeDocument = onRequest(
+export const storeDocument = onCall(
   {region: "europe-west9"},
-  async (req, res) => {
+  async (req) => {
+    // if (!req?.auth) {
+    //   return { message: "Authentication Required!", code: 401 };
+    // }
     try {
-      const body = parseBodyStore(req.body);
-      storeFile(body.content, body.fileFormat,
+      logger.debug(req.data);
+      const body = parseBodyStore(req.data);
+      await storeFile(body.content, body.fileFormat,
         body.title, body.travelId, body.fileSize);
-      res.json({result: "Oooooookayy"});
     } catch (e) {
       logger.error("some error occured", e);
-      res.json({result: "Fail"});
+      return {message: "Ohhhhhh nooo", code: 500};
     }
+
+    return {message: "Oooooookayyy", code: 200};
   }
 );
 
@@ -229,10 +234,9 @@ async function storeFile(
   const file = bucket.file(document.id);
   await file.save(Buffer.from(contentBase64url, "base64url"));
 
-  logger.debug("Uploaded the ", format,
-    " ", title,
-    " of size ", size,
-    " with id ", document.id);
+  logger.debug("Uploaded the", format, title,
+    "of size", size,
+    "with id", document.id);
 }
 
 /**
