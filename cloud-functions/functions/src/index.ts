@@ -39,13 +39,22 @@ initializeApp();
 
 const ADDRESS_TO_ID = /^<?travelpouchswent\+(.*)@gmail.com>?$/;
 
-interface Body {
+interface BodyGmail {
   message: {
     data: string,
     messageId: number,
     publishTime: Date
   }
   subscription: string
+}
+
+interface BodyStore {
+  fileFormat: string,
+  fileSize: number,
+  title: string,
+  travelId: string,
+  visibility: string,
+  content: string
 }
 
 interface DataHistoryId {
@@ -129,7 +138,7 @@ export const gmailDocuments = onRequest(
   async (req, res) => {
     logger.debug(req.headers);
     try {
-      const newHistoryId = parseBody(req.body);
+      const newHistoryId = parseBodyGmail(req.body);
       const accessTokenPromise = getAccessToken();
       const historyId = (await updateVars({historyId: newHistoryId}))
         .historyId;
@@ -151,11 +160,17 @@ export const gmailDocuments = onRequest(
             newMessageId,
             destAttachment.id,
             accessToken);
+
+          const travelId =
+            ADDRESS_TO_ID.exec(destAttachments.destination)?.at(1);
+          if (travelId == null) {
+            return;
+          }
           storeFile(
             contentBase64,
             destAttachment.format,
             destAttachment.title,
-            destAttachments.destination,
+            travelId,
             destAttachment.size);
         }
       }
@@ -166,6 +181,59 @@ export const gmailDocuments = onRequest(
     res.json({result: "Ok"});
   }
 );
+
+export const storeDocument = onRequest(
+  {region: "europe-west9"},
+  async (req, res) => {
+    try {
+      const body = parseBodyStore(req.body);
+      storeFile(body.content, body.fileFormat,
+        body.title, body.travelId, body.fileSize);
+      res.json({result: "Oooooookayy"});
+    } catch (e) {
+      logger.error("some error occured", e);
+      res.json({result: "Fail"});
+    }
+  }
+);
+
+/**
+ * Store a file in the cloud
+ * @param {string} contentBase64url
+ *  The content of the file to sotre in base64url encoding
+ * @param {string} format The mime type of the file
+ * @param {string} title The name of the file
+ * @param {string} travelId The id of the travel linked
+ * @param {number} size The size of the file in bytes
+ */
+async function storeFile(
+  contentBase64url: string,
+  format: string,
+  title: string,
+  travelId: string,
+  size: number) {
+  const fs = getFirestore();
+  const reference = fs.collection("travels")
+    .doc(travelId);
+  const document = await fs.collection("documents").add({
+    addedAt: Timestamp.now(),
+    fileFormat: format,
+    fileSize: size,
+    title,
+    travelRef: reference,
+    visibility: "ME",
+  } as Document);
+
+  const storage = getStorage();
+  const bucket = storage.bucket();
+  const file = bucket.file(document.id);
+  await file.save(Buffer.from(contentBase64url, "base64url"));
+
+  logger.debug("Uploaded the ", format,
+    " ", title,
+    " of size ", size,
+    " with id ", document.id);
+}
 
 /**
  * Get the old version of the vars and replace it by the newVars
@@ -187,11 +255,30 @@ async function updateVars(newVars: MailProcessingVars)
 }
 
 /**
+ * Check the coerance of the body
+ * @param {BodyStore} body The body to check
+ * @return {BodyStore} the body checked
+ */
+function parseBodyStore(body: BodyStore): BodyStore {
+  if (body?.fileFormat == null ||
+      body.fileSize == null ||
+      body.title == null ||
+      body.travelId == null ||
+      body.visibility == null ||
+      body.content == null
+  ) {
+    throw new ParseError;
+  }
+
+  return body;
+}
+
+/**
  * Parse the body to extract the historyId given by pub/sub
- * @param {Body} body the body of the request
+ * @param {BodyGmail} body the body of the request
  * @return {number} the historyId
  */
-function parseBody(body: Body): number {
+function parseBodyGmail(body: BodyGmail): number {
   logger.debug(body);
   if (body?.message?.data != null) {
     const content: DataHistoryId = JSON.parse(atob(body.message.data));
@@ -371,47 +458,4 @@ function getAttachment(
     .then((res) => {
       return res?.data;
     });
-}
-
-/**
- * Store a file in the cloud
- * @param {string} contentBase64url
- *  The content of the file to sotre in base64url encoding
- * @param {string} format The mime type of the file
- * @param {string} title The name of the file
- * @param {string} destination The destination address of the mail
- * @param {number} size The size of the file in bytes
- */
-async function storeFile(
-  contentBase64url: string,
-  format: string,
-  title: string,
-  destination: string,
-  size: number) {
-  const fs = getFirestore();
-  logger.debug(destination, ADDRESS_TO_ID.exec(destination));
-  const travelId = ADDRESS_TO_ID.exec(destination)?.at(1);
-  if (travelId == null) {
-    return;
-  }
-  const reference = fs.collection("travels")
-    .doc(travelId);
-  const document = await fs.collection("documents").add({
-    addedAt: Timestamp.now(),
-    fileFormat: format,
-    fileSize: size,
-    title,
-    travelRef: reference,
-    visibility: "ME",
-  } as Document);
-
-  const storage = getStorage();
-  const bucket = storage.bucket();
-  const file = bucket.file(document.id);
-  await file.save(Buffer.from(contentBase64url, "base64url"));
-
-  logger.debug("Uploaded the ", format,
-    " ", title,
-    " of size ", size,
-    " with id ", document.id);
 }
