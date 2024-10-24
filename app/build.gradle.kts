@@ -14,7 +14,6 @@ android {
     namespace = "com.github.se.travelpouch"
     compileSdk = 34
     compileSdk = 34
-
     // Load the API key from local.properties
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -22,6 +21,10 @@ android {
         localProperties.load(FileInputStream(localPropertiesFile))
     }
 
+    val keystoreFile = System.getenv("KEYSTORE_FILE") ?: localProperties.getProperty("KEYSTORE_FILE")
+    val keystorePassword = System.getenv("KEYSTORE_PASSWORD") ?: localProperties.getProperty("KEYSTORE_PASSWORD")
+    val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS")
+    val keyPassword = System.getenv("KEY_PASSWORD") ?: localProperties.getProperty("KEY_PASSWORD")
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
 
     defaultConfig {
@@ -38,25 +41,28 @@ android {
             useSupportLibrary = true
         }
     }
-    signingConfigs {
-        // Ensure debug signing config exists or create a new one
-        create("release") {
-            storeFile = file(System.getProperty("user.home") + "/test-release.keystore") // Use custom keystore here
-            storePassword = "testpass" // Change this to your keystore password
-            keyAlias = "testalias" // Alias used in the keystore
-            keyPassword = "testpass" // Key password
-        }
-    }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Only assign signing config if it exists
+            if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
+                println("creating a release config")
+                signingConfig = signingConfigs.create("release") {
+                    storeFile(file(keystoreFile))
+                    storePassword(keystorePassword)
+                    keyAlias(keyAlias)
+                    keyPassword(keyPassword)
+                }
+            }
+            else {
+                println("No release signing config set.")
+            }
         }
 
         debug {
