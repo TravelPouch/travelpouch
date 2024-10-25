@@ -14,7 +14,7 @@ class MessageRepository(private val firestore: FirebaseFirestore) {
   // Reference to the "messages" collection in Firestore
   private val messageCollection = firestore.collection("messages")
 
-  fun newUid(): String {
+  fun getNewUid(): String {
     return messageCollection.document().id
   }
 

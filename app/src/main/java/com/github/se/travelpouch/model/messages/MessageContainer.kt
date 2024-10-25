@@ -34,6 +34,8 @@ data class Message(
     require(isValidUid(receiverUid)) { "Receiver UID cannot be blank" }
     // Todo: need to check if the travel exists in the database
     require(isValidUid(travelUid)) { "Travel UID cannot be blank" }
+
+    require(senderUid != receiverUid) { "Sender and receiver cannot be the same" }
   }
 
   /**

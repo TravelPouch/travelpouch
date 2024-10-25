@@ -47,7 +47,14 @@ class MessageContainerInvalidDataTest(
               generateAutoId(),
               generateAutoId(),
               "",
-              MessageContent.InvitationMessage("John Doe", "Trip to Paris", Role.PARTICIPANT)))
+              MessageContent.InvitationMessage("John Doe", "Trip to Paris", Role.PARTICIPANT)),
+          arrayOf(
+              generateAutoId(),
+              "6NU2zp2oGdA34s1Q1q5h",
+              "6NU2zp2oGdA34s1Q1q5h",
+              generateAutoId(),
+              MessageContent.InvitationMessage("TheName", "Trip to Paris", Role.PARTICIPANT)),
+      )
     }
   }
 
