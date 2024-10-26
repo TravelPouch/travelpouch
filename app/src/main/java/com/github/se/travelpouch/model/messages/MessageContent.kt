@@ -28,17 +28,6 @@ sealed class MessageContent {
     override fun toDisplayString(): String {
       return "$inviterName invited you to join the travel $travelTitle as a ${role.name}."
     }
-
-    /**
-     * Generates action buttons for the invitation message.
-     *
-     * @return A list of action buttons for the invitation message.
-     */
-    fun toActionButtons(): List<MessageAction> {
-      return listOf(
-          MessageAction("Accept", ActionType.ACCEPT_INVITATION),
-          MessageAction("Decline", ActionType.DECLINE_INVITATION))
-    }
   }
 
   /**
@@ -63,31 +52,18 @@ sealed class MessageContent {
     override fun toDisplayString(): String {
       return "You have not yet accepted $inviterName's invitation for the '$travelTitle' trip."
     }
-
-    /**
-     * Generates action buttons for the pending invitation reminder.
-     *
-     * @return A list of action buttons for the pending invitation reminder.
-     */
-    fun toActionButtons(): List<MessageAction> {
-      return listOf(
-          MessageAction("Accept", ActionType.ACCEPT_INVITATION),
-          MessageAction("Decline", ActionType.DECLINE_INVITATION))
-    }
   }
 
   /**
    * Data class representing a role change message.
    *
-   * @property userName The name of the user whose role has changed.
    * @property travelTitle The title of the travel event.
    * @property role The new role assigned to the user.
    */
-  data class RoleChangeMessage(val userName: String, val travelTitle: String, val role: Role) :
+  data class RoleChangeMessage(val travelTitle: String, val role: Role) :
       MessageContent() {
 
     init {
-      require(userName.isNotBlank()) { "User name cannot be blank" }
       require(travelTitle.isNotBlank()) { "Travel title cannot be blank" }
     }
 
@@ -97,7 +73,7 @@ sealed class MessageContent {
      * @return A string representation of the role change message.
      */
     override fun toDisplayString(): String {
-      return "You have added $userName to the '$travelTitle' trip as a $role. The request is being processed."
+      return "Your role for the '$travelTitle' trip has been changed to ${role.name}."
     }
   }
 
@@ -140,17 +116,3 @@ sealed class MessageContent {
    */
   abstract fun toDisplayString(): String
 }
-
-/** Enum class representing different types of actions for messages. */
-enum class ActionType {
-  ACCEPT_INVITATION,
-  DECLINE_INVITATION
-}
-
-/**
- * Data class representing an action button for a message.
- *
- * @property label The label of the action button.
- * @property actionType The type of action the button represents.
- */
-data class MessageAction(val label: String, val actionType: ActionType)
