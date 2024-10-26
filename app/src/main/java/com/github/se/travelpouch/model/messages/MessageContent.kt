@@ -5,6 +5,9 @@ import com.github.se.travelpouch.model.Role
 /** Sealed class representing different types of message content. */
 sealed class MessageContent {
 
+  val INVITER_NAME_NOT_BLANK = "Inviter name cannot be blank"
+  val TRAVEL_TITLE_NOT_BLANK = "Travel title cannot be blank"
+
   /**
    * Data class representing an invitation message.
    *
@@ -16,8 +19,8 @@ sealed class MessageContent {
       MessageContent() {
 
     init {
-      require(inviterName.isNotBlank()) { "Inviter name cannot be blank" }
-      require(travelTitle.isNotBlank()) { "Travel title cannot be blank" }
+      require(inviterName.isNotBlank()) { INVITER_NAME_NOT_BLANK }
+      require(travelTitle.isNotBlank()) { TRAVEL_TITLE_NOT_BLANK }
     }
 
     /**
@@ -40,8 +43,8 @@ sealed class MessageContent {
       MessageContent() {
 
     init {
-      require(inviterName.isNotBlank()) { "Inviter name cannot be blank" }
-      require(travelTitle.isNotBlank()) { "Travel title cannot be blank" }
+      require(inviterName.isNotBlank()) { INVITER_NAME_NOT_BLANK }
+      require(travelTitle.isNotBlank()) { TRAVEL_TITLE_NOT_BLANK }
     }
 
     /**
@@ -63,7 +66,7 @@ sealed class MessageContent {
   data class RoleChangeMessage(val travelTitle: String, val role: Role) : MessageContent() {
 
     init {
-      require(travelTitle.isNotBlank()) { "Travel title cannot be blank" }
+      require(travelTitle.isNotBlank()) { TRAVEL_TITLE_NOT_BLANK }
     }
 
     /**
@@ -91,7 +94,7 @@ sealed class MessageContent {
 
     init {
       require(userName.isNotBlank()) { "User name cannot be blank" }
-      require(travelTitle.isNotBlank()) { "Travel title cannot be blank" }
+      require(travelTitle.isNotBlank()) { TRAVEL_TITLE_NOT_BLANK }
     }
 
     /**
