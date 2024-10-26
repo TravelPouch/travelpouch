@@ -60,8 +60,7 @@ sealed class MessageContent {
    * @property travelTitle The title of the travel event.
    * @property role The new role assigned to the user.
    */
-  data class RoleChangeMessage(val travelTitle: String, val role: Role) :
-      MessageContent() {
+  data class RoleChangeMessage(val travelTitle: String, val role: Role) : MessageContent() {
 
     init {
       require(travelTitle.isNotBlank()) { "Travel title cannot be blank" }
