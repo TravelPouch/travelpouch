@@ -143,8 +143,21 @@ class EditTravelSettingsScreenTest {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
-    composeTestRule.onNodeWithTag("addUserFab").performClick()
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+    // perform add user
+    // Check that the dialog is displayed
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    // Check that the title text is displayed and correct
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+    // Check that the OutlinedTextField is displayed and has the correct default value
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("newuser.email@example.org")
+    val randomEmail = "random.email@example.org"
+    inputText("addUserEmailField", "newuser.email@example.org", randomEmail)
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
     composeTestRule.onNodeWithTag("travelDeleteButton").performClick()
     doNothing().`when`(navigationActions).goBack()
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
