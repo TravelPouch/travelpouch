@@ -24,7 +24,11 @@ class MessageRepository(private val firestore: FirebaseFirestore) {
    * @param message The message to be added.
    */
   fun addMessage(message: Message) {
-    messageCollection.add(message)
+    messageCollection
+        .document(message.messageUid)
+        .set(message)
+        .addOnSuccessListener { Log.d("MessageRepository", "Message added successfully") }
+        .addOnFailureListener { e -> Log.e("MessageRepository", "Error adding message", e) }
   }
 
   /**
@@ -52,5 +56,9 @@ class MessageRepository(private val firestore: FirebaseFirestore) {
    */
   fun markMessageAsRead(messageId: String) {
     messageCollection.document(messageId).update("status", MessageStatus.READ)
+  }
+
+  fun changeMessageType(messageId: String, messageType: MessageType) {
+    messageCollection.document(messageId).update("messageType", messageType)
   }
 }

@@ -57,11 +57,11 @@ data class Message(
 }
 
 /** Enum class representing the type of the message. */
-enum class MessageType {
-  INVITATION,
-  ACCEPTED,
-  DECLINED,
-  ROLE_UPDATE
+enum class MessageType(val isAccepted: Boolean) {
+  INVITATION(false),
+  ACCEPTED(true),
+  DECLINED(false),
+  ROLE_UPDATE(true)
 }
 
 /** Enum class representing the status of the message. */

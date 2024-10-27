@@ -3,6 +3,9 @@ package com.github.se.travelpouch.model.messages
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 /**
  * ViewModel class for managing messages in the travel pouch application.
@@ -14,6 +17,20 @@ class MessageViewModel(private val messageRepository: MessageRepository) : ViewM
   // LiveData holding the list of messages
   private val _messages = MutableLiveData<List<Message>>()
   val messages: LiveData<List<Message>> = _messages
+
+  /**
+   * Factory object for creating instances of MessageViewModel. This factory is used to provide the
+   * MessageViewModel with a MessageRepository that is initialized with Firebase Firestore.
+   */
+  companion object {
+    val Factory: ViewModelProvider.Factory =
+        object : ViewModelProvider.Factory {
+          @Suppress("UNCHECKED_CAST")
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return MessageViewModel(MessageRepository(Firebase.firestore)) as T
+          }
+        }
+  }
 
   /**
    * Loads messages for a specific user.
@@ -40,5 +57,9 @@ class MessageViewModel(private val messageRepository: MessageRepository) : ViewM
    */
   fun sendMessage(message: Message) {
     messageRepository.addMessage(message)
+  }
+
+  fun changeMessageType(messageId: String, messageType: MessageType) {
+    messageRepository.changeMessageType(messageId, messageType)
   }
 }

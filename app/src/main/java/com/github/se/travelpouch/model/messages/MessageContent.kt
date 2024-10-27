@@ -2,11 +2,11 @@ package com.github.se.travelpouch.model.messages
 
 import com.github.se.travelpouch.model.Role
 
+private const val INVITER_NAME_NOT_BLANK = "Inviter name cannot be blank"
+private const val TRAVEL_TITLE_NOT_BLANK = "Travel title cannot be blank"
+
 /** Sealed class representing different types of message content. */
 sealed class MessageContent {
-
-  val INVITER_NAME_NOT_BLANK = "Inviter name cannot be blank"
-  val TRAVEL_TITLE_NOT_BLANK = "Travel title cannot be blank"
 
   /**
    * Data class representing an invitation message.
