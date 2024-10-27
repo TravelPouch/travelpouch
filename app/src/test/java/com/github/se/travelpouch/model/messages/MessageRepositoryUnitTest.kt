@@ -74,12 +74,36 @@ class MessageRepositoryUnitTest {
   }
 
   @Test
-  fun addMessage_callsCollectionAdd() {
+  fun addMessage_successful() {
     val message = mock(Message::class.java)
+    val documentReference = mock(DocumentReference::class.java)
+    val task = Tasks.forResult<Void>(null) // Create a Task<Void> instance
+
+    `when`(messageCollection.document(message.messageUid)).thenReturn(documentReference)
+    `when`(documentReference.set(message)).thenReturn(task)
 
     messageRepository.addMessage(message)
 
-    verify(messageCollection).add(message)
+    verify(documentReference).set(message)
+  }
+
+  @Test
+  fun addMessage_failure() {
+    val message = mock(Message::class.java)
+    val documentReference = mock(DocumentReference::class.java)
+    val task = Tasks.forException<Void>(Exception("Simulated Firestore failure"))
+
+    `when`(messageCollection.document(message.messageUid)).thenReturn(documentReference)
+    `when`(documentReference.set(message)).thenReturn(task)
+
+    mockStatic(Log::class.java).use { logMock ->
+      logMock.`when`<Int> { Log.e(any(), any(), any()) }.thenReturn(0)
+
+      messageRepository.addMessage(message)
+
+      verify(documentReference).set(message)
+      Log.e("MessageRepository", "Error adding message", Exception("Simulated Firestore failure"))
+    }
   }
 
   @Test
