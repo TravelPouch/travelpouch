@@ -1,11 +1,15 @@
 package com.github.se.travelpouch.ui.travel
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,10 +39,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.TravelContainer
@@ -68,6 +75,9 @@ fun EditTravelSettingsScreen(
 ) {
   val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
   val context = LocalContext.current
+  val clipboardManager = LocalClipboardManager.current
+  val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
+
   Scaffold(
       modifier = Modifier.testTag("editScreen"),
       topBar = {
@@ -94,15 +104,17 @@ fun EditTravelSettingsScreen(
             horizontalArrangement = Arrangement.spacedBy(150.dp)) {
               FloatingActionButton(
                   onClick = {
-                    Toast.makeText(context, "Add User clicked", Toast.LENGTH_SHORT).show()
+                    setExpandedAddUserDialog(true)
+                    Log.d("EditTravelSettingsScreen", "Add User clicked")
                   },
                   modifier = Modifier.testTag("addUserFab").padding(end = 16.dp)) {
                     Text("Add User")
                   }
               FloatingActionButton(
                   onClick = {
-                    Toast.makeText(context, "Import Email clicked to clipboard", Toast.LENGTH_SHORT)
-                        .show()
+                    clipboardManager.setText(
+                        AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com"))
+                    Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
                   },
                   modifier = Modifier.testTag("importEmailFab")) {
                     Text("Import Email to Clipboard")
@@ -146,7 +158,6 @@ fun EditTravelSettingsScreen(
                               .clickable {
                                 listTravelViewModel.fetchAllParticipantsInfo()
                                 navigationActions.navigateTo(PARTICIPANT_LIST)
-                                Toast.makeText(context, "Icon clicked", Toast.LENGTH_SHORT).show()
                               })
                   Text(
                       "${selectedTravel!!.allParticipants.size} participants",
@@ -278,8 +289,49 @@ fun EditTravelSettingsScreen(
           "No Travel to be edited was selected. If you read this message an error has occurred.",
           modifier = Modifier.padding(padding).testTag("noTravelSelectedText"))
     }
+    if (expandedAddUserDialog) {
+      val addUserEmail = remember { mutableStateOf("newuser.email@example.org") }
+      Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
+        Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("addUserDialogBox")) {
+          Column(
+              modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center) {
+                Text(
+                    "Add User by Email",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle"))
+                OutlinedTextField(
+                    value = addUserEmail.value,
+                    onValueChange = { addUserEmail.value = it },
+                    label = { Text("Enter User's Email") },
+                    placeholder = { Text("Enter User's Email") },
+                    modifier = Modifier.testTag("addUserEmailField"))
+                Button(
+                    onClick = {
+                      listTravelViewModel.addUserToTravel(
+                          addUserEmail.value,
+                          selectedTravel!!,
+                          { updatedContainer ->
+                            listTravelViewModel.selectTravel(updatedContainer)
+                            Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT)
+                                .show()
+                            setExpandedAddUserDialog(false)
+                          },
+                          {
+                            Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
+                          })
+                    },
+                    modifier = Modifier.testTag("addUserButton")) {
+                      Text("Add User")
+                    }
+              }
+        }
+      }
+    }
   }
 }
+
 /**
  * Parses a date string in the format "dd/MM/yyyy" to a `Timestamp`.
  *
