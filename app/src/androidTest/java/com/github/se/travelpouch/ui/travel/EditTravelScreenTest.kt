@@ -143,12 +143,6 @@ class EditTravelSettingsScreenTest {
   @Test
   fun pressALotOfButtons() {
     val travelContainer = createContainer()
-    val customUserInfo =
-        UserInfo(
-            "abcdefghijklmnopqstu",
-            "Custom User",
-            listOf("00000000000000000000"),
-            "newuser.email@example.org")
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
