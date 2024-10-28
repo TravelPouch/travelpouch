@@ -294,7 +294,11 @@ fun EditTravelSettingsScreen(
       Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
         Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("addUserDialogBox")) {
           Column(
-              modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()).testTag("roleDialogColumn"),
+              modifier =
+                  Modifier.fillMaxSize()
+                      .padding(16.dp)
+                      .verticalScroll(rememberScrollState())
+                      .testTag("roleDialogColumn"),
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.Center) {
                 Text(
