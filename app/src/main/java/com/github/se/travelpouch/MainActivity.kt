@@ -19,6 +19,8 @@ import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
+import com.github.se.travelpouch.ui.dashboard.CalendarScreen
+import com.github.se.travelpouch.ui.dashboard.CalendarViewModel
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
@@ -56,10 +58,12 @@ fun TravelPouchApp() {
   val documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory)
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
+  val calendarViewModel: CalendarViewModel =
+      viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
-        startDestination = Screen.AUTH,
+        startDestination = Screen.CALENDAR,
         route = Route.DEFAULT,
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
@@ -84,6 +88,7 @@ fun TravelPouchApp() {
       }
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
+      composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel) }
     }
   }
 }
