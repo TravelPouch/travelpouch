@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
@@ -95,5 +96,41 @@ class TravelActivityScreen {
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.title)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.location.name)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains("1/1/1970")
+  }
+
+  @Test
+  fun verifyBannerIsDisplayedCorrectly() {
+    val nowSeconds = Timestamp.now().seconds
+    val activitiesNow =
+        listOf(
+            Activity(
+                "1",
+                "title1",
+                "description1",
+                Location(0.0, 0.0, Timestamp(0, 0), "lcoation1"),
+                Timestamp(nowSeconds + 3600L, 0),
+                mapOf<String, Int>()),
+            Activity(
+                "2",
+                "title2",
+                "description2",
+                Location(0.0, 0.0, Timestamp(0, 0), "lcoation2"),
+                Timestamp(nowSeconds + 3600L, 0),
+                mapOf<String, Int>()))
+
+    composeTestRule.setContent { NextActivitiesBanner(activitiesNow, {}) }
+    composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("NextActivitiesBannerBox")
+        .assertTextContains("Next activities due: title1, title2 in the next 24 hours.")
+    composeTestRule.onNodeWithTag("NextActivitiesBannerDismissButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("NextActivitiesBannerBox").performClick()
+    composeTestRule.onNodeWithTag("NextActivitiesBannerDismissButton").performClick()
+  }
+
+  @Test
+  fun verifyBannerIsNotDisplayedIfNoActivities() {
+    composeTestRule.setContent { NextActivitiesBanner(emptyList(), {}) }
+    composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertDoesNotExist()
   }
 }

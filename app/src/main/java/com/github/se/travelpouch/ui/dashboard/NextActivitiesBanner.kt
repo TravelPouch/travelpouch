@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
 import com.google.firebase.Timestamp
@@ -58,7 +59,8 @@ fun NextActivitiesBanner(
                   // Set the outline on first tap
                   showOutline.value = true
                 }
-                .padding(16.dp),
+                .padding(16.dp)
+                .testTag("NextActivitiesBannerBox"),
         contentAlignment = Alignment.Center) {
           Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -73,8 +75,8 @@ fun NextActivitiesBanner(
                         } in the next 24 hours.",
                       color = Color.White,
                       maxLines =
-                          3 // Limit max lines if you want to restrict vertical growth as well
-                      )
+                          3, // Limit max lines if you want to restrict vertical growth as well
+                      modifier = Modifier.testTag("NextActivitiesBannerText"))
                 }
 
                 // Dismiss button
@@ -82,9 +84,10 @@ fun NextActivitiesBanner(
                     onClick = onDismiss,
                     modifier =
                         Modifier.border(
-                            width = if (showOutline.value) 2.dp else 0.dp,
-                            color = if (showOutline.value) Color.Black else Color.Transparent,
-                            shape = CircleShape)) {
+                                width = if (showOutline.value) 2.dp else 0.dp,
+                                color = if (showOutline.value) Color.Black else Color.Transparent,
+                                shape = CircleShape)
+                            .testTag("NextActivitiesBannerDismissButton")) {
                       Icon(
                           imageVector = Icons.Default.Close,
                           contentDescription = "Dismiss",
