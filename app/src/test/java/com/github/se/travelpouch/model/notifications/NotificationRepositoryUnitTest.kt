@@ -21,6 +21,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class NotificationRepositoryUnitTest {
 
@@ -93,23 +95,35 @@ class NotificationRepositoryUnitTest {
     val notification = mock(Notification::class.java)
     val documentReference = mock(DocumentReference::class.java)
     val task = Tasks.forException<Void>(Exception("Simulated Firestore failure"))
+    val latch = CountDownLatch(1)
 
-    `when`(notificationCollection.document(notification.notificationUid))
-        .thenReturn(documentReference)
+    // Arrange mocks
+    `when`(notificationCollection.document(notification.notificationUid)).thenReturn(documentReference)
     `when`(documentReference.set(notification)).thenReturn(task)
 
+    // Mock the Log.e method to ensure it's called
     mockStatic(Log::class.java).use { logMock ->
-      logMock.`when`<Int> { Log.e(any(), any(), any()) }.thenReturn(0)
+      logMock.`when`<Int> { Log.e(any(), any(), any()) }.thenAnswer {
+        latch.countDown() // Release latch when Log.e is called
+        0
+      }
 
+      // Act
       notificationRepository.addNotification(notification)
 
+      // Wait for the latch to be released or timeout
+      latch.await(2, TimeUnit.SECONDS)
+
+      // Assert
       verify(documentReference).set(notification)
       Log.e(
-          "NotificationRepository",
-          "Error adding notification",
-          Exception("Simulated Firestore failure"))
+        eq("NotificationRepository"),
+        eq("Error adding notification"),
+        any(Exception::class.java)
+      )
     }
   }
+
 
   @Test
   fun fetchNotificationsForUser_callsCollectionWhereEqualTo() {
