@@ -83,29 +83,29 @@ class TravelRepositoryFirestore(
       onSuccess: (UserInfo?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    db.collection(userCollectionPath).whereEqualTo("email", email).get().addOnCompleteListener {
-        task ->
-      if (task.isSuccessful) {
-        Log.d("TravelRepositoryFirestore", "checkParticipantExists success ${task.result.isEmpty}")
-        val user =
-            task.result?.let { userEntries ->
-              if (userEntries.isEmpty) {
-                null
-              } else {
-                if (userEntries.size() > 1) {
-                  Log.e("TravelRepositoryFirestore", "Multiple users with same email")
+    db.collection(userCollectionPath)
+        .whereEqualTo("email", email)
+        .get()
+        .addOnSuccessListener { userEntries ->
+          Log.d(
+              "TravelRepositoryFirestore", "checkParticipantExists success ${userEntries.isEmpty}")
+          val user =
+              userEntries?.let {
+                if (userEntries.isEmpty) {
+                  null
+                } else {
+                  if (userEntries.size() > 1) {
+                    Log.e("TravelRepositoryFirestore", "Multiple users with same email")
+                  }
+                  documentToUserInfo(userEntries.documents[0])
                 }
-                documentToUserInfo(userEntries.documents[0])
               }
-            }
-        onSuccess(user)
-      } else {
-        task.exception?.let { e ->
-          Log.e("TravelRepositoryFirestore", "API error checking participant existence", e)
-          onFailure(e)
+          onSuccess(user)
         }
-      }
-    }
+        .addOnFailureListener {
+          Log.e("TravelRepositoryFirestore", "API error checking participant existence", it)
+          onFailure(it)
+        }
   }
 
   /**
