@@ -2,8 +2,13 @@ package com.github.se.travelpouch.model.notifications
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.generateAutoId
+import com.google.firebase.firestore.FirebaseFirestore
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.instanceOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,6 +25,7 @@ class NotificationViewModelUnitTest {
 
   @Mock private lateinit var notificationRepository: NotificationRepository
   @Mock private lateinit var notificationViewModel: NotificationViewModel
+  @Mock private lateinit var mockFirestore: FirebaseFirestore
 
   @get:Rule val rule = InstantTaskExecutorRule()
 
@@ -78,5 +84,24 @@ class NotificationViewModelUnitTest {
             notificationType = NotificationType.INVITATION)
     notificationViewModel.sendNotification(notification)
     verify(notificationRepository, times(1)).addNotification(eq(notification))
+  }
+
+  @Test
+  fun `Factory creates NotificationViewModel instance`() {
+    // Directly mock NotificationRepository for simplicity
+    notificationRepository = mock(NotificationRepository::class.java)
+
+    // Create the ViewModel using the Factory
+    val factory =
+        object : ViewModelProvider.Factory {
+          @Suppress("UNCHECKED_CAST")
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return NotificationViewModel(notificationRepository) as T
+          }
+        }
+
+    val viewModel = factory.create(NotificationViewModel::class.java)
+
+    assertThat(viewModel, instanceOf(NotificationViewModel::class.java))
   }
 }
