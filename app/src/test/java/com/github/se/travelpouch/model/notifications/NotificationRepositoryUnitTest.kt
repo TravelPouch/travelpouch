@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.model.messages
+package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
 import com.google.android.gms.tasks.OnFailureListener
@@ -22,11 +22,11 @@ import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
-class MessageRepositoryUnitTest {
+class NotificationRepositoryUnitTest {
 
   private lateinit var firestore: FirebaseFirestore
 
-  @Mock private lateinit var messageCollection: CollectionReference
+  @Mock private lateinit var notificationCollection: CollectionReference
 
   @Mock private lateinit var query: Query
 
@@ -36,24 +36,24 @@ class MessageRepositoryUnitTest {
 
   @Mock private lateinit var queryDocumentSnapshot: QueryDocumentSnapshot
 
-  private lateinit var messageRepository: MessageRepository
+  private lateinit var notificationRepository: NotificationRepository
 
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
     firestore = mock(FirebaseFirestore::class.java)
-    messageCollection = mock(CollectionReference::class.java)
-    `when`(firestore.collection("messages")).thenReturn(messageCollection)
-    messageRepository = MessageRepository(firestore)
+    notificationCollection = mock(CollectionReference::class.java)
+    `when`(firestore.collection("notifications")).thenReturn(notificationCollection)
+    notificationRepository = NotificationRepository(firestore)
   }
 
   @Test
   fun newUid_returnsNonNullUid() {
     val documentReference = mock(DocumentReference::class.java)
-    `when`(messageCollection.document()).thenReturn(documentReference)
+    `when`(notificationCollection.document()).thenReturn(documentReference)
     `when`(documentReference.id).thenReturn("unique-id")
 
-    val uid = messageRepository.getNewUid()
+    val uid = notificationRepository.getNewUid()
 
     assertNotNull(uid)
     assertEquals("unique-id", uid)
@@ -63,56 +63,56 @@ class MessageRepositoryUnitTest {
   fun newUid_generatesDifferentUids() {
     val documentReference1 = mock(DocumentReference::class.java)
     val documentReference2 = mock(DocumentReference::class.java)
-    `when`(messageCollection.document()).thenReturn(documentReference1, documentReference2)
+    `when`(notificationCollection.document()).thenReturn(documentReference1, documentReference2)
     `when`(documentReference1.id).thenReturn("unique-id-1")
     `when`(documentReference2.id).thenReturn("unique-id-2")
 
-    val uid1 = messageRepository.getNewUid()
-    val uid2 = messageRepository.getNewUid()
+    val uid1 = notificationRepository.getNewUid()
+    val uid2 = notificationRepository.getNewUid()
 
     assertNotEquals(uid1, uid2)
   }
 
   @Test
-  fun addMessage_successful() {
-    val message = mock(Message::class.java)
+  fun addNotification_successful() {
+    val notification = mock(Notification::class.java)
     val documentReference = mock(DocumentReference::class.java)
     val task = Tasks.forResult<Void>(null) // Create a Task<Void> instance
 
-    `when`(messageCollection.document(message.messageUid)).thenReturn(documentReference)
-    `when`(documentReference.set(message)).thenReturn(task)
+    `when`(notificationCollection.document(notification.notificationUid)).thenReturn(documentReference)
+    `when`(documentReference.set(notification)).thenReturn(task)
 
-    messageRepository.addMessage(message)
+    notificationRepository.addNotification(notification)
 
-    verify(documentReference).set(message)
+    verify(documentReference).set(notification)
   }
 
   @Test
-  fun addMessage_failure() {
-    val message = mock(Message::class.java)
+  fun addNotification_failure() {
+    val notification = mock(Notification::class.java)
     val documentReference = mock(DocumentReference::class.java)
     val task = Tasks.forException<Void>(Exception("Simulated Firestore failure"))
 
-    `when`(messageCollection.document(message.messageUid)).thenReturn(documentReference)
-    `when`(documentReference.set(message)).thenReturn(task)
+    `when`(notificationCollection.document(notification.notificationUid)).thenReturn(documentReference)
+    `when`(documentReference.set(notification)).thenReturn(task)
 
     mockStatic(Log::class.java).use { logMock ->
       logMock.`when`<Int> { Log.e(any(), any(), any()) }.thenReturn(0)
 
-      messageRepository.addMessage(message)
+      notificationRepository.addNotification(notification)
 
-      verify(documentReference).set(message)
-      Log.e("MessageRepository", "Error adding message", Exception("Simulated Firestore failure"))
+      verify(documentReference).set(notification)
+      Log.e("NotificationRepository", "Error adding notification", Exception("Simulated Firestore failure"))
     }
   }
 
   @Test
-  fun fetchMessagesForUser_callsCollectionWhereEqualTo() {
+  fun fetchNotificationsForUser_callsCollectionWhereEqualTo() {
     val userId = "user-id"
-    val onMessagesFetched: (List<Message>) -> Unit = mock()
+    val onNotificationsFetched: (List<Notification>) -> Unit = mock()
 
     // Arrange
-    whenever(messageCollection.whereEqualTo("receiverId", userId)).thenReturn(query)
+    whenever(notificationCollection.whereEqualTo("receiverId", userId)).thenReturn(query)
     whenever(query.orderBy("timestamp", Query.Direction.DESCENDING)).thenReturn(query)
     whenever(query.get()).thenReturn(task)
 
@@ -124,38 +124,38 @@ class MessageRepositoryUnitTest {
     // Mock `addOnSuccessListener` to capture the listener
     whenever(task.addOnSuccessListener(successListenerCaptor.capture())).thenReturn(task)
 
-    // Mock the document snapshot and map it to a Message object
-    val mockMessage =
-        Message(
+    // Mock the document snapshot and map it to a Notification object
+    val mockNotification =
+        Notification(
             "6NU2zp2oGdA34s1Q1q5h",
             "6NU2zp2oGdA34s1Q1q5h",
             "6NU2zp2oGdA34s1Q1222",
             "6NU2zp2oGdA34s1Q1q5h",
-            mock(MessageContent::class.java),
-            MessageType.INVITATION)
+            mock(NotificationContent::class.java),
+            NotificationType.INVITATION)
     whenever(querySnapshot.documents).thenReturn(listOf(queryDocumentSnapshot))
-    whenever(queryDocumentSnapshot.toObject(Message::class.java)).thenReturn(mockMessage)
+    whenever(queryDocumentSnapshot.toObject(Notification::class.java)).thenReturn(mockNotification)
 
     // Act
-    messageRepository.fetchMessagesForUser(userId, onMessagesFetched)
+    notificationRepository.fetchNotificationsForUser(userId, onNotificationsFetched)
 
     // Simulate successful fetch by invoking the captured OnSuccessListener
     successListenerCaptor.value.onSuccess(querySnapshot)
 
     // Assert
-    verify(messageCollection).whereEqualTo("receiverId", userId)
+    verify(notificationCollection).whereEqualTo("receiverId", userId)
     verify(query).orderBy("timestamp", Query.Direction.DESCENDING)
     verify(query).get()
-    verify(onMessagesFetched).invoke(listOf(mockMessage)) // Verify the callback with expected data
+    verify(onNotificationsFetched).invoke(listOf(mockNotification)) // Verify the callback with expected data
   }
 
   @Test
-  fun fetchMessagesForUser_callsAddOnFailureListener_andLogsError() {
+  fun fetchNotificationsForUser_callsAddOnFailureListener_andLogsError() {
     val userId = "user-id"
-    val onMessagesFetched: (List<Message>) -> Unit = mock()
+    val onNotificationsFetched: (List<Notification>) -> Unit = mock()
 
     // Arrange
-    whenever(messageCollection.whereEqualTo("receiverId", userId)).thenReturn(query)
+    whenever(notificationCollection.whereEqualTo("receiverId", userId)).thenReturn(query)
     whenever(query.orderBy("timestamp", Query.Direction.DESCENDING)).thenReturn(query)
     whenever(query.get()).thenReturn(task)
 
@@ -171,14 +171,14 @@ class MessageRepositoryUnitTest {
       logMock.`when`<Int> { Log.e(any(), any(), any()) }.thenReturn(0)
 
       // Act
-      messageRepository.fetchMessagesForUser(userId, onMessagesFetched)
+      notificationRepository.fetchNotificationsForUser(userId, onNotificationsFetched)
 
       // Simulate a failure by invoking the captured OnFailureListener
       val exception = Exception("Simulated Firestore failure")
       failureListenerCaptor.value.onFailure(exception)
 
       // Verify error logging
-      Log.e("MessageRepository", "Error fetching messages", exception)
+      Log.e("NotificationRepository", "Error fetching notifications", exception)
     }
 
     // Verify that the failure listener was added to the task
@@ -186,16 +186,16 @@ class MessageRepositoryUnitTest {
   }
 
   @Test
-  fun markMessageAsRead_callsDocumentUpdate() {
-    val messageId = "6NU2zp2oGdA34s1Q1q5h"
+  fun markNotificationAsRead_callsDocumentUpdate() {
+    val notificationUid = "6NU2zp2oGdA34s1Q1q5h"
     val documentReference = mock(DocumentReference::class.java)
     val task = Tasks.forResult<Void>(null) // Create a Task<Void> instance
 
-    `when`(messageCollection.document(messageId)).thenReturn(documentReference)
-    `when`(documentReference.update("status", MessageStatus.READ)).thenReturn(task)
+    `when`(notificationCollection.document(notificationUid)).thenReturn(documentReference)
+    `when`(documentReference.update("status", NotificationStatus.READ)).thenReturn(task)
 
-    messageRepository.markMessageAsRead(messageId)
+    notificationRepository.markNotificationAsRead(notificationUid)
 
-    verify(documentReference).update("status", MessageStatus.READ)
+    verify(documentReference).update("status", NotificationStatus.READ)
   }
 }
