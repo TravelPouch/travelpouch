@@ -12,15 +12,17 @@ import com.google.firebase.firestore.firestore
  *
  * @property notificationRepository The repository used for notification operations.
  */
-class NotificationViewModel(private val notificationRepository: NotificationRepository) : ViewModel() {
+class NotificationViewModel(private val notificationRepository: NotificationRepository) :
+    ViewModel() {
 
   // LiveData holding the list of notifications
   private val _notifications = MutableLiveData<List<Notification>>()
   val notifications: LiveData<List<Notification>> = _notifications
 
   /**
-   * Factory object for creating instances of NotificationViewModel. This factory is used to provide the
-   * NotificationViewModel with a NotificationRepository that is initialized with Firebase Firestore.
+   * Factory object for creating instances of NotificationViewModel. This factory is used to provide
+   * the NotificationViewModel with a NotificationRepository that is initialized with Firebase
+   * Firestore.
    */
   companion object {
     val Factory: ViewModelProvider.Factory =
@@ -38,7 +40,9 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    * @param userId The UID of the user whose notifications are to be loaded.
    */
   fun loadNotificationsForUser(userId: String) {
-    notificationRepository.fetchNotificationsForUser(userId) { notifications -> _notifications.value = notifications }
+    notificationRepository.fetchNotificationsForUser(userId) { notifications ->
+      _notifications.value = notifications
+    }
   }
 
   /**
@@ -59,6 +63,12 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
     notificationRepository.addNotification(notification)
   }
 
+  /**
+   * Changes the type of a notification.
+   *
+   * @param notificationsUid The UID of the notification to be changed.
+   * @param notificationType The new type of the notification.
+   */
   fun changeNotificationType(notificationsUid: String, notificationType: NotificationType) {
     notificationRepository.changeNotificationType(notificationsUid, notificationType)
   }

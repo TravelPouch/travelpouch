@@ -15,8 +15,11 @@ sealed class NotificationContent {
    * @property travelTitle The title of the travel event.
    * @property role The role assigned to the invitee.
    */
-  data class InvitationNotification(val inviterName: String, val travelTitle: String, val role: Role) :
-      NotificationContent() {
+  data class InvitationNotification(
+      val inviterName: String,
+      val travelTitle: String,
+      val role: Role
+  ) : NotificationContent() {
 
     init {
       require(inviterName.isNotBlank()) { INVITER_NAME_NOT_BLANK }
@@ -63,7 +66,8 @@ sealed class NotificationContent {
    * @property travelTitle The title of the travel event.
    * @property role The new role assigned to the user.
    */
-  data class RoleChangeNotification(val travelTitle: String, val role: Role) : NotificationContent() {
+  data class RoleChangeNotification(val travelTitle: String, val role: Role) :
+      NotificationContent() {
 
     init {
       require(travelTitle.isNotBlank()) { TRAVEL_TITLE_NOT_BLANK }

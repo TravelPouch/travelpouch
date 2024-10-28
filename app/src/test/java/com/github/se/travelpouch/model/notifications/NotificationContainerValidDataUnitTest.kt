@@ -13,7 +13,8 @@ class NotificationContainerLastCaseTest {
     val senderUid = generateAutoId()
     val receiverUid = generateAutoId()
     val travelUid = generateAutoId()
-    val content = NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
+    val content =
+        NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
     try {
       val myBeautifulNotification =
           Notification(
@@ -41,7 +42,8 @@ class NotificationContainerLastCaseTest {
     val senderUid = generateAutoId()
     val receiverUid = generateAutoId()
     val travelUid = generateAutoId()
-    val content = NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
+    val content =
+        NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
     val notification =
         Notification(
             notificationUid = notificationUid,

@@ -40,7 +40,8 @@ class NotificationViewModelUnitTest {
                 receiverUid = userId,
                 travelUid = generateAutoId(),
                 content =
-                    NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT),
+                    NotificationContent.InvitationNotification(
+                        "John Doe", "Trip to Paris", Role.PARTICIPANT),
                 notificationType = NotificationType.INVITATION))
     val observer = mock(Observer::class.java) as Observer<List<Notification>>
     notificationViewModel.notifications.observeForever(observer)
@@ -72,7 +73,8 @@ class NotificationViewModelUnitTest {
             receiverUid = generateAutoId(),
             travelUid = generateAutoId(),
             content =
-                NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT),
+                NotificationContent.InvitationNotification(
+                    "John Doe", "Trip to Paris", Role.PARTICIPANT),
             notificationType = NotificationType.INVITATION)
     notificationViewModel.sendNotification(notification)
     verify(notificationRepository, times(1)).addNotification(eq(notification))

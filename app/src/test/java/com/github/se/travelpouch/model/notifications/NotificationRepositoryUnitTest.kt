@@ -79,7 +79,8 @@ class NotificationRepositoryUnitTest {
     val documentReference = mock(DocumentReference::class.java)
     val task = Tasks.forResult<Void>(null) // Create a Task<Void> instance
 
-    `when`(notificationCollection.document(notification.notificationUid)).thenReturn(documentReference)
+    `when`(notificationCollection.document(notification.notificationUid))
+        .thenReturn(documentReference)
     `when`(documentReference.set(notification)).thenReturn(task)
 
     notificationRepository.addNotification(notification)
@@ -93,7 +94,8 @@ class NotificationRepositoryUnitTest {
     val documentReference = mock(DocumentReference::class.java)
     val task = Tasks.forException<Void>(Exception("Simulated Firestore failure"))
 
-    `when`(notificationCollection.document(notification.notificationUid)).thenReturn(documentReference)
+    `when`(notificationCollection.document(notification.notificationUid))
+        .thenReturn(documentReference)
     `when`(documentReference.set(notification)).thenReturn(task)
 
     mockStatic(Log::class.java).use { logMock ->
@@ -102,7 +104,10 @@ class NotificationRepositoryUnitTest {
       notificationRepository.addNotification(notification)
 
       verify(documentReference).set(notification)
-      Log.e("NotificationRepository", "Error adding notification", Exception("Simulated Firestore failure"))
+      Log.e(
+          "NotificationRepository",
+          "Error adding notification",
+          Exception("Simulated Firestore failure"))
     }
   }
 
@@ -146,7 +151,8 @@ class NotificationRepositoryUnitTest {
     verify(notificationCollection).whereEqualTo("receiverId", userId)
     verify(query).orderBy("timestamp", Query.Direction.DESCENDING)
     verify(query).get()
-    verify(onNotificationsFetched).invoke(listOf(mockNotification)) // Verify the callback with expected data
+    verify(onNotificationsFetched)
+        .invoke(listOf(mockNotification)) // Verify the callback with expected data
   }
 
   @Test

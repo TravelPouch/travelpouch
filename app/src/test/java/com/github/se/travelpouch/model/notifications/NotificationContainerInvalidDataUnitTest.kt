@@ -29,31 +29,36 @@ class NotificationContainerInvalidDataTest(
               generateAutoId(),
               generateAutoId(),
               generateAutoId(),
-              NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)),
+              NotificationContent.InvitationNotification(
+                  "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
               generateAutoId(),
               "",
               generateAutoId(),
               generateAutoId(),
-              NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)),
+              NotificationContent.InvitationNotification(
+                  "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
               generateAutoId(),
               generateAutoId(),
               "",
               generateAutoId(),
-              NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)),
+              NotificationContent.InvitationNotification(
+                  "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
               generateAutoId(),
               generateAutoId(),
               generateAutoId(),
               "",
-              NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)),
+              NotificationContent.InvitationNotification(
+                  "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
               generateAutoId(),
               "6NU2zp2oGdA34s1Q1q5h",
               "6NU2zp2oGdA34s1Q1q5h",
               generateAutoId(),
-              NotificationContent.InvitationNotification("TheName", "Trip to Paris", Role.PARTICIPANT)),
+              NotificationContent.InvitationNotification(
+                  "TheName", "Trip to Paris", Role.PARTICIPANT)),
       )
     }
   }

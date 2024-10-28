@@ -9,7 +9,8 @@ class NotificationContentUnitTest {
 
   @Test
   fun invitationNotification_toDisplayString() {
-    notificationContent = NotificationContent.InvitationNotification("Alice", "Trip to Paris", Role.PARTICIPANT)
+    notificationContent =
+        NotificationContent.InvitationNotification("Alice", "Trip to Paris", Role.PARTICIPANT)
     assert(
         notificationContent.toDisplayString() ==
             "Alice invited you to join the travel Trip to Paris as a PARTICIPANT.")
@@ -18,7 +19,8 @@ class NotificationContentUnitTest {
   @Test
   fun invitationNotification_invalidArgument() {
     try {
-      notificationContent = NotificationContent.InvitationNotification(" ", "Trip to Paris", Role.PARTICIPANT)
+      notificationContent =
+          NotificationContent.InvitationNotification(" ", "Trip to Paris", Role.PARTICIPANT)
       assert(false)
     } catch (e: IllegalArgumentException) {
       assert(e.message == "Inviter name cannot be blank")
@@ -26,7 +28,8 @@ class NotificationContentUnitTest {
     }
 
     try {
-      notificationContent = NotificationContent.InvitationNotification("Alice", " ", Role.PARTICIPANT)
+      notificationContent =
+          NotificationContent.InvitationNotification("Alice", " ", Role.PARTICIPANT)
       assert(false)
     } catch (e: IllegalArgumentException) {
       assert(e.message == "Travel title cannot be blank")
@@ -82,12 +85,14 @@ class NotificationContentUnitTest {
 
   @Test
   fun invitationResponseNotification_toDisplayString() {
-    notificationContent = NotificationContent.InvitationResponseNotification("Alice", "Trip to Paris", true)
+    notificationContent =
+        NotificationContent.InvitationResponseNotification("Alice", "Trip to Paris", true)
     assert(
         notificationContent.toDisplayString() ==
             "Alice has accepted your invitation to the 'Trip to Paris' trip.")
 
-    notificationContent = NotificationContent.InvitationResponseNotification("Alice", "Trip to Paris", false)
+    notificationContent =
+        NotificationContent.InvitationResponseNotification("Alice", "Trip to Paris", false)
     assert(
         notificationContent.toDisplayString() ==
             "Alice has declined your invitation to the 'Trip to Paris' trip.")
@@ -96,7 +101,8 @@ class NotificationContentUnitTest {
   @Test
   fun invitationResponseNotification_invalidArgument() {
     try {
-      notificationContent = NotificationContent.InvitationResponseNotification(" ", "Trip to Paris", true)
+      notificationContent =
+          NotificationContent.InvitationResponseNotification(" ", "Trip to Paris", true)
       assert(false)
     } catch (e: IllegalArgumentException) {
       assert(e.message == "User name cannot be blank")

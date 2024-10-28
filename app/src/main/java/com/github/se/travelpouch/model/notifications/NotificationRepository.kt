@@ -24,29 +24,38 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
    * @param notification The notification to be added.
    */
   fun addNotification(notification: Notification) {
-      notificationCollection
+    notificationCollection
         .document(notification.notificationUid)
         .set(notification)
         .addOnSuccessListener { Log.d("NotificationRepository", "Notification added successfully") }
-        .addOnFailureListener { e -> Log.e("NotificationRepository", "Error adding notification", e) }
+        .addOnFailureListener { e ->
+          Log.e("NotificationRepository", "Error adding notification", e)
+        }
   }
 
   /**
    * Fetches notifications for a specific user from the Firestore database.
    *
    * @param userId The UID of the user whose notifications are to be fetched.
-   * @param onNotificationFetched Callback function to be invoked with the list of fetched notifications.
+   * @param onNotificationFetched Callback function to be invoked with the list of fetched
+   *   notifications.
    */
-  fun fetchNotificationsForUser(userId: String, onNotificationFetched: (List<Notification>) -> Unit) {
-      notificationCollection
+  fun fetchNotificationsForUser(
+      userId: String,
+      onNotificationFetched: (List<Notification>) -> Unit
+  ) {
+    notificationCollection
         .whereEqualTo("receiverId", userId)
         .orderBy("timestamp", Query.Direction.DESCENDING)
         .get()
         .addOnSuccessListener { querySnapshot ->
-          val notifications = querySnapshot.documents.map { it.toObject(Notification::class.java)!! }
+          val notifications =
+              querySnapshot.documents.map { it.toObject(Notification::class.java)!! }
           onNotificationFetched(notifications)
         }
-        .addOnFailureListener { e -> Log.e("NotificationRepository", "Error fetching notifications", e) }
+        .addOnFailureListener { e ->
+          Log.e("NotificationRepository", "Error fetching notifications", e)
+        }
   }
 
   /**
@@ -55,10 +64,16 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
    * @param notificationUid The UID of the notification to be marked as read.
    */
   fun markNotificationAsRead(notificationUid: String) {
-      notificationCollection.document(notificationUid).update("status", NotificationStatus.READ)
+    notificationCollection.document(notificationUid).update("status", NotificationStatus.READ)
   }
 
+  /**
+   * Change the notification type in the Firestore database.
+   *
+   * @param notificationUid The UID of the notification to be changed.
+   * @param notificationType The new type of the notification.
+   */
   fun changeNotificationType(notificationUid: String, notificationType: NotificationType) {
-      notificationCollection.document(notificationUid).update("notificationType", notificationType)
+    notificationCollection.document(notificationUid).update("notificationType", notificationType)
   }
 }

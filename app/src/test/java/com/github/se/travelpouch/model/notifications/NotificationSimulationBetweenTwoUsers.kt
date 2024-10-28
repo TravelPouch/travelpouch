@@ -32,7 +32,8 @@ class NotificationSimulationBetweenTwoUsers {
 
     notificationRepository =
         NotificationRepository(Firebase.firestore) // Initialize your repository with Firestore
-    notificationViewModel = NotificationViewModel(notificationRepository) // Initialize your ViewModel
+    notificationViewModel =
+        NotificationViewModel(notificationRepository) // Initialize your ViewModel
   }
 
   @Test
@@ -84,7 +85,8 @@ class NotificationSimulationBetweenTwoUsers {
 
     // User 2 accepts the invitation
     // This situation happens when User 2 performs click on the accept button
-    notificationViewModel.changeNotificationType(invitationNotification.notificationUid, NotificationType.ACCEPTED)
+    notificationViewModel.changeNotificationType(
+        invitationNotification.notificationUid, NotificationType.ACCEPTED)
     Thread.sleep(1000) // Wait for the notification to be updated
     notificationViewModel.sendNotification(
         Notification(
