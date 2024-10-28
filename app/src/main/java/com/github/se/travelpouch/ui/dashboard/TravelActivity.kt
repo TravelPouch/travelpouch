@@ -3,6 +3,8 @@ package com.github.se.travelpouch.ui.dashboard
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +30,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -62,7 +68,7 @@ fun TravelActivitiesScreen(
     activityModelView: ActivityViewModel
 ) {
   val context = LocalContext.current
-
+    val showBanner = remember { mutableStateOf(true) }
   val listOfActivities = activityModelView.activities.collectAsState()
   val listOfDestinations =
       listOf(
@@ -129,31 +135,50 @@ fun TravelActivitiesScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
       }) { pd ->
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 8.dp),
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(pd)
-                    .testTag("activityColumn")) {
+      Box(
+          modifier = Modifier
+              .fillMaxSize()
+              .padding(pd) // Apply scaffold padding to the whole box
+      ) {
+          LazyColumn(
+              verticalArrangement = Arrangement.spacedBy(8.dp),
+              contentPadding = PaddingValues(vertical = 8.dp),
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 16.dp)
+                  .testTag("activityColumn")
+          ) {
               if (listOfActivities.value.isEmpty()) {
-                item {
-                  Text(
-                      text = "No activities planned for this trip",
-                      modifier = Modifier.testTag("emptyTravel"))
-                }
+                  item {
+                      Text(
+                          text = "No activities planned for this trip",
+                          modifier = Modifier.testTag("emptyTravel")
+                      )
+                  }
               } else {
-                items(listOfActivities.value.size) { idx ->
-                  ActivityItem(
-                      listOfActivities.value[idx],
-                      onClick = {
-                        Toast.makeText(context, "Activity clicked", Toast.LENGTH_SHORT).show()
-                      })
-                }
+                  items(listOfActivities.value.size) { idx ->
+                      ActivityItem(
+                          listOfActivities.value[idx],
+                          onClick = {
+                              Toast.makeText(context, "Activity clicked", Toast.LENGTH_SHORT).show()
+                          }
+                      )
+                  }
               }
-            }
+          }
+
+          if (showBanner.value) {
+              NextActivitiesBanner(
+                  activities = listOfActivities.value,
+                  onDismiss = { showBanner.value = false },
+                  //modifier = Modifier
+                  //    .fillMaxWidth()
+                  //    .alpha(0.8f) // Set transparency
+                  //    .padding(8.dp) // Add some padding around the banner
+              )
+          }
       }
+  }
 }
 
 /**
