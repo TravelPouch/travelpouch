@@ -2,7 +2,6 @@ package com.github.se.travelpouch.ui.dashboard.map
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -18,16 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 
 /**
  * Composable function that displays a map screen showing all activities. The activities are marked
@@ -86,29 +80,4 @@ fun ActivitiesMapScreen(
               }
         }
       })
-}
-
-@Composable
-fun Map(
-    listOfActivities: List<Activity>,
-    paddingValues: PaddingValues,
-    cameraPositionState: CameraPositionState
-) {
-  GoogleMap(
-      modifier = Modifier.padding(paddingValues).testTag("Map"),
-      cameraPositionState = cameraPositionState) {
-        // Add a marker for each activity's location
-        listOfActivities.forEach { activity ->
-          activity.location.let { location -> // Ensure location is not null
-            Marker(
-                state =
-                    rememberMarkerState(
-                        position =
-                            LatLng(location.latitude.toDouble(), location.longitude.toDouble())),
-                title = activity.title, // The title of the activity
-                snippet = activity.description, // The description of the activity
-                contentDescription = "Marker for ${activity.title}")
-          }
-        }
-      }
 }
