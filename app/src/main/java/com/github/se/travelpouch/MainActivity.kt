@@ -63,7 +63,7 @@ fun TravelPouchApp() {
 
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
-        startDestination = Screen.CALENDAR,
+        startDestination = Screen.AUTH,
         route = Route.DEFAULT,
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
