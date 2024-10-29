@@ -9,7 +9,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,8 +16,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 
 /**
@@ -60,16 +57,4 @@ fun MapScaffold(
               }
         }
       })
-}
-
-@Composable
-fun CameraUpdater(listOfActivities: List<Activity>, cameraPositionState: CameraPositionState) {
-  LaunchedEffect(listOfActivities) {
-    if (listOfActivities.isNotEmpty()) {
-      val firstLocation = listOfActivities.first().location
-      cameraPositionState.position =
-          CameraPosition.fromLatLngZoom(
-              LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
-    }
-  }
 }
