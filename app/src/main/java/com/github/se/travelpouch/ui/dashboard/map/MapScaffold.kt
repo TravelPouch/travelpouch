@@ -37,15 +37,9 @@ fun MapScaffold(
 ) {
 
   // Effect that runs whenever the list of activities changes
+
   LaunchedEffect(listOfActivities) {
-    if (listOfActivities.isNotEmpty()) {
-      // Update camera position to the first activity's location
-      Log.d("ActivitiesMapScreen", "Camera position : ${listOfActivities.first().location}")
-      val firstLocation = listOfActivities.first().location
-      cameraPositionState.position =
-          CameraPosition.fromLatLngZoom(
-              LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
-    }
+    cameraPositionState.position = getInitialCameraPosition(listOfActivities, cameraPositionState)
   }
 
   Scaffold(
@@ -69,4 +63,18 @@ fun MapScaffold(
               }
         }
       })
+}
+
+fun getInitialCameraPosition(
+    listOfActivities: List<Activity>,
+    cameraPositionState: CameraPositionState
+): CameraPosition {
+  return if (listOfActivities.isNotEmpty()) {
+    // Update camera position to the first activity's location
+    Log.d("ActivitiesMapScreen", "Camera position : ${listOfActivities.first().location}")
+    val firstLocation = listOfActivities.first().location
+    CameraPosition.fromLatLngZoom(LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
+  } else {
+    cameraPositionState.position
+  }
 }
