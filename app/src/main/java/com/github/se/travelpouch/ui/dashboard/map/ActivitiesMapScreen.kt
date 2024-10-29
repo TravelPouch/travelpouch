@@ -1,8 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard.map
 
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.github.se.travelpouch.model.activity.ActivityViewModel
@@ -35,16 +33,5 @@ fun ActivitiesMapScreen(
     position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
   }
 
-  // Effect that runs whenever the list of activities changes
-  LaunchedEffect(listOfActivities) {
-    if (listOfActivities.isNotEmpty()) {
-      // Update camera position to the first activity's location
-      Log.d("ActivitiesMapScreen", "Camera position : ${listOfActivities.first().location}")
-      val firstLocation = listOfActivities.first().location
-      cameraPositionState.position =
-          CameraPosition.fromLatLngZoom(
-              LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
-    }
-  }
   MapScaffold(listOfActivities, cameraPositionState, navigationActions)
 }

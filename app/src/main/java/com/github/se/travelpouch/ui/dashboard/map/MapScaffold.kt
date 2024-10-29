@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard.map
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -9,6 +10,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +18,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 
 /**
@@ -31,6 +35,19 @@ fun MapScaffold(
     cameraPositionState: CameraPositionState,
     navigationActions: NavigationActions
 ) {
+
+  // Effect that runs whenever the list of activities changes
+  LaunchedEffect(listOfActivities) {
+    if (listOfActivities.isNotEmpty()) {
+      // Update camera position to the first activity's location
+      Log.d("ActivitiesMapScreen", "Camera position : ${listOfActivities.first().location}")
+      val firstLocation = listOfActivities.first().location
+      cameraPositionState.position =
+          CameraPosition.fromLatLngZoom(
+              LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
+    }
+  }
+
   Scaffold(
       modifier = Modifier.testTag("ActivityMapScreen"),
       content = { paddingValues ->
