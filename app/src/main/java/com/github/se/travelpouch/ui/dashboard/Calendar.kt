@@ -66,13 +66,15 @@ fun CalendarScreen(
         TopAppBar(
             title = { Text("Calendar") },
             navigationIcon = {
-              IconButton(onClick = { /* TODO: Implement go back navigation logic */}) {
-                // Back icon for navigation
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    modifier = Modifier.testTag("goBackIcon"))
-              }
+              IconButton(
+                  modifier = Modifier.testTag("goBackIcon"),
+                  onClick = { /* TODO: Implement go back navigation logic */}) {
+                    // Back icon for navigation
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                    )
+                  }
             },
             colors =
                 TopAppBarDefaults.topAppBarColors(
