@@ -34,6 +34,7 @@ import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -149,6 +150,7 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
                               Toast.LENGTH_SHORT)
                           .show()
                     }
+                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                   },
                   modifier = Modifier.testTag("saveButton")) {
                     Text("Save")

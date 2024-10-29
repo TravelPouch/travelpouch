@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Folder
@@ -27,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -61,6 +63,12 @@ fun TravelActivitiesScreen(
     navigationActions: NavigationActions,
     activityModelView: ActivityViewModel
 ) {
+
+    LaunchedEffect(Unit) {
+        activityModelView.getAllActivities()
+        // sleep the thread for 1 second to allow the data to be fetched
+    }
+
   val context = LocalContext.current
 
   val listOfActivities = activityModelView.activities.collectAsState()
@@ -101,6 +109,12 @@ fun TravelActivitiesScreen(
                   modifier = Modifier.testTag("documentListButton")) {
                     Icon(imageVector = Icons.Default.Folder, contentDescription = null)
                   }
+
+                IconButton(
+                    onClick = {navigationActions.navigateTo(Screen.PROFILE)},
+                    modifier = Modifier.testTag("ProfileButton")) {
+                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
+                }
             })
       },
       bottomBar = {
