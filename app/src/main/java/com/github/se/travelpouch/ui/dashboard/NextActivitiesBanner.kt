@@ -96,4 +96,7 @@ fun NextActivitiesBanner(
               }
         }
   }
+    else{
+        onDismiss()
+  }
 }
