@@ -134,10 +134,10 @@ class TravelActivityScreen {
     composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertDoesNotExist()
   }
 
-    @Test
-    fun verifyBannerIsNotDisplayedIfNoDueActivities() {
+  @Test
+  fun verifyBannerIsNotDisplayedIfNoDueActivities() {
 
-        composeTestRule.setContent { NextActivitiesBanner(activites_test, {}) }
-        composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertDoesNotExist()
-    }
+    composeTestRule.setContent { NextActivitiesBanner(activites_test, {}) }
+    composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertDoesNotExist()
+  }
 }
