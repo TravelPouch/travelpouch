@@ -15,10 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.ui.dashboard.BottomNavigationItem
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import java.util.Locale
@@ -56,6 +61,11 @@ fun TravelListScreen(
   // travelContainers.getTravels()
   val travelList = listTravelViewModel.travels.collectAsState().value
 
+  val listOfDestinations =
+      listOf(
+          BottomNavigationItem("Activities", Icons.Default.Home),
+          BottomNavigationItem("Calendar", Icons.Default.DateRange))
+
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
       floatingActionButton = {
@@ -64,6 +74,23 @@ fun TravelListScreen(
             modifier = Modifier.testTag("createTravelFab")) {
               Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
+      },
+      bottomBar = {
+        NavigationBar(modifier = Modifier.testTag("navigationBarTravelList")) {
+          listOfDestinations.forEach { destination ->
+            NavigationBarItem(
+                onClick = {
+                  when (destination.title) {
+                    "Activities" -> navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    "Calendar" -> navigationActions.navigateTo(Screen.CALENDAR)
+                  }
+                },
+                icon = { Icon(destination.icon, contentDescription = null) },
+                selected = false,
+                label = { Text(destination.title) },
+                modifier = Modifier.testTag("navigationBarItem"))
+          }
+        }
       },
       content = { pd ->
         Column {
