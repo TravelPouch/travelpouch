@@ -15,11 +15,13 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
+import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
@@ -61,6 +63,10 @@ fun TravelPouchApp() {
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
   val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
 
+  val calendarViewModel: CalendarViewModel =
+      viewModel(factory = CalendarViewModel.Factory(activityModelView))
+
+
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
         startDestination = Screen.AUTH,
@@ -88,10 +94,14 @@ fun TravelPouchApp() {
       }
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
+
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
       composable(Screen.EDIT_PROFILE) {
         ModifyingProfileScreen(navigationActions, profileModelView)
       }
+
+      composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel) }
+
     }
   }
 }

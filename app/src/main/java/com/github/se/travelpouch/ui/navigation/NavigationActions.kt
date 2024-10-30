@@ -17,8 +17,12 @@ object Screen {
   const val TRAVEL_ACTIVITIES = "TravelActivities Screen"
   const val ADD_ACTIVITY = "AddActivity Screen"
   const val TIMELINE = "Timeline Screen"
+
   const val PROFILE = "Profile Screen"
   const val EDIT_PROFILE = "Edit Profile Screen"
+
+  const val CALENDAR = "Calendar Screen"
+
 }
 
 open class NavigationActions(
