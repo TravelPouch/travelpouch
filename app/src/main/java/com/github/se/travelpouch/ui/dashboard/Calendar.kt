@@ -41,6 +41,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: NavigationActions) {
+
   // Observe the state of activities from the ViewModel
   val calendarState by calendarViewModel.calendarState.collectAsState(initial = emptyList())
 
@@ -63,6 +64,7 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
               IconButton(
                   modifier = Modifier.testTag("goBackIcon"),
                   onClick = { navigationActions.goBack() }) {
+
                     // Back icon for navigation
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
