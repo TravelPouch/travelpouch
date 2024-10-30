@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.dashboard
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -149,7 +148,7 @@ fun TravelActivitiesScreen(
                       listOfActivities.value[idx],
                       onClick = {
                         activityModelView.selectActivity(listOfActivities.value[idx])
-                          navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
+                        navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
                       })
                 }
               }

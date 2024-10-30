@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.dashboard
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,122 +41,118 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel){
+fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel) {
 
-    val dateFormat =
-        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-            isLenient = false // strict date format
-        }
+  val dateFormat =
+      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+        isLenient = false // strict date format
+      }
 
-    val gregorianCalendar = GregorianCalendar()
-    val context = LocalContext.current
+  val gregorianCalendar = GregorianCalendar()
+  val context = LocalContext.current
 
+  val selectedActivity = activityViewModel.selectedActivity.collectAsState()
 
-    val selectedActivity = activityViewModel.selectedActivity.collectAsState()
+  var title by remember { mutableStateOf(selectedActivity.value!!.title) }
+  var description by remember { mutableStateOf(selectedActivity.value!!.description) }
+  var location by remember { mutableStateOf(selectedActivity.value!!.location.name) }
+  var date by remember {
+    mutableStateOf(convertDateToString(selectedActivity.value!!.date.toDate()))
+  }
 
-    var title by remember { mutableStateOf(selectedActivity.value!!.title) }
-    var description by remember { mutableStateOf(selectedActivity.value!!.description) }
-    var location by remember { mutableStateOf(selectedActivity.value!!.location.name) }
-    var date by remember {
-        mutableStateOf(convertDateToString(selectedActivity.value!!.date.toDate()))
-    }
-
-
-    Scaffold(
-        modifier = Modifier.testTag("AddActivityScreen"),
-        topBar = {
-            TopAppBar(
-                title = { Text("Add Activity", Modifier.testTag("travelTitle")) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navigationActions.goBack() },
-                        modifier = Modifier.testTag("goBackButton")) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back")
-                    }
-                })
-        }
-    ) { paddingValues ->
+  Scaffold(
+      modifier = Modifier.testTag("EditActivityScreen"),
+      topBar = {
+        TopAppBar(
+            title = { Text("Edit Activity", Modifier.testTag("travelTitle")) },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
+            })
+      }) { paddingValues ->
         Column(
             modifier =
-            Modifier.fillMaxSize()
-                .padding(16.dp)
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            OutlinedTextField(
-                value = title,
-                onValueChange = {title = it},
-                enabled = true,
-                label = { Text("Title") }
-            )
+                Modifier.fillMaxSize()
+                    .padding(16.dp)
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+              OutlinedTextField(
+                  value = title,
+                  onValueChange = { title = it },
+                  enabled = true,
+                  label = { Text("Title") },
+                  modifier = Modifier.testTag("titleField"))
 
-            OutlinedTextField(
-                value = description,
-                onValueChange = {description = it},
-                enabled = true,
-                label = { Text("Description") }
-            )
+              OutlinedTextField(
+                  value = description,
+                  onValueChange = { description = it },
+                  enabled = true,
+                  label = { Text("Description") },
+                  modifier = Modifier.testTag("descriptionField"))
 
-            OutlinedTextField(
-                value = location,
-                onValueChange = {},
-                enabled = true,
-                label = { Text("Location") }
-            )
+              OutlinedTextField(
+                  value = location,
+                  onValueChange = {},
+                  enabled = true,
+                  label = { Text("Location") },
+                  modifier = Modifier.testTag("locationField"))
 
-            OutlinedTextField(
-                value = date,
-                onValueChange = {
+              OutlinedTextField(
+                  value = date,
+                  onValueChange = {
                     if (it.isDigitsOnly() && it.length <= 8) {
-                        date = it
+                      date = it
                     }
-                },
-                enabled = true,
-                label = { Text("Date") },
-                visualTransformation = DateVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
+                  },
+                  enabled = true,
+                  label = { Text("Date") },
+                  visualTransformation = DateVisualTransformation(),
+                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                  modifier = Modifier.testTag("dateField"))
 
-            Button(
-                enabled =
-                location.isNotBlank() &&
-                        title.isNotBlank() &&
-                        description.isNotBlank() &&
-                        date.isNotBlank(),
-                onClick = {
+              Button(
+                  enabled =
+                      location.isNotBlank() &&
+                          title.isNotBlank() &&
+                          description.isNotBlank() &&
+                          date.isNotBlank(),
+                  onClick = {
                     try {
-                        val finalDate = convertStringToDate(date, dateFormat, gregorianCalendar)
+                      val finalDate = convertStringToDate(date, dateFormat, gregorianCalendar)
 
-                        val activity =
-                            Activity(
-                                selectedActivity.value!!.uid,
-                                title,
-                                description,
-                                selectedActivity.value!!.location,
-                                finalDate,
-                                mapOf())
+                      val activity =
+                          Activity(
+                              selectedActivity.value!!.uid,
+                              title,
+                              description,
+                              selectedActivity.value!!.location,
+                              finalDate,
+                              mapOf())
 
-                        activityViewModel.updateActivity(activity, context)
+                      activityViewModel.updateActivity(activity, context)
                     } catch (e: java.text.ParseException) {
-                        Toast.makeText(
-                            context,
-                            "Invalid format, date must be DD/MM/YYYY.",
-                            Toast.LENGTH_SHORT)
-                            .show()
+                      Toast.makeText(
+                              context,
+                              "Invalid format, date must be DD/MM/YYYY.",
+                              Toast.LENGTH_SHORT)
+                          .show()
                     }
                     navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-                },
-                modifier = Modifier.testTag("saveButton")) {
-                Text("Save")
+                  },
+                  modifier = Modifier.testTag("saveButton")) {
+                    Text("Save")
+                  }
             }
-        }
-    }
+      }
 }
 
-private fun convertDateToString(date: Date): String{
-    val df = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
-    return df.format(date)
+private fun convertDateToString(date: Date): String {
+  val df = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+  return df.format(date)
 }
