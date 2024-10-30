@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,10 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import com.github.se.travelpouch.model.dashboard.ActivityRow
+import com.github.se.travelpouch.model.dashboard.CalendarScreenLaunchedEffect
 import com.github.se.travelpouch.model.dashboard.CalendarView
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 
 /**
@@ -45,13 +44,7 @@ fun CalendarScreen(
   val calendarState by calendarViewModel.calendarState.collectAsState(initial = emptyList())
 
   // Initial Setup
-  LaunchedEffect(Unit) {
-    // Set the default selected date to today
-    val today = Calendar.getInstance().time
-    calendarViewModel.onDateSelected(today)
-
-    calendarViewModel.activityViewModel.getAllActivities()
-  }
+  CalendarScreenLaunchedEffect(calendarViewModel = calendarViewModel)
 
   // Application
   Scaffold(

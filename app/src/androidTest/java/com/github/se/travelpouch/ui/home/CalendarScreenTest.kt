@@ -13,7 +13,6 @@ import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
