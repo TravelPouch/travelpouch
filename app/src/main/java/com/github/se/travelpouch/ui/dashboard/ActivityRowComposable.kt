@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.model.dashboard
+package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -1,7 +1,8 @@
-package com.github.se.travelpouch.model.dashboard
+package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import java.util.Calendar
 
 @Composable

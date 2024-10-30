@@ -23,9 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import com.github.se.travelpouch.model.dashboard.ActivityRow
-import com.github.se.travelpouch.model.dashboard.CalendarScreenLaunchedEffect
-import com.github.se.travelpouch.model.dashboard.CalendarView
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
