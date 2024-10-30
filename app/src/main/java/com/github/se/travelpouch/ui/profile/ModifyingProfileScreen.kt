@@ -1,16 +1,11 @@
 package com.github.se.travelpouch.ui.profile
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,68 +34,67 @@ import com.github.se.travelpouch.ui.navigation.Screen
 fun ModifyingProfileScreen(
     navigationActions: NavigationActions,
     profileModelView: ProfileModelView
-){
-    val profile = profileModelView.profile.collectAsState()
-    val context = LocalContext.current
+) {
+  val profile = profileModelView.profile.collectAsState()
+  val context = LocalContext.current
 
-    var email by remember { mutableStateOf(profile.value.email) }
-    var username by remember { mutableStateOf(profile.value.username) }
+  var email by remember { mutableStateOf(profile.value.email) }
+  var username by remember { mutableStateOf(profile.value.username) }
 
-
-    Scaffold(
-        modifier = Modifier.testTag("ProfileScreen"),
-        topBar = {
-            TopAppBar(
-                title = { Text("Profile", Modifier.testTag("ProfileBar")) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navigationActions.goBack() },
-                        modifier = Modifier.testTag("goBackButton")) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back")
-                    }
-                },
-                )
-        },
-    ) { pd ->
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
+  Scaffold(
+      modifier = Modifier.testTag("ProfileScreen"),
+      topBar = {
+        TopAppBar(
+            title = { Text("Profile", Modifier.testTag("ProfileBar")) },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
+            },
+        )
+      },
+  ) { pd ->
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier =
+            Modifier.fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .padding(pd)
-                .testTag("ProfileColumn")
-        ){
-            OutlinedTextField(
-                value = email,
-                onValueChange = {email = it},
-                enabled = true,
-                label = { Text("Email") },
-                modifier = Modifier.testTag("emailField")
-            )
+                .testTag("ProfileColumn")) {
+          OutlinedTextField(
+              value = email,
+              onValueChange = { email = it },
+              enabled = true,
+              label = { Text("Email") },
+              modifier = Modifier.testTag("emailField"))
 
-            OutlinedTextField(
-                value = username,
-                onValueChange = {username = it},
-                enabled = true,
-                label = { Text("Username") },
-                modifier = Modifier.testTag("usernameField")
-            )
+          OutlinedTextField(
+              value = username,
+              onValueChange = { username = it },
+              enabled = true,
+              label = { Text("Username") },
+              modifier = Modifier.testTag("usernameField"))
 
-            OutlinedTextField(
-                value = "No Friend, sadge :(",
-                onValueChange = {},
-                enabled = false,
-                label = { Text("Friends") },
-                modifier = Modifier.testTag("friendsField")
-            )
+          OutlinedTextField(
+              value = "No Friend, sadge :(",
+              onValueChange = {},
+              enabled = false,
+              label = { Text("Friends") },
+              modifier = Modifier.testTag("friendsField"))
 
-            Button(onClick = {
+          Button(
+              onClick = {
                 val newProfile = Profile(profile.value.uid, username, email, null)
                 profileModelView.updateProfile(newProfile, context)
                 navigationActions.navigateTo(Screen.PROFILE)
-            },
-                modifier = Modifier.testTag("saveButton")) { Text("Save") }
+              },
+              modifier = Modifier.testTag("saveButton")) {
+                Text("Save")
+              }
         }
-    }
+  }
 }

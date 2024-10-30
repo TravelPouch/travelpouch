@@ -150,7 +150,7 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
                               Toast.LENGTH_SHORT)
                           .show()
                     }
-                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                   },
                   modifier = Modifier.testTag("saveButton")) {
                     Text("Save")

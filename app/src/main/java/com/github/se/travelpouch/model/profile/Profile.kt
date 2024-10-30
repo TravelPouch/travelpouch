@@ -7,6 +7,6 @@ data class Profile(
     val friends: Map<Int, String>?
 )
 
-object ErrorProfile{
-    val errorProfile = Profile("-1", "", "", null)
+object ErrorProfile {
+  val errorProfile = Profile("-1", "", "", null)
 }

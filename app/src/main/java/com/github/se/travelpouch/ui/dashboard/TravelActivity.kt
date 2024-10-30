@@ -64,10 +64,10 @@ fun TravelActivitiesScreen(
     activityModelView: ActivityViewModel
 ) {
 
-    LaunchedEffect(Unit) {
-        activityModelView.getAllActivities()
-        // sleep the thread for 1 second to allow the data to be fetched
-    }
+  LaunchedEffect(Unit) {
+    activityModelView.getAllActivities()
+    // sleep the thread for 1 second to allow the data to be fetched
+  }
 
   val context = LocalContext.current
 
@@ -110,11 +110,11 @@ fun TravelActivitiesScreen(
                     Icon(imageVector = Icons.Default.Folder, contentDescription = null)
                   }
 
-                IconButton(
-                    onClick = {navigationActions.navigateTo(Screen.PROFILE)},
-                    modifier = Modifier.testTag("ProfileButton")) {
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
+                  modifier = Modifier.testTag("ProfileButton")) {
                     Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
-                }
+                  }
             })
       },
       bottomBar = {

@@ -34,7 +34,6 @@ import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +89,9 @@ fun TravelPouchApp() {
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
-      composable(Screen.EDIT_PROFILE) { ModifyingProfileScreen(navigationActions, profileModelView) }
-}
+      composable(Screen.EDIT_PROFILE) {
+        ModifyingProfileScreen(navigationActions, profileModelView)
+      }
+    }
   }
 }
