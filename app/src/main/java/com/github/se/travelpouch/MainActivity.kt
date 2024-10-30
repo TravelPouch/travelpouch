@@ -19,6 +19,7 @@ import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
+import com.github.se.travelpouch.ui.dashboard.EditActivity
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
@@ -69,6 +70,7 @@ fun TravelPouchApp() {
         TravelActivitiesScreen(navigationActions, activityModelView)
       }
       composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
+      composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
       composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
         EditTravelSettingsScreen(listTravelViewModel, navigationActions)

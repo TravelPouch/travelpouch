@@ -148,7 +148,8 @@ fun TravelActivitiesScreen(
                   ActivityItem(
                       listOfActivities.value[idx],
                       onClick = {
-                        Toast.makeText(context, "Activity clicked", Toast.LENGTH_SHORT).show()
+                        activityModelView.selectActivity(listOfActivities.value[idx])
+                          navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
                       })
                 }
               }
