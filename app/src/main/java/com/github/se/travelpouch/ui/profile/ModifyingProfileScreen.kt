@@ -48,7 +48,7 @@ fun ModifyingProfileScreen(
 
 
     Scaffold(
-        modifier = Modifier.testTag("travelActivitiesScreen"),
+        modifier = Modifier.testTag("ProfileScreen"),
         topBar = {
             TopAppBar(
                 title = { Text("Profile", Modifier.testTag("ProfileBar")) },
@@ -75,28 +75,32 @@ fun ModifyingProfileScreen(
                 value = email,
                 onValueChange = {email = it},
                 enabled = true,
-                label = { Text("Email") }
+                label = { Text("Email") },
+                modifier = Modifier.testTag("emailField")
             )
 
             OutlinedTextField(
                 value = username,
                 onValueChange = {username = it},
                 enabled = true,
-                label = { Text("Username") }
+                label = { Text("Username") },
+                modifier = Modifier.testTag("usernameField")
             )
 
             OutlinedTextField(
                 value = "No Friend, sadge :(",
                 onValueChange = {},
                 enabled = false,
-                label = { Text("Friends") }
+                label = { Text("Friends") },
+                modifier = Modifier.testTag("friendsField")
             )
 
             Button(onClick = {
                 val newProfile = Profile(profile.value.uid, username, email, null)
                 profileModelView.updateProfile(newProfile, context)
                 navigationActions.navigateTo(Screen.PROFILE)
-            }) { Text("Save") }
+            },
+                modifier = Modifier.testTag("saveButton")) { Text("Save") }
         }
     }
 }

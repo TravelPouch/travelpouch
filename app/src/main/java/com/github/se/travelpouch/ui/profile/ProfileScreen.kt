@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,10 +36,15 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     profileModelView: ProfileModelView
 ){
+    LaunchedEffect(Unit) {
+        profileModelView.getProfile()
+        // sleep the thread for 1 second to allow the data to be fetched
+    }
+
     val profile = profileModelView.profile.collectAsState()
 
     Scaffold(
-        modifier = Modifier.testTag("travelActivitiesScreen"),
+        modifier = Modifier.testTag("ProfileScreen"),
         topBar = {
             TopAppBar(
                 title = { Text("Profile", Modifier.testTag("ProfileBar")) },
@@ -71,21 +77,24 @@ fun ProfileScreen(
                 value = profile.value.email,
                 onValueChange = {},
                 enabled = false,
-                label = { Text("Email") }
+                label = { Text("Email") },
+                modifier = Modifier.testTag("emailField")
             )
 
             OutlinedTextField(
                 value = profile.value.username,
                 onValueChange = {},
                 enabled = false,
-                label = { Text("Username") }
+                label = { Text("Username") },
+                modifier = Modifier.testTag("usernameField")
             )
 
             OutlinedTextField(
                 value = "No Friend, sadge :(",
                 onValueChange = {},
                 enabled = false,
-                label = { Text("Friends") }
+                label = { Text("Friends") },
+                modifier = Modifier.testTag("friendsField")
             )
         }
     }
