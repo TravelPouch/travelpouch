@@ -15,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -27,10 +26,8 @@ import com.github.se.travelpouch.ui.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navigationActions: NavigationActions, profileModelView: ProfileModelView) {
-  LaunchedEffect(Unit) {
-    profileModelView.getProfile()
-    // sleep the thread for 1 second to allow the data to be fetched
-  }
+
+  profileModelView.getProfile()
 
   val profile = profileModelView.profile.collectAsState()
 
