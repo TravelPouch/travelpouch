@@ -17,8 +17,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class CalendarScreenTest {
@@ -26,18 +28,13 @@ class CalendarScreenTest {
   private lateinit var calendarViewModel: CalendarViewModel
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityViewModel: ActivityViewModel
-  private lateinit var activitiesFlow: MutableStateFlow<List<Activity>>
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
-    activitiesFlow = MutableStateFlow(emptyList())
-    mockActivityViewModel =
-        ActivityViewModel(mockActivityRepositoryFirebase).apply { activities = activitiesFlow }
-
-    `when`(mockActivityViewModel.getNewUid()).thenReturn("uid")
+    mockActivityViewModel = ActivityViewModel(mockActivityRepositoryFirebase)
     calendarViewModel = CalendarViewModel(activityViewModel = mockActivityViewModel)
   }
 
@@ -70,8 +67,19 @@ class CalendarScreenTest {
             location = Location(0.0, 0.0, Timestamp(0, 0), "location"),
             documentsNeeded = mapOf())
 
-    // Update the activities flow to emit the mock activities
-    activitiesFlow.value = listOf(activityToday)
+    val listOfActivities = listOf(activityToday)
+
+    // Mock getAllActivities to return the list of activities
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument<(List<Activity>) -> Unit>(0)
+          onSuccess(listOfActivities)
+          null
+        }
+        .whenever(mockActivityRepositoryFirebase)
+        .getAllActivities(anyOrNull(), anyOrNull())
+
+    // Call getAllActivities to populate activities in ViewModel
+    mockActivityViewModel.getAllActivities()
 
     // Act
     composeTestRule.setContent { CalendarScreen(calendarViewModel = calendarViewModel) }

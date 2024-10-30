@@ -30,7 +30,7 @@ class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : Vi
   }
 
   private val activities_ = MutableStateFlow<List<Activity>>(emptyList())
-  var activities: StateFlow<List<Activity>> = activities_.asStateFlow()
+  val activities: StateFlow<List<Activity>> = activities_.asStateFlow()
 
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
