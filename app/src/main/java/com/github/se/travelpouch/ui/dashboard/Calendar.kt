@@ -88,7 +88,10 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
                 icon = { Icon(destination.icon, contentDescription = null) },
                 selected = false,
                 label = { Text(destination.title) },
-                modifier = Modifier.testTag("navigationBarItem"))
+                modifier =
+                    Modifier.testTag(
+                        if (destination.title == "Map") "navigationBarItemMap"
+                        else "navigationBarItem"))
           }
         }
       }) { innerPadding ->

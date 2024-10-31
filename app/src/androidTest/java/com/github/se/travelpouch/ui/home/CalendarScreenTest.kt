@@ -10,6 +10,7 @@ import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,10 +29,13 @@ class CalendarScreenTest {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityViewModel: ActivityViewModel
 
+  private lateinit var navigationActions: NavigationActions
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
+    navigationActions = mock(NavigationActions::class.java)
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
     mockActivityViewModel = ActivityViewModel(mockActivityRepositoryFirebase)
     calendarViewModel = CalendarViewModel(activityViewModel = mockActivityViewModel)
@@ -40,7 +44,9 @@ class CalendarScreenTest {
   @Test
   fun hasRequiredComponents() {
     // Act
-    composeTestRule.setContent { CalendarScreen(calendarViewModel = calendarViewModel) }
+    composeTestRule.setContent {
+      CalendarScreen(calendarViewModel = calendarViewModel, navigationActions)
+    }
     composeTestRule.waitForIdle()
 
     // Assert
@@ -81,7 +87,9 @@ class CalendarScreenTest {
     mockActivityViewModel.getAllActivities()
 
     // Act
-    composeTestRule.setContent { CalendarScreen(calendarViewModel = calendarViewModel) }
+    composeTestRule.setContent {
+      CalendarScreen(calendarViewModel = calendarViewModel, navigationActions = navigationActions)
+    }
     composeTestRule.waitForIdle()
 
     // Assert activity for today is displayed
@@ -92,5 +100,31 @@ class CalendarScreenTest {
 
     // Click on the back icon to test navigation
     composeTestRule.onNodeWithTag("goBackIcon").performClick()
+  }
+
+  @Test
+  fun testNavigationGoBack() {
+    // Act
+    composeTestRule.setContent {
+      CalendarScreen(calendarViewModel = calendarViewModel, navigationActions)
+    }
+    composeTestRule.waitForIdle()
+
+    // Click on the back icon to test navigation
+    composeTestRule.onNodeWithTag("goBackIcon").performClick()
+    composeTestRule.waitForIdle()
+  }
+
+  @Test
+  fun testNavigationBottomBar() {
+    // Act
+    composeTestRule.setContent {
+      CalendarScreen(calendarViewModel = calendarViewModel, navigationActions)
+    }
+    composeTestRule.waitForIdle()
+
+    // Click on the Map icon to test navigation
+    composeTestRule.onNodeWithTag("navigationBarItemMap").performClick()
+    composeTestRule.waitForIdle()
   }
 }
