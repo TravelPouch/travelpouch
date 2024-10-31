@@ -111,7 +111,7 @@ fun TravelActivitiesScreen(
             NavigationBarItem(
                 onClick = {
                   when (destination.title) {
-                    "Activities" -> navno ifs no buts?igationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    "Activities" -> navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                     "Map" ->
                         navigationActions.navigateTo(
                             Screen.ACTIVITIES_MAP) // Todo: navigate to map screen
@@ -131,7 +131,6 @@ fun TravelActivitiesScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
       }) { pd ->
-
         Box(
             modifier = Modifier.fillMaxSize().padding(pd) // Apply scaffold padding to the whole box
             ) {
