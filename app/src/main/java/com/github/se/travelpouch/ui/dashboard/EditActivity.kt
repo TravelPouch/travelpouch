@@ -39,6 +39,13 @@ import java.util.Date
 import java.util.GregorianCalendar
 import java.util.Locale
 
+/**
+ * This function displays the screen that allows us to edit an activity
+ *
+ * @param navigationActions (NavigationActions) : the navigation actions that we use to navigate
+ *   between screens
+ * @param activityViewModel (ActivityViewModel) : the view model used to manange activities
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel) {
@@ -152,6 +159,12 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
       }
 }
 
+/**
+ * This function converts a date to a String
+ *
+ * @param date (Date) : the date we want to convert
+ * @return (String) : the string obtained from the original date
+ */
 private fun convertDateToString(date: Date): String {
   val df = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
   return df.format(date)
