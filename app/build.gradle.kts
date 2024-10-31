@@ -208,6 +208,8 @@ dependencies {
     implementation(libs.compose.viewmodel)
     // Coil
     implementation(libs.coil)
+    // Bouquet
+    implementation(libs.bouquet)
     // Android Studio Preview support
     implementation(libs.compose.preview)
     debugImplementation(libs.compose.tooling)
