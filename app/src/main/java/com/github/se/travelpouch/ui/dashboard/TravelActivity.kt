@@ -115,7 +115,7 @@ fun TravelActivitiesScreen(
                     "Activities" -> navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                     "Map" ->
                         navigationActions.navigateTo(
-                            Screen.TRAVEL_ACTIVITIES) // Todo: navigate to map screen
+                            Screen.ACTIVITIES_MAP) // Todo: navigate to map screen
                   }
                 },
                 icon = { Icon(destination.icon, contentDescription = null) },
