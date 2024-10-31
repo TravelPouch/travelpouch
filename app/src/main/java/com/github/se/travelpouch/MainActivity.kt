@@ -94,7 +94,7 @@ fun TravelPouchApp() {
       }
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
-      composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel) }
+      composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
     }
   }
 }
