@@ -20,11 +20,8 @@ import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
-
 import com.github.se.travelpouch.ui.dashboard.EditActivity
-
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
-
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
