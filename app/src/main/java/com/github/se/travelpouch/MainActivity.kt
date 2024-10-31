@@ -24,6 +24,7 @@ import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.EditActivity
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
+import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
 import com.github.se.travelpouch.ui.home.AddTravelScreen
@@ -79,6 +80,11 @@ fun TravelPouchApp() {
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
         EditTravelSettingsScreen(listTravelViewModel, navigationActions)
       }
+
+      composable(Screen.ACTIVITIES_MAP) {
+        ActivitiesMapScreen(activityModelView, navigationActions)
+      }
+
       composable(Screen.PARTICIPANT_LIST) {
         ParticipantListScreen(listTravelViewModel, navigationActions)
       }
@@ -90,7 +96,7 @@ fun TravelPouchApp() {
       }
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
-      composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel) }
+      composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
     }
   }
 }

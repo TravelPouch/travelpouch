@@ -65,6 +65,48 @@ class TravelRepositoryFirestore(
       }
     }
   }
+  /**
+   * Checks if a participant exists in the Firestore database by their email.
+   *
+   * This function queries the Firestore database under 'userslist' to check if a participant with
+   * the given email exists. If the participant exists, the `onSuccess` callback is invoked with the
+   * participant's information. If the participant does not exist or an error occurs, the
+   * `onFailure` callback is invoked.
+   *
+   * @param email The email of the participant to check.
+   * @param onSuccess The callback to call with the participant's information if the operation is
+   *   successful.
+   * @param onFailure The callback to call with the exception if the operation fails.
+   */
+  override fun checkParticipantExists(
+      email: String,
+      onSuccess: (UserInfo?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(userCollectionPath).whereEqualTo("email", email).get().addOnCompleteListener {
+        task ->
+      if (task.isSuccessful) {
+        Log.d("TravelRepositoryFirestore", "checkParticipantExists success ${task.result.isEmpty}")
+        val user =
+            task.result?.let { userEntries ->
+              if (userEntries.isEmpty) {
+                null
+              } else {
+                if (userEntries.size() > 1) {
+                  Log.e("TravelRepositoryFirestore", "Multiple users with same email")
+                }
+                documentToUserInfo(userEntries.documents[0])
+              }
+            }
+        onSuccess(user)
+      } else {
+        task.exception?.let { e ->
+          Log.e("TravelRepositoryFirestore", "API error checking participant existence", e)
+          onFailure(e)
+        }
+      }
+    }
+  }
 
   /**
    * Adds a new travel document to the Firestore database.
