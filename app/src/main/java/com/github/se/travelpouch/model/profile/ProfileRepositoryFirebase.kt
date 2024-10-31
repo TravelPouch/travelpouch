@@ -34,7 +34,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     }
   }
 
-  private fun gettingUserProfile(user: FirebaseUser, onSuccess: () -> Unit) {
+  fun gettingUserProfile(user: FirebaseUser, onSuccess: () -> Unit) {
 
     documentPath = user.uid
     db.collection(collectionPath)
