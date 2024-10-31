@@ -58,35 +58,42 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
   }
 
   fun storeSelectedDocument(documentFile: DocumentFile, contentResolver: ContentResolver) {
-    val file =
-        documentFile.createFile(
-            selectedDocument.value?.fileFormat?.mimeType!!, selectedDocument.value?.title!!)
+    val mimeType = selectedDocument.value?.fileFormat?.mimeType
+    val title = selectedDocument.value?.title
+    val ref = selectedDocument.value?.ref?.id
+
+    if (mimeType == null || title == null || ref == null) {
+      Log.i("DocumentViewModel", "Some fields are empty. Abort download")
+      return
+    }
+
+    val file = documentFile.createFile(mimeType, title)
+
+    if (file == null) {
+      Log.e("DocumentViewModel", "Failed to create document file in specified directory")
+      return
+    }
 
     val storageRef = FirebaseStorage.getInstance("gs://travelpouch-7d692.appspot.com").reference
-    val documentRef = storageRef.child(selectedDocument.value?.ref?.id!!)
+    val documentRef = storageRef.child(ref)
 
-    if (file != null) {
-      val downloadTask = documentRef.stream
-      downloadTask
-          .addOnCompleteListener { taskSnapshot ->
-            Thread() {
-                  contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-                    taskSnapshot.result.stream.use { it.copyTo(outputStream) }
-                  }
-                      ?: run {
-                        Log.e(
-                            "DocumentViewModel",
-                            "Failed to open output stream for URI: ${file.uri}")
-                      }
+    val downloadTask = documentRef.stream
+    downloadTask
+        .addOnCompleteListener { taskSnapshot ->
+          Thread() {
+                contentResolver.openOutputStream(file.uri)?.use { outputStream ->
+                  taskSnapshot.result.stream.use { it.copyTo(outputStream) }
                 }
-                .start()
-          }
-          .addOnFailureListener { exception ->
-            Log.e("DocumentViewModel", "Failed to download document", exception)
-          }
-    } else {
-      Log.e("DocumentViewModel", "Failed to create document file in specified directory")
-    }
+                    ?: run {
+                      Log.e(
+                          "DocumentViewModel", "Failed to open output stream for URI: ${file.uri}")
+                    }
+              }
+              .start()
+        }
+        .addOnFailureListener { exception ->
+          Log.e("DocumentViewModel", "Failed to download document", exception)
+        }
   }
 
   //    /**

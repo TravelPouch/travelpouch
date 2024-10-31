@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.documents
 
-import android.os.Environment
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -75,16 +74,9 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   }
             },
             actions = {
-              StoreDocumentButton(Environment.DIRECTORY_DOCUMENTS) { uri ->
-                //                uri?.let {
-                //                  DocumentFile.fromTreeUri(context, it)?.let {
-                //                    documentViewModel.storeSelectedDocument(it.uri,
-                // context.contentResolver)
-                //                  }
-                //                }
-                uri?.let {
-                  documentViewModel.storeSelectedDocument(
-                      DocumentFile.fromTreeUri(context, it)!!, context.contentResolver)
+              StoreDocumentButton() { uri ->
+                DocumentFile.fromTreeUri(context, uri)?.let {
+                  documentViewModel.storeSelectedDocument(it, context.contentResolver)
                 }
               }
               IconButton(

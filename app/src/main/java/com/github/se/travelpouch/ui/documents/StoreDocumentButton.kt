@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 
 @Composable
-fun StoreDocumentButton(pickerInitialFolderName: String, onDirectoryPicked: (Uri?) -> Unit) {
+fun StoreDocumentButton(onDirectoryPicked: (Uri) -> Unit) {
   val openDirectoryLauncher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) {
           uri: Uri? ->
