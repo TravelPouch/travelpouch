@@ -16,13 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.ui.home.SimpleMarker
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**
  * Composable function that displays a map screen showing all activities. The activities are marked
@@ -39,6 +40,8 @@ fun ActivitiesMapScreen(
 
   // Collect the list of activities from the ViewModel
   val listOfActivities by activityViewModel.activities.collectAsState()
+
+  val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
   // Default location to use if activities are not yet loaded (e.g., Paris)
   val defaultLocation = LatLng(48.8566, 2.3522)
@@ -64,16 +67,12 @@ fun ActivitiesMapScreen(
                 // Add a marker for each activity's location
                 listOfActivities.forEach { activity ->
                   activity.location.let { location -> // Ensure location is not null
-                    Marker(
-                        state =
-                            rememberMarkerState(
-                                position =
-                                    LatLng(
-                                        location.latitude.toDouble(),
-                                        location.longitude.toDouble())),
+                    SimpleMarker(
+                        position = LatLng(location.latitude, location.longitude),
                         title = activity.title, // The title of the activity
-                        snippet = activity.description, // The description of the activity
-                        contentDescription = "Marker for ${activity.title}")
+                        snippet =
+                            dateFormat.format(activity.date.toDate()), // The date of the activity
+                    )
                   }
                 }
               }
@@ -84,7 +83,7 @@ fun ActivitiesMapScreen(
               modifier =
                   Modifier.align(Alignment.TopStart) // Position the button at the top-left
                       .padding(16.dp)
-                      .size(48.dp) // Optional size for the button
+                      .size(48.dp)
                       .testTag("GoBackButton")) {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
               }
