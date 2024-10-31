@@ -90,7 +90,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    */
   private fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo) -> Unit,
+      onSuccess: (Profile) -> Unit,
       onFailure: () -> Unit
   ) {
     repository.checkParticipantExists(

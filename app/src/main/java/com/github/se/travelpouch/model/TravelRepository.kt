@@ -14,7 +14,7 @@ interface TravelRepository {
 
   fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   )
 

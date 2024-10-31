@@ -82,7 +82,7 @@ class TravelRepositoryFirestore(
    */
   override fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     db.collection(userCollectionPath).whereEqualTo("email", email).get().addOnCompleteListener {
@@ -97,7 +97,7 @@ class TravelRepositoryFirestore(
                 if (userEntries.size() > 1) {
                   Log.e("TravelRepositoryFirestore", "Multiple users with same email")
                 }
-                documentToUserInfo(userEntries.documents[0])
+                documentToProfile(userEntries.documents[0])
               }
             }
         onSuccess(user)

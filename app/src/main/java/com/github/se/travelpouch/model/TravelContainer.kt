@@ -80,7 +80,7 @@ data class TravelContainer(
  * @return True if the UID is valid, false otherwise.
  */
 fun isValidUid(fsUid: fsUid): Boolean {
-  return fsUid.isNotBlank() && fsUid.matches(Regex("^[a-zA-Z0-9]{20}$"))
+  return fsUid.isNotBlank() && fsUid.matches(Regex("^(?=[a-zA-Z0-9]*\$)(?:.{20}|.{28})\$"))
 }
 
 /**

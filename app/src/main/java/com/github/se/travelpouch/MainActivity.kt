@@ -67,7 +67,6 @@ fun TravelPouchApp() {
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
-
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
         startDestination = Screen.AUTH,
@@ -101,15 +100,12 @@ fun TravelPouchApp() {
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
 
-
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
       composable(Screen.EDIT_PROFILE) {
         ModifyingProfileScreen(navigationActions, profileModelView)
       }
 
-
       composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
-
     }
   }
 }
