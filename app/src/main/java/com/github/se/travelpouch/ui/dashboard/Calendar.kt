@@ -9,9 +9,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -24,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
+import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -34,14 +40,18 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarScreen(
-    calendarViewModel: CalendarViewModel,
-) {
+fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: NavigationActions) {
   // Observe the state of activities from the ViewModel
   val calendarState by calendarViewModel.calendarState.collectAsState(initial = emptyList())
 
   // Initial Setup
   CalendarScreenLaunchedEffect(calendarViewModel = calendarViewModel)
+
+  // List of destinations for the bottom navigation bar
+  val listOfDestinations =
+      listOf(
+          BottomNavigationItem("Activities", Icons.Default.Home),
+          BottomNavigationItem("Map", Icons.Default.Place))
 
   // Application
   Scaffold(
@@ -52,7 +62,7 @@ fun CalendarScreen(
             navigationIcon = {
               IconButton(
                   modifier = Modifier.testTag("goBackIcon"),
-                  onClick = { /* TODO: Implement go back navigation logic */}) {
+                  onClick = { navigationActions.goBack() }) {
                     // Back icon for navigation
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
@@ -64,6 +74,26 @@ fun CalendarScreen(
                 TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF6200EE), titleContentColor = Color.White),
             modifier = Modifier.testTag("calendarTopAppBar"))
+      },
+      bottomBar = {
+        NavigationBar(modifier = Modifier.testTag("navigationBarCalendar")) {
+          listOfDestinations.forEach { destination ->
+            NavigationBarItem(
+                onClick = {
+                  when (destination.title) {
+                    "Activities" -> navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    "Map" -> navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                  }
+                },
+                icon = { Icon(destination.icon, contentDescription = null) },
+                selected = false,
+                label = { Text(destination.title) },
+                modifier =
+                    Modifier.testTag(
+                        if (destination.title == "Map") "navigationBarItemMap"
+                        else "navigationBarItem"))
+          }
+        }
       }) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("calendarScreenColumn"),
