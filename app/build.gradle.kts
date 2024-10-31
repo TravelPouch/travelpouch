@@ -167,6 +167,7 @@ dependencies {
     implementation(libs.play.services.mlkit.document.scanner)
     implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.navigation.testing)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
