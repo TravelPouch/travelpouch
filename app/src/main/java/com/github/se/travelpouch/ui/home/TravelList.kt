@@ -88,7 +88,11 @@ fun TravelListScreen(
                 icon = { Icon(destination.icon, contentDescription = null) },
                 selected = false,
                 label = { Text(destination.title) },
-                modifier = Modifier.testTag("navigationBarItem"))
+                modifier =
+                    Modifier.testTag(
+                        if (destination.title == "Activities") "navigationBarItemActivities"
+                        else "navigationBarItemCalendar"))
+            // modifier = Modifier.testTag("navigationBarItem"))
           }
         }
       },
