@@ -12,6 +12,12 @@ interface TravelRepository {
       onFailure: (Exception) -> Unit
   )
 
+  fun checkParticipantExists(
+      email: String,
+      onSuccess: (UserInfo?) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
+
   fun init(onSuccess: () -> Unit)
 
   fun getTravels(onSuccess: (List<TravelContainer>) -> Unit, onFailure: (Exception) -> Unit)

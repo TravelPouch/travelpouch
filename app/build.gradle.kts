@@ -163,6 +163,7 @@ dependencies {
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.navigation.testing)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
@@ -191,6 +192,7 @@ dependencies {
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
     testImplementation (libs.mockk.v1120)
+    testImplementation(libs.androidx.core.testing)
 
     // Test UI
     androidTestImplementation(libs.androidx.junit)

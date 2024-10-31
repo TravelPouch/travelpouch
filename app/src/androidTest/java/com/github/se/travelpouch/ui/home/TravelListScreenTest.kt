@@ -2,6 +2,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.Participant
@@ -12,6 +13,7 @@ import com.github.se.travelpouch.model.TravelRepository
 import com.github.se.travelpouch.ui.home.MapScreen
 import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,6 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.whenever
@@ -145,5 +148,63 @@ class TravelListScreenTest {
 
     // Assert
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun testNavigationBottomBar() {
+    // Act
+    composeTestRule.setContent {
+      TravelListScreen(
+          navigationActions = navigationActions, listTravelViewModel = listTravelViewModel)
+    }
+    composeTestRule.waitForIdle()
+
+    // Click on the "Activities" navigation item
+    composeTestRule.onNodeWithTag("navigationBarItemActivities").performClick()
+    composeTestRule.waitForIdle()
+
+    // Verify that the navigation action was called for "Activities"
+    verify(navigationActions).navigateTo(Screen.TRAVEL_ACTIVITIES)
+
+    // Click on the "Calendar" navigation item
+    composeTestRule.onNodeWithTag("navigationBarItemCalendar").performClick()
+    composeTestRule.waitForIdle()
+
+    // Verify that the navigation action was called for "Calendar"
+    verify(navigationActions).navigateTo(Screen.CALENDAR)
+  }
+
+  @Test
+  fun testTravelItemClickNavigatesToTravelActivities() {
+    // Act
+    composeTestRule.setContent {
+      TravelListScreen(
+          navigationActions = navigationActions, listTravelViewModel = listTravelViewModel)
+    }
+    composeTestRule.waitForIdle()
+
+    // Find and click on a travel list item
+    composeTestRule.onNodeWithTag("travelListItem").performClick()
+    composeTestRule.waitForIdle()
+
+    // Verify that the navigation action was called for TRAVEL_ACTIVITIES
+    verify(navigationActions).navigateTo(Screen.TRAVEL_ACTIVITIES)
+  }
+
+  @Test
+  fun testCreateTravelFabClickNavigatesToAddTravel() {
+    // Act
+    composeTestRule.setContent {
+      TravelListScreen(
+          navigationActions = navigationActions, listTravelViewModel = listTravelViewModel)
+    }
+    composeTestRule.waitForIdle()
+
+    // Find and click on the create travel FAB
+    composeTestRule.onNodeWithTag("createTravelFab").performClick()
+    composeTestRule.waitForIdle()
+
+    // Verify that the navigation action was called for ADD_TRAVEL
+    verify(navigationActions).navigateTo(Screen.ADD_TRAVEL)
   }
 }

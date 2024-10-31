@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.travel
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -31,11 +30,7 @@ fun ParticipantRow(
   val context = LocalContext.current
 
   Row(
-      modifier =
-          Modifier.fillMaxWidth().testTag("participantRow").clickable {
-            onClick()
-            Toast.makeText(context, "Participant clicked", Toast.LENGTH_SHORT).show()
-          },
+      modifier = Modifier.fillMaxWidth().testTag("participantRow").clickable { onClick() },
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
         Icon(
