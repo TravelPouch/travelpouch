@@ -33,3 +33,7 @@
 -keepattributes *Annotation*
 -dontwarn okhttp3.**
 -keep class okhttp3.** { *; }
+
+# JP2Decoder
+-keep class com.gemalto.jp2.** { *; }
+-dontwarn com.gemalto.jp2.JP2Decoder
