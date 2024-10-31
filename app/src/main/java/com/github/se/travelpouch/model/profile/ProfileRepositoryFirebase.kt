@@ -64,7 +64,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .document(documentPath)
         .get()
         .addOnSuccessListener { result ->
-          val profile = documentToProfile(result)
+          val profile = ProfileRepositoryConvert.documentToProfile(result)
           onSuccess(profile)
         }
         .addOnFailureListener { e ->
@@ -95,27 +95,31 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
           onFailure(e)
         }
   }
+}
 
-  private fun documentToProfile(document: DocumentSnapshot): Profile {
-    return try {
-      val uid = document.id
-      val username = document.getString("username")
-      val email = document.getString("email")
-      val friendsData = document["documentsNeeded"] as? Map<*, *>
-      val friends = friendsData?.map { (key, value) -> key as Int to value as String }?.toMap()
-      val userTravelList = document.get("listoftravellinked") as? List<String>
-      val name = document.getString("name")
+class ProfileRepositoryConvert {
+  companion object {
+    fun documentToProfile(document: DocumentSnapshot): Profile {
+      return try {
+        val uid = document.id
+        val username = document.getString("username")
+        val email = document.getString("email")
+        val friendsData = document["documentsNeeded"] as? Map<*, *>
+        val friends = friendsData?.map { (key, value) -> key as Int to value as String }?.toMap()
+        val userTravelList = document.get("listoftravellinked") as? List<String>
+        val name = document.getString("name")
 
-      Profile(
-          fsUid = uid,
-          username = username!!,
-          email = email!!,
-          friends = friends,
-          name!!,
-          userTravelList = userTravelList ?: emptyList())
-    } catch (e: Exception) {
-      Log.e("ProfileRepository", "Error converting document to Profile", e)
-      ErrorProfile.errorProfile
+        Profile(
+            fsUid = uid,
+            username = username!!,
+            email = email!!,
+            friends = friends,
+            name!!,
+            userTravelList = userTravelList ?: emptyList())
+      } catch (e: Exception) {
+        Log.e("ProfileRepository", "Error converting document to Profile", e)
+        ErrorProfile.errorProfile
+      }
     }
   }
 }

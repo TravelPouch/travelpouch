@@ -124,13 +124,7 @@ class ProfileRepositoryTest {
 
   @Test
   fun documentToProfileTest() {
-    val privateFunc =
-        profileRepositoryFirestore.javaClass.getDeclaredMethod(
-            "documentToProfile", DocumentSnapshot::class.java)
-    privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(1)
-    parameters[0] = mockDocumentSnapshot
-    val result = privateFunc.invoke(profileRepositoryFirestore, *parameters)
+    val result = ProfileRepositoryConvert.documentToProfile(mockDocumentSnapshot)
     assertThat(result, `is`(profile))
   }
 }
