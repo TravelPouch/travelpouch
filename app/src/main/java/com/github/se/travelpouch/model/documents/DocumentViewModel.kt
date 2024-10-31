@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.model.documents
 
 import android.content.ContentResolver
-import android.os.AsyncTask
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
@@ -9,15 +8,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StreamDownloadTask
-import com.google.firebase.storage.StreamDownloadTask.TaskSnapshot
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * ViewModel for managing documents and related operations.
@@ -65,29 +58,32 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
   }
 
   fun storeSelectedDocument(documentFile: DocumentFile, contentResolver: ContentResolver) {
-    val file = documentFile.createFile(
-      selectedDocument.value?.fileFormat?.mimeType!!,
-      selectedDocument.value?.title!!
-    )
+    val file =
+        documentFile.createFile(
+            selectedDocument.value?.fileFormat?.mimeType!!, selectedDocument.value?.title!!)
 
-    val storageRef = FirebaseStorage.getInstance("gs://travelpouch-7d692.appspot.com").reference;
+    val storageRef = FirebaseStorage.getInstance("gs://travelpouch-7d692.appspot.com").reference
     val documentRef = storageRef.child(selectedDocument.value?.ref?.id!!)
 
     if (file != null) {
       val downloadTask = documentRef.stream
-      downloadTask.addOnCompleteListener { taskSnapshot ->
-        Thread() {
-          contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-            taskSnapshot.result.stream.use {
-              it.copyTo(outputStream)
-            }
-          } ?: run {
-            Log.e("DocumentViewModel", "Failed to open output stream for URI: ${file.uri}")
+      downloadTask
+          .addOnCompleteListener { taskSnapshot ->
+            Thread() {
+                  contentResolver.openOutputStream(file.uri)?.use { outputStream ->
+                    taskSnapshot.result.stream.use { it.copyTo(outputStream) }
+                  }
+                      ?: run {
+                        Log.e(
+                            "DocumentViewModel",
+                            "Failed to open output stream for URI: ${file.uri}")
+                      }
+                }
+                .start()
           }
-        }.start()
-      }.addOnFailureListener { exception ->
-        Log.e("DocumentViewModel", "Failed to download document", exception)
-      }
+          .addOnFailureListener { exception ->
+            Log.e("DocumentViewModel", "Failed to download document", exception)
+          }
     } else {
       Log.e("DocumentViewModel", "Failed to create document file in specified directory")
     }

@@ -76,13 +76,15 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
             },
             actions = {
               StoreDocumentButton(Environment.DIRECTORY_DOCUMENTS) { uri ->
-//                uri?.let {
-//                  DocumentFile.fromTreeUri(context, it)?.let {
-//                    documentViewModel.storeSelectedDocument(it.uri, context.contentResolver)
-//                  }
-//                }
+                //                uri?.let {
+                //                  DocumentFile.fromTreeUri(context, it)?.let {
+                //                    documentViewModel.storeSelectedDocument(it.uri,
+                // context.contentResolver)
+                //                  }
+                //                }
                 uri?.let {
-                  documentViewModel.storeSelectedDocument(DocumentFile.fromTreeUri(context, it)!!, context.contentResolver)
+                  documentViewModel.storeSelectedDocument(
+                      DocumentFile.fromTreeUri(context, it)!!, context.contentResolver)
                 }
               }
               IconButton(
@@ -96,19 +98,13 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
             })
       },
   ) { paddingValue ->
-    Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(paddingValue)) {
-      Box(modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.inversePrimary)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
+      Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.inversePrimary)) {
         Column(modifier = Modifier.fillMaxWidth()) {
           Text(
               text = documentContainer.title,
               style = MaterialTheme.typography.bodyLarge,
-              modifier = Modifier
-                .padding(8.dp)
-                .testTag("documentTitle"))
+              modifier = Modifier.padding(8.dp).testTag("documentTitle"))
           Text(
               text = "Preview not yet implemented",
               style = MaterialTheme.typography.bodyLarge,
