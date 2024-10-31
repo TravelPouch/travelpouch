@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -75,8 +76,13 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
             },
             actions = {
               StoreDocumentButton(Environment.DIRECTORY_DOCUMENTS) { uri ->
+//                uri?.let {
+//                  DocumentFile.fromTreeUri(context, it)?.let {
+//                    documentViewModel.storeSelectedDocument(it.uri, context.contentResolver)
+//                  }
+//                }
                 uri?.let {
-                  documentViewModel.storeSelectedDocument(it, context.contentResolver)
+                  documentViewModel.storeSelectedDocument(DocumentFile.fromTreeUri(context, it)!!, context.contentResolver)
                 }
               }
               IconButton(
