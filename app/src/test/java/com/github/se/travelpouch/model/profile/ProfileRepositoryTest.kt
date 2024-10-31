@@ -72,6 +72,9 @@ class ProfileRepositoryTest {
     // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
     `when`(mockCollectionReference.document(anyOrNull())).thenReturn(mockDocumentReference)
 
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     // Call the method under test
@@ -90,6 +93,9 @@ class ProfileRepositoryTest {
   fun updateProfile_shouldCallFirestoreCollection() {
     `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
 
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     // This test verifies that when we add a new event, the Firestore `collection()` method is
     // called.
     profileRepositoryFirestore.updateProfile(profile, onSuccess = {}, onFailure = {})
@@ -111,6 +117,9 @@ class ProfileRepositoryTest {
     parameters[0] = "email"
     parameters[1] = "uid"
 
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
 
     // This test verifies that when we add a new event, the Firestore `collection()` method is
