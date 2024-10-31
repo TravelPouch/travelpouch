@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.2"
+coreTesting = "2.2.0"
 kotlin = "1.8.10"
 coreKtx = "1.13.1"
 ktfmt = "0.17.0"
@@ -58,6 +59,7 @@ navigationTesting = "2.8.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
