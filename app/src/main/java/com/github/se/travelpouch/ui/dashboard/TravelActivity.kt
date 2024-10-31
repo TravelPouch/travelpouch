@@ -78,7 +78,7 @@ fun TravelActivitiesScreen(
             title = { Text("Travel", Modifier.testTag("travelTitle")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.goBack() },
+                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,

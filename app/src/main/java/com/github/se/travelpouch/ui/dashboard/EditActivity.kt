@@ -74,7 +74,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
             title = { Text("Edit Activity", Modifier.testTag("travelTitle")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.goBack() },
+                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
