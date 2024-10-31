@@ -25,7 +25,7 @@ android {
     val keystorePassword = System.getenv("KEYSTORE_PASSWORD") ?: localProperties.getProperty("KEYSTORE_PASSWORD")
     val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS")
     val keyPassword = System.getenv("KEY_PASSWORD") ?: localProperties.getProperty("KEY_PASSWORD")
-    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+    val mapsApiKey: String = System.getenv("MAPS_API_KEY") ?: (localProperties.getProperty("MAPS_API_KEY") ?: "")
 
     defaultConfig {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
@@ -162,6 +162,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
