@@ -42,7 +42,7 @@ fun NextActivitiesBanner(
 ) {
   val showOutline = remember { mutableStateOf(false) }
   // Filter activities due within the next 24 hours
-  val reminderRange = 86400000L // 2400 hours in milliseconds
+  val reminderRange = 86400L // 2400 hours in milliseconds
   val nowTime = Timestamp.now().seconds
   val upcomingActivities =
       activities.filter { activity ->
