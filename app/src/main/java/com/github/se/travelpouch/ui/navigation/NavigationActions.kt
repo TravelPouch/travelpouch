@@ -18,6 +18,7 @@ object Screen {
   const val ADD_ACTIVITY = "AddActivity Screen"
   const val TIMELINE = "Timeline Screen"
   const val ACTIVITIES_MAP = "MapActivities Screen"
+  const val CALENDAR = "Calendar Screen"
 }
 
 open class NavigationActions(
