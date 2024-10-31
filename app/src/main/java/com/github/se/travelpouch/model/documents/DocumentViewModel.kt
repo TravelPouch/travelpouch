@@ -8,9 +8,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * ViewModel for managing documents and related operations.
@@ -57,6 +61,12 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
         onFailure = { Log.e("DocumentsViewModel", "Failed to create Document", it) })
   }
 
+  /**
+   * Downloads a Document from Firebase store adn store it in the folder pointed by documentFile
+   *
+   * @param documentFile The folder in which to create the file
+   * @param contentResolver A content resolver to
+   */
   fun storeSelectedDocument(documentFile: DocumentFile, contentResolver: ContentResolver) {
     val mimeType = selectedDocument.value?.fileFormat?.mimeType
     val title = selectedDocument.value?.title
@@ -80,16 +90,16 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
     val downloadTask = documentRef.stream
     downloadTask
         .addOnCompleteListener { taskSnapshot ->
-          Thread() {
-                contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-                  taskSnapshot.result.stream.use { it.copyTo(outputStream) }
-                }
-                    ?: run {
-                      Log.e(
-                          "DocumentViewModel", "Failed to open output stream for URI: ${file.uri}")
-                    }
+          CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+              contentResolver.openOutputStream(file.uri)?.use { outputStream ->
+                taskSnapshot.result.stream.use { it.copyTo(outputStream) }
               }
-              .start()
+                  ?: run {
+                    Log.e("DocumentViewModel", "Failed to open output stream for URI: ${file.uri}")
+                  }
+            }
+          }
         }
         .addOnFailureListener { exception ->
           Log.e("DocumentViewModel", "Failed to download document", exception)
