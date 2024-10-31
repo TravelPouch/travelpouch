@@ -16,7 +16,7 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
     ViewModel() {
 
   // LiveData holding the list of notifications
-  private val _notifications = MutableLiveData<List<Notification>>()
+  private val _notifications = MutableLiveData<List<Notification>>(emptyList())
   val notifications: LiveData<List<Notification>> = _notifications
 
   /**

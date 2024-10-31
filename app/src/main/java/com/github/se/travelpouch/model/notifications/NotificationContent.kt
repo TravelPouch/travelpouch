@@ -4,6 +4,7 @@ import com.github.se.travelpouch.model.Role
 
 private const val INVITER_NAME_NOT_BLANK = "Inviter name cannot be blank"
 private const val TRAVEL_TITLE_NOT_BLANK = "Travel title cannot be blank"
+private const val USER_NAME_NOT_BLANK = "User name cannot be blank"
 
 /** Sealed class representing different types of notification content. */
 sealed class NotificationContent {
@@ -97,7 +98,7 @@ sealed class NotificationContent {
   ) : NotificationContent() {
 
     init {
-      require(userName.isNotBlank()) { "User name cannot be blank" }
+      require(userName.isNotBlank()) { USER_NAME_NOT_BLANK }
       require(travelTitle.isNotBlank()) { TRAVEL_TITLE_NOT_BLANK }
     }
 

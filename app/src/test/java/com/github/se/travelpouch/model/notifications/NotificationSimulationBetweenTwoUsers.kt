@@ -75,12 +75,13 @@ class NotificationSimulationBetweenTwoUsers {
     Thread.sleep(1000) // Wait for the notification to be loaded
     notificationViewModel.markNotificationAsRead(invitationNotification.notificationUid)
     notificationViewModel.notifications.observeForever { notifications ->
-      val receivedNotification = notifications.first()
-      assert(receivedNotification.status == NotificationStatus.READ)
-      assert(receivedNotification.content is NotificationContent.InvitationNotification)
-      assert(
-          receivedNotification.content.toDisplayString() ==
-              "Donkey Kong invited you to join the travel Travel to the Moon as a PARTICIPANT.")
+      if(notifications.isEmpty()) return@observeForever
+        val receivedNotification = notifications.first()
+        assert(receivedNotification.status == NotificationStatus.READ)
+        assert(receivedNotification.content is NotificationContent.InvitationNotification)
+        assert(
+            receivedNotification.content.toDisplayString() ==
+                    "Donkey Kong invited you to join the travel Travel to the Moon as a PARTICIPANT.")
     }
 
     // User 2 accepts the invitation
@@ -106,12 +107,14 @@ class NotificationSimulationBetweenTwoUsers {
     Thread.sleep(1000) // Wait for the notification to be loaded
     // Verfiy that the notification is unread
     notificationViewModel.notifications.observeForever { notifications ->
+        if(notifications.isEmpty()) return@observeForever
       val receivedNotification = notifications.first()
       assert(receivedNotification.status == NotificationStatus.UNREAD)
     }
     Thread.sleep(1000) // Wait for the notification to be loaded
     notificationViewModel.markNotificationAsRead(invitationNotification.notificationUid)
     notificationViewModel.notifications.observeForever { notifications ->
+        if(notifications.isEmpty()) return@observeForever
       val receivedNotification = notifications.first()
       assert(receivedNotification.status == NotificationStatus.READ)
       assert(
