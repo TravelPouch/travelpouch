@@ -1,10 +1,14 @@
 package com.github.se.travelpouch.model.documents
 
+import android.content.ContentResolver
+import android.net.Uri
+import android.provider.DocumentsContract
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,6 +56,28 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
         document,
         onSuccess = { getDocuments() },
         onFailure = { Log.e("DocumentsViewModel", "Failed to create Document", it) })
+  }
+
+  fun storeSelectedDocument(uri: Uri, contentResolver: ContentResolver) {
+    DocumentsContract.createDocument(
+      contentResolver,
+      uri,
+      selectedDocument.value?.fileFormat?.mimeType!!,
+      selectedDocument.value?.title!!
+    )
+
+    val storageRef = FirebaseStorage.getInstance("gs://travelpouch-7d692.appspot.com").reference;
+    val documentRef = storageRef.child(selectedDocument.value?.ref.toString())
+
+    contentResolver.openOutputStream(uri)?.use { outputStream ->
+      documentRef.stream.addOnCompleteListener { taskSnapshot ->
+        taskSnapshot.result.stream.copyTo(outputStream)
+      }.addOnFailureListener { exception ->
+        Log.e("DocumentViewModel", "Failed to download document", exception)
+      }
+    } ?: run {
+      Log.e("DocumentViewModel", "Failed to open file with uri $documentRef")
+    }
   }
 
   //    /**
