@@ -3,6 +3,7 @@ package com.github.se.travelpouch.model.profile
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,28 +17,36 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     Firebase.auth.addAuthStateListener {
       val user = it.currentUser
       if (user != null) {
-        documentPath = user.uid
-        db.collection(collectionPath)
-            .document(documentPath)
-            .get()
-            .addOnSuccessListener { result ->
-              if (!result.exists()) {
-                try {
-                  addProfile(user.email!!, user.uid)
-                } catch (e: Exception) {
-                  Log.e("nullEmail", "Email of user was null")
-                  user.delete()
-                  Firebase.auth.signOut()
-                }
-              }
-
-              onSuccess()
-            }
-            .addOnFailureListener {
-              Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
-            }
+        gettingUserProfile(user, onSuccess)
       }
     }
+  }
+
+  private fun addingUserIfNotRegistered(user: FirebaseUser, document: DocumentSnapshot) {
+    if (!document.exists()) {
+      try {
+        addProfile(user.email!!, user.uid)
+      } catch (e: Exception) {
+        Log.e("nullEmail", "Email of user was null")
+        user.delete()
+        Firebase.auth.signOut()
+      }
+    }
+  }
+
+  private fun gettingUserProfile(user: FirebaseUser, onSuccess: () -> Unit) {
+
+    documentPath = user.uid
+    db.collection(collectionPath)
+        .document(documentPath)
+        .get()
+        .addOnSuccessListener { result ->
+          addingUserIfNotRegistered(user, result)
+          onSuccess()
+        }
+        .addOnFailureListener {
+          Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
+        }
   }
 
   private fun addProfile(email: String, uid: String) {

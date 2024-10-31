@@ -5,11 +5,12 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -22,6 +23,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.never
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
@@ -29,11 +31,12 @@ import org.robolectric.Shadows.shadowOf
 
 @RunWith(RobolectricTestRunner::class)
 class ProfileRepositoryTest {
+  private lateinit var mockFirebaseUser: FirebaseUser
+  private lateinit var mockFirebaseAuth: FirebaseAuth
   @Mock private lateinit var mockFirestore: FirebaseFirestore
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
-  @Mock private lateinit var mockToDoQuerySnapshot: QuerySnapshot
 
   private lateinit var profileRepositoryFirestore: ProfileRepositoryFirebase
 
@@ -53,6 +56,8 @@ class ProfileRepositoryTest {
     profileRepositoryFirestore = ProfileRepositoryFirebase(mockFirestore)
     mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
     mockTaskDocumentSnapshot = mock()
+    mockFirebaseAuth = mock(FirebaseAuth::class.java)
+    mockFirebaseUser = mock(FirebaseUser::class.java)
 
     `when`(mockDocumentSnapshot.id).thenReturn("1")
     `when`(mockDocumentSnapshot.getString("email")).thenReturn("emailTest")
@@ -60,10 +65,6 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshot.getString("username")).thenReturn("usernameTest")
     `when`(mockDocumentSnapshot.get("userTravelList")).thenReturn(emptyList<String>())
     `when`(mockDocumentSnapshot.get("friends")).thenReturn(null)
-
-    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
-    `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
   }
 
   @Test
@@ -127,4 +128,75 @@ class ProfileRepositoryTest {
     val result = ProfileRepositoryConvert.documentToProfile(mockDocumentSnapshot)
     assertThat(result, `is`(profile))
   }
+
+  @Test
+  fun addingUserWhenDoesNotExistTest() {
+    val privateFunc =
+        profileRepositoryFirestore.javaClass.getDeclaredMethod(
+            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java)
+    privateFunc.isAccessible = true
+    val parameters = arrayOfNulls<Any>(2)
+    parameters[0] = mockFirebaseUser
+    parameters[1] = mockDocumentSnapshot
+
+    `when`(mockFirebaseUser.uid).thenReturn("uid")
+    `when`(mockFirebaseUser.email).thenReturn("email")
+
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
+    `when`(mockDocumentReference.set(anyOrNull())).thenReturn(Tasks.forResult(null))
+
+    `when`(mockDocumentSnapshot.exists()).thenReturn(false)
+    privateFunc.invoke(profileRepositoryFirestore, *parameters)
+
+    verify(mockDocumentReference).set(anyOrNull())
+  }
+
+  @Test
+  fun addingUserTest() {
+    val privateFunc =
+        profileRepositoryFirestore.javaClass.getDeclaredMethod(
+            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java)
+    privateFunc.isAccessible = true
+    val parameters = arrayOfNulls<Any>(2)
+    parameters[0] = mockFirebaseUser
+    parameters[1] = mockDocumentSnapshot
+
+    `when`(mockFirebaseUser.uid).thenReturn("uid")
+    `when`(mockFirebaseUser.email).thenReturn("email")
+
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
+    `when`(mockDocumentReference.set(anyOrNull())).thenReturn(Tasks.forResult(null))
+
+    `when`(mockDocumentSnapshot.exists()).thenReturn(true)
+    privateFunc.invoke(profileRepositoryFirestore, *parameters)
+
+    verify(mockDocumentReference, never()).set(anyOrNull())
+  }
+
+  //  @Test
+  //  fun gettingProfileUserCallsTheDocumentReference(){
+  //
+  //    val privateFunc =
+  //      profileRepositoryFirestore.javaClass.getDeclaredMethod(
+  //        "gettingUserProfile", FirebaseUser::class.java, {}.javaClass)
+  //    privateFunc.isAccessible = true
+  //    val parameters = arrayOfNulls<Any>(2)
+  //    parameters[0] = mockFirebaseUser
+  //    parameters[1] = {}
+  //
+  //    `when`(mockFirebaseUser.uid).thenReturn("uid")
+  //    `when`(mockFirebaseUser.email).thenReturn("email")
+  //
+  //    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+  //    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+  //    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(null))
+  //
+  //
+  //    privateFunc.invoke(profileRepositoryFirestore, *parameters)
+  //    verify(){(mockDocumentReference)}
+  //  }
 }
