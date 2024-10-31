@@ -9,22 +9,19 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepository {
 
-  private var collectionPath = ""
-
-  override fun getNewUid(): String {
-    return db.collection(collectionPath).document().id
-  }
+  private var collectionPath = "userslist"
+  private var documentPath = ""
 
   override fun init(onSuccess: () -> Unit) {
     Firebase.auth.addAuthStateListener {
       val user = it.currentUser
-      var flag = false
       if (user != null) {
-        db.collection(user.uid)
+        documentPath = user.uid
+        db.collection(collectionPath)
+            .document(documentPath)
             .get()
             .addOnSuccessListener { result ->
-              if (result.isEmpty) {
-                flag = true
+              if (!result.exists()) {
                 try {
                   addProfile(user.email!!, user.uid)
                 } catch (e: Exception) {
@@ -33,16 +30,12 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
                   Firebase.auth.signOut()
                 }
               }
-              collectionPath = user.uid
+
               onSuccess()
             }
             .addOnFailureListener {
               Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
             }
-      }
-
-      if (!flag) {
-        Log.d("problem", "wtf, listener useless")
       }
     }
   }
@@ -50,9 +43,14 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   private fun addProfile(email: String, uid: String) {
     val profile =
         Profile(
-            uid = uid, username = email.substringBefore("@") + uid, email = email, friends = null)
+            fsUid = uid,
+            username = email.substringBefore("@") + uid,
+            email = email,
+            friends = null,
+            name = "",
+            emptyList())
     performFirestoreOperation(
-        db.collection(uid).document("profile").set(profile),
+        db.collection(collectionPath).document(uid).set(profile),
         onSuccess = { Log.d("ProfileCreated", "profile created") },
         onFailure = {
           Log.e("ErrorProfile", "Error while creating profile")
@@ -63,10 +61,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   override fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit) {
     Log.d("ProfileRepository", "getProfile")
     db.collection(collectionPath)
+        .document(documentPath)
         .get()
         .addOnSuccessListener { result ->
-          val profile =
-              result?.mapNotNull { documentToProfile(it) }?.get(0) ?: ErrorProfile.errorProfile
+          val profile = documentToProfile(result)
           onSuccess(profile)
         }
         .addOnFailureListener { e ->
@@ -82,9 +80,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   ) {
     Log.d("ProfileRepositoryFirestore", "updateProfile")
     performFirestoreOperation(
-        db.collection(collectionPath).document(newProfile.uid).set(newProfile),
-        onSuccess,
-        onFailure)
+        db.collection(collectionPath).document(documentPath).set(newProfile), onSuccess, onFailure)
   }
 
   private fun performFirestoreOperation(
@@ -107,8 +103,16 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
       val email = document.getString("email")
       val friendsData = document["documentsNeeded"] as? Map<*, *>
       val friends = friendsData?.map { (key, value) -> key as Int to value as String }?.toMap()
+      val userTravelList = document.get("listoftravellinked") as? List<String>
+      val name = document.getString("name")
 
-      Profile(uid = uid, username = username!!, email = email!!, friends)
+      Profile(
+          fsUid = uid,
+          username = username!!,
+          email = email!!,
+          friends = friends,
+          name!!,
+          userTravelList = userTravelList ?: emptyList())
     } catch (e: Exception) {
       Log.e("ProfileRepository", "Error converting document to Profile", e)
       ErrorProfile.errorProfile

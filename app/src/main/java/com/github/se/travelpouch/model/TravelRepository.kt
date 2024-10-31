@@ -1,12 +1,14 @@
 package com.github.se.travelpouch.model
 
+import com.github.se.travelpouch.model.profile.Profile
+
 interface TravelRepository {
 
   fun getNewUid(): String
 
   fun getParticipantFromfsUid(
       fsUid: fsUid,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   )
 

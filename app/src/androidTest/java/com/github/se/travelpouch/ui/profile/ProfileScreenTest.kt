@@ -21,7 +21,14 @@ class ProfileScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var profileRepository: ProfileRepository
 
-  val profile = Profile(uid = "1", email = "test@swent.ch", username = "test", friends = null)
+  val profile =
+      Profile(
+          fsUid = "1",
+          email = "test@swent.ch",
+          username = "test",
+          friends = null,
+          name = "name",
+          userTravelList = emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
 

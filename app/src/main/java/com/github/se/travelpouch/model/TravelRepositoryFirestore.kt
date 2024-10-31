@@ -1,6 +1,8 @@
 package com.github.se.travelpouch.model
 
 import android.util.Log
+import com.github.se.travelpouch.model.profile.ErrorProfile
+import com.github.se.travelpouch.model.profile.Profile
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
@@ -48,14 +50,14 @@ class TravelRepositoryFirestore(
    */
   override fun getParticipantFromfsUid(
       fsUid: fsUid,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid")
     db.collection(userCollectionPath).document(fsUid).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid success")
-        val user = task.result?.let { userEntry -> documentToUserInfo(userEntry) }
+        val user = task.result?.let { userEntry -> documentToProfile(userEntry) }
         onSuccess(user)
       } else {
         task.exception?.let { e ->
@@ -220,20 +222,43 @@ class TravelRepositoryFirestore(
    * @return A UserInfo object if the conversion is successful, or null if any required field is
    *   missing or an error occurs.
    */
-  private fun documentToUserInfo(document: DocumentSnapshot): UserInfo? {
+  //  private fun documentToUserInfo(document: DocumentSnapshot): UserInfo? {
+  //    return try {
+  //      val fsUid = document.id
+  //      val name = document.getString("name")
+  //      val email = document.getString("email")
+  //      val userTravelList = document.get("listoftravellinked") as? List<String>
+  //      UserInfo(
+  //          fsUid = fsUid,
+  //          name = name!!,
+  //          userTravelList = userTravelList ?: emptyList(),
+  //          email = email!!)
+  //    } catch (e: Exception) {
+  //      Log.e("TravelRepositoryFirestore", "Error converting document to UserInfo", e)
+  //      null
+  //    }
+  //  }
+
+  private fun documentToProfile(document: DocumentSnapshot): Profile {
     return try {
-      val fsUid = document.id
-      val name = document.getString("name")
+      val uid = document.id
+      val username = document.getString("username")
       val email = document.getString("email")
+      val friendsData = document["documentsNeeded"] as? Map<*, *>
+      val friends = friendsData?.map { (key, value) -> key as Int to value as String }?.toMap()
       val userTravelList = document.get("listoftravellinked") as? List<String>
-      UserInfo(
-          fsUid = fsUid,
-          name = name!!,
-          userTravelList = userTravelList ?: emptyList(),
-          email = email!!)
+      val name = document.getString("name")
+
+      Profile(
+          fsUid = uid,
+          username = username!!,
+          email = email!!,
+          friends = friends,
+          name!!,
+          userTravelList = userTravelList ?: emptyList())
     } catch (e: Exception) {
-      Log.e("TravelRepositoryFirestore", "Error converting document to UserInfo", e)
-      null
+      Log.e("ProfileRepository", "Error converting document to Profile", e)
+      ErrorProfile.errorProfile
     }
   }
 }

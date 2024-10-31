@@ -28,10 +28,6 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
   private val profile_ = MutableStateFlow<Profile>(ErrorProfile.errorProfile)
   val profile: StateFlow<Profile> = profile_.asStateFlow()
 
-  fun getNewUid(): String {
-    return repository.getNewUid()
-  }
-
   init {
     repository.init { getProfile() }
   }

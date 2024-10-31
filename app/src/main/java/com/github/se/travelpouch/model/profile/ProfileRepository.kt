@@ -7,6 +7,4 @@ interface ProfileRepository {
   fun updateProfile(newProfile: Profile, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   fun init(onSuccess: () -> Unit)
-
-  fun getNewUid(): String
 }
