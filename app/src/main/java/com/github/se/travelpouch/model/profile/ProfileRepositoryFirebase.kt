@@ -8,6 +8,12 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * The class representing the communication scheme between our project and the database that will
+ * allow us to store and retrieve profiles.
+ *
+ * @param db (FirebaseFirestore) : the database used to store our profiles
+ */
 class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepository {
 
   private var collectionPath = "userslist"
@@ -22,6 +28,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     }
   }
 
+  /**
+   * This function adds a user if its profile does not exist. If an error occurs, we delete the user
+   * from the database.
+   *
+   * @param user (FirebaseUser) : the FirebaseUser that is connected on the application
+   * @param document (DocumentSnapshot) : the document containing the profile of the connected user.
+   */
   private fun addingUserIfNotRegistered(user: FirebaseUser, document: DocumentSnapshot) {
     if (!document.exists()) {
       try {
@@ -34,6 +47,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     }
   }
 
+  /**
+   * This function gets a user profile. If the profile does not exist we create a profile for the
+   * user.
+   *
+   * @param user (FirebaseUser) : the currently connected user on the application
+   * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
+   */
   fun gettingUserProfile(user: FirebaseUser, onSuccess: () -> Unit) {
 
     documentPath = user.uid
@@ -49,6 +69,12 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         }
   }
 
+  /**
+   * This function adds a profile to Firebase
+   *
+   * @param email (String) : the email of the user
+   * @param uid (String) : the unique identifier of the user
+   */
   private fun addProfile(email: String, uid: String) {
     val profile =
         Profile(
@@ -92,6 +118,17 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         db.collection(collectionPath).document(documentPath).set(newProfile), onSuccess, onFailure)
   }
 
+  /**
+   * This function is a helper function that safely performs a Firebase operation. A task has
+   * listeners added to it. If the task is successful, we apply onSuccess. Otherwise we perform
+   * onFailure.
+   *
+   * @param task (Task<Void>) : a task to perform
+   * @param onSuccess (() -> Unit) : the function called when the profile is correctly added/updated
+   *   to the database
+   * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during the
+   *   adding/updating a profile to the database
+   */
   private fun performFirestoreOperation(
       task: Task<Void>,
       onSuccess: () -> Unit,
@@ -106,8 +143,17 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   }
 }
 
+/** This class is used to convert a document to a profile, across the project */
 class ProfileRepositoryConvert {
   companion object {
+    /**
+     * This function converts a document got from Firebase to a profile. It returns an error profile
+     * if an error occurs
+     *
+     * @param document (DocumentSnapshot) : The document from Firebase
+     * @return (Profile) : If the conversion goes without a problem a profile is return. Otherwise,
+     *   the error profile is returned.
+     */
     fun documentToProfile(document: DocumentSnapshot): Profile {
       return try {
         val uid = document.id

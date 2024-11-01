@@ -29,6 +29,14 @@ import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 
+/**
+ * This screen allows us to edit out profile information.
+ *
+ * @param navigationActions (NavigationActions) : the navigation actions used to navigate between
+ *   screens
+ * @param profileModelView (ProfileModelView) : the model view used to interact between profile
+ *   information and the screen
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModifyingProfileScreen(
