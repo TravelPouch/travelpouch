@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -25,6 +26,7 @@ class DocumentListItemTest {
   private lateinit var mockDocumentRepository: DocumentRepository
   private lateinit var mockDocumentViewModel: DocumentViewModel
   private lateinit var mockDocumentReference: DocumentReference
+  private lateinit var mockFileDownloader: FileDownloader
   private lateinit var document: DocumentContainer
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -44,9 +46,10 @@ class DocumentListItemTest {
             mockDocumentReference,
             Timestamp(LocalDate.EPOCH.atStartOfDay(ZoneId.systemDefault()).toInstant()),
             DocumentVisibility.ME)
+    mockFileDownloader = mock(FileDownloader::class.java)
     navigationActions = mock(NavigationActions::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
-    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository)
+    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
 
     mockDocumentViewModel.selectDocument(document)
   }

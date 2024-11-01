@@ -26,10 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
 import coil.compose.AsyncImage
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
@@ -50,6 +52,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
   val documentContainer: DocumentContainer =
       documentViewModel.selectedDocument.collectAsState().value!!
   var documentUri by remember { mutableStateOf("") }
+  val context = LocalContext.current
   LaunchedEffect(documentContainer) { documentViewModel.getDownloadUrl(documentContainer) }
   documentUri = documentViewModel.downloadUrls[documentContainer.ref.id] ?: ""
 
@@ -73,6 +76,11 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   }
             },
             actions = {
+              StoreDocumentButton(modifier = Modifier.testTag("downloadButton")) {
+                DocumentFile.fromTreeUri(context, it)?.let {
+                  documentViewModel.storeSelectedDocument(it)
+                }
+              }
               IconButton(
                   onClick = {
                     documentViewModel.deleteDocumentById(documentContainer.ref.id)

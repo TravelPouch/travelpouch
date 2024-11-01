@@ -168,7 +168,7 @@ class DocumentRepositoryFirestore(
         .call(
             mapOf(
                 "content" to bytes64,
-                "fileFormat" to fileFormatToString(format),
+                "fileFormat" to format.mimeType,
                 "title" to "Scan $scanTimestamp",
                 "travelId" to travelId,
                 "fileSize" to bytes.size,
@@ -181,35 +181,6 @@ class DocumentRepositoryFirestore(
             onFailure()
           }
         }
-  }
-
-  /**
-   * Extracts the DocumentFileFormat from a DocumentSnapshot representing a TravelPouch Document.
-   *
-   * @param snapshot The firebase DocumentSnapshot to be added.
-   * @throws IllegalArgumentException if the document is not formatted properly.
-   */
-  private fun fileFormatFromSnapshot(snapshot: DocumentSnapshot): DocumentFileFormat? {
-    return when (snapshot.getString("fileFormat")) {
-      "image/jpeg" -> DocumentFileFormat.JPEG
-      "image/png" -> DocumentFileFormat.PNG
-      "application/pdf" -> DocumentFileFormat.PDF
-      else -> null
-    }
-  }
-
-  /**
-   * Converts a DocumentFileFormat to a String for database storage.
-   *
-   * @param document The firebase document to be added.
-   * @throws IllegalArgumentException if the document is not formatted properly.
-   */
-  private fun fileFormatToString(fileFormat: DocumentFileFormat): String {
-    return when (fileFormat) {
-      DocumentFileFormat.JPEG -> "image/jpeg"
-      DocumentFileFormat.PNG -> "image/png"
-      DocumentFileFormat.PDF -> "application/pdf"
-    }
   }
 
   /**
@@ -254,7 +225,7 @@ class DocumentRepositoryFirestore(
           travelRef = requireNotNull(document.getDocumentReference("travelRef")),
           activityRef = document.getDocumentReference("activityRef"),
           title = requireNotNull(document.getString("title")),
-          fileFormat = requireNotNull(fileFormatFromSnapshot(document)),
+          fileFormat = requireNotNull(DocumentFileFormat.fromMimeType(requireNotNull( document.getString("fileFormat")))),
           fileSize = requireNotNull(document.getLong("fileSize")),
           addedByEmail = document.getString("addedByEmail"),
           addedByUser = document.getDocumentReference("addedByUser"),
@@ -274,7 +245,7 @@ class DocumentRepositoryFirestore(
     return mapOf(
         "title" to document.title,
         "travelRef" to document.travelRef,
-        "fileFormat" to fileFormatToString(document.fileFormat),
+        "fileFormat" to document.fileFormat.mimeType,
         "fileSize" to document.fileSize,
         "addedAt" to document.addedAt,
         "visibility" to visibilityToString(document.visibility))

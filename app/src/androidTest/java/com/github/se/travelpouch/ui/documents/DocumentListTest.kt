@@ -10,6 +10,7 @@ import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -33,6 +34,7 @@ class DocumentListTest {
   private lateinit var mockDocumentViewModel: DocumentViewModel
   private lateinit var mockDocumentReference: DocumentReference
   private lateinit var mockListTravelViewModel: ListTravelViewModel
+  private lateinit var mockFileDownloader: FileDownloader
   private lateinit var list_documents: List<DocumentContainer>
   private lateinit var travelContainer: TravelContainer
 
@@ -79,9 +81,10 @@ class DocumentListTest {
             HashMap(),
             participants)
     navigationActions = mock(NavigationActions::class.java)
+    mockFileDownloader = mock(FileDownloader::class.java)
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
-    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository)
+    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
   }
 
   @Test
