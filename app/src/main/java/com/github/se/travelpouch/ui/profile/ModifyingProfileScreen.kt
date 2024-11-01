@@ -56,7 +56,7 @@ fun ModifyingProfileScreen(
             title = { Text("Profile", Modifier.testTag("ProfileBar")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.goBack() },
+                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
