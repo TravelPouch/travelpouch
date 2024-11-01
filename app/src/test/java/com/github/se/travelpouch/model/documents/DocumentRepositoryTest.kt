@@ -12,6 +12,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.storage.FirebaseStorage
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
@@ -34,6 +35,7 @@ import org.robolectric.RobolectricTestRunner
 class DocumentRepositoryTest {
 
   @Mock private lateinit var mockFirestore: FirebaseFirestore
+  @Mock private lateinit var mockStorage: FirebaseStorage
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockAuth: FirebaseAuth
@@ -69,7 +71,7 @@ class DocumentRepositoryTest {
             DocumentVisibility.ME // visibility
             )
 
-    documentRepository = DocumentRepositoryFirestore(mockFirestore, mockAuth)
+    documentRepository = DocumentRepositoryFirestore(mockFirestore, mockStorage, mockAuth)
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
