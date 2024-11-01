@@ -71,7 +71,7 @@ fun DocumentListScreen(
 ) {
   val documents = documentViewModel.documents.collectAsState()
   documentViewModel.getDocuments()
-  val selectedTravel = remember { listTravelViewModel.selectedTravel.value }
+  val selectedTravel = listTravelViewModel.selectedTravel.collectAsState()
 
   val context = LocalContext.current
   val scannerOptions =
@@ -92,15 +92,15 @@ fun DocumentListScreen(
               scanningResult?.pages?.size?.let { size ->
                 if (size == 1) {
                   val bytes = scanningResult.pages?.firstOrNull()?.imageUri?.toFile()?.readBytes()
-                  if (bytes != null && selectedTravel != null) {
+                  if (bytes != null && selectedTravel.value != null) {
                     documentViewModel.uploadDocument(
-                        selectedTravel.fsUid, bytes, DocumentFileFormat.JPEG)
+                        selectedTravel.value!!.fsUid, bytes, DocumentFileFormat.JPEG)
                   }
-                } else if (size > 1 && selectedTravel != null) {
+                } else if (size > 1 && selectedTravel.value != null) {
                   scanningResult.pdf?.let { pdf ->
                     val bytes = pdf.uri.toFile().readBytes()
                     documentViewModel.uploadDocument(
-                        selectedTravel.fsUid, bytes, DocumentFileFormat.PDF)
+                      selectedTravel.value!!.fsUid, bytes, DocumentFileFormat.PDF)
                   }
                 }
               }

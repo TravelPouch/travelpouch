@@ -168,7 +168,7 @@ class DocumentRepositoryFirestore(
         .call(
             mapOf(
                 "content" to bytes64,
-                "fileFormat" to format.mimeType,
+                "fileFormat" to fileFormatToString(format),
                 "title" to "Scan $scanTimestamp",
                 "travelId" to travelId,
                 "fileSize" to bytes.size,
