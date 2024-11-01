@@ -67,7 +67,7 @@ class TimelineScreenTest {
     }
 
     composeTestRule.onAllNodes(hasTestTag("eventCard")).apply {
-      fetchSemanticsNodes().forEachIndexed() { i, _ -> get(i).assertIsDisplayed() }
+      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
     }
   }
 
