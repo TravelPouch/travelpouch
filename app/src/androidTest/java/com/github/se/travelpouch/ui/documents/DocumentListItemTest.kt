@@ -12,14 +12,12 @@ import com.github.se.travelpouch.model.documents.DocumentVisibility
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import java.time.LocalDate
+import java.time.ZoneId
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.util.Date
 
 class DocumentListItemTest {
 
@@ -44,7 +42,7 @@ class DocumentListItemTest {
             0,
             "email",
             mockDocumentReference,
-          Timestamp(LocalDate.EPOCH.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+            Timestamp(LocalDate.EPOCH.atStartOfDay(ZoneId.systemDefault()).toInstant()),
             DocumentVisibility.ME)
     navigationActions = mock(NavigationActions::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
