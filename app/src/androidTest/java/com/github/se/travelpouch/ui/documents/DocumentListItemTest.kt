@@ -46,6 +46,7 @@ class DocumentListItemTest {
             mockDocumentReference,
             Timestamp(LocalDate.EPOCH.atStartOfDay(ZoneId.systemDefault()).toInstant()),
             DocumentVisibility.ME)
+    mockFileDownloader = mock(FileDownloader::class.java)
     navigationActions = mock(NavigationActions::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
     mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)

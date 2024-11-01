@@ -81,6 +81,7 @@ class DocumentListTest {
             HashMap(),
             participants)
     navigationActions = mock(NavigationActions::class.java)
+    mockFileDownloader = mock(FileDownloader::class.java)
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
     mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)

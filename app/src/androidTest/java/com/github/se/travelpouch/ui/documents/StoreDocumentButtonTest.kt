@@ -14,6 +14,7 @@ import androidx.core.app.ActivityOptionsCompat
 import com.github.se.travelpouch.ui.documents.StoreDocumentButton
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -106,6 +107,6 @@ class StoreDocumentButtonTest {
     composeTestRule.onNodeWithTag("clickMe").performClick()
 
     // Verify that the mock callback was called once with null
-    verify(mockOnDirectoryPicked, never())
+    verify(mockOnDirectoryPicked, never()).invoke(any())
   }
 }
