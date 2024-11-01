@@ -112,7 +112,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
               AsyncImage(
                   model = documentUri,
                   contentDescription = null,
-                  contentScale = ContentScale.FillBounds,
+                  contentScale = ContentScale.Fit,
                   modifier = Modifier.fillMaxSize())
             }
           }
