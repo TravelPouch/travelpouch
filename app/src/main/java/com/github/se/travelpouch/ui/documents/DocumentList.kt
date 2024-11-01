@@ -47,6 +47,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -63,12 +64,14 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentListScreen(
-    documentViewModel: DocumentViewModel = viewModel(),
+    documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory),
+    listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
     navigationActions: NavigationActions,
     onNavigateToDocumentPreview: () -> Unit
 ) {
   val documents = documentViewModel.documents.collectAsState()
   documentViewModel.getDocuments()
+  val selectedTravel = remember { listTravelViewModel.selectedTravel.value }
 
   val context = LocalContext.current
   val scannerOptions =
@@ -89,13 +92,15 @@ fun DocumentListScreen(
               scanningResult?.pages?.size?.let { size ->
                 if (size == 1) {
                   val bytes = scanningResult.pages?.firstOrNull()?.imageUri?.toFile()?.readBytes()
-                  if (bytes != null) {
-                    documentViewModel.uploadDocument(bytes, DocumentFileFormat.JPEG)
+                  if (bytes != null && selectedTravel != null) {
+                    documentViewModel.uploadDocument(
+                        selectedTravel.fsUid, bytes, DocumentFileFormat.JPEG)
                   }
-                } else if (size > 1) {
+                } else if (size > 1 && selectedTravel != null) {
                   scanningResult.pdf?.let { pdf ->
                     val bytes = pdf.uri.toFile().readBytes()
-                    documentViewModel.uploadDocument(bytes, DocumentFileFormat.PDF)
+                    documentViewModel.uploadDocument(
+                        selectedTravel.fsUid, bytes, DocumentFileFormat.PDF)
                   }
                 }
               }

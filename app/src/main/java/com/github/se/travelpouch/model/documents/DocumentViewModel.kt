@@ -124,8 +124,9 @@ open class DocumentViewModel(
         onFailure = { Log.e("DocumentPreview", "Failed to get image uri", it) })
   }
 
-  fun uploadDocument(bytes: ByteArray, format: DocumentFileFormat) {
+  fun uploadDocument(travelId: String, bytes: ByteArray, format: DocumentFileFormat) {
     repository.uploadDocument(
+        travelId,
         bytes,
         format,
         onSuccess = { getDocuments() },
