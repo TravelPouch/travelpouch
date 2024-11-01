@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -50,10 +51,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TravelPouchApp() {
+  val context = LocalContext.current
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory)
-  val documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory)
+  val documentViewModel: DocumentViewModel =
+      viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
 
@@ -79,6 +82,7 @@ fun TravelPouchApp() {
       composable(Screen.DOCUMENT_LIST) {
         DocumentListScreen(
             documentViewModel,
+            listTravelViewModel,
             navigationActions,
             onNavigateToDocumentPreview = { navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW) })
       }

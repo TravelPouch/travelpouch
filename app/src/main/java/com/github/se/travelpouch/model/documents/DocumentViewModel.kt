@@ -5,23 +5,23 @@ import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.se.travelpouch.helper.FileDownloader
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * ViewModel for managing documents and related operations.
  *
  * @property repository The repository used for accessing documents data.
+ * @property fileDownloader The file downloader to use when downloading files
  */
-open class DocumentViewModel(private val repository: DocumentRepository) : ViewModel() {
+open class DocumentViewModel(
+    private val repository: DocumentRepository,
+    private val fileDownloader: FileDownloader
+) : ViewModel() {
   private val _documents = MutableStateFlow<List<DocumentContainer>>(emptyList())
   val documents: StateFlow<List<DocumentContainer>> = _documents.asStateFlow()
   private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
@@ -33,11 +33,13 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
 
   // create factory
   companion object {
-    val Factory: ViewModelProvider.Factory =
+    fun Factory(contentResolver: ContentResolver): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return DocumentViewModel(DocumentRepositoryFirestore(Firebase.firestore)) as T
+            return DocumentViewModel(
+                DocumentRepositoryFirestore(Firebase.firestore), FileDownloader(contentResolver))
+                as T
           }
         }
   }
@@ -67,43 +69,17 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
    * @param documentFile The folder in which to create the file
    * @param contentResolver A content resolver to
    */
-  fun storeSelectedDocument(documentFile: DocumentFile, contentResolver: ContentResolver) {
+  fun storeSelectedDocument(documentFile: DocumentFile) {
     val mimeType = selectedDocument.value?.fileFormat?.mimeType
     val title = selectedDocument.value?.title
     val ref = selectedDocument.value?.ref?.id
 
     if (mimeType == null || title == null || ref == null) {
-      Log.i("DocumentViewModel", "Some fields are empty. Abort download")
+      Log.i("DocumentViewModel", "Some required fields are empty. Abort download")
       return
     }
 
-    val file = documentFile.createFile(mimeType, title)
-
-    if (file == null) {
-      Log.e("DocumentViewModel", "Failed to create document file in specified directory")
-      return
-    }
-
-    val storageRef = FirebaseStorage.getInstance("gs://travelpouch-7d692.appspot.com").reference
-    val documentRef = storageRef.child(ref)
-
-    val downloadTask = documentRef.stream
-    downloadTask
-        .addOnCompleteListener { taskSnapshot ->
-          CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO) {
-              contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-                taskSnapshot.result.stream.use { it.copyTo(outputStream) }
-              }
-                  ?: run {
-                    Log.e("DocumentViewModel", "Failed to open output stream for URI: ${file.uri}")
-                  }
-            }
-          }
-        }
-        .addOnFailureListener { exception ->
-          Log.e("DocumentViewModel", "Failed to download document", exception)
-        }
+    fileDownloader.downloadFile(mimeType, title, ref, documentFile)
   }
 
   //    /**

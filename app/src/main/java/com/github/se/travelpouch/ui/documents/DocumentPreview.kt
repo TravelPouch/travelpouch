@@ -74,9 +74,9 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   }
             },
             actions = {
-              StoreDocumentButton() { uri ->
-                DocumentFile.fromTreeUri(context, uri)?.let {
-                  documentViewModel.storeSelectedDocument(it, context.contentResolver)
+              StoreDocumentButton() {
+                DocumentFile.fromTreeUri(context, it)?.let {
+                  documentViewModel.storeSelectedDocument(it)
                 }
               }
               IconButton(
