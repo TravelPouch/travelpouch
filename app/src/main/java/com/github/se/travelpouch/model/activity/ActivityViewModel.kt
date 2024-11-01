@@ -120,4 +120,9 @@ class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : Vi
   fun selectActivity(activity: Activity) {
     selectedActivity_.value = activity
   }
+
+  /** This function sorts the activities by date */
+  fun getSortedActivities(): List<Activity> {
+    return activities_.value.sortedBy { it.date }
+  }
 }
