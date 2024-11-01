@@ -32,6 +32,7 @@ interface DocumentRepository {
   )
 
   fun uploadDocument(
+      travelId: String,
       bytes: ByteArray,
       format: DocumentFileFormat,
       onSuccess: () -> Unit,
@@ -154,6 +155,7 @@ class DocumentRepositoryFirestore(
   }
 
   override fun uploadDocument(
+      travelId: String,
       bytes: ByteArray,
       format: DocumentFileFormat,
       onSuccess: () -> Unit,
@@ -167,8 +169,8 @@ class DocumentRepositoryFirestore(
             mapOf(
                 "content" to bytes64,
                 "fileFormat" to fileFormatToString(format),
-                "title" to "Scan ${scanTimestamp}",
-                "travelId" to "$scanTimestamp",
+                "title" to "Scan $scanTimestamp",
+                "travelId" to travelId,
                 "fileSize" to bytes.size,
                 "visibility" to DocumentVisibility.PARTICIPANTS.toString()))
         .continueWith { task ->

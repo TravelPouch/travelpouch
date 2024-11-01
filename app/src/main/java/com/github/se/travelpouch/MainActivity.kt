@@ -89,6 +89,7 @@ fun TravelPouchApp() {
       composable(Screen.DOCUMENT_LIST) {
         DocumentListScreen(
             documentViewModel,
+            listTravelViewModel,
             navigationActions,
             onNavigateToDocumentPreview = { navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW) })
       }
