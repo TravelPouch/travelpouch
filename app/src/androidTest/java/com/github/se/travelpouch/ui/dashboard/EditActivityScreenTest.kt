@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.ui.semantics.SemanticsProperties.EditableText
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -61,6 +62,8 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("locationField").isDisplayed()
     composeTestRule.onNodeWithTag("saveButton").isDisplayed()
     composeTestRule.onNodeWithTag("saveButton").assertTextEquals("Save")
+    composeTestRule.onNodeWithTag("deleteButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("deleteButton").assertTextEquals("Delete")
   }
 
   private fun VerifyFieldsAreCorrect(composeTestRule: ComposeContentTestRule) {
@@ -76,6 +79,13 @@ class EditActivityScreenTest {
     assert(result.text == "location")
     result = composeTestRule.onNodeWithTag("dateField").fetchSemanticsNode().config[EditableText]
     assert(result.text == "01/01/1970")
+  }
+
+  @Test
+  fun deletesCallsDeleteById() {
+    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView) }
+    composeTestRule.onNodeWithTag("deleteButton").performClick()
+    verify(mockActivityRepositoryFirebase).deleteActivityById(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test

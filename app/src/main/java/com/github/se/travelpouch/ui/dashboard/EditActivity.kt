@@ -155,6 +155,16 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   modifier = Modifier.testTag("saveButton")) {
                     Text("Save")
                   }
+
+              Button(
+                  enabled = true,
+                  onClick = {
+                    activityViewModel.deleteActivityById(selectedActivity.value!!, context)
+                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                  },
+                  modifier = Modifier.testTag("deleteButton")) {
+                    Text("Delete")
+                  }
             }
       }
 }
