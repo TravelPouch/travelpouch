@@ -50,7 +50,7 @@ import java.util.Locale
 @Composable
 fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: ActivityViewModel) {
   val dateFormat =
-      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+      SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).apply {
         isLenient = false // strict date format
       }
 
@@ -59,11 +59,10 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   var dateText by remember { mutableStateOf("") }
-  val location by remember { mutableStateOf("Placeholder") }
+  var timeText by remember { mutableStateOf("") }
+  var location by remember { mutableStateOf("") }
 
   val context = LocalContext.current
-
-  val placeholerLocation = Location(0.0, 0.0, Timestamp(0, 0), "name")
 
   Scaffold(
       modifier = Modifier.testTag("AddActivityScreen"),
@@ -116,8 +115,20 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
                   modifier = Modifier.testTag("dateField"))
 
               OutlinedTextField(
+                  value = timeText,
+                  onValueChange = {
+                    if (it.isDigitsOnly() && it.length <= 4) {
+                      timeText = it
+                    }
+                  },
+                  label = { Text("Time") },
+                  placeholder = { Text("HHMM") },
+                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                  modifier = Modifier.testTag("timeField"))
+
+              OutlinedTextField(
                   value = location,
-                  onValueChange = {},
+                  onValueChange = { location = it },
                   label = { Text("Location") },
                   placeholder = { Text("Location") },
                   modifier = Modifier.testTag("locationField"))
@@ -127,17 +138,18 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
                       location.isNotBlank() &&
                           title.isNotBlank() &&
                           description.isNotBlank() &&
-                          dateText.isNotBlank(),
+                          dateText.isNotBlank() &&
+                          timeText.isNotBlank(),
                   onClick = {
                     try {
-                      val finalDate = convertStringToDate(dateText, dateFormat, gregorianCalendar)
+                      val finalDate = convertStringToDate(dateText + timeText, dateFormat, gregorianCalendar)
 
                       val activity =
                           Activity(
                               activityModelView.getNewUid(),
                               title,
                               description,
-                              placeholerLocation,
+                              Location(0.0, 0.0, finalDate, location),
                               finalDate,
                               mapOf())
 
@@ -145,7 +157,7 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
                     } catch (e: java.text.ParseException) {
                       Toast.makeText(
                               context,
-                              "Invalid format, date must be DD/MM/YYYY.",
+                              "Invalid format, date must be DD/MM/YYYY and time must be HHMM.",
                               Toast.LENGTH_SHORT)
                           .show()
                     }
@@ -172,14 +184,13 @@ fun convertStringToDate(
     gregorianCalendar: GregorianCalendar
 ): Timestamp {
   val finalDateString =
-      stringDate.substring(0, 2) + "/" + stringDate.substring(2, 4) + "/" + stringDate.substring(4)
+      stringDate.substring(0, 2) + "/" + stringDate.substring(2, 4) + "/" + stringDate.substring(4, 8) + " " +
+      stringDate.substring(8, 10) + ":" + stringDate.substring(10)
 
   val date = dateFormat.parse(finalDateString)
   val calendar =
       gregorianCalendar.apply {
         time = date!!
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
       }
 
