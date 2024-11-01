@@ -142,7 +142,8 @@ fun AddActivityScreen(navigationActions: NavigationActions, activityModelView: A
                           timeText.isNotBlank(),
                   onClick = {
                     try {
-                      val finalDate = convertStringToDate(dateText + timeText, dateFormat, gregorianCalendar)
+                      val finalDate =
+                          convertStringToDate(dateText + timeText, dateFormat, gregorianCalendar)
 
                       val activity =
                           Activity(
@@ -184,8 +185,15 @@ fun convertStringToDate(
     gregorianCalendar: GregorianCalendar
 ): Timestamp {
   val finalDateString =
-      stringDate.substring(0, 2) + "/" + stringDate.substring(2, 4) + "/" + stringDate.substring(4, 8) + " " +
-      stringDate.substring(8, 10) + ":" + stringDate.substring(10)
+      stringDate.substring(0, 2) +
+          "/" +
+          stringDate.substring(2, 4) +
+          "/" +
+          stringDate.substring(4, 8) +
+          " " +
+          stringDate.substring(8, 10) +
+          ":" +
+          stringDate.substring(10)
 
   val date = dateFormat.parse(finalDateString)
   val calendar =
