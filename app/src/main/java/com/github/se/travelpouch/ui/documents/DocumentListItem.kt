@@ -79,8 +79,7 @@ fun DocumentListItem(
           Box(
               modifier =
                   Modifier.height(200.dp)
-                      .width(150.dp)
-                      .background(MaterialTheme.colorScheme.onPrimary)) {
+                      .width(150.dp)) {
                 if (previewUri.isNotEmpty()) {
                   DocumentPreviewBox(previewUri, documentContainer.fileFormat)
                 } else {
@@ -107,7 +106,7 @@ fun DocumentPreviewBox(previewUri: String, fileFormat: DocumentFileFormat) {
     AsyncImage(
         model = previewUri,
         contentDescription = null,
-        contentScale = ContentScale.FillBounds,
+        contentScale = ContentScale.Fit,
         modifier = Modifier.fillMaxSize(),
     )
   }
