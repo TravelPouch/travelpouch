@@ -64,7 +64,7 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentListScreen(
-    documentViewModel: DocumentViewModel = viewModel(factory = DocumentViewModel.Factory),
+    documentViewModel: DocumentViewModel = viewModel(),
     listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
     navigationActions: NavigationActions,
     onNavigateToDocumentPreview: () -> Unit

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -26,6 +27,7 @@ class DocumentListTest {
   private lateinit var mockDocumentRepository: DocumentRepository
   private lateinit var mockDocumentViewModel: DocumentViewModel
   private lateinit var mockDocumentReference: DocumentReference
+  private lateinit var mockListTravelViewModel: ListTravelViewModel
   private lateinit var list_documents: List<DocumentContainer>
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -59,6 +61,7 @@ class DocumentListTest {
                 DocumentVisibility.ORGANIZERS),
         )
     navigationActions = mock(NavigationActions::class.java)
+    mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
     mockDocumentViewModel = DocumentViewModel(mockDocumentRepository)
   }
@@ -69,7 +72,7 @@ class DocumentListTest {
       it.getArgument<(List<DocumentContainer>) -> Unit>(0)(list_documents)
     }
 
-    composeTestRule.setContent { DocumentListScreen(mockDocumentViewModel, navigationActions, {}) }
+    composeTestRule.setContent { DocumentListScreen(mockDocumentViewModel, mockListTravelViewModel, navigationActions, {}) }
 
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("documentListTitle").assertIsDisplayed()
