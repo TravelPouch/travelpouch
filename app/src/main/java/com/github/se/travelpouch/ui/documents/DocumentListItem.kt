@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.documents
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
-import com.google.firebase.storage.FirebaseStorage
+import com.github.se.travelpouch.model.documents.DocumentViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -39,7 +39,15 @@ import java.util.Locale
  * @param documentContainer The document container to display.
  */
 @Composable
-fun DocumentListItem(documentContainer: DocumentContainer, onClick: () -> Unit) {
+fun DocumentListItem(
+    documentContainer: DocumentContainer,
+    documentViewModel: DocumentViewModel,
+    onClick: () -> Unit
+) {
+  var previewUri by remember { mutableStateOf("") }
+  LaunchedEffect(documentContainer) { documentViewModel.getDownloadUrl(documentContainer) }
+  previewUri = documentViewModel.downloadUrls[documentContainer.ref.id] ?: ""
+
   Card(
       modifier =
           Modifier.testTag("documentListItem")
@@ -47,15 +55,6 @@ fun DocumentListItem(documentContainer: DocumentContainer, onClick: () -> Unit) 
               .padding(4.dp)
               .clickable(onClick = onClick),
   ) {
-      var documentUri by remember { mutableStateOf("") }
-      FirebaseStorage.getInstance()
-          .getReference(documentContainer.ref.id)
-          .downloadUrl
-          .addOnSuccessListener { uri ->
-              documentUri = uri.toString()
-              Log.d("DocumentPreview", "Document uri: $documentUri")
-          }
-          .addOnFailureListener { Log.e("DocumentPreview", "Failed to get image uri", it) }
     Column(
         modifier = Modifier.padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,13 +81,12 @@ fun DocumentListItem(documentContainer: DocumentContainer, onClick: () -> Unit) 
                   Modifier.height(200.dp)
                       .width(150.dp)
                       .background(MaterialTheme.colorScheme.onPrimary)) {
-
-              if (documentUri.isNotEmpty()) {
-                DocumentPreviewBox(documentUri, documentContainer.fileFormat)
-              } else {
-                // Display a placeholder
+                if (previewUri.isNotEmpty()) {
+                  DocumentPreviewBox(previewUri, documentContainer.fileFormat)
+                } else {
+                  // Display a placeholder
+                }
               }
-          }
 
           Text(
               text = documentContainer.title,
@@ -99,19 +97,18 @@ fun DocumentListItem(documentContainer: DocumentContainer, onClick: () -> Unit) 
 }
 
 @Composable
-fun DocumentPreviewBox(documentUri: String, fileFormat: DocumentFileFormat) {
-    if (fileFormat == DocumentFileFormat.PDF) {
-        Text(
-            text = "PDF Preview Not Implemented",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.testTag("DocumentPreviewBoxNotImpl"))
-    } else {
-        Log.d("DocumentPreview", "Displaying Image")
-        AsyncImage(
-            model = documentUri,
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
+fun DocumentPreviewBox(previewUri: String, fileFormat: DocumentFileFormat) {
+  if (fileFormat == DocumentFileFormat.PDF) {
+    Text(
+        text = "PDF Preview Not Implemented",
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.testTag("DocumentPreviewBoxNotImpl"))
+  } else {
+    AsyncImage(
+        model = previewUri,
+        contentDescription = null,
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier.fillMaxSize(),
+    )
+  }
 }

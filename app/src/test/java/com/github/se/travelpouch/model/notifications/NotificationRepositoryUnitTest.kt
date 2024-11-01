@@ -11,6 +11,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
@@ -21,8 +23,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class NotificationRepositoryUnitTest {
 
@@ -98,15 +98,18 @@ class NotificationRepositoryUnitTest {
     val latch = CountDownLatch(1)
 
     // Arrange mocks
-    `when`(notificationCollection.document(notification.notificationUid)).thenReturn(documentReference)
+    `when`(notificationCollection.document(notification.notificationUid))
+        .thenReturn(documentReference)
     `when`(documentReference.set(notification)).thenReturn(task)
 
     // Mock the Log.e method to ensure it's called
     mockStatic(Log::class.java).use { logMock ->
-      logMock.`when`<Int> { Log.e(any(), any(), any()) }.thenAnswer {
-        latch.countDown() // Release latch when Log.e is called
-        0
-      }
+      logMock
+          .`when`<Int> { Log.e(any(), any(), any()) }
+          .thenAnswer {
+            latch.countDown() // Release latch when Log.e is called
+            0
+          }
 
       // Act
       notificationRepository.addNotification(notification)
@@ -117,13 +120,9 @@ class NotificationRepositoryUnitTest {
       // Assert
       verify(documentReference).set(notification)
       Log.e(
-        eq("NotificationRepository"),
-        eq("Error adding notification"),
-        any(Exception::class.java)
-      )
+          eq("NotificationRepository"), eq("Error adding notification"), any(Exception::class.java))
     }
   }
-
 
   @Test
   fun fetchNotificationsForUser_callsCollectionWhereEqualTo() {

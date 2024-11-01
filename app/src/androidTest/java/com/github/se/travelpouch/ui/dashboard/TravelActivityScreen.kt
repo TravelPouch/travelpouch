@@ -136,23 +136,23 @@ class TravelActivityScreen {
 
   @Test
   fun verifyBannerIsNotDisplayedIfNoDueActivities() {
-      val nowSeconds = Timestamp.now().seconds
-      val activitiesOutOfDate =
-          listOf(
-              Activity(
-                  "1",
-                  "title1",
-                  "description1",
-                  Location(0.0, 0.0, Timestamp(0, 0), "location1"),
-                  Timestamp(nowSeconds - 100_000L, 0),
-                  mapOf<String, Int>()),
-              Activity(
-                  "2",
-                  "title2",
-                  "description2",
-                  Location(0.0, 0.0, Timestamp(0, 0), "location2"),
-                  Timestamp(nowSeconds + 100_000L, 0),
-                  mapOf<String, Int>()))
+    val nowSeconds = Timestamp.now().seconds
+    val activitiesOutOfDate =
+        listOf(
+            Activity(
+                "1",
+                "title1",
+                "description1",
+                Location(0.0, 0.0, Timestamp(0, 0), "location1"),
+                Timestamp(nowSeconds - 100_000L, 0),
+                mapOf<String, Int>()),
+            Activity(
+                "2",
+                "title2",
+                "description2",
+                Location(0.0, 0.0, Timestamp(0, 0), "location2"),
+                Timestamp(nowSeconds + 100_000L, 0),
+                mapOf<String, Int>()))
 
     composeTestRule.setContent { NextActivitiesBanner(activitiesOutOfDate, {}) }
     composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertDoesNotExist()

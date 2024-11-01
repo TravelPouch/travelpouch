@@ -170,7 +170,7 @@ fun AddTravelScreen(
                                 Modifier.padding(8.dp)
                                     .testTag("suggestion_${location.name}") // Tag each suggestion
                             )
-                          HorizontalDivider() // Separate items with a divider
+                        HorizontalDivider() // Separate items with a divider
                       }
 
                       if (locationSuggestions.size > 3) {

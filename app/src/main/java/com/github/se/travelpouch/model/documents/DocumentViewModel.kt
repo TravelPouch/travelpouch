@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.documents
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
@@ -19,6 +20,9 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
   val documents: StateFlow<List<DocumentContainer>> = _documents.asStateFlow()
   private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
   var selectedDocument: StateFlow<DocumentContainer?> = _selectedDocument.asStateFlow()
+  private val _downloadUrls = mutableStateMapOf<String, String>()
+  val downloadUrls: Map<String, String>
+    get() = _downloadUrls
 
   init {
     repository.init { getDocuments() }
@@ -80,5 +84,23 @@ open class DocumentViewModel(private val repository: DocumentRepository) : ViewM
   /** Defines selected document for the preview */
   fun selectDocument(document: DocumentContainer) {
     _selectedDocument.value = document
+  }
+
+  fun getDownloadUrl(document: DocumentContainer) {
+    if (_downloadUrls.containsKey(document.ref.id)) {
+      return
+    }
+    repository.getDownloadUrl(
+        document,
+        onSuccess = { _downloadUrls[document.ref.id] = it },
+        onFailure = { Log.e("DocumentPreview", "Failed to get image uri", it) })
+  }
+
+  fun uploadDocument(bytes: ByteArray, format: DocumentFileFormat) {
+    repository.uploadDocument(
+        bytes,
+        format,
+        onSuccess = { getDocuments() },
+        onFailure = { Log.e("DocumentsViewModel", "Failed to upload Document") })
   }
 }
