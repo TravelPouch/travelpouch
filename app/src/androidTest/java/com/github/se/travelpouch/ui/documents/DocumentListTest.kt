@@ -63,6 +63,7 @@ class DocumentListTest {
                 DocumentVisibility.ORGANIZERS),
         )
     navigationActions = mock(NavigationActions::class.java)
+    mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
     mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
   }
@@ -73,7 +74,7 @@ class DocumentListTest {
       it.getArgument<(List<DocumentContainer>) -> Unit>(0)(list_documents)
     }
 
-    composeTestRule.setContent { DocumentListScreen(mockDocumentViewModel, navigationActions, {}) }
+    composeTestRule.setContent { DocumentListScreen(mockDocumentViewModel, mockListTravelViewModel, navigationActions, {}) }
 
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("documentListTitle").assertIsDisplayed()
