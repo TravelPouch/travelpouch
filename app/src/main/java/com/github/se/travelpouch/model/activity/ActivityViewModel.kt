@@ -38,7 +38,7 @@ class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : Vi
   private val onFailureTag = "ActivityViewModel"
 
   /** This is the initialisation function of the model view */
-  fun init() {
+  init {
     activityRepositoryFirebase.init { getAllActivities() }
   }
 

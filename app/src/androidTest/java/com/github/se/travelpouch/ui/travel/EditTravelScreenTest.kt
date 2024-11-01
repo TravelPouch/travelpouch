@@ -16,11 +16,13 @@ import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.TravelRepository
+import com.github.se.travelpouch.model.UserInfo
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
@@ -143,8 +145,60 @@ class EditTravelSettingsScreenTest {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
-    composeTestRule.onNodeWithTag("addUserFab").performClick()
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+    // perform add user
+    // Check that the dialog is displayed
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    // Check that the title text is displayed and correct
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+    // Check that the OutlinedTextField is displayed and has the correct default value
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("addUserEmailField")
+        .assertTextContains("newuser.email@example.org")
+    val randomEmail = "random.email@example.org"
+    inputText("addUserEmailField", "newuser.email@example.org", randomEmail)
+    // Now this is an invalid user that doesn't exist
+    doAnswer { invocation ->
+          val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
+          onFailure(Exception("User not found"))
+        }
+        .`when`(travelRepository)
+        .checkParticipantExists(any(), any(), any())
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+    // Now this is a valid user that had serialisation problems
+    inputText("addUserEmailField", randomEmail, "newuser.email@example.org")
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument<(UserInfo?) -> Unit>(1)
+          // Call the onSuccess callback with null
+          onSuccess(null)
+        }
+        .`when`(travelRepository)
+        .checkParticipantExists(any(), any(), any())
+    // Mock the repository.updateTravel method to do nothing
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+    // Now this is a valid user that does exist
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(UserInfo?) -> Unit>(1)
+          val customUserInfo =
+              UserInfo("abcdefghijklmnopqstu", "Custom User", listOf("00000000000000000000"), email)
+          // Call the onSuccess callback with the custom UserInfo
+          onSuccess(customUserInfo)
+        }
+        .`when`(travelRepository)
+        .checkParticipantExists(any(), any(), any())
+    // Mock the repository.updateTravel method to do nothing
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+    // perform deletion of travel
     composeTestRule.onNodeWithTag("travelDeleteButton").performClick()
     doNothing().`when`(navigationActions).goBack()
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()

@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# Firebase UI Auth rules
+-keep class com.firebase.ui.auth.** { *; }
+-keep class com.google.android.gms.auth.api.credentials.** { *; }
+-keep class com.google.android.gms.tasks.** { *; }
+
+# General rules for Google Play Services
+-dontwarn com.google.android.gms.**
+-keep class androidx.** { *; }
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keepattributes *Annotation*
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *; }
+
+# JP2Decoder
+-keep class com.gemalto.jp2.** { *; }
+-dontwarn com.gemalto.jp2.JP2Decoder

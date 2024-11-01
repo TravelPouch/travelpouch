@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.documents
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,22 +17,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import androidx.documentfile.provider.DocumentFile
 import com.github.se.travelpouch.model.documents.DocumentContainer
+import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.google.firebase.storage.FirebaseStorage
+import com.rizzi.bouquet.ResourceType
+import com.rizzi.bouquet.VerticalPDFReader
+import com.rizzi.bouquet.rememberVerticalPdfReaderState
 
 /**
  * Composable function for previewing a document.
@@ -45,14 +51,10 @@ import com.google.firebase.storage.FirebaseStorage
 fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: NavigationActions) {
   val documentContainer: DocumentContainer =
       documentViewModel.selectedDocument.collectAsState().value!!
-  var imageUri by remember { mutableStateOf("") }
+  var documentUri by remember { mutableStateOf("") }
   val context = LocalContext.current
-
-  FirebaseStorage.getInstance()
-      .getReference(documentContainer.ref.id)
-      .downloadUrl
-      .addOnSuccessListener { uri -> imageUri = uri.toString() }
-      .addOnFailureListener { Log.e("DocumentPreview", "Failed to get image uri", it) }
+  LaunchedEffect(documentContainer) { documentViewModel.getDownloadUrl(documentContainer) }
+  documentUri = documentViewModel.downloadUrls[documentContainer.ref.id] ?: ""
 
   Scaffold(
       modifier = Modifier.testTag("documentListScreen"),
@@ -97,23 +99,23 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
               text = documentContainer.title,
               style = MaterialTheme.typography.bodyLarge,
               modifier = Modifier.padding(8.dp).testTag("documentTitle"))
-          Text(
-              text = "Preview not yet implemented",
-              style = MaterialTheme.typography.bodyLarge,
-              modifier = Modifier.padding(8.dp))
-          Text(
-              text = imageUri,
-              style = MaterialTheme.typography.bodyMedium,
-              modifier = Modifier.padding(8.dp))
 
-          // TODO: replace the text with the real AsyncImage
-          //      if (imageUri.isNotEmpty()) {
-          //        AsyncImage(
-          //            model = "$imageUri&file.jpg",
-          //            contentDescription = null,
-          //            contentScale = ContentScale.FillBounds,
-          //            modifier = Modifier.fillMaxSize())
-          //      }
+          if (documentUri.isNotEmpty()) {
+            if (documentContainer.fileFormat == DocumentFileFormat.PDF) {
+              val pdfState =
+                  rememberVerticalPdfReaderState(
+                      resource = ResourceType.Remote(documentUri), isZoomEnable = true)
+              VerticalPDFReader(
+                  state = pdfState,
+                  modifier = Modifier.fillMaxSize().background(color = Color.Gray))
+            } else {
+              AsyncImage(
+                  model = documentUri,
+                  contentDescription = null,
+                  contentScale = ContentScale.FillBounds,
+                  modifier = Modifier.fillMaxSize())
+            }
+          }
         }
       }
     }

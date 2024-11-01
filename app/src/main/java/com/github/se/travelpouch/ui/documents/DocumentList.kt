@@ -47,11 +47,9 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.google.android.gms.common.util.Base64Utils
-import com.google.firebase.Timestamp
-import com.google.firebase.functions.FirebaseFunctions
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.SCANNER_MODE_FULL
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
@@ -72,13 +70,14 @@ fun DocumentListScreen(
   val documents = documentViewModel.documents.collectAsState()
   documentViewModel.getDocuments()
 
-  val functions = FirebaseFunctions.getInstance("europe-west9")
   val context = LocalContext.current
   val scannerOptions =
       GmsDocumentScannerOptions.Builder()
           .setScannerMode(SCANNER_MODE_FULL)
           .setGalleryImportAllowed(true)
-          .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_PDF)
+          .setResultFormats(
+              GmsDocumentScannerOptions.RESULT_FORMAT_JPEG,
+              GmsDocumentScannerOptions.RESULT_FORMAT_PDF)
           .build()
   val scanner = GmsDocumentScanning.getClient(scannerOptions)
   val scannerLauncher =
@@ -87,25 +86,18 @@ fun DocumentListScreen(
             if (it.resultCode == Activity.RESULT_OK) {
               val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(it.data)
               Log.d("DocumentList", "Scanning result: $scanningResult")
-              scanningResult?.pdf?.let { pdf ->
-                val bytes = pdf.uri.toFile().readBytes()
-                val bytes64 = Base64Utils.encodeUrlSafe(bytes)
-                val scanTimestamp = Timestamp.now().seconds
-                functions
-                    .getHttpsCallable("storeDocument")
-                    .call(
-                        mapOf(
-                            "content" to bytes64,
-                            "fileFormat" to "application/pdf",
-                            "title" to "Scan ${scanTimestamp}.pdf",
-                            "travelId" to "$scanTimestamp",
-                            "fileSize" to bytes.size,
-                            "visibility" to "PARTICIPANTS"))
-                    .continueWith { task ->
-                      val result = task.result?.data
-                      Log.d("DocumentList", "Function storeDocument result: $result")
-                      documentViewModel.getDocuments()
-                    }
+              scanningResult?.pages?.size?.let { size ->
+                if (size == 1) {
+                  val bytes = scanningResult.pages?.firstOrNull()?.imageUri?.toFile()?.readBytes()
+                  if (bytes != null) {
+                    documentViewModel.uploadDocument(bytes, DocumentFileFormat.JPEG)
+                  }
+                } else if (size > 1) {
+                  scanningResult.pdf?.let { pdf ->
+                    val bytes = pdf.uri.toFile().readBytes()
+                    documentViewModel.uploadDocument(bytes, DocumentFileFormat.PDF)
+                  }
+                }
               }
             }
           }
@@ -196,6 +188,7 @@ fun DocumentListScreen(
                 items(documents.value.size) { index ->
                   DocumentListItem(
                       documents.value[index],
+                      documentViewModel,
                       onClick = {
                         documentViewModel.selectDocument(documents.value[index])
                         onNavigateToDocumentPreview()

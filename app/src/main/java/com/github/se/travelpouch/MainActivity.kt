@@ -16,12 +16,15 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
+import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
+import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
 import com.github.se.travelpouch.ui.home.AddTravelScreen
@@ -59,6 +62,8 @@ fun TravelPouchApp() {
       viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
+  val calendarViewModel: CalendarViewModel =
+      viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
@@ -76,18 +81,23 @@ fun TravelPouchApp() {
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
         EditTravelSettingsScreen(listTravelViewModel, navigationActions)
       }
+
+      composable(Screen.ACTIVITIES_MAP) {
+        ActivitiesMapScreen(activityModelView, navigationActions)
+      }
+
       composable(Screen.PARTICIPANT_LIST) {
         ParticipantListScreen(listTravelViewModel, navigationActions)
       }
       composable(Screen.DOCUMENT_LIST) {
         DocumentListScreen(
             documentViewModel,
-            listTravelViewModel,
             navigationActions,
             onNavigateToDocumentPreview = { navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW) })
       }
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
+      composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
     }
   }
 }
