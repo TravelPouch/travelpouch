@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.documents
 
 import android.util.Log
+import com.github.se.travelpouch.helper.FileDownloader
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,12 +22,14 @@ class DocumentViewModelTest {
 
   private lateinit var documentContainer: DocumentContainer
   private lateinit var documentReference: DocumentReference
+  private lateinit var fileDownloader: FileDownloader
   private lateinit var document: NewDocumentContainer
 
   @Before
   fun setUp() {
     documentRepository = mock(DocumentRepository::class.java)
-    documentViewModel = DocumentViewModel(documentRepository)
+    fileDownloader = mock(FileDownloader::class.java)
+    documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
     documentReference = mock(DocumentReference::class.java)
 
     documentContainer =
