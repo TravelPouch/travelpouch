@@ -16,6 +16,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.util.Date
 
 class DocumentListItemTest {
 
@@ -40,7 +44,7 @@ class DocumentListItemTest {
             0,
             "email",
             mockDocumentReference,
-            Timestamp(0, 0),
+          Timestamp(LocalDate.EPOCH.atStartOfDay(ZoneId.systemDefault()).toInstant()),
             DocumentVisibility.ME)
     navigationActions = mock(NavigationActions::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
@@ -51,7 +55,7 @@ class DocumentListItemTest {
 
   @Test
   fun testsEverythingIsDisplayed() {
-    composeTestRule.setContent { DocumentListItem(document, {}) }
+    composeTestRule.setContent { DocumentListItem(document, mockDocumentViewModel) {} }
 
     composeTestRule.onNodeWithTag("documentListItem", useUnmergedTree = true).assertIsDisplayed()
 
