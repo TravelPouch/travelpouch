@@ -1,11 +1,15 @@
 package com.github.se.travelpouch.model.documents
 
 import android.util.Log
+import com.google.android.gms.common.util.Base64Utils
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.storage.FirebaseStorage
 
 /** Interface for the DocumentRepository. */
 interface DocumentRepository {
@@ -20,6 +24,20 @@ interface DocumentRepository {
   )
 
   fun deleteDocumentById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+
+  fun getDownloadUrl(
+      document: DocumentContainer,
+      onSuccess: (String) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
+
+  fun uploadDocument(
+      travelId: String,
+      bytes: ByteArray,
+      format: DocumentFileFormat,
+      onSuccess: () -> Unit,
+      onFailure: () -> Int
+  )
 }
 
 /**
@@ -30,7 +48,9 @@ interface DocumentRepository {
  */
 class DocumentRepositoryFirestore(
     private val db: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth = Firebase.auth
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance(),
+    private val firebaseAuth: FirebaseAuth = Firebase.auth,
+    private val functions: FirebaseFunctions = FirebaseFunctions.getInstance("europe-west9")
 ) : DocumentRepository {
   private val collectionPath = "documents"
 
@@ -56,7 +76,7 @@ class DocumentRepositoryFirestore(
       if (task.isSuccessful) {
         val documents =
             task.result?.documents?.mapNotNull { document -> fromSnapshot(document) } ?: emptyList()
-        onSuccess(documents)
+        onSuccess(documents.sortedByDescending { it.addedAt })
       } else {
         task.exception?.let { e ->
           Log.e("DocumentRepositoryFirestore", "Error getting documents", e)
@@ -116,32 +136,51 @@ class DocumentRepositoryFirestore(
   }
 
   /**
-   * Extracts the DocumentFileFormat from a DocumentSnapshot representing a TravelPouch Document.
+   * Fetches the download URL of a document from the Firestore database.
    *
-   * @param snapshot The firebase DocumentSnapshot to be added.
-   * @throws IllegalArgumentException if the document is not formatted properly.
+   * @param document The document to fetch the download URL for.
+   * @param onSuccess Callback function to be called when the download URL is fetched successfully.
+   * @param onFailure Callback function to be called when an error occurs.
    */
-  private fun fileFormatFromSnapshot(snapshot: DocumentSnapshot): DocumentFileFormat? {
-    return when (snapshot.getString("fileFormat")) {
-      "image/jpeg" -> DocumentFileFormat.JPEG
-      "image/png" -> DocumentFileFormat.PNG
-      "application/pdf" -> DocumentFileFormat.PDF
-      else -> null
-    }
+  override fun getDownloadUrl(
+      document: DocumentContainer,
+      onSuccess: (String) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    storage
+        .getReference(document.ref.id)
+        .downloadUrl
+        .addOnSuccessListener { uri -> onSuccess(uri.toString()) }
+        .addOnFailureListener(onFailure)
   }
 
-  /**
-   * Converts a DocumentFileFormat to a String for database storage.
-   *
-   * @param document The firebase document to be added.
-   * @throws IllegalArgumentException if the document is not formatted properly.
-   */
-  private fun fileFormatToString(fileFormat: DocumentFileFormat): String {
-    return when (fileFormat) {
-      DocumentFileFormat.JPEG -> "image/jpeg"
-      DocumentFileFormat.PNG -> "image/png"
-      DocumentFileFormat.PDF -> "application/pdf"
-    }
+  override fun uploadDocument(
+      travelId: String,
+      bytes: ByteArray,
+      format: DocumentFileFormat,
+      onSuccess: () -> Unit,
+      onFailure: () -> Int
+  ) {
+    val bytes64 = Base64Utils.encodeUrlSafe(bytes)
+    val scanTimestamp = Timestamp.now().seconds
+    functions
+        .getHttpsCallable("storeDocument")
+        .call(
+            mapOf(
+                "content" to bytes64,
+                "fileFormat" to format.mimeType,
+                "title" to "Scan $scanTimestamp",
+                "travelId" to travelId,
+                "fileSize" to bytes.size,
+                "visibility" to DocumentVisibility.PARTICIPANTS.toString()))
+        .continueWith { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            Log.e("DocumentRepositoryFirestore", "Error uploading document", task.exception)
+            onFailure()
+          }
+        }
   }
 
   /**
@@ -186,7 +225,7 @@ class DocumentRepositoryFirestore(
           travelRef = requireNotNull(document.getDocumentReference("travelRef")),
           activityRef = document.getDocumentReference("activityRef"),
           title = requireNotNull(document.getString("title")),
-          fileFormat = requireNotNull(fileFormatFromSnapshot(document)),
+          fileFormat = requireNotNull(DocumentFileFormat.fromMimeType(requireNotNull( document.getString("fileFormat")))),
           fileSize = requireNotNull(document.getLong("fileSize")),
           addedByEmail = document.getString("addedByEmail"),
           addedByUser = document.getDocumentReference("addedByUser"),
@@ -206,7 +245,7 @@ class DocumentRepositoryFirestore(
     return mapOf(
         "title" to document.title,
         "travelRef" to document.travelRef,
-        "fileFormat" to fileFormatToString(document.fileFormat),
+        "fileFormat" to document.fileFormat.mimeType,
         "fileSize" to document.fileSize,
         "addedAt" to document.addedAt,
         "visibility" to visibilityToString(document.visibility))

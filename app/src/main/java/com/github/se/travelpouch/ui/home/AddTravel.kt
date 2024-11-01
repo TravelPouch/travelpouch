@@ -17,10 +17,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -170,7 +170,7 @@ fun AddTravelScreen(
                                 Modifier.padding(8.dp)
                                     .testTag("suggestion_${location.name}") // Tag each suggestion
                             )
-                        Divider() // Separate items with a divider
+                        HorizontalDivider() // Separate items with a divider
                       }
 
                       if (locationSuggestions.size > 3) {

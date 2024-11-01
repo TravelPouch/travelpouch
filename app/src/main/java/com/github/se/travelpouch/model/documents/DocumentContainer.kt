@@ -55,10 +55,19 @@ data class NewDocumentContainer(
  * @property PNG image/png
  * @property PDF application/pdf
  */
-enum class DocumentFileFormat {
-  JPEG,
-  PNG,
-  PDF
+enum class DocumentFileFormat(val mimeType: String) {
+  JPEG("image/jpeg"),
+  PNG("image/png"),
+  PDF("application/pdf");
+
+  companion object {
+    fun fromMimeType(mimeType: String): DocumentFileFormat? {
+      for (value in values()) {
+        if (value.mimeType == mimeType) return value
+      }
+      return null
+    }
+  }
 }
 
 /**

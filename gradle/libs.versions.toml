@@ -53,9 +53,14 @@ mockkAndroid = "1.13.7"
 robolectric = "4.11.1"
 sonar = "4.4.1.3373"
 uiTestJunit4 = "1.7.3"
+firebaseFunctionsKtx = "21.0.0"
 runtimeLivedata = "1.7.4"
 navigationTesting = "2.8.3"
 
+# Documents
+playServicesMlkitDocumentScanner = "16.0.0-beta1"
+coil = "2.1.0"
+bouquet = "1.1.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -94,6 +99,7 @@ firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", 
 firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseCommonKtx" }
 
 #GOOGLE SERVICES & MAPS
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
@@ -118,6 +124,11 @@ androidx-espresso-intents = { module = "androidx.test.espresso:espresso-intents"
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
+
+play-services-mlkit-document-scanner = { group = "com.google.android.gms", name = "play-services-mlkit-document-scanner", version.ref = "playServicesMlkitDocumentScanner" }
+firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctionsKtx" }
+coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+bouquet = { group = "io.github.grizzi91", name = "bouquet", version.ref = "bouquet" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
