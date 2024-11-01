@@ -14,6 +14,7 @@ android {
     namespace = "com.github.se.travelpouch"
     compileSdk = 34
     compileSdk = 34
+
     // Load the API key from local.properties
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -162,6 +163,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.play.services.mlkit.document.scanner)
+    implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.testing)
     testImplementation(libs.junit)
@@ -223,6 +227,10 @@ dependencies {
     implementation(libs.compose.activity)
     // Integration with ViewModels
     implementation(libs.compose.viewmodel)
+    // Coil
+    implementation(libs.coil)
+    // Bouquet
+    implementation(libs.bouquet)
     // Android Studio Preview support
     implementation(libs.compose.preview)
     debugImplementation(libs.compose.tooling)
