@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 
 @Composable
-fun StoreDocumentButton(onDirectoryPicked: (Uri) -> Unit) {
+fun StoreDocumentButton(modifier: Modifier = Modifier, onDirectoryPicked: (Uri) -> Unit) {
   val openDirectoryLauncher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) {
           uri: Uri? ->
@@ -21,9 +21,10 @@ fun StoreDocumentButton(onDirectoryPicked: (Uri) -> Unit) {
         else Log.e("OpenDocumentButton", "Failed to access local storage")
       }
 
-  IconButton(
-      onClick = { openDirectoryLauncher.launch(null) },
-      modifier = Modifier.testTag("DownloadButton")) {
-        Icon(imageVector = Icons.Default.FileDownload, contentDescription = "Download Document")
-      }
+  IconButton(onClick = { openDirectoryLauncher.launch(null) }, modifier = modifier) {
+    Icon(
+        imageVector = Icons.Default.FileDownload,
+        contentDescription = "Download Document",
+        modifier = Modifier.testTag("storeDocumentButtonIcon"))
+  }
 }

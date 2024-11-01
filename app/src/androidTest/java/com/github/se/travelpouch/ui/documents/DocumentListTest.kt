@@ -5,6 +5,8 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -26,6 +28,8 @@ class DocumentListTest {
   private lateinit var mockDocumentRepository: DocumentRepository
   private lateinit var mockDocumentViewModel: DocumentViewModel
   private lateinit var mockDocumentReference: DocumentReference
+  private lateinit var mockFileDownloader: FileDownloader
+  private lateinit var mockListTravelViewModel: ListTravelViewModel
   private lateinit var list_documents: List<DocumentContainer>
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -60,7 +64,7 @@ class DocumentListTest {
         )
     navigationActions = mock(NavigationActions::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
-    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository)
+    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
   }
 
   @Test

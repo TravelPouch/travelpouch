@@ -31,8 +31,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import androidx.documentfile.provider.DocumentFile
+import coil.compose.AsyncImage
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentViewModel
@@ -76,7 +76,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   }
             },
             actions = {
-              StoreDocumentButton() {
+              StoreDocumentButton(modifier = Modifier.testTag("downloadButton")) {
                 DocumentFile.fromTreeUri(context, it)?.let {
                   documentViewModel.storeSelectedDocument(it)
                 }

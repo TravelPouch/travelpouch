@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Helper class to download files from Firbase storage to local files */
-class FileDownloader(private val contentResolver: ContentResolver) {
+open class FileDownloader(private val contentResolver: ContentResolver) {
   /**
    * Download a file described by source and store it in the folder pointed by destinationFolder.
    *
