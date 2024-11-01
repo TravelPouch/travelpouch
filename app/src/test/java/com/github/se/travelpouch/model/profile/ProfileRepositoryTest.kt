@@ -37,6 +37,7 @@ class ProfileRepositoryTest {
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
+  @Mock private lateinit var mockDocumentSnapshotError: DocumentSnapshot
 
   private lateinit var profileRepositoryFirestore: ProfileRepositoryFirebase
 
@@ -55,6 +56,7 @@ class ProfileRepositoryTest {
 
     profileRepositoryFirestore = ProfileRepositoryFirebase(mockFirestore)
     mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
+    mockDocumentSnapshotError = mock(DocumentSnapshot::class.java)
     mockTaskDocumentSnapshot = mock()
     mockFirebaseAuth = mock(FirebaseAuth::class.java)
     mockFirebaseUser = mock(FirebaseUser::class.java)
@@ -65,6 +67,13 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshot.getString("username")).thenReturn("usernameTest")
     `when`(mockDocumentSnapshot.get("userTravelList")).thenReturn(emptyList<String>())
     `when`(mockDocumentSnapshot.get("friends")).thenReturn(null)
+
+    `when`(mockDocumentSnapshotError.id).thenReturn("1")
+    `when`(mockDocumentSnapshotError.getString("email")).thenReturn(null)
+    `when`(mockDocumentSnapshotError.getString("name")).thenReturn("nameTest")
+    `when`(mockDocumentSnapshotError.getString("username")).thenReturn("usernameTest")
+    `when`(mockDocumentSnapshotError.get("userTravelList")).thenReturn(emptyList<String>())
+    `when`(mockDocumentSnapshotError.get("friends")).thenReturn(null)
   }
 
   @Test
@@ -222,6 +231,12 @@ class ProfileRepositoryTest {
 
     profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
     verify(timeout(1000)) { (mockDocumentReference) }
+  }
+
+  @Test
+  fun testReturnsErrorProfileIfEmailNull() {
+    val result = ProfileRepositoryConvert.documentToProfile(mockDocumentSnapshotError)
+    assertThat(result, `is`(ErrorProfile.errorProfile))
   }
 
   //  @Test
