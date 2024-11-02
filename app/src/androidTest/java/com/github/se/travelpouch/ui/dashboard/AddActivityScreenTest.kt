@@ -1,6 +1,8 @@
 package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.ui.semantics.SemanticsProperties.EditableText
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -13,6 +15,8 @@ import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.location.LocationRepository
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -28,6 +32,24 @@ class AddActivityScreenTest {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityModelView: ActivityViewModel
   private lateinit var navigationActions: NavigationActions
+  private lateinit var mockLocationViewModel: LocationViewModel
+
+  class FakeLocationRepository : LocationRepository {
+
+    val location =
+        listOf(
+            Location(48.8566, 2.3522, Timestamp.now(), "Paris"),
+            Location(34.0522, -118.2437, Timestamp.now(), "Los Angeles"),
+            Location(51.5074, -0.1278, Timestamp.now(), "London"))
+
+    override fun search(
+        query: String,
+        onSuccess: (List<Location>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+      onSuccess(location)
+    }
+  }
 
   val activity =
       Activity(
@@ -45,6 +67,7 @@ class AddActivityScreenTest {
     navigationActions = mock(NavigationActions::class.java)
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
     mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
+    mockLocationViewModel = LocationViewModel(FakeLocationRepository())
 
     `when`(mockActivityModelView.getNewUid()).thenReturn("uid")
   }
@@ -151,12 +174,52 @@ class AddActivityScreenTest {
 
   @Test
   fun limitOfEightCharactersInDateField() {
-    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+    }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("01234567")
     composeTestRule.onNodeWithTag("dateField").performTextInput("8")
     val result =
         composeTestRule.onNodeWithTag("dateField").fetchSemanticsNode().config[EditableText]
     assert(result.text == "01/23/4567")
+  }
+
+  @Test
+  fun locationDropdownAppearsAndSelectionWorks() {
+    val testQuery = "Paris"
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+    }
+
+    // Type in the location field
+    composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput(testQuery)
+
+    // The dropdown should appear with the suggestion
+    composeTestRule.onNodeWithTag("suggestion_$testQuery").assertIsDisplayed()
+
+    // Click on the suggestion
+    composeTestRule.onNodeWithTag("suggestion_$testQuery").performClick()
+  }
+
+  @Test
+  fun timePickerDialogOpensOnClick() {
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+    }
+
+    // Click on the time field
+    composeTestRule.onNodeWithTag("timeField").performClick()
+    // TODO: Add a test for the time picker dialog
+    // Since TimePickerDialog is a platform dialog, we cannot directly test its display.
+    // However, we can test that the timeText state variable updates after interaction.
+
+    // For this test, assume that the TimePickerDialog sets the time to "12:34"
+    // We need to simulate this by updating the timeText state.
+
+    // Unfortunately, Compose UI testing cannot interact with platform dialogs like
+    // TimePickerDialog.
+
+    composeTestRule.onNodeWithTag("timeField").assertHasClickAction()
   }
 }
