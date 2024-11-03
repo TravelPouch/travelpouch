@@ -61,7 +61,7 @@ class TravelRepositoryFirestoreUnitTest {
               "Test Location",
           ),
           mapOf("Test Key item" to "Test Value item"),
-          mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER))
+          mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER))
 
   @Before
   fun setUp() {
@@ -369,7 +369,7 @@ class TravelRepositoryFirestoreUnitTest {
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
 
-    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER)
     whenever(document.get("allParticipants"))
         .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
 
@@ -462,7 +462,7 @@ class TravelRepositoryFirestoreUnitTest {
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
 
-    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER)
     whenever(document.get("allParticipants"))
         .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
 
@@ -497,7 +497,7 @@ class TravelRepositoryFirestoreUnitTest {
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
 
-    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER)
     whenever(document.get("allParticipants"))
         .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
 
@@ -532,7 +532,7 @@ class TravelRepositoryFirestoreUnitTest {
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
 
-    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER)
     whenever(document.get("allParticipants"))
         .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
 
@@ -566,7 +566,7 @@ class TravelRepositoryFirestoreUnitTest {
     val attachmentsMap = mapOf("Test Key item" to "Test Value item")
     whenever(document.get("allAttachments")).thenReturn(attachmentsMap)
 
-    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER)
+    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER)
     whenever(document.get("allParticipants"))
         .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
 
