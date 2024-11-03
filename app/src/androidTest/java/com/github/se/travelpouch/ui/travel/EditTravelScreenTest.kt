@@ -43,8 +43,8 @@ class EditTravelSettingsScreenTest {
     val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
     val attachments: MutableMap<String, String> = HashMap()
     attachments["Attachment1"] = "UID1"
-    val user1ID = "rythwEmprFhOOgsANXnv"
-    val user2ID = "sigmasigmasigmasigma"
+    val user1ID = "rythwEmprFhOOgsANXnv12345678"
+    val user2ID = "sigmasigmasigmasigma12345678"
     val participants: MutableMap<Participant, Role> = HashMap()
     participants[Participant(user1ID)] = Role.OWNER
     participants[Participant(user2ID)] = Role.PARTICIPANT
@@ -189,7 +189,7 @@ class EditTravelSettingsScreenTest {
           val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
           val customUserInfo =
               Profile(
-                  fsUid = "abcdefghijklmnopqstu",
+                  fsUid = "abcdefghijklmnopqrstuvwxyz12",
                   name = "Custom User",
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
