@@ -1,0 +1,1 @@
+val notifications: LiveData<List<Notification>> = _notifications
