@@ -160,14 +160,14 @@ class TravelListScreenTest {
     composeTestRule.waitForIdle()
 
     // Click on the "Activities" navigation item
-    composeTestRule.onNodeWithTag("navigationBarItemActivities").performClick()
+    composeTestRule.onNodeWithTag("Travels").performClick()
     composeTestRule.waitForIdle()
 
     // Verify that the navigation action was called for "Activities"
-    verify(navigationActions).navigateTo(Screen.TRAVEL_ACTIVITIES)
+    verify(navigationActions).navigateTo(Screen.TRAVEL_LIST)
 
     // Click on the "Calendar" navigation item
-    composeTestRule.onNodeWithTag("navigationBarItemCalendar").performClick()
+    composeTestRule.onNodeWithTag("Calendar").performClick()
     composeTestRule.waitForIdle()
 
     // Verify that the navigation action was called for "Calendar"

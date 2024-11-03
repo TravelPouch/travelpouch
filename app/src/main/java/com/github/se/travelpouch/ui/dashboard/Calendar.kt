@@ -9,13 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -28,8 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
+import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -46,12 +43,6 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
 
   // Initial Setup
   CalendarScreenLaunchedEffect(calendarViewModel = calendarViewModel)
-
-  // List of destinations for the bottom navigation bar
-  val listOfDestinations =
-      listOf(
-          BottomNavigationItem("Activities", Icons.Default.Home),
-          BottomNavigationItem("Map", Icons.Default.Place))
 
   // Application
   Scaffold(
@@ -76,24 +67,9 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
             modifier = Modifier.testTag("calendarTopAppBar"))
       },
       bottomBar = {
-        NavigationBar(modifier = Modifier.testTag("navigationBarCalendar")) {
-          listOfDestinations.forEach { destination ->
-            NavigationBarItem(
-                onClick = {
-                  when (destination.title) {
-                    "Activities" -> navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-                    "Map" -> navigationActions.navigateTo(Screen.TRAVEL_LIST)
-                  }
-                },
-                icon = { Icon(destination.icon, contentDescription = null) },
-                selected = false,
-                label = { Text(destination.title) },
-                modifier =
-                    Modifier.testTag(
-                        if (destination.title == "Map") "navigationBarItemMap"
-                        else "navigationBarItem"))
-          }
-        }
+        BottomNavigationMenu(
+            tabList = listOf(TopLevelDestinations.TRAVELS, TopLevelDestinations.CALENDAR),
+            navigationActions = navigationActions)
       }) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("calendarScreenColumn"),

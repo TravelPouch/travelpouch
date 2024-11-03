@@ -225,7 +225,10 @@ class DocumentRepositoryFirestore(
           travelRef = requireNotNull(document.getDocumentReference("travelRef")),
           activityRef = document.getDocumentReference("activityRef"),
           title = requireNotNull(document.getString("title")),
-          fileFormat = requireNotNull(DocumentFileFormat.fromMimeType(requireNotNull( document.getString("fileFormat")))),
+          fileFormat =
+              requireNotNull(
+                  DocumentFileFormat.fromMimeType(
+                      requireNotNull(document.getString("fileFormat")))),
           fileSize = requireNotNull(document.getLong("fileSize")),
           addedByEmail = document.getString("addedByEmail"),
           addedByUser = document.getDocumentReference("addedByUser"),
