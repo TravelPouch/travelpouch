@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.notifications
 
-import com.github.se.travelpouch.model.isValidUid
+import com.github.se.travelpouch.model.isValidObjectUid
+import com.github.se.travelpouch.model.isValidUserUid
 import com.google.firebase.Timestamp
 
 /**
@@ -27,13 +28,13 @@ data class Notification(
 ) {
 
   init {
-    require(isValidUid(notificationUid)) { "Notification UID cannot be blank" }
+    require(isValidObjectUid(notificationUid)) { "Notification UID cannot be blank" }
     // Todo: need to check if the sender exists in the database
-    require(isValidUid(senderUid)) { "Sender UID cannot be blank" }
+    require(isValidUserUid(senderUid)) { "Sender UID cannot be blank" }
     // Todo: need to check if the receiver exists in the database
-    require(isValidUid(receiverUid)) { "Receiver UID cannot be blank" }
+    require(isValidUserUid(receiverUid)) { "Receiver UID cannot be blank" }
     // Todo: need to check if the travel exists in the database
-    require(isValidUid(travelUid)) { "Travel UID cannot be blank" }
+    require(isValidObjectUid(travelUid)) { "Travel UID cannot be blank" }
 
     require(senderUid != receiverUid) { "Sender and receiver cannot be the same" }
   }

@@ -39,7 +39,7 @@ data class TravelContainer(
   init {
     require(allParticipants.isNotEmpty()) { "At least one participant is required" }
     require(allParticipants.values.contains(Role.OWNER)) { "At least one owner is required" }
-    require(isValidUid(fsUid)) { "Invalid fsUid format" }
+    require(isValidObjectUid(fsUid)) { "Invalid fsUid format" }
     require(title.isNotBlank()) { "Title cannot be blank" }
     require(startTime.toDate().before(endTime.toDate())) {
       "startTime must be strictly before endTime"
@@ -79,8 +79,12 @@ data class TravelContainer(
  * @param fsUid Firestore UID to check.
  * @return True if the UID is valid, false otherwise.
  */
-fun isValidUid(fsUid: fsUid): Boolean {
+fun isValidObjectUid(fsUid: fsUid): Boolean {
   return fsUid.isNotBlank() && fsUid.matches(Regex("^[a-zA-Z0-9]{20}$"))
+}
+
+fun isValidUserUid(fsUid: fsUid): Boolean {
+  return fsUid.isNotBlank() && fsUid.matches(Regex("^[a-zA-Z0-9]{28}$"))
 }
 
 /**
@@ -92,7 +96,7 @@ data class Participant(
     val fsUid: fsUid, // Firestore UID
 ) {
   init {
-    require(isValidUid(fsUid)) { "Invalid fsUid format" }
+    require(isValidUserUid(fsUid)) { "Invalid fsUid format" }
   }
 }
 
@@ -103,7 +107,7 @@ data class UserInfo(
     val email: String,
 ) {
   init {
-    require(isValidUid(fsUid)) { "Invalid fsUid format for fsUid" }
+    require(isValidUserUid(fsUid)) { "Invalid fsUid format for fsUid" }
   }
 
   fun toMap(): Map<String, Any> {
@@ -155,9 +159,14 @@ object TravelContainerMock {
    *
    * @return A randomly generated alphanumeric string.
    */
-  fun generateAutoId(): String {
+  fun generateAutoObjectId(): String {
     val chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return (1..20).map { chars.random() }.joinToString("")
+  }
+
+  fun generateAutoUserId(): String {
+    val chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return (1..28).map { chars.random() }.joinToString("")
   }
 
   /**
@@ -178,14 +187,15 @@ object TravelContainerMock {
    * @return A mock TravelContainer object.
    */
   fun createMockTravelContainer(
-      fsUid: String = generateAutoId(),
+      fsUid: String = generateAutoObjectId(),
       title: String = "Mock Travel",
       description: String = "This is a mock travel container",
       startTime: Timestamp = Timestamp.now(),
       endTime: Timestamp = Timestamp(Date(Timestamp.now().toDate().time + 86400000)), // Add one day
       location: Location = Location(46.5191, 6.5668, Timestamp.now(), "EPFL"),
       allAttachments: Map<String, String> = mapOf("Attachment1" to "mockAttachmentUid1"),
-      allParticipants: Map<Participant, Role> = mapOf(Participant(generateAutoId()) to Role.OWNER)
+      allParticipants: Map<Participant, Role> =
+          mapOf(Participant(generateAutoUserId()) to Role.OWNER)
   ): TravelContainer {
     return TravelContainer(
         fsUid = fsUid,
@@ -222,7 +232,7 @@ object TravelContainerMock {
    */
   fun createMockTravelContainersList(
       size: Int,
-      fsUidGenerator: () -> String = ::generateAutoId,
+      fsUidGenerator: () -> String = ::generateAutoObjectId,
       titleGenerator: (Int) -> String = { "Mock Travel $it" },
       descriptionGenerator: (Int) -> String = { "This is mock travel container $it" },
       startTimeGenerator: (Int) -> Timestamp = { Timestamp.now() },
@@ -234,7 +244,7 @@ object TravelContainerMock {
         mapOf("Attachment$index" to "mockAttachmentUid$index")
       },
       allParticipantsGenerator: (Int) -> Map<Participant, Role> = {
-        mapOf(Participant(generateAutoId()) to Role.OWNER)
+        mapOf(Participant(generateAutoUserId()) to Role.OWNER)
       }
   ): List<TravelContainer> {
     return (1..size).map { index ->

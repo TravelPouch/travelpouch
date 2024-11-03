@@ -69,7 +69,7 @@ class DocumentListTest {
                 DocumentVisibility.ORGANIZERS),
         )
     val participants: MutableMap<Participant, Role> = HashMap()
-    participants[Participant("rythwEmprFhOOgsANXnv")] = Role.OWNER
+    participants[Participant("rythwEmprFhOOgsANXnv12345678")] = Role.OWNER
     travelContainer =
         TravelContainer(
             "rythwEmprFhOOgsANXnv",
