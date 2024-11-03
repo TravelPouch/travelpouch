@@ -16,6 +16,8 @@ interface ProfileRepository {
    */
   fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit)
 
+  fun getFsUidByEmail(email: String, onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit)
+
   /**
    * This function updates the information of the user profile.
    *

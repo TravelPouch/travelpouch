@@ -48,7 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.model.notifications.Notification
+import com.github.se.travelpouch.model.notifications.NotificationContent
+import com.github.se.travelpouch.model.notifications.NotificationType
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
+import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.google.firebase.Timestamp
@@ -72,6 +78,8 @@ import java.util.Locale
 fun EditTravelSettingsScreen(
     listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
+    notificationViewModel: NotificationViewModel,
+    profileViewModel: ProfileModelView
 ) {
   val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
   val context = LocalContext.current
@@ -313,17 +321,31 @@ fun EditTravelSettingsScreen(
                     modifier = Modifier.testTag("addUserEmailField"))
                 Button(
                     onClick = {
-                      listTravelViewModel.addUserToTravel(
+                      profileViewModel.getFsUidByEmail(
                           addUserEmail.value,
-                          selectedTravel!!,
-                          { updatedContainer ->
-                            listTravelViewModel.selectTravel(updatedContainer)
-                            Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT)
-                                .show()
-                            setExpandedAddUserDialog(false)
+                          onSuccess = { fsUid ->
+                            if (fsUid !=
+                                null) { // TODO : && fsUid != profileViewModel.profile.value.fsUid
+                              notificationViewModel.sendNotification(
+                                  Notification(
+                                      listTravelViewModel.getNewUid(),
+                                      profileViewModel.profile.value.fsUid,
+                                      fsUid,
+                                      selectedTravel!!.fsUid,
+                                      NotificationContent.InvitationNotification(
+                                          profileViewModel.profile.value.name,
+                                          selectedTravel!!.title,
+                                          Role.PARTICIPANT),
+                                      NotificationType.INVITATION))
+                            } else {
+                              Toast.makeText(context, "Error: SAME fsUID", Toast.LENGTH_SHORT)
+                                  .show()
+                            }
                           },
-                          {
-                            Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
+                          onFailure = { e ->
+                            Log.e("EditTravelSettingsScreen", "Error getting fsUid by email", e)
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                                .show()
                           })
                     },
                     modifier = Modifier.testTag("addUserButton")) {

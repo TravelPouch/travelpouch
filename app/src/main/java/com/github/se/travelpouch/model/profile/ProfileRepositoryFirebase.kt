@@ -69,6 +69,28 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         }
   }
 
+  override fun getFsUidByEmail(
+      email: String,
+      onSuccess: (String?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(collectionPath)
+        .whereEqualTo("email", email)
+        .get()
+        .addOnSuccessListener { result ->
+          if (result.documents.isNotEmpty()) {
+            val fsUid = result.documents[0].id
+            onSuccess(fsUid)
+          } else {
+            onSuccess(null)
+          }
+        }
+        .addOnFailureListener { e ->
+          Log.e("ProfileRepository", "Error getting fsUid by email", e)
+          onFailure(e)
+        }
+  }
+
   /**
    * This function adds a profile to Firebase
    *

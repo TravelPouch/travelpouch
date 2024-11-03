@@ -39,7 +39,8 @@ object TopLevelDestinations {
   val ACTIVITIES = TopLevelDestination(Screen.TRAVEL_ACTIVITIES, Icons.Default.Home, "Activities")
   val MAP = TopLevelDestination(Screen.ACTIVITIES_MAP, Icons.Default.Place, "Map")
   val CALENDAR = TopLevelDestination(Screen.CALENDAR, Icons.Default.DateRange, "Calendar")
-  val NOTIFICATION = TopLevelDestination(Screen.NOTIFICATION, Icons.Default.Notifications, "Notifications")
+  val NOTIFICATION =
+      TopLevelDestination(Screen.NOTIFICATION, Icons.Default.Notifications, "Notifications")
 }
 
 open class NavigationActions(

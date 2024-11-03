@@ -69,7 +69,8 @@ fun TravelPouchApp() {
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
   val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
-  val notificationViewModel: NotificationViewModel = viewModel(factory = NotificationViewModel.Factory)
+  val notificationViewModel: NotificationViewModel =
+      viewModel(factory = NotificationViewModel.Factory)
 
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
@@ -91,7 +92,8 @@ fun TravelPouchApp() {
         AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
       }
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
-        EditTravelSettingsScreen(listTravelViewModel, navigationActions)
+        EditTravelSettingsScreen(
+            listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
       }
 
       composable(Screen.ACTIVITIES_MAP) {
@@ -120,7 +122,8 @@ fun TravelPouchApp() {
     }
 
     composable(Screen.NOTIFICATION) {
-        NotificationsScreen(navigationActions, notificationViewModel, profileModelView)
+      NotificationsScreen(
+          navigationActions, notificationViewModel, profileModelView, listTravelViewModel)
     }
   }
 }

@@ -53,6 +53,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   fun getNewUid(): String {
     return repository.getNewUid()
   }
+
   /**
    * Fetches participant information from the repository using their unique ID.
    *
@@ -74,6 +75,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
         },
         onFailure = { Log.e("ListTravelViewModel", "Failed to get participant", it) })
   }
+
   /**
    * Checks if a participant with the given email exists.
    *
@@ -165,6 +167,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   fun selectTravel(travel: TravelContainer) {
     selectedTravel_.value = travel
   }
+
   /**
    * Fetches information for all participants of the selected travel.
    *
@@ -198,6 +201,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
           "lastFetchedParticipants: $lastFetchedParticipants and currentParticipants: $currentParticipants")
     }
   }
+
   /**
    * Adds a user to the selected travel by their email.
    *
@@ -230,5 +234,9 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
           onSuccess(newTravel)
         },
         onFailure = { onFailure() })
+  }
+
+  fun getNameOfTravelByUid(uid: String): String {
+    return travels.value.find { it.fsUid == uid }?.title ?: "Travel not found"
   }
 }

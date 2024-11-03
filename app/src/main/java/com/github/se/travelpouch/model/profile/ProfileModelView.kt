@@ -47,6 +47,10 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
         onFailure = { Log.e(onFailureTag, "Failed to get profile", it) })
   }
 
+  fun getFsUidByEmail(email: String, onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
+    repository.getFsUidByEmail(email, onSuccess, onFailure)
+  }
+
   /**
    * This function updates the information of the user.
    *
