@@ -1,6 +1,8 @@
 package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
+import com.github.se.travelpouch.model.Role
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -45,13 +47,16 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
       onNotificationFetched: (List<Notification>) -> Unit
   ) {
     notificationCollection
-        .whereEqualTo("receiverId", userId)
+        .whereEqualTo("receiverUid", userId)
         .orderBy("timestamp", Query.Direction.DESCENDING)
         .get()
-        .addOnSuccessListener { querySnapshot ->
-          val notifications =
-              querySnapshot.documents.map { it.toObject(Notification::class.java)!! }
-          onNotificationFetched(notifications)
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            val notifications = task.result?.documents?.map { documentToNotification(it) }
+            onNotificationFetched(notifications ?: emptyList())
+          } else {
+            Log.e("NotificationRepository", "Error fetching notifications", task.exception)
+          }
         }
         .addOnFailureListener { e ->
           Log.e("NotificationRepository", "Error fetching notifications", e)
@@ -76,4 +81,67 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
   fun changeNotificationType(notificationUid: String, notificationType: NotificationType) {
     notificationCollection.document(notificationUid).update("notificationType", notificationType)
   }
+
+    private fun documentToNotification(document: DocumentSnapshot): Notification {
+        try {
+            val notificationUid = document.id
+            val senderUid = document.getString("senderUid")!!
+            val receiverUid = document.getString("receiverUid")!!
+            val travelUid = document.getString("travelUid")!!
+            val contentData = document["content"] as Map<*, *>
+            val notificationType = NotificationType.valueOf(document.getString("notificationType")!!)
+            val content =
+                when(notificationType) {
+                    NotificationType.INVITATION -> {
+                        val userName = contentData["userName"] as String
+                        val travelTitle = contentData["travelTitle"] as String
+                        val accepted = contentData["accepted"] as Boolean
+                        NotificationContent.InvitationResponseNotification(
+                            userName,
+                            travelTitle,
+                            accepted
+                        )
+                    }
+                    NotificationType.ROLE_UPDATE -> {
+                        val travelTitle = contentData["travelTitle"] as String
+                        val role = Role.valueOf(contentData["role"] as String)
+                        NotificationContent.RoleChangeNotification(travelTitle, role)
+                    }
+                    NotificationType.ACCEPTED -> {
+                        val userName = contentData["userName"] as String
+                        val travelTitle = contentData["travelTitle"] as String
+                        NotificationContent.InvitationResponseNotification(
+                            userName,
+                            travelTitle,
+                            true
+                        )
+                    }
+                    NotificationType.DECLINED -> {
+                        val userName = contentData["userName"] as String
+                        val travelTitle = contentData["travelTitle"] as String
+                        NotificationContent.InvitationResponseNotification(
+                            userName,
+                            travelTitle,
+                            false
+                        )
+                    }
+                }
+            val timestamp = document.getTimestamp("timestamp")!!
+            val status = NotificationStatus.valueOf(document.getString("status")!!)
+
+            return Notification(
+                notificationUid,
+                senderUid,
+                receiverUid,
+                travelUid,
+                content,
+                notificationType,
+                timestamp,
+                status
+            )
+        } catch (e: Exception) {
+            Log.e("NotificationRepository", "Error converting document to Notification", e)
+            throw e
+        }
+    }
 }
