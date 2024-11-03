@@ -43,7 +43,14 @@ class ProfileRepositoryTest {
 
   private lateinit var mockTaskDocumentSnapshot: Task<DocumentSnapshot>
 
-  val profile = Profile("1", "usernameTest", "emailTest", null, "nameTest", emptyList())
+  val profile =
+      Profile(
+          "qwertzuiopasdfghjklyxcvbnm12",
+          "usernameTest",
+          "email@test.ch",
+          null,
+          "nameTest",
+          emptyList())
 
   @Before
   fun setUp() {
@@ -61,14 +68,14 @@ class ProfileRepositoryTest {
     mockFirebaseAuth = mock(FirebaseAuth::class.java)
     mockFirebaseUser = mock(FirebaseUser::class.java)
 
-    `when`(mockDocumentSnapshot.id).thenReturn("1")
-    `when`(mockDocumentSnapshot.getString("email")).thenReturn("emailTest")
+    `when`(mockDocumentSnapshot.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
+    `when`(mockDocumentSnapshot.getString("email")).thenReturn("email@test.ch")
     `when`(mockDocumentSnapshot.getString("name")).thenReturn("nameTest")
     `when`(mockDocumentSnapshot.getString("username")).thenReturn("usernameTest")
     `when`(mockDocumentSnapshot.get("userTravelList")).thenReturn(emptyList<String>())
     `when`(mockDocumentSnapshot.get("friends")).thenReturn(null)
 
-    `when`(mockDocumentSnapshotError.id).thenReturn("1")
+    `when`(mockDocumentSnapshotError.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockDocumentSnapshotError.getString("email")).thenReturn(null)
     `when`(mockDocumentSnapshotError.getString("name")).thenReturn("nameTest")
     `when`(mockDocumentSnapshotError.getString("username")).thenReturn("usernameTest")
@@ -123,8 +130,8 @@ class ProfileRepositoryTest {
             "addProfile", String::class.java, String::class.java)
     privateFunc.isAccessible = true
     val parameters = arrayOfNulls<Any>(2)
-    parameters[0] = "email"
-    parameters[1] = "uid"
+    parameters[0] = "email@test.ch"
+    parameters[1] = "qwertzuiopasdfghjklyxcvbnm12"
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
@@ -157,8 +164,8 @@ class ProfileRepositoryTest {
     parameters[0] = mockFirebaseUser
     parameters[1] = mockDocumentSnapshot
 
-    `when`(mockFirebaseUser.uid).thenReturn("uid")
-    `when`(mockFirebaseUser.email).thenReturn("email")
+    `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
+    `when`(mockFirebaseUser.email).thenReturn("email@test.ch")
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
@@ -181,8 +188,8 @@ class ProfileRepositoryTest {
     parameters[0] = mockFirebaseUser
     parameters[1] = mockDocumentSnapshot
 
-    `when`(mockFirebaseUser.uid).thenReturn("uid")
-    `when`(mockFirebaseUser.email).thenReturn("email")
+    `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
+    `when`(mockFirebaseUser.email).thenReturn("email@test.ch")
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
@@ -205,7 +212,7 @@ class ProfileRepositoryTest {
     parameters[0] = mockFirebaseUser
     parameters[1] = mockDocumentSnapshot
 
-    `when`(mockFirebaseUser.uid).thenReturn("uid")
+    `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockFirebaseUser.email).thenReturn(null)
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
@@ -222,8 +229,8 @@ class ProfileRepositoryTest {
   @Test
   fun gettingProfileUserCallsTheDocumentReference() {
 
-    `when`(mockFirebaseUser.uid).thenReturn("uid")
-    `when`(mockFirebaseUser.email).thenReturn("email")
+    `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
+    `when`(mockFirebaseUser.email).thenReturn("email@test.ch")
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)

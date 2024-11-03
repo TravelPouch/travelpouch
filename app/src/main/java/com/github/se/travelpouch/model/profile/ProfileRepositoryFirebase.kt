@@ -82,7 +82,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             username = email.substringBefore("@") + uid,
             email = email,
             friends = null,
-            name = "",
+            name = email.substringBefore("@"),
             emptyList())
     performFirestoreOperation(
         db.collection(collectionPath).document(uid).set(profile),

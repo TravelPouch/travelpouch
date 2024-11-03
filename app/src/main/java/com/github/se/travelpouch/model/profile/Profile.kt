@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.profile
 
+import androidx.core.util.PatternsCompat
 import com.github.se.travelpouch.model.isValidUserUid
 
 /**
@@ -20,24 +21,25 @@ data class Profile(
     val friends: Map<Int, String>?,
     val name: String,
     val userTravelList: List<String>
-){
-    init {
-        require(fsUid.isNotBlank() && isValidUserUid(fsUid)) { "Invalid fsUid" }
-        require(isValidEmail(email)) { "Invalid email" }
-        require(name.isNotBlank()) { "Name cannot be blank" }
-        require(username.isNotBlank()) { "username cannot be blank"}
-    }
+) {
+  init {
+    require(fsUid.isNotBlank() && isValidUserUid(fsUid)) { "Invalid fsUid" }
+    require(isValidEmail(email)) { "Invalid email" }
+    require(name.isNotBlank()) { "Name cannot be blank" }
+    require(username.isNotBlank()) { "username cannot be blank" }
+  }
 }
 
 /** This profile represents the error profile. It is used when a profile is corrupted */
 object ErrorProfile {
-  val errorProfile = Profile("-1", "", "", null, "error", emptyList())
+  val errorProfile =
+      Profile("000errorerrorerrorerrorerror", "error", "error@error.ch", null, "error", emptyList())
 }
 
-fun checkProfileValidity(profile: Profile): Boolean{
-    return isValidUserUid(profile.fsUid) && isValidEmail(profile.email)
+fun checkProfileValidity(profile: Profile): Boolean {
+  return isValidUserUid(profile.fsUid) && isValidEmail(profile.email)
 }
 
-fun isValidEmail(email: String): Boolean{
-    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+fun isValidEmail(email: String): Boolean {
+  return PatternsCompat.EMAIL_ADDRESS.matcher(email).matches()
 }

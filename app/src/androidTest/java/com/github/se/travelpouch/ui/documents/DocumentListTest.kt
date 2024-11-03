@@ -5,12 +5,12 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository

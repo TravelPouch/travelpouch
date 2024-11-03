@@ -12,7 +12,9 @@ class ProfileModelViewTest {
   private lateinit var profileViewModel: ProfileModelView
   private lateinit var context: Context
 
-  val profile = Profile("1", "username", "email", null, "name", emptyList())
+  val profile =
+      Profile(
+          "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", null, "name", emptyList())
 
   @Before
   fun setUp() {

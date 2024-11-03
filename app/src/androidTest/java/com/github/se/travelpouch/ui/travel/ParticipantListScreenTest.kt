@@ -28,25 +28,25 @@ import org.mockito.Mockito.mock
 
 class ParticipantListScreenTest {
 
-    private val container = createContainer()
-    private val participant1 =
-        Profile(
-            fsUid = container.allParticipants.keys.toList()[0].fsUid,
-            name = "User One",
-            userTravelList = listOf("travel1"),
-            email = "user1@example.com",
-            friends = null,
-            username = "username")
-    private val participant2 =
-        Profile(
-            fsUid = container.allParticipants.keys.toList()[1].fsUid,
-            name = "User Two",
-            userTravelList = listOf("travel2"),
-            email = "user2@example.com",
-            friends = null,
-            username = "username")
+  private val container = createContainer()
+  private val participant1 =
+      Profile(
+          fsUid = container.allParticipants.keys.toList()[0].fsUid,
+          name = "User One",
+          userTravelList = listOf("travel1"),
+          email = "user1@example.com",
+          friends = null,
+          username = "username")
+  private val participant2 =
+      Profile(
+          fsUid = container.allParticipants.keys.toList()[1].fsUid,
+          name = "User Two",
+          userTravelList = listOf("travel2"),
+          email = "user2@example.com",
+          friends = null,
+          username = "username")
 
-    private fun createContainer(): TravelContainer {
+  private fun createContainer(): TravelContainer {
     val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
     val attachments: MutableMap<String, String> = HashMap()
     attachments["Attachment1"] = "UID1"
