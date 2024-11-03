@@ -47,6 +47,7 @@ import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.location.LocationViewModel
+import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 
@@ -64,7 +65,8 @@ import com.google.firebase.Timestamp
 fun AddTravelScreen(
     listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
     navigationActions: NavigationActions,
-    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory),
+    profileModelView: ProfileModelView
 ) {
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
@@ -237,7 +239,7 @@ fun AddTravelScreen(
                                 allAttachments = emptyMap(),
                                 allParticipants =
                                     mapOf(
-                                        Participant(fsUid = listTravelViewModel.getNewUid()) to
+                                        Participant(fsUid = profileModelView.profile.value.fsUid) to
                                             Role.OWNER))
 
                         Log.d("AddTravelScreen", "TravelContainer created successfully.")
