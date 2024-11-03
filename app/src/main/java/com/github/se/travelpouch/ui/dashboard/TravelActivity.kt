@@ -56,7 +56,6 @@ fun TravelActivitiesScreen(
 
   activityModelView.getAllActivities()
 
-  val context = LocalContext.current
 
   val showBanner = remember { mutableStateOf(true) }
   val listOfActivities = activityModelView.activities.collectAsState()
