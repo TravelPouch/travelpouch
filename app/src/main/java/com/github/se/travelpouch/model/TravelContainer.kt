@@ -39,7 +39,7 @@ data class TravelContainer(
   init {
     require(allParticipants.isNotEmpty()) { "At least one participant is required" }
     require(allParticipants.values.contains(Role.OWNER)) { "At least one owner is required" }
-    require(isValidUid(fsUid)) { "Invalid fsUid format" }
+    require(isValidObjectUid(fsUid)) { "Invalid fsUid format" }
     require(title.isNotBlank()) { "Title cannot be blank" }
     require(startTime.toDate().before(endTime.toDate())) {
       "startTime must be strictly before endTime"
@@ -79,8 +79,12 @@ data class TravelContainer(
  * @param fsUid Firestore UID to check.
  * @return True if the UID is valid, false otherwise.
  */
-fun isValidUid(fsUid: fsUid): Boolean {
-  return fsUid.isNotBlank() && fsUid.matches(Regex("^(?=[a-zA-Z0-9]*\$)(?:.{20}|.{28})\$"))
+fun isValidObjectUid(fsUid: fsUid): Boolean {
+    return fsUid.isNotBlank() && fsUid.matches(Regex("^[a-zA-Z0-9]{20}$"))
+}
+
+fun isValidUserUid(fsUid: fsUid): Boolean{
+    return fsUid.isNotBlank() && fsUid.matches(Regex("^[a-zA-Z0-9]{28}$"))
 }
 
 /**
@@ -92,7 +96,7 @@ data class Participant(
     val fsUid: fsUid, // Firestore UID
 ) {
   init {
-    require(isValidUid(fsUid)) { "Invalid fsUid format" }
+    require(isValidUserUid(fsUid)) { "Invalid fsUid format" }
   }
 }
 
@@ -103,7 +107,7 @@ data class UserInfo(
     val email: String,
 ) {
   init {
-    require(isValidUid(fsUid)) { "Invalid fsUid format for fsUid" }
+    require(isValidUserUid(fsUid)) { "Invalid fsUid format for fsUid" }
   }
 
   fun toMap(): Map<String, Any> {

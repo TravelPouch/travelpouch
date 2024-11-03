@@ -1,5 +1,7 @@
 package com.github.se.travelpouch.model.profile
 
+import com.github.se.travelpouch.model.isValidUserUid
+
 /**
  * A data class representing a profile
  *
@@ -18,9 +20,24 @@ data class Profile(
     val friends: Map<Int, String>?,
     val name: String,
     val userTravelList: List<String>
-)
+){
+    init {
+        require(fsUid.isNotBlank() && isValidUserUid(fsUid)) { "Invalid fsUid" }
+        require(isValidEmail(email)) { "Invalid email" }
+        require(name.isNotBlank()) { "Name cannot be blank" }
+        require(username.isNotBlank()) { "username cannot be blank"}
+    }
+}
 
 /** This profile represents the error profile. It is used when a profile is corrupted */
 object ErrorProfile {
   val errorProfile = Profile("-1", "", "", null, "error", emptyList())
+}
+
+fun checkProfileValidity(profile: Profile): Boolean{
+    return isValidUserUid(profile.fsUid) && isValidEmail(profile.email)
+}
+
+fun isValidEmail(email: String): Boolean{
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }

@@ -52,7 +52,7 @@ class ProfileEditTest {
   }
 
   @Test
-  fun verifiesEverythingWorks() {
+  fun verifiesTheProfileIsCorrectlyUpdated() {
     `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
       it.getArgument<(Profile) -> Unit>(0)(profile)
     }
