@@ -42,12 +42,12 @@ class TravelListScreenTest {
     listTravelViewModel = ListTravelViewModel(travelRepository)
 
     // Mock the repository methods
-    val participant = Participant(fsUid = TravelContainerMock.generateAutoId())
+    val participant = Participant(fsUid = TravelContainerMock.generateAutoUserId())
     val participants = mapOf(participant to Role.OWNER)
     val travelList =
         listOf(
             TravelContainer(
-                fsUid = TravelContainerMock.generateAutoId(),
+                fsUid = TravelContainerMock.generateAutoObjectId(),
                 title = "Trip to Paris",
                 description = "A wonderful trip to Paris",
                 startTime = Timestamp(Date()),
@@ -108,7 +108,7 @@ class TravelListScreenTest {
     // Arrange
     val startTime = Timestamp(Date())
     val endTime = Timestamp(Date(startTime.toDate().time + 86400000))
-    val participant = Participant(fsUid = TravelContainerMock.generateAutoId())
+    val participant = Participant(fsUid = TravelContainerMock.generateAutoUserId())
     val participants = mapOf(participant to Role.OWNER)
     val attachments = mapOf<String, String>()
 
@@ -116,7 +116,7 @@ class TravelListScreenTest {
         Location(latitude = 48.8566, longitude = 2.3522, insertTime = startTime, name = "Paris")
     val travelParis =
         TravelContainer(
-            fsUid = TravelContainerMock.generateAutoId(),
+            fsUid = TravelContainerMock.generateAutoObjectId(),
             title = "Trip to Paris",
             description = "A wonderful trip to Paris",
             startTime = startTime,
@@ -130,7 +130,7 @@ class TravelListScreenTest {
             latitude = 40.7128, longitude = -74.0060, insertTime = startTime, name = "New York")
     val travelNYC =
         TravelContainer(
-            fsUid = TravelContainerMock.generateAutoId(),
+            fsUid = TravelContainerMock.generateAutoObjectId(),
             title = "Visit New York",
             description = "Exploring NYC",
             startTime = startTime,
@@ -160,14 +160,14 @@ class TravelListScreenTest {
     composeTestRule.waitForIdle()
 
     // Click on the "Activities" navigation item
-    composeTestRule.onNodeWithTag("navigationBarItemActivities").performClick()
+    composeTestRule.onNodeWithTag("Travels").performClick()
     composeTestRule.waitForIdle()
 
     // Verify that the navigation action was called for "Activities"
-    verify(navigationActions).navigateTo(Screen.TRAVEL_ACTIVITIES)
+    verify(navigationActions).navigateTo(Screen.TRAVEL_LIST)
 
     // Click on the "Calendar" navigation item
-    composeTestRule.onNodeWithTag("navigationBarItemCalendar").performClick()
+    composeTestRule.onNodeWithTag("Calendar").performClick()
     composeTestRule.waitForIdle()
 
     // Verify that the navigation action was called for "Calendar"

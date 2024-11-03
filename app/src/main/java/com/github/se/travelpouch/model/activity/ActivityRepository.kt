@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.model.activity
 
 interface ActivityRepository {
-
   /**
    * This function allows us to retrieve all the activities from Firebase.
    *
