@@ -69,7 +69,7 @@ fun TravelListScreen(
       },
       bottomBar = {
         BottomNavigationMenu(
-            tabList = listOf(TopLevelDestinations.ACTIVITIES, TopLevelDestinations.CALENDAR),
+            tabList = listOf(TopLevelDestinations.TRAVELS, TopLevelDestinations.CALENDAR),
             navigationActions = navigationActions)
       },
       content = { pd ->
