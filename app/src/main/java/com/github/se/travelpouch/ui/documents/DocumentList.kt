@@ -100,7 +100,7 @@ fun DocumentListScreen(
                   scanningResult.pdf?.let { pdf ->
                     val bytes = pdf.uri.toFile().readBytes()
                     documentViewModel.uploadDocument(
-                      selectedTravel.value!!.fsUid, bytes, DocumentFileFormat.PDF)
+                        selectedTravel.value!!.fsUid, bytes, DocumentFileFormat.PDF)
                   }
                 }
               }
