@@ -23,7 +23,7 @@ class ProfileScreenTest {
 
   val profile =
       Profile(
-          fsUid = "1",
+          fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
           friends = null,

@@ -232,7 +232,7 @@ object TravelContainerMock {
    */
   fun createMockTravelContainersList(
       size: Int,
-      fsUidGenerator: () -> String = ::generateAutoUserId,
+      fsUidGenerator: () -> String = ::generateAutoObjectId,
       titleGenerator: (Int) -> String = { "Mock Travel $it" },
       descriptionGenerator: (Int) -> String = { "This is mock travel container $it" },
       startTimeGenerator: (Int) -> Timestamp = { Timestamp.now() },

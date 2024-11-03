@@ -97,7 +97,7 @@ fun ModifyingProfileScreen(
           Button(
               onClick = {
                 val newProfile =
-                    Profile(profile.value.fsUid, username, email, null, "", emptyList())
+                    Profile(profile.value.fsUid, username, email, null, "name", emptyList())
                 profileModelView.updateProfile(newProfile, context)
                 navigationActions.navigateTo(Screen.PROFILE)
               },

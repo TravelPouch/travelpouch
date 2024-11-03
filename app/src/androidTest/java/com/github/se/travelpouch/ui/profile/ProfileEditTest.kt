@@ -26,7 +26,7 @@ class ProfileEditTest {
 
   val profile =
       Profile(
-          fsUid = "1",
+          fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
           friends = null,
@@ -35,8 +35,8 @@ class ProfileEditTest {
 
   val newProfile =
       Profile(
-          fsUid = "1",
-          email = "newEmail",
+          fsUid = "qwertzuiopasdfghjklyxcvbnm12",
+          email = "newtest@test.ch",
           username = "newUsername",
           friends = null,
           name = "name",
