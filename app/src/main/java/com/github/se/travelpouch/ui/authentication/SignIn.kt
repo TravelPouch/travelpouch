@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -66,16 +66,16 @@ fun SignInScreen(navigationActions: NavigationActions) {
           Image(
               painter = painterResource(id = R.drawable.travelpouch_logo),
               contentDescription = "App Logo",
-              modifier = Modifier.size(250.dp).testTag("appLogo"))
+              modifier = Modifier.fillMaxWidth().height(150.dp).testTag("appLogo"))
 
           Spacer(modifier = Modifier.height(16.dp))
 
           // Welcome Text
           Text(
-              modifier = Modifier.testTag("welcomText"),
+              modifier = Modifier.testTag("welcomText").padding(horizontal = 16.dp),
               text = "Welcome",
               style =
-                  MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
+                  MaterialTheme.typography.headlineLarge.copy(fontSize = 36.sp, lineHeight = 44.sp),
               fontWeight = FontWeight.Bold,
               textAlign = TextAlign.Center)
 
