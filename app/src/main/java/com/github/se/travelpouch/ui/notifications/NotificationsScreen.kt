@@ -54,64 +54,87 @@ fun NotificationsScreen(
     profileModelView: ProfileModelView,
     listTravelViewModel: ListTravelViewModel
 ) {
-  profileModelView.getProfile()
+    profileModelView.getProfile()
 
-  val profile = profileModelView.profile.collectAsState()
-  notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
-  val notifications by notificationViewModel.notifications.observeAsState(emptyList())
+    val profile = profileModelView.profile.collectAsState()
+    notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
+    val notifications by notificationViewModel.notifications.collectAsState()
 
-  val categorizedNotifications = categorizeNotifications(notifications)
+    val categorizedNotifications = categorizeNotifications(notifications)
+    val context = LocalContext.current
 
-  Scaffold(
-      topBar = {
-        TopAppBar(
-            title = {
-              Text(
-                  text = "Notifications",
-                  fontSize = 32.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color.Black,
-                  modifier = Modifier.fillMaxWidth())
-            },
-            modifier = Modifier.padding(8.dp))
-      },
-      content = { paddingValues ->
-        LazyColumn(
-            modifier =
-                Modifier.fillMaxSize()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Notifications",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                actions = {
+                    Button(onClick = {
+                        notificationViewModel.deleteAllNotificationsForUser(
+                            profile.value.fsUid,
+                            onSuccess = {
+                                Toast.makeText(context, "All notifications deleted", Toast.LENGTH_SHORT).show()
+                                notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
+                            },
+                            onFailure = { e ->
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }) {
+                        Text("Delete All")
+                    }
+                },
+                modifier = Modifier.padding(8.dp)
+            )
+        },
+        content = { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(paddingValues) // Padding to avoid overlap with top bar
             ) {
-              categorizedNotifications.forEach { (category, notifications) ->
-                item {
-                  Text(
-                      text = category,
-                      fontSize = 20.sp,
-                      fontWeight = FontWeight.Bold,
-                      modifier = Modifier.padding(8.dp))
+                categorizedNotifications.forEach { (category, notifications) ->
+                    item {
+                        Text(
+                            text = category,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                    itemsIndexed(notifications) { _, notification ->
+                        notificationViewModel.markNotificationAsRead(notification.notificationUid)
+                        NotificationItem(
+                            notification = notification,
+                            notificationViewModel = notificationViewModel,
+                            profileViewModel = profileModelView,
+                            listTravelViewModel = listTravelViewModel,
+                            navigationActions = navigationActions
+                        ) {
+                            // Handle notification click
+                        }
+                    }
                 }
-                itemsIndexed(notifications) { _, notification ->
-                  notificationViewModel.markNotificationAsRead(notification.notificationUid)
-                  NotificationItem(
-                      notification = notification,
-                      notificationViewModel = notificationViewModel,
-                      profileViewModel = profileModelView,
-                      listTravelViewModel = listTravelViewModel,
-                      navigationActions = navigationActions) {
-                        // Handle notification click
-                      }
-                }
-              }
             }
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            navigationActions = navigationActions,
-            tabList =
-                listOf(
+        },
+        bottomBar = {
+            BottomNavigationMenu(
+                navigationActions = navigationActions,
+                tabList = listOf(
                     TopLevelDestinations.NOTIFICATION,
                     TopLevelDestinations.TRAVELS,
-                    TopLevelDestinations.CALENDAR))
-      })
+                    TopLevelDestinations.CALENDAR
+                )
+            )
+        }
+    )
 }
 
 @Composable

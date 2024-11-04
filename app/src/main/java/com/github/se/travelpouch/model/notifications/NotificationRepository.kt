@@ -72,6 +72,21 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
     notificationCollection.document(notificationUid).update("status", NotificationStatus.READ)
   }
 
+    fun deleteAllNotificationsForUser(userUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        notificationCollection
+            .whereEqualTo("receiverUid", userUid)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    notificationCollection.document(document.id).delete()
+                }
+                onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
+    }
+
   /**
    * Change the notification type in the Firestore database.
    *

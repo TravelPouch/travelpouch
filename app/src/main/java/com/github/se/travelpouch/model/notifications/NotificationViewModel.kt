@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * ViewModel class for managing notifications in the travel pouch application.
@@ -16,8 +19,8 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
     ViewModel() {
 
   // LiveData holding the list of notifications
-  private val _notifications = MutableLiveData<List<Notification>>(emptyList())
-  val notifications: LiveData<List<Notification>> = _notifications
+  private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
+  val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
 
   /**
    * Factory object for creating instances of NotificationViewModel. This factory is used to provide
@@ -71,5 +74,9 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    */
   fun changeNotificationType(notificationsUid: String, notificationType: NotificationType) {
     notificationRepository.changeNotificationType(notificationsUid, notificationType)
+  }
+
+  fun deleteAllNotificationsForUser(userUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    notificationRepository.deleteAllNotificationsForUser(userUid, onSuccess, onFailure)
   }
 }
