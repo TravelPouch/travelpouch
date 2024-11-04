@@ -109,7 +109,7 @@ fun AddActivityScreen(
                     }
                   },
                   label = { Text("Date") },
-                  placeholder = { Text("01/01/2000") },
+                  placeholder = { Text("01/01/2024") },
                   visualTransformation = DateVisualTransformation(),
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                   modifier = Modifier.testTag("dateField").fillMaxWidth())
@@ -260,7 +260,7 @@ fun convertStringToDate(
   val month = stringDate.substring(2, 4)
   val year = stringDate.substring(4, 8)
   val hour = if (stringDate.length > 8) stringDate.substring(8, 10) else "00"
-  val minute = if (stringDate.length > 10) stringDate.substring(10, 12) else "00"
+  val minute = if (stringDate.length > 10) stringDate.substring(11, 13) else "00"
 
   val finalDateString = "$day/$month/$year $hour:$minute"
 
