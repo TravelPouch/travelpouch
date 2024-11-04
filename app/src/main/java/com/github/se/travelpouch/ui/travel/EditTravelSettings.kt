@@ -81,360 +81,299 @@ fun EditTravelSettingsScreen(
     notificationViewModel: NotificationViewModel,
     profileViewModel: ProfileModelView
 ) {
-    val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
-    val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
-    val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
+  val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
+  val context = LocalContext.current
+  val clipboardManager = LocalClipboardManager.current
+  val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
 
-    Scaffold(
-        modifier = Modifier.testTag("editScreen"),
-        topBar = {
-            MediumTopAppBar(
-                colors =
+  Scaffold(
+      modifier = Modifier.testTag("editScreen"),
+      topBar = {
+        MediumTopAppBar(
+            colors =
                 TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("Edit Travel", modifier = Modifier.testTag("editTravelText")) },
-                navigationIcon = {
-                    Button(
-                        onClick = { navigationActions.goBack() },
-                        modifier = Modifier.testTag("goBackButton")
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                })
-        },
-        floatingActionButton = {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(150.dp)
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        setExpandedAddUserDialog(true)
-                        Log.d("EditTravelSettingsScreen", "Add User clicked")
-                    },
-                    modifier = Modifier
-                        .testTag("addUserFab")
-                        .padding(end = 16.dp)
-                ) {
-                    Text("Add User")
-                }
-                FloatingActionButton(
-                    onClick = {
-                        clipboardManager.setText(
-                            AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com")
-                        )
-                        Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
-                    },
-                    modifier = Modifier.testTag("importEmailFab")
-                ) {
-                    Text("Import Email to Clipboard")
-                }
-            }
-        },
-        floatingActionButtonPosition = FabPosition.End,
-    ) { padding ->
-        if (selectedTravel != null) {
-            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val titleText = remember { mutableStateOf(selectedTravel!!.title) }
-            val descriptionText = remember { mutableStateOf(selectedTravel!!.description) }
-            val startTime = remember {
-                mutableStateOf(formatter.format(selectedTravel!!.startTime.toDate()))
-            }
-            val locationName = remember { mutableStateOf(selectedTravel!!.location.name) }
-            val latitude =
-                remember { mutableStateOf(selectedTravel!!.location.latitude.toString()) }
-            val longitude =
-                remember { mutableStateOf(selectedTravel!!.location.longitude.toString()) }
-            val endTimeText = remember {
-                mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate()))
-            }
-
-            Column(
-                modifier =
-                Modifier
-                    .padding(padding)
-                    .testTag("editTravelColumn")
-                    .verticalScroll(rememberScrollState()),
-                Arrangement.Top,
-                Alignment.CenterHorizontally
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .testTag("editTravelRow")
-                ) {
+            title = { Text("Edit Travel", modifier = Modifier.testTag("editTravelText")) },
+            navigationIcon = {
+              Button(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
                     Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Participants",
-                        modifier =
-                        Modifier
-                            .padding(start = 50.dp, end = 8.dp)
-                            .size(50.dp)
-                            .testTag("editTravelParticipantIcon")
-                            .clickable {
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Localized description")
+                  }
+            })
+      },
+      floatingActionButton = {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(150.dp)) {
+              FloatingActionButton(
+                  onClick = {
+                    setExpandedAddUserDialog(true)
+                    Log.d("EditTravelSettingsScreen", "Add User clicked")
+                  },
+                  modifier = Modifier.testTag("addUserFab").padding(end = 16.dp)) {
+                    Text("Add User")
+                  }
+              FloatingActionButton(
+                  onClick = {
+                    clipboardManager.setText(
+                        AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com"))
+                    Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
+                  },
+                  modifier = Modifier.testTag("importEmailFab")) {
+                    Text("Import Email to Clipboard")
+                  }
+            }
+      },
+      floatingActionButtonPosition = FabPosition.End,
+  ) { padding ->
+    if (selectedTravel != null) {
+      val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+      val titleText = remember { mutableStateOf(selectedTravel!!.title) }
+      val descriptionText = remember { mutableStateOf(selectedTravel!!.description) }
+      val startTime = remember {
+        mutableStateOf(formatter.format(selectedTravel!!.startTime.toDate()))
+      }
+      val locationName = remember { mutableStateOf(selectedTravel!!.location.name) }
+      val latitude = remember { mutableStateOf(selectedTravel!!.location.latitude.toString()) }
+      val longitude = remember { mutableStateOf(selectedTravel!!.location.longitude.toString()) }
+      val endTimeText = remember {
+        mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate()))
+      }
+
+      Column(
+          modifier =
+              Modifier.padding(padding)
+                  .testTag("editTravelColumn")
+                  .verticalScroll(rememberScrollState()),
+          Arrangement.Top,
+          Alignment.CenterHorizontally) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(8.dp).testTag("editTravelRow")) {
+                  Icon(
+                      imageVector = Icons.Default.Person,
+                      contentDescription = "Participants",
+                      modifier =
+                          Modifier.padding(start = 50.dp, end = 8.dp)
+                              .size(50.dp)
+                              .testTag("editTravelParticipantIcon")
+                              .clickable {
                                 listTravelViewModel.fetchAllParticipantsInfo()
                                 navigationActions.navigateTo(PARTICIPANT_LIST)
-                            })
-                    Text(
-                        "${selectedTravel!!.allParticipants.size} participants",
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("inputParticipants")
-                    )
+                              })
+                  Text(
+                      "${selectedTravel!!.allParticipants.size} participants",
+                      modifier = Modifier.weight(1f).testTag("inputParticipants"))
                 }
 
-                OutlinedTextField(
-                    value = titleText.value,
-                    onValueChange = { keystroke -> titleText.value = keystroke },
-                    modifier = Modifier.testTag("inputTravelTitle"),
-                    label = { Text("Title") },
-                    placeholder = { Text("Name the Travel") })
-                OutlinedTextField(
-                    value = descriptionText.value,
-                    onValueChange = { keystroke -> descriptionText.value = keystroke },
-                    modifier = Modifier.testTag("inputTravelDescription"),
-                    label = { Text("Description") },
-                    placeholder = { Text("Describe the Travel") })
+            OutlinedTextField(
+                value = titleText.value,
+                onValueChange = { keystroke -> titleText.value = keystroke },
+                modifier = Modifier.testTag("inputTravelTitle"),
+                label = { Text("Title") },
+                placeholder = { Text("Name the Travel") })
+            OutlinedTextField(
+                value = descriptionText.value,
+                onValueChange = { keystroke -> descriptionText.value = keystroke },
+                modifier = Modifier.testTag("inputTravelDescription"),
+                label = { Text("Description") },
+                placeholder = { Text("Describe the Travel") })
 
-                OutlinedTextField(
-                    value = locationName.value,
-                    onValueChange = { locationName.value = it },
-                    label = { Text("Location Name") },
-                    placeholder = { Text("Enter location name") },
-                    modifier = Modifier.testTag("inputTravelLocationName")
-                )
+            OutlinedTextField(
+                value = locationName.value,
+                onValueChange = { locationName.value = it },
+                label = { Text("Location Name") },
+                placeholder = { Text("Enter location name") },
+                modifier = Modifier.testTag("inputTravelLocationName"))
 
-                // Latitude Input
-                OutlinedTextField(
-                    value = latitude.value,
-                    onValueChange = { latitude.value = it },
-                    label = { Text("Latitude") },
-                    placeholder = { Text("Enter latitude (e.g. 48.8566)") },
-                    modifier = Modifier.testTag("inputTravelLatitude")
-                )
+            // Latitude Input
+            OutlinedTextField(
+                value = latitude.value,
+                onValueChange = { latitude.value = it },
+                label = { Text("Latitude") },
+                placeholder = { Text("Enter latitude (e.g. 48.8566)") },
+                modifier = Modifier.testTag("inputTravelLatitude"))
 
-                // Longitude Input
-                OutlinedTextField(
-                    value = longitude.value,
-                    onValueChange = { longitude.value = it },
-                    label = { Text("Longitude") },
-                    placeholder = { Text("Enter longitude (e.g. 2.3522)") },
-                    modifier = Modifier.testTag("inputTravelLongitude")
-                )
-                OutlinedTextField(
-                    value = startTime.value,
-                    onValueChange = { keystroke -> startTime.value = keystroke },
-                    modifier = Modifier.testTag("inputTravelStartTime"),
-                    label = { Text("StartTime") },
-                    placeholder = { Text("StartTime") })
-                OutlinedTextField(
-                    value = endTimeText.value,
-                    onValueChange = { keystroke -> endTimeText.value = keystroke },
-                    modifier = Modifier.testTag("inputTravelEndTime"),
-                    label = { Text("EndTime") },
-                    placeholder = { Text("--/--/--") })
+            // Longitude Input
+            OutlinedTextField(
+                value = longitude.value,
+                onValueChange = { longitude.value = it },
+                label = { Text("Longitude") },
+                placeholder = { Text("Enter longitude (e.g. 2.3522)") },
+                modifier = Modifier.testTag("inputTravelLongitude"))
+            OutlinedTextField(
+                value = startTime.value,
+                onValueChange = { keystroke -> startTime.value = keystroke },
+                modifier = Modifier.testTag("inputTravelStartTime"),
+                label = { Text("StartTime") },
+                placeholder = { Text("StartTime") })
+            OutlinedTextField(
+                value = endTimeText.value,
+                onValueChange = { keystroke -> endTimeText.value = keystroke },
+                modifier = Modifier.testTag("inputTravelEndTime"),
+                label = { Text("EndTime") },
+                placeholder = { Text("--/--/--") })
 
+            Button(
+                onClick = {
+                  try {
+                    val fsUid = selectedTravel!!.fsUid
+                    val newLocation: Location
+                    try {
+                      newLocation =
+                          Location(
+                              latitude = latitude.value.toDouble(),
+                              longitude = longitude.value.toDouble(),
+                              name = locationName.value,
+                              insertTime = Timestamp.now())
+                    } catch (e: NumberFormatException) {
+                      Toast.makeText(
+                              context,
+                              "Error: latitude and longitude must be numbers",
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } catch (e: IllegalArgumentException) {
+                      Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                      return@Button
+                    }
+
+                    val newStart = parseDateToTimestamp(startTime.value)
+                    val newEnd = parseDateToTimestamp(endTimeText.value)
+
+                    val newTravel =
+                        TravelContainer(
+                            fsUid = fsUid,
+                            title = titleText.value,
+                            description = descriptionText.value,
+                            startTime = newStart,
+                            endTime = newEnd,
+                            location = newLocation,
+                            allAttachments = selectedTravel!!.allAttachments,
+                            allParticipants = selectedTravel!!.allParticipants,
+                        )
+                    listTravelViewModel.updateTravel(newTravel)
+                    Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
+                  } catch (e: ParseException) {
+                    Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
+                    return@Button
+                  } catch (e: Exception) {
+                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    return@Button
+                  }
+                },
+                modifier = Modifier.testTag("travelSaveButton")) {
+                  Text("Save")
+                }
+
+            Button(
+                onClick = {
+                  navigationActions.goBack()
+                  listTravelViewModel.deleteTravelById(selectedTravel!!.fsUid)
+                  Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
+                },
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent, contentColor = Color.Red),
+                shape = RoundedCornerShape(8.dp),
+                modifier =
+                    Modifier.testTag("travelDeleteButton")
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)) {
+                  Text(
+                      // text = "🗑  Delete",
+                      text = "Delete",
+                      fontWeight = FontWeight.Bold)
+                }
+          }
+    } else {
+      Text(
+          "No Travel to be edited was selected. If you read this message an error has occurred.",
+          modifier = Modifier.padding(padding).testTag("noTravelSelectedText"))
+    }
+    if (expandedAddUserDialog) {
+      val addUserEmail = remember { mutableStateOf("") }
+      Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
+        Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("addUserDialogBox")) {
+          Column(
+              modifier =
+                  Modifier.fillMaxSize()
+                      .padding(16.dp)
+                      .verticalScroll(rememberScrollState())
+                      .testTag("roleDialogColumn"),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center) {
+                Text(
+                    "Add User by Email",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle"))
+                OutlinedTextField(
+                    value = addUserEmail.value,
+                    onValueChange = { addUserEmail.value = it },
+                    label = { Text("Enter User's Email") },
+                    placeholder = { Text("Enter User's Email") },
+                    modifier = Modifier.testTag("addUserEmailField"))
                 Button(
                     onClick = {
-                        try {
-                            val fsUid = selectedTravel!!.fsUid
-                            val newLocation: Location
-                            try {
-                                newLocation =
-                                    Location(
-                                        latitude = latitude.value.toDouble(),
-                                        longitude = longitude.value.toDouble(),
-                                        name = locationName.value,
-                                        insertTime = Timestamp.now()
-                                    )
-                            } catch (e: NumberFormatException) {
+                      profileViewModel.getFsUidByEmail(
+                          addUserEmail.value,
+                          onSuccess = { fsUid ->
+                            val isUserAlreadyAdded =
+                                selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
+                            /*if (fsUid == profileViewModel.profile.value.fsUid) {
                                 Toast.makeText(
                                     context,
-                                    "Error: latitude and longitude must be numbers",
+                                    "Error: You can't invite yourself",
                                     Toast.LENGTH_SHORT
                                 )
                                     .show()
-                                return@Button
-                            } catch (e: IllegalArgumentException) {
-                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                                    .show()
-                                return@Button
+                            } else */ if (isUserAlreadyAdded) {
+                              Toast.makeText(
+                                      context, "Error: User already added", Toast.LENGTH_SHORT)
+                                  .show()
+                            } else if (fsUid !=
+                                null) { // TODO : && fsUid != profileViewModel.profile.value.fsUid
+                              notificationViewModel.sendNotification(
+                                  Notification(
+                                      listTravelViewModel.getNewUid(),
+                                      profileViewModel.profile.value.fsUid,
+                                      fsUid,
+                                      selectedTravel!!.fsUid,
+                                      NotificationContent.InvitationNotification(
+                                          profileViewModel.profile.value.name,
+                                          selectedTravel!!.title,
+                                          Role.PARTICIPANT),
+                                      NotificationType.INVITATION))
+                              // Go back
+                              setExpandedAddUserDialog(false)
+                            } else {
+                              Toast.makeText(
+                                      context,
+                                      "Error: User with email not found",
+                                      Toast.LENGTH_SHORT)
+                                  .show()
                             }
-
-                            val newStart = parseDateToTimestamp(startTime.value)
-                            val newEnd = parseDateToTimestamp(endTimeText.value)
-
-                            val newTravel =
-                                TravelContainer(
-                                    fsUid = fsUid,
-                                    title = titleText.value,
-                                    description = descriptionText.value,
-                                    startTime = newStart,
-                                    endTime = newEnd,
-                                    location = newLocation,
-                                    allAttachments = selectedTravel!!.allAttachments,
-                                    allParticipants = selectedTravel!!.allParticipants,
-                                )
-                            listTravelViewModel.updateTravel(newTravel)
-                            Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
-                        } catch (e: ParseException) {
-                            Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT)
-                                .show()
-                            return@Button
-                        } catch (e: Exception) {
+                          },
+                          onFailure = { e ->
+                            Log.e("EditTravelSettingsScreen", "Error getting fsUid by email", e)
                             Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
                                 .show()
-                            return@Button
-                        }
+                          })
                     },
-                    modifier = Modifier.testTag("travelSaveButton")
-                ) {
-                    Text("Save")
-                }
-
-                Button(
-                    onClick = {
-                        navigationActions.goBack()
-                        listTravelViewModel.deleteTravelById(selectedTravel!!.fsUid)
-                        Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
-                    },
-                    colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent, contentColor = Color.Red
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier =
-                    Modifier
-                        .testTag("travelDeleteButton")
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        // text = "🗑  Delete",
-                        text = "Delete",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        } else {
-            Text(
-                "No Travel to be edited was selected. If you read this message an error has occurred.",
-                modifier = Modifier
-                    .padding(padding)
-                    .testTag("noTravelSelectedText")
-            )
-        }
-        if (expandedAddUserDialog) {
-            val addUserEmail = remember { mutableStateOf("") }
-            Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
-                Box(
-                    Modifier
-                        .size(800.dp, 250.dp)
-                        .background(Color.White)
-                        .testTag("addUserDialogBox")
-                ) {
-                    Column(
-                        modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .verticalScroll(rememberScrollState())
-                            .testTag("roleDialogColumn"),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "Add User by Email",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .testTag("addUserDialogTitle")
-                        )
-                        OutlinedTextField(
-                            value = addUserEmail.value,
-                            onValueChange = { addUserEmail.value = it },
-                            label = { Text("Enter User's Email") },
-                            placeholder = { Text("Enter User's Email") },
-                            modifier = Modifier.testTag("addUserEmailField")
-                        )
-                        Button(
-                            onClick = {
-                                profileViewModel.getFsUidByEmail(
-                                    addUserEmail.value,
-                                    onSuccess = { fsUid ->
-                                        val isUserAlreadyAdded = selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
-                                        /*if (fsUid == profileViewModel.profile.value.fsUid) {
-                                            Toast.makeText(
-                                                context,
-                                                "Error: You can't invite yourself",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                                .show()
-                                        } else */if (isUserAlreadyAdded) {
-                                            Toast.makeText(
-                                                context,
-                                                "Error: User already added",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                                .show()
-                                        } else
-                                        if (fsUid != null) { // TODO : && fsUid != profileViewModel.profile.value.fsUid
-                                            notificationViewModel.sendNotification(
-                                                Notification(
-                                                    listTravelViewModel.getNewUid(),
-                                                    profileViewModel.profile.value.fsUid,
-                                                    fsUid,
-                                                    selectedTravel!!.fsUid,
-                                                    NotificationContent.InvitationNotification(
-                                                        profileViewModel.profile.value.name,
-                                                        selectedTravel!!.title,
-                                                        Role.PARTICIPANT
-                                                    ),
-                                                    NotificationType.INVITATION
-                                                )
-                                            )
-                                            // Go back
-                                            setExpandedAddUserDialog(false)
-                                        } else {
-                                            Toast.makeText(
-                                                context,
-                                                "Error: User with email not found",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                                .show()
-                                        }
-                                    },
-                                    onFailure = { e ->
-                                        Log.e(
-                                            "EditTravelSettingsScreen",
-                                            "Error getting fsUid by email",
-                                            e
-                                        )
-                                        Toast.makeText(
-                                            context,
-                                            "Error: ${e.message}",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                    })
-                            },
-                            modifier = Modifier.testTag("addUserButton")
-                        ) {
-                            Text("Add User")
-                        }
+                    modifier = Modifier.testTag("addUserButton")) {
+                      Text("Add User")
                     }
-                }
-            }
+              }
         }
+      }
     }
+  }
 }
 
 /**
@@ -445,18 +384,18 @@ fun EditTravelSettingsScreen(
  * @throws ParseException If the date string is not in the expected format.
  */
 fun parseDateToTimestamp(dateString: String): Timestamp {
-    val dateFormat =
-        SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).apply {
-            isLenient = false // strict date format
-        }
-    val date = dateFormat.parse(dateString)
-    val calendar = GregorianCalendar(Locale.FRENCH)
-    val datetime =
-        calendar.apply {
-            time = date!!
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-        }
-    return Timestamp(datetime.time)
+  val dateFormat =
+      SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH).apply {
+        isLenient = false // strict date format
+      }
+  val date = dateFormat.parse(dateString)
+  val calendar = GregorianCalendar(Locale.FRENCH)
+  val datetime =
+      calendar.apply {
+        time = date!!
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+      }
+  return Timestamp(datetime.time)
 }

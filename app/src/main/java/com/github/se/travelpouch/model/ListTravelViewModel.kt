@@ -236,30 +236,29 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
         onFailure = { onFailure() })
   }
 
-    fun addUserToTravel(
-        userFsUid: String,
-        travelFsUid: String,
-        onSuccess: (TravelContainer) -> Unit,
-        onFailure: () -> Unit
-    ) {
-        val selectedTravel = travels.value.find { it.fsUid == travelFsUid }
-        if (selectedTravel != null) {
-            repository.getParticipantFromfsUid(
-                userFsUid,
-                onSuccess = { user ->
-                    val newParticipant = Participant(user!!.fsUid)
-                    val newParticipantMap = selectedTravel.allParticipants.toMutableMap()
-                    newParticipantMap[newParticipant] = Role.PARTICIPANT
-                    val newTravel = selectedTravel.copy(allParticipants = newParticipantMap.toMap())
-                    updateTravel(newTravel)
-                    onSuccess(newTravel)
-                },
-                onFailure = { onFailure() }
-            )
-        } else {
-            onFailure()
-        }
+  fun addUserToTravel(
+      userFsUid: String,
+      travelFsUid: String,
+      onSuccess: (TravelContainer) -> Unit,
+      onFailure: () -> Unit
+  ) {
+    val selectedTravel = travels.value.find { it.fsUid == travelFsUid }
+    if (selectedTravel != null) {
+      repository.getParticipantFromfsUid(
+          userFsUid,
+          onSuccess = { user ->
+            val newParticipant = Participant(user!!.fsUid)
+            val newParticipantMap = selectedTravel.allParticipants.toMutableMap()
+            newParticipantMap[newParticipant] = Role.PARTICIPANT
+            val newTravel = selectedTravel.copy(allParticipants = newParticipantMap.toMap())
+            updateTravel(newTravel)
+            onSuccess(newTravel)
+          },
+          onFailure = { onFailure() })
+    } else {
+      onFailure()
     }
+  }
 
   fun getNameOfTravelByUid(uid: String): String {
     return travels.value.find { it.fsUid == uid }?.title ?: "Travel not found"

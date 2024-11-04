@@ -1,7 +1,5 @@
 package com.github.se.travelpouch.model.notifications
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
@@ -76,7 +74,11 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
     notificationRepository.changeNotificationType(notificationsUid, notificationType)
   }
 
-  fun deleteAllNotificationsForUser(userUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+  fun deleteAllNotificationsForUser(
+      userUid: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     notificationRepository.deleteAllNotificationsForUser(userUid, onSuccess, onFailure)
   }
 }

@@ -143,7 +143,8 @@ fun AddActivityScreen(
                         value = timeText,
                         onValueChange = {},
                         label = {
-                          Text("Time (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                          Text(
+                              "Time (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         },
                         placeholder = {
                           Text(
@@ -164,7 +165,8 @@ fun AddActivityScreen(
                       showDropdown = true // Show dropdown when user starts typing
                     },
                     label = {
-                      Text("Location (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                      Text(
+                          "Location (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     },
                     placeholder = {
                       Text(

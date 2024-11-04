@@ -101,7 +101,8 @@ fun TravelPouchApp() {
       }
 
       composable(Screen.PARTICIPANT_LIST) {
-        ParticipantListScreen(listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+        ParticipantListScreen(
+            listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
       }
       composable(Screen.DOCUMENT_LIST) {
         DocumentListScreen(
