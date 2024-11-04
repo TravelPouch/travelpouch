@@ -1,17 +1,17 @@
 package com.github.se.travelpouch.model.activity.map
 
+import android.annotation.SuppressLint
 import android.util.Log
-import java.io.IOException
-import okhttp3.Call
-import okhttp3.Callback
+import com.github.se.travelpouch.helper.NetworkManager
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import org.json.JSONObject
 
 /** Repository for fetching directions using the Google Maps Directions API. */
 class DirectionsRepository(private val client: OkHttpClient) : DirectionsRepositoryInterface {
+
+  private val networkManager: NetworkManager = NetworkManager(client)
 
   /**
    * Parses the JSON response from the Google Maps Directions API.
@@ -51,6 +51,7 @@ class DirectionsRepository(private val client: OkHttpClient) : DirectionsReposit
    * @param onSuccess Callback that is called when the request is successful.
    * @param onFailure Callback that is called when the request fails.
    */
+  @SuppressLint("SuspiciousIndentation")
   override fun getDirections(
       origin: String,
       destination: String,
@@ -81,40 +82,21 @@ class DirectionsRepository(private val client: OkHttpClient) : DirectionsReposit
             .header("User-Agent", "TravelPouchApp/1.0 (travelpouchswent@gmail.com)")
             .build()
 
-    // Make the network call
-    client
-        .newCall(request)
-        .enqueue(
-            object : Callback {
-              override fun onFailure(call: Call, e: IOException) {
-                Log.e("DirectionsRepositoryImpl", "Failed to execute request", e)
-                onFailure(e)
-              }
-
-              override fun onResponse(call: Call, response: Response) {
-                response.use {
-                  if (!response.isSuccessful) {
-                    onFailure(Exception("Unexpected code $response"))
-                    Log.d("DirectionsRepository", "Unexpected code $response")
-                    return
-                  }
-
-                  val body = response.body?.string()
-                  if (body != null) {
-                    try {
-                      // Parse the JSON response using Gson
-                      val directionsResponse = parseBody(body)
-                      onSuccess(directionsResponse)
-                    } catch (e: Exception) {
-                      onFailure(e)
-                      Log.e("DirectionsRepository", "Failed to parse response", e)
-                    }
-                  } else {
-                    Log.d("DirectionsRepository", "Empty body")
-                    onFailure(Exception("Empty response body"))
-                  }
-                }
-              }
-            })
+    // Use NetworkManager to make the network call
+    networkManager.executeRequest(
+        request,
+        onSuccess = { body ->
+          try {
+            val directionsResponse = parseBody(body)
+            onSuccess(directionsResponse)
+          } catch (e: Exception) {
+            Log.e("DirectionsRepository", "Failed to parse response", e)
+            onFailure(e)
+          }
+        },
+        onFailure = { e ->
+          Log.e("DirectionsRepository", "Network request failed", e)
+          onFailure(e)
+        })
   }
 }
