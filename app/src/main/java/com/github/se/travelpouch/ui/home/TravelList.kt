@@ -1,13 +1,16 @@
 package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -55,8 +59,13 @@ fun TravelListScreen(
     listTravelViewModel.getTravels()
     // sleep the thread for 1 second to allow the data to be fetched
   }
-  // travelContainers.getTravels()
+
   val travelList = listTravelViewModel.travels.collectAsState().value
+
+  // Used for the screen orientation redraw
+  val configuration = LocalConfiguration.current
+  val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+  val mapHeight = if (isPortrait) 300.dp else 200.dp
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
@@ -73,28 +82,33 @@ fun TravelListScreen(
             navigationActions = navigationActions)
       },
       content = { pd ->
-        Column {
-          // Add the map to display the travels
-          MapContent(
-              modifier = Modifier.fillMaxWidth().height(300.dp), travelContainers = travelList)
-
-          if (travelList.isNotEmpty()) {
-            LazyColumn(
-                contentPadding = PaddingValues(vertical = 8.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
-                  items(travelList.size) { index ->
-                    TravelItem(travelContainer = travelList[index]) {
-                      listTravelViewModel.selectTravel(travelList[index])
-                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-                    }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(pd),
+            contentPadding = PaddingValues(bottom = 80.dp)) {
+              item {
+                MapContent(
+                    modifier = Modifier.fillMaxWidth().height(mapHeight),
+                    travelContainers = travelList)
+              }
+              if (travelList.isNotEmpty()) {
+                items(travelList.size) { index ->
+                  TravelItem(travelContainer = travelList[index]) {
+                    listTravelViewModel.selectTravel(travelList[index])
+                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                   }
                 }
-          } else {
-            Text(
-                modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
-                text = "You have no travels yet.")
-          }
-        }
+              } else {
+                item {
+                  Box(
+                      modifier = Modifier.fillMaxSize().padding(16.dp),
+                      contentAlignment = Alignment.Center) {
+                        Text(
+                            modifier = Modifier.testTag("emptyTravelPrompt"),
+                            text = "You have no travels yet.")
+                      }
+                }
+              }
+            }
       })
 }
 
