@@ -1,7 +1,7 @@
 package com.github.se.travelpouch.model.location
 
 import android.util.Log
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.travels.Location
 import com.google.firebase.Timestamp
 import java.io.IOException
 import okhttp3.Call

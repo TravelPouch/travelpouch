@@ -34,6 +34,10 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
         }
   }
 
+  fun initAfterLogin() {
+    notificationRepository.initAfterLogin()
+  }
+
   /**
    * Loads notifications for a specific user.
    *

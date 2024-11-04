@@ -31,8 +31,8 @@ open class DocumentViewModel(
   val downloadUrls: Map<String, String>
     get() = _downloadUrls
 
-  init {
-    repository.init { getDocuments() }
+  fun initAfterTravelAccess(travelId: String) {
+    repository.initAfterTravelAccess({ getDocuments() }, travelId)
   }
 
   // create factory

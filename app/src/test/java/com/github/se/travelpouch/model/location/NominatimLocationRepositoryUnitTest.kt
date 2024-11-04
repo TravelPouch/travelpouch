@@ -1,5 +1,5 @@
-import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.location.NominatimLocationRepository
+import com.github.se.travelpouch.model.travels.Location
 import java.io.IOException
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue

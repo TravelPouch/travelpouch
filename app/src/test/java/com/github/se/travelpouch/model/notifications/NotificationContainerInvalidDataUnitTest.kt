@@ -1,9 +1,9 @@
 // Import necessary dependencies
 package com.github.se.travelpouch.model.notifications
 
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.TravelContainerMock.generateAutoObjectId
-import com.github.se.travelpouch.model.TravelContainerMock.generateAutoUserId
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized

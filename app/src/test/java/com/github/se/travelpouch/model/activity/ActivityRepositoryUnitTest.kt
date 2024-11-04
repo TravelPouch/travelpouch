@@ -2,7 +2,7 @@ package com.github.se.travelpouch.model.activity
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.travels.Location
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp

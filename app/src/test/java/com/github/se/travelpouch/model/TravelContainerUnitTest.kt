@@ -1,7 +1,11 @@
 package com.github.se.travelpouch.model
 
-import com.github.se.travelpouch.model.TravelContainerMock.generateAutoObjectId
-import com.github.se.travelpouch.model.TravelContainerMock.generateAutoUserId
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import com.google.firebase.Timestamp
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows

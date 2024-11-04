@@ -100,7 +100,11 @@ fun TravelActivitiesScreen(
       },
       bottomBar = {
         BottomNavigationMenu(
-            tabList = listOf(TopLevelDestinations.ACTIVITIES, TopLevelDestinations.MAP),
+            tabList =
+                listOf(
+                    TopLevelDestinations.ACTIVITIES,
+                    TopLevelDestinations.CALENDAR,
+                    TopLevelDestinations.MAP),
             navigationActions = navigationActions)
       },
       floatingActionButton = {

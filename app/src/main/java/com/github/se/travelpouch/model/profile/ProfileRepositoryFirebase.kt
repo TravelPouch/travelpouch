@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 /**
  * The class representing the communication scheme between our project and the database that will
@@ -19,12 +20,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   private var collectionPath = "userslist"
   private var documentPath = ""
 
-  override fun init(onSuccess: () -> Unit) {
-    Firebase.auth.addAuthStateListener {
-      val user = it.currentUser
-      if (user != null) {
-        gettingUserProfile(user, onSuccess)
-      }
+  override suspend fun initAfterLogin() {
+    Log.d("ProfileRepo", "init after login")
+    val user = Firebase.auth.currentUser
+    if (user != null) {
+      gettingUserProfile(user)
+    } else {
+      Firebase.auth.signOut()
     }
   }
 
@@ -54,20 +56,42 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param user (FirebaseUser) : the currently connected user on the application
    * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
    */
-  fun gettingUserProfile(user: FirebaseUser, onSuccess: () -> Unit) {
+  suspend fun gettingUserProfile(user: FirebaseUser) {
 
+    Log.d("Profile repo", "getting profile")
     documentPath = user.uid
-    db.collection(collectionPath)
-        .document(documentPath)
-        .get()
-        .addOnSuccessListener { result ->
-          addingUserIfNotRegistered(user, result)
-          onSuccess()
-        }
-        .addOnFailureListener {
-          Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
-        }
+    try {
+      val document = db.collection(collectionPath).document(documentPath).get().await()
+      Log.d("ProfileRepository", "in try og getting profile")
+      addingUserIfNotRegistered(user, document)
+      CurrentProfile.profile = ProfileRepositoryConvert.documentToProfile(document)
+    } catch (e: Exception) {
+      Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
+    }
   }
+
+  //    AtomicBoolean done = new AtomicBoolean(false);
+  //    Global ans; // the return value holder
+  //    try{
+  //        result = someAsyncCall(query, new Thread()); // this new thread is for listener callback
+  //        result.setResultListener(result -> {
+  //            // do something with result.
+  //            ans = result.getAns() ; // set global ans
+  //            done.set(true);
+  //            synchronized (done) {
+  //                done.notifyAll(); // notify the main thread which is waiting
+  //            }
+  //        });
+  //    }
+  //    catch (Exception e ) {
+  //        Log(e);
+  //    }
+  //    synchronized (done) {
+  //        while (done.get() == false) {
+  //            done.wait(); // wait here until the listener fires
+  //        }
+  //    }
+  //    return ans; // return global ans
 
   /**
    * This function adds a profile to Firebase
@@ -99,6 +123,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .document(documentPath)
         .get()
         .addOnSuccessListener { result ->
+          Log.d("ProfileRepository", "in lambda")
           val profile = ProfileRepositoryConvert.documentToProfile(result)
           onSuccess(profile)
         }
@@ -155,6 +180,7 @@ class ProfileRepositoryConvert {
      *   the error profile is returned.
      */
     fun documentToProfile(document: DocumentSnapshot): Profile {
+      Log.d("ProfileRepository", "converting doc to profile")
       return try {
         val uid = document.id
         val username = document.getString("username")
@@ -169,7 +195,7 @@ class ProfileRepositoryConvert {
             username = username!!,
             email = email!!,
             friends = friends,
-            name!!,
+            name = name!!,
             userTravelList = userTravelList ?: emptyList())
       } catch (e: Exception) {
         Log.e("ProfileRepository", "Error converting document to Profile", e)

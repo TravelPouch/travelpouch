@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.github.se.travelpouch.model.profile.CurrentProfile
+import com.github.se.travelpouch.model.profile.Profile
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,14 +25,14 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   private val selectedTravel_ = MutableStateFlow<TravelContainer?>(null)
   open val selectedTravel: StateFlow<TravelContainer?> = selectedTravel_.asStateFlow()
 
-  private val participants_ = MutableStateFlow<Map<fsUid, UserInfo>>(emptyMap())
-  val participants: StateFlow<Map<fsUid, UserInfo>> = participants_.asStateFlow()
+  private val participants_ = MutableStateFlow<Map<fsUid, Profile>>(emptyMap())
+  val participants: StateFlow<Map<fsUid, Profile>> = participants_.asStateFlow()
 
   private var lastFetchedTravel: TravelContainer? = null
   private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
 
-  init {
-    repository.init { getTravels() }
+  fun initAfterLogin() {
+    repository.initAfterLogin { getTravels() }
   }
 
   // create factory
@@ -89,7 +91,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    */
   private fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo) -> Unit,
+      onSuccess: (Profile) -> Unit,
       onFailure: () -> Unit
   ) {
     repository.checkParticipantExists(
@@ -113,6 +115,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
 
   /** Gets all Travel documents. */
   fun getTravels() {
+
     repository.getTravels(
         onSuccess = { travels_.value = it },
         onFailure = { Log.e("ListTravelViewModel", "Failed to get travels", it) })
@@ -148,6 +151,8 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    * @param id The ID of the Travel document to be deleted.
    */
   fun deleteTravelById(id: String) {
+    CurrentProfile.profile.userTravelList =
+        CurrentProfile.profile.userTravelList.filter { it != id }
     repository.deleteTravelById(
         id = id,
         onSuccess = { getTravels() },
@@ -224,7 +229,14 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
           val newParticipant = Participant(user.fsUid)
           val newParticipantMap = selectedTravel.allParticipants.toMutableMap()
           newParticipantMap[newParticipant] = Role.PARTICIPANT
-          val newTravel = selectedTravel.copy(allParticipants = newParticipantMap.toMap())
+
+          val newParticipantList = selectedTravel.listParticipant.toMutableList()
+          newParticipantList.plus(user.fsUid)
+
+          val newTravel =
+              selectedTravel.copy(
+                  allParticipants = newParticipantMap.toMap(),
+                  listParticipant = newParticipantList.toList())
           updateTravel(newTravel)
           onSuccess(newTravel)
         },

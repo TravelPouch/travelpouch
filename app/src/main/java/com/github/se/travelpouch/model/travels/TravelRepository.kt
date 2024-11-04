@@ -1,22 +1,24 @@
 package com.github.se.travelpouch.model.travels
 
+import com.github.se.travelpouch.model.profile.Profile
+
 interface TravelRepository {
 
   fun getNewUid(): String
 
   fun getParticipantFromfsUid(
       fsUid: fsUid,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   )
 
   fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   )
 
-  fun init(onSuccess: () -> Unit)
+  fun initAfterLogin(onSuccess: () -> Unit)
 
   fun getTravels(onSuccess: (List<TravelContainer>) -> Unit, onFailure: (Exception) -> Unit)
 

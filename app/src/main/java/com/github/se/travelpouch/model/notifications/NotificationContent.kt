@@ -1,6 +1,6 @@
 package com.github.se.travelpouch.model.notifications
 
-import com.github.se.travelpouch.model.Role
+import com.github.se.travelpouch.model.travels.Role
 
 private const val INVITER_NAME_NOT_BLANK = "Inviter name cannot be blank"
 private const val TRAVEL_TITLE_NOT_BLANK = "Travel title cannot be blank"

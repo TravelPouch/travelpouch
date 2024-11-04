@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.documents
 
 import android.util.Log
+import com.github.se.travelpouch.model.FirebasePaths
 import com.google.android.gms.common.util.Base64Utils
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
@@ -13,7 +14,7 @@ import com.google.firebase.storage.FirebaseStorage
 
 /** Interface for the DocumentRepository. */
 interface DocumentRepository {
-  fun init(onSuccess: () -> Unit)
+  fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String)
 
   fun getDocuments(onSuccess: (List<DocumentContainer>) -> Unit, onFailure: (Exception) -> Unit)
 
@@ -52,14 +53,13 @@ class DocumentRepositoryFirestore(
     private val firebaseAuth: FirebaseAuth = Firebase.auth,
     private val functions: FirebaseFunctions = FirebaseFunctions.getInstance("europe-west9")
 ) : DocumentRepository {
-  private val collectionPath = "documents"
+  private var collectionPath = ""
 
-  override fun init(onSuccess: () -> Unit) {
-    firebaseAuth.addAuthStateListener {
-      if (it.currentUser != null) {
-        onSuccess()
-      }
-    }
+  override fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String) {
+    val p1 = FirebasePaths.TravelsSuperCollection
+    val p2 = FirebasePaths.documents
+    collectionPath = FirebasePaths.constructPath(p1, travelId, p2)
+    onSuccess()
   }
 
   /**

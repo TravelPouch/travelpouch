@@ -16,10 +16,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.model.fsUid
 import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.fsUid
 
 @Composable
 fun ParticipantRow(

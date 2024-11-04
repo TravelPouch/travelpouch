@@ -1,9 +1,8 @@
 package com.github.se.travelpouch.model.events
 
 import android.util.Log
+import com.github.se.travelpouch.model.FirebasePaths
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -16,7 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventRepository {
 
   /** The path to the collection of events of the travel */
-  private val collectionPath = "events"
+  private var collectionPath = ""
 
   /**
    * This function returns an unused unique identifier for a new event.
@@ -32,12 +31,11 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    *
    * @param (() -> Unit) : the function to apply when the authentication goes without a trouble
    */
-  override fun init(onSuccess: () -> Unit) {
-    Firebase.auth.addAuthStateListener {
-      if (it.currentUser != null) {
-        onSuccess()
-      }
-    }
+  override fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String) {
+    val p1 = FirebasePaths.TravelsSuperCollection
+    val p2 = FirebasePaths.events
+    collectionPath = FirebasePaths.constructPath(p1, travelId, p2)
+    onSuccess()
   }
 
   /**
