@@ -68,6 +68,8 @@ class TravelRepositoryFirestore(
       }
     }
   }
+
+
   /**
    * Checks if a participant exists in the Firestore database by their email.
    *

@@ -172,6 +172,20 @@ fun NotificationItem(
                                             notification.travelUid),
                                         true),
                                     NotificationType.ACCEPTED))
+
+                              listTravelViewModel.addUserToTravel(
+                                  profileViewModel.profile.value.fsUid,
+                                  notification.travelUid,
+                                  { updatedContainer ->
+                                      listTravelViewModel.selectTravel(updatedContainer)
+                                      Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT)
+                                          .show()
+                                  },
+                                  {
+                                      Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
+                                  })
+
+                              // profileViewModel.profile.value.userTravelList += notification.travelUid TODO : is the userList in profile really necessary ?
                             Toast.makeText(context, "ACCEPTED", Toast.LENGTH_SHORT).show()
                           },
                           modifier = Modifier.padding(end = 8.dp), // Space between buttons
@@ -210,7 +224,7 @@ fun NotificationItem(
 }
 
 fun categorizeNotifications(notifications: List<Notification>): Map<String, List<Notification>> {
-  val today = mutableListOf<Notification>()
+  val thisWeek = mutableListOf<Notification>()
   val lastWeek = mutableListOf<Notification>()
   val lastMonth = mutableListOf<Notification>()
   val lastYear = mutableListOf<Notification>()
@@ -222,7 +236,7 @@ fun categorizeNotifications(notifications: List<Notification>): Map<String, List
     val diff = now.time.time - notificationTime.time
 
     when {
-      isToday(notificationTime, now) -> today.add(notification)
+        isThisWeek(notificationTime, now) -> thisWeek.add(notification)
       isLastWeek(notificationTime, now) -> lastWeek.add(notification)
       isLastMonth(notificationTime, now) -> lastMonth.add(notification)
       isLastYear(notificationTime, now) -> lastYear.add(notification)
@@ -230,13 +244,13 @@ fun categorizeNotifications(notifications: List<Notification>): Map<String, List
   }
 
   return mapOf(
-      "Today" to today, "Last week" to lastWeek, "Last month" to lastMonth, "Last year" to lastYear)
+      "This week" to thisWeek, "Last week" to lastWeek, "Last month" to lastMonth, "Last year" to lastYear)
 }
 
-fun isToday(date: Date, now: Calendar): Boolean {
-  val calendar = Calendar.getInstance().apply { time = date }
-  return calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
-      calendar.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
+fun isThisWeek(date: Date, now: Calendar): Boolean {
+    val calendar = Calendar.getInstance().apply { time = date }
+    return calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+            calendar.get(Calendar.WEEK_OF_YEAR) == now.get(Calendar.WEEK_OF_YEAR)
 }
 
 fun isLastWeek(date: Date, now: Calendar): Boolean {
