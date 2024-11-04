@@ -18,12 +18,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.model.UserInfo
 import com.github.se.travelpouch.model.fsUid
+import com.github.se.travelpouch.model.profile.Profile
 
 @Composable
 fun ParticipantRow(
-    participant: Map.Entry<fsUid, UserInfo>,
+    participant: Map.Entry<fsUid, Profile>,
     selectedTravel: TravelContainer,
     onClick: () -> Unit
 ) {

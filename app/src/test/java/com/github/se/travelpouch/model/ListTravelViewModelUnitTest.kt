@@ -39,7 +39,7 @@ class ListTravelViewModelTest {
               "Test Location",
           ),
           mapOf("Test Key item" to "Test Value item"),
-          mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER))
+          mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER))
 
   @Before
   fun setUp() {
