@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.github.se.travelpouch.model.profile.Profile
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +24,8 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   private val selectedTravel_ = MutableStateFlow<TravelContainer?>(null)
   open val selectedTravel: StateFlow<TravelContainer?> = selectedTravel_.asStateFlow()
 
-  private val participants_ = MutableStateFlow<Map<fsUid, UserInfo>>(emptyMap())
-  val participants: StateFlow<Map<fsUid, UserInfo>> = participants_.asStateFlow()
+  private val participants_ = MutableStateFlow<Map<fsUid, Profile>>(emptyMap())
+  val participants: StateFlow<Map<fsUid, Profile>> = participants_.asStateFlow()
 
   private var lastFetchedTravel: TravelContainer? = null
   private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
@@ -89,7 +90,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    */
   private fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo) -> Unit,
+      onSuccess: (Profile) -> Unit,
       onFailure: () -> Unit
   ) {
     repository.checkParticipantExists(

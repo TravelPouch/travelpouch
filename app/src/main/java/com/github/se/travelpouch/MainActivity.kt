@@ -19,6 +19,7 @@ import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
@@ -33,6 +34,8 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
+import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
@@ -63,6 +66,8 @@ fun TravelPouchApp() {
       viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
+  val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
+
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
@@ -79,7 +84,9 @@ fun TravelPouchApp() {
       }
       composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
       composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
-      composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
+      composable(Screen.ADD_TRAVEL) {
+        AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+      }
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
         EditTravelSettingsScreen(listTravelViewModel, navigationActions)
       }
@@ -100,6 +107,12 @@ fun TravelPouchApp() {
       }
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
+
+      composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
+      composable(Screen.EDIT_PROFILE) {
+        ModifyingProfileScreen(navigationActions, profileModelView)
+      }
+
       composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
     }
   }

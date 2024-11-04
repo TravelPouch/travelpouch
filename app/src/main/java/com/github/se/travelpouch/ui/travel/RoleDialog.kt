@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.model.UserInfo
 import com.github.se.travelpouch.model.fsUid
+import com.github.se.travelpouch.model.profile.Profile
 
 /**
  * A composable function that displays a dialog for changing the role of a participant.
@@ -24,7 +24,7 @@ import com.github.se.travelpouch.model.fsUid
 @Composable
 fun ChangeRoleDialog(
     selectedTravel: TravelContainer?,
-    participant: Map.Entry<fsUid, UserInfo>,
+    participant: Map.Entry<fsUid, Profile>,
     onRoleChange: (Role) -> Unit,
 ) {
   Text(
@@ -75,7 +75,7 @@ fun ChangeRoleDialog(
 @Composable
 fun RoleEntryDialog(
     selectedTravel: TravelContainer?,
-    participant: Map.Entry<fsUid, UserInfo>,
+    participant: Map.Entry<fsUid, Profile>,
     changeRoleAction: (Boolean) -> Unit,
     removeParticipantAction: () -> Unit
 ) {

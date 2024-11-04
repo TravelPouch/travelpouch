@@ -1,6 +1,8 @@
 package com.github.se.travelpouch.model
 
 import android.util.Log
+import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.profile.ProfileRepositoryConvert
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
@@ -48,14 +50,15 @@ class TravelRepositoryFirestore(
    */
   override fun getParticipantFromfsUid(
       fsUid: fsUid,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid")
     db.collection(userCollectionPath).document(fsUid).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid success")
-        val user = task.result?.let { userEntry -> documentToUserInfo(userEntry) }
+        val user =
+            task.result?.let { userEntry -> ProfileRepositoryConvert.documentToProfile(userEntry) }
         onSuccess(user)
       } else {
         task.exception?.let { e ->
@@ -80,7 +83,7 @@ class TravelRepositoryFirestore(
    */
   override fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     db.collection(userCollectionPath).whereEqualTo("email", email).get().addOnCompleteListener {
@@ -95,7 +98,7 @@ class TravelRepositoryFirestore(
                 if (userEntries.size() > 1) {
                   Log.e("TravelRepositoryFirestore", "Multiple users with same email")
                 }
-                documentToUserInfo(userEntries.documents[0])
+                ProfileRepositoryConvert.documentToProfile(userEntries.documents[0])
               }
             }
         onSuccess(user)
@@ -251,30 +254,6 @@ class TravelRepositoryFirestore(
           allParticipants = allParticipants!!)
     } catch (e: Exception) {
       Log.e("TravelRepositoryFirestore", "Error converting document to TravelContainer", e)
-      null
-    }
-  }
-
-  /**
-   * Converts a Firestore document to a UserInfo object.
-   *
-   * @param document The Firestore document to convert.
-   * @return A UserInfo object if the conversion is successful, or null if any required field is
-   *   missing or an error occurs.
-   */
-  private fun documentToUserInfo(document: DocumentSnapshot): UserInfo? {
-    return try {
-      val fsUid = document.id
-      val name = document.getString("name")
-      val email = document.getString("email")
-      val userTravelList = document.get("listoftravellinked") as? List<String>
-      UserInfo(
-          fsUid = fsUid,
-          name = name!!,
-          userTravelList = userTravelList ?: emptyList(),
-          email = email!!)
-    } catch (e: Exception) {
-      Log.e("TravelRepositoryFirestore", "Error converting document to UserInfo", e)
       null
     }
   }

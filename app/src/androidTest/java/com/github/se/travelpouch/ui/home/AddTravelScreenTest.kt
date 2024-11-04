@@ -14,6 +14,9 @@ import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.TravelRepository
 import com.github.se.travelpouch.model.location.LocationRepository
 import com.github.se.travelpouch.model.location.LocationViewModel
+import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -25,6 +28,7 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doThrow
 
 class AddTravelScreenTest {
@@ -50,26 +54,41 @@ class AddTravelScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listTravelViewModel: ListTravelViewModel
   private lateinit var locationViewModel: LocationViewModel
+  private lateinit var profileRepository: ProfileRepository
+  private lateinit var profileModelView: ProfileModelView
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
+    val profile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", null, "name", emptyList())
+
     // Mocking objects for ViewModel and NavigationActions
     travelRepository = mock(TravelRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
+    profileRepository = mock(ProfileRepository::class.java)
     listTravelViewModel = ListTravelViewModel(travelRepository)
     // Use a real LocationViewModel with a fake repository
     locationViewModel = LocationViewModel(FakeLocationRepository())
+    profileModelView = ProfileModelView(profileRepository)
 
     // Mock the current route to be the add travel screen
     `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
     `when`(listTravelViewModel.getNewUid()).thenReturn("validMockUid12345678")
+
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(profile)
+    }
   }
 
   @Test
   fun displayAllComponents() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
+    profileModelView.getProfile()
 
     composeTestRule.onNodeWithTag("addTravelScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
@@ -88,8 +107,9 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithInvalidStartDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView)
     }
+    profileModelView.getProfile()
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -114,8 +134,9 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithEndInvalidDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView)
     }
+    profileModelView.getProfile()
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -136,8 +157,9 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithInvalidStartAndEndDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView)
     }
+    profileModelView.getProfile()
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -162,8 +184,9 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithNonNumericDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView)
     }
+    profileModelView.getProfile()
 
     // Input valid title and description
     inputText("inputTravelTitle", "Trip to Paris")
@@ -190,8 +213,9 @@ class AddTravelScreenTest {
 
     // Set up the content for the test
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView)
     }
+    profileModelView.getProfile()
 
     composeTestRule.waitForIdle() // Ensures inputs are registered
 
@@ -217,8 +241,11 @@ class AddTravelScreenTest {
 
   @Test
   fun backButtonNavigatesCorrectly() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
+    profileModelView.getProfile()
     // Click the go back button
     composeTestRule.onNodeWithTag("goBackButton").performClick()
 
@@ -228,8 +255,11 @@ class AddTravelScreenTest {
 
   @Test
   fun saveButtonNotEnabled() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
+    profileModelView.getProfile()
     // Initially, the save button should be disabled
     composeTestRule.onNodeWithTag("travelSaveButton").assertIsNotEnabled()
   }
@@ -243,9 +273,10 @@ class AddTravelScreenTest {
 
     // Set up the content for the test
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView)
     }
 
+    profileModelView.getProfile()
     // Input valid travel details
     inputText("inputTravelTitle", "Trip to Paris")
     inputText("inputTravelDescription", "A fun trip to Paris")

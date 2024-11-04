@@ -16,8 +16,8 @@ import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.TravelRepository
-import com.github.se.travelpouch.model.UserInfo
 import com.github.se.travelpouch.model.fsUid
+import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,12 +28,30 @@ import org.mockito.Mockito.mock
 
 class ParticipantListScreenTest {
 
+  private val container = createContainer()
+  private val participant1 =
+      Profile(
+          fsUid = container.allParticipants.keys.toList()[0].fsUid,
+          name = "User One",
+          userTravelList = listOf("travel1"),
+          email = "user1@example.com",
+          friends = null,
+          username = "username")
+  private val participant2 =
+      Profile(
+          fsUid = container.allParticipants.keys.toList()[1].fsUid,
+          name = "User Two",
+          userTravelList = listOf("travel2"),
+          email = "user2@example.com",
+          friends = null,
+          username = "username")
+
   private fun createContainer(): TravelContainer {
     val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
     val attachments: MutableMap<String, String> = HashMap()
     attachments["Attachment1"] = "UID1"
-    val user1ID = "rythwEmprFhOOgsANXnv"
-    val user2ID = "sigmasigmasigmasigma"
+    val user1ID = "rythwEmprFhOOgsANXnvAAAAAAAA"
+    val user2ID = "sigmasigmasigmasigmaAAAAAAAA"
     val participants: MutableMap<Participant, Role> = HashMap()
     participants[Participant(user1ID)] = Role.OWNER
     participants[Participant(user2ID)] = Role.PARTICIPANT
@@ -91,27 +109,13 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewChangeRole() {
-    val container = createContainer()
-    // Add participants directly
-    val participant1 =
-        UserInfo(
-            container.allParticipants.keys.toList()[0].fsUid,
-            "User One",
-            listOf("travel1"),
-            "user1@example.com")
-    val participant2 =
-        UserInfo(
-            container.allParticipants.keys.toList()[1].fsUid,
-            "User Two",
-            listOf("travel2"),
-            "user2@example.com")
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
     val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
     participants_field.isAccessible = true
     val participantFlow =
-        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, Profile>>
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
@@ -161,27 +165,13 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewChangeRoleFailed() {
-    val container = createContainer()
-    // Add participants directly
-    val participant1 =
-        UserInfo(
-            container.allParticipants.keys.toList()[0].fsUid,
-            "User One",
-            listOf("travel1"),
-            "user1@example.com")
-    val participant2 =
-        UserInfo(
-            container.allParticipants.keys.toList()[1].fsUid,
-            "User Two",
-            listOf("travel2"),
-            "user2@example.com")
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
     val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
     participants_field.isAccessible = true
     val participantFlow =
-        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, Profile>>
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
@@ -232,27 +222,13 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewChangeRoleToSameRole() {
-    val container = createContainer()
-    // Add participants directly
-    val participant1 =
-        UserInfo(
-            container.allParticipants.keys.toList()[0].fsUid,
-            "User One",
-            listOf("travel1"),
-            "user1@example.com")
-    val participant2 =
-        UserInfo(
-            container.allParticipants.keys.toList()[1].fsUid,
-            "User Two",
-            listOf("travel2"),
-            "user2@example.com")
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
     val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
     participants_field.isAccessible = true
     val participantFlow =
-        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, Profile>>
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
@@ -297,27 +273,13 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewRemoveParticipant() {
-    val container = createContainer()
-    // Add participants directly
-    val participant1 =
-        UserInfo(
-            container.allParticipants.keys.toList()[0].fsUid,
-            "User One",
-            listOf("travel1"),
-            "user1@example.com")
-    val participant2 =
-        UserInfo(
-            container.allParticipants.keys.toList()[1].fsUid,
-            "User Two",
-            listOf("travel2"),
-            "user2@example.com")
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
     val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
     participants_field.isAccessible = true
     val participantFlow =
-        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, Profile>>
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
@@ -347,27 +309,13 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewRemoveParticipantFail() {
-    val container = createContainer()
-    // Add participants directly
-    val participant1 =
-        UserInfo(
-            container.allParticipants.keys.toList()[0].fsUid,
-            "User One",
-            listOf("travel1"),
-            "user1@example.com")
-    val participant2 =
-        UserInfo(
-            container.allParticipants.keys.toList()[1].fsUid,
-            "User Two",
-            listOf("travel2"),
-            "user2@example.com")
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
     val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
     participants_field.isAccessible = true
     val participantFlow =
-        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, UserInfo>>
+        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, Profile>>
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 

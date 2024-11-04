@@ -1,7 +1,8 @@
 package com.github.se.travelpouch.model.notifications
 
 import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.generateAutoId
+import com.github.se.travelpouch.model.TravelContainerMock.generateAutoObjectId
+import com.github.se.travelpouch.model.TravelContainerMock.generateAutoUserId
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -9,10 +10,10 @@ class NotificationContainerLastCaseTest {
 
   @Test
   fun notificationInitialization_ValidData() {
-    val notificationUid = generateAutoId()
-    val senderUid = generateAutoId()
-    val receiverUid = generateAutoId()
-    val travelUid = generateAutoId()
+    val notificationUid = generateAutoObjectId()
+    val senderUid = generateAutoUserId()
+    val receiverUid = generateAutoUserId()
+    val travelUid = generateAutoObjectId()
     val content =
         NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
     try {
@@ -38,10 +39,10 @@ class NotificationContainerLastCaseTest {
 
   @Test
   fun toMap_withValidData_returnsCorrectMap() {
-    val notificationUid = generateAutoId()
-    val senderUid = generateAutoId()
-    val receiverUid = generateAutoId()
-    val travelUid = generateAutoId()
+    val notificationUid = generateAutoObjectId()
+    val senderUid = generateAutoUserId()
+    val receiverUid = generateAutoUserId()
+    val travelUid = generateAutoObjectId()
     val content =
         NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
     val notification =

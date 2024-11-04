@@ -16,7 +16,7 @@ import com.github.se.travelpouch.model.Participant
 import com.github.se.travelpouch.model.Role
 import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.TravelRepository
-import com.github.se.travelpouch.model.UserInfo
+import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -43,8 +43,8 @@ class EditTravelSettingsScreenTest {
     val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
     val attachments: MutableMap<String, String> = HashMap()
     attachments["Attachment1"] = "UID1"
-    val user1ID = "rythwEmprFhOOgsANXnv"
-    val user2ID = "sigmasigmasigmasigma"
+    val user1ID = "rythwEmprFhOOgsANXnv12345678"
+    val user2ID = "sigmasigmasigmasigma12345678"
     val participants: MutableMap<Participant, Role> = HashMap()
     participants[Participant(user1ID)] = Role.OWNER
     participants[Participant(user2ID)] = Role.PARTICIPANT
@@ -173,7 +173,7 @@ class EditTravelSettingsScreenTest {
     // Now this is a valid user that had serialisation problems
     inputText("addUserEmailField", randomEmail, "newuser.email@example.org")
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(UserInfo?) -> Unit>(1)
+          val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
           // Call the onSuccess callback with null
           onSuccess(null)
         }
@@ -186,9 +186,15 @@ class EditTravelSettingsScreenTest {
     // Now this is a valid user that does exist
     doAnswer { invocation ->
           val email = invocation.getArgument<String>(0)
-          val onSuccess = invocation.getArgument<(UserInfo?) -> Unit>(1)
+          val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
           val customUserInfo =
-              UserInfo("abcdefghijklmnopqstu", "Custom User", listOf("00000000000000000000"), email)
+              Profile(
+                  fsUid = "abcdefghijklmnopqrstuvwxyz12",
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = null)
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo)
         }
