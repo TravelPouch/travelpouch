@@ -175,8 +175,8 @@ class NominatimLocationRepositoryUnitTest {
     repository.search("Paris", { result -> locations = result }, { e -> failureException = e })
 
     // Verification
-    assertTrue(locations != null) // The locations list should not be null
-    assertTrue(locations!!.isEmpty()) // The list should be empty if the body is null
-    assertTrue(failureException == null) // No exception should be thrown
+    assertTrue(locations == null) // The locations list should not be null
+    assertTrue(failureException != null)
+    assertEquals("Empty response body", failureException?.message)
   }
 }
