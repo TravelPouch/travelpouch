@@ -146,8 +146,8 @@ class NotificationRepositoryUnitTest {
     val mockNotification =
         Notification(
             "6NU2zp2oGdA34s1Q1q5h",
-            "6NU2zp2oGdA34s1Q1q5h",
-            "6NU2zp2oGdA34s1Q1222",
+            "6NU2zp2oGdA34s1Q1q5h12345678",
+            "6NU2zp2oGdA34s1Q122212345678",
             "6NU2zp2oGdA34s1Q1q5h",
             mock(NotificationContent::class.java),
             NotificationType.INVITATION)

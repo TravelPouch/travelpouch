@@ -1,5 +1,11 @@
 package com.github.se.travelpouch.ui.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CardTravel
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 
 object Route {
@@ -16,9 +22,24 @@ object Screen {
   const val DOCUMENT_PREVIEW = "DocumentPreview Screen"
   const val TRAVEL_ACTIVITIES = "TravelActivities Screen"
   const val ADD_ACTIVITY = "AddActivity Screen"
+  const val EDIT_ACTIVITY = "Edit Activity Screen"
   const val TIMELINE = "Timeline Screen"
+
+  const val PROFILE = "Profile Screen"
+  const val EDIT_PROFILE = "Edit Profile Screen"
+
   const val ACTIVITIES_MAP = "MapActivities Screen"
+
   const val CALENDAR = "Calendar Screen"
+}
+
+data class TopLevelDestination(val screen: String, val icon: ImageVector, val textId: String)
+
+object TopLevelDestinations {
+  val TRAVELS = TopLevelDestination(Screen.TRAVEL_LIST, Icons.Default.CardTravel, "Travels")
+  val ACTIVITIES = TopLevelDestination(Screen.TRAVEL_ACTIVITIES, Icons.Default.Home, "Activities")
+  val MAP = TopLevelDestination(Screen.ACTIVITIES_MAP, Icons.Default.Place, "Map")
+  val CALENDAR = TopLevelDestination(Screen.CALENDAR, Icons.Default.DateRange, "Calendar")
 }
 
 open class NavigationActions(

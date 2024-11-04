@@ -2,7 +2,8 @@
 package com.github.se.travelpouch.model.notifications
 
 import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.generateAutoId
+import com.github.se.travelpouch.model.TravelContainerMock.generateAutoObjectId
+import com.github.se.travelpouch.model.TravelContainerMock.generateAutoUserId
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -26,37 +27,37 @@ class NotificationContainerInvalidDataTest(
       return listOf(
           arrayOf(
               "",
-              generateAutoId(),
-              generateAutoId(),
-              generateAutoId(),
+              generateAutoUserId(),
+              generateAutoUserId(),
+              generateAutoObjectId(),
               NotificationContent.InvitationNotification(
                   "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
-              generateAutoId(),
+              generateAutoObjectId(),
               "",
-              generateAutoId(),
-              generateAutoId(),
+              generateAutoUserId(),
+              generateAutoObjectId(),
               NotificationContent.InvitationNotification(
                   "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
-              generateAutoId(),
-              generateAutoId(),
+              generateAutoObjectId(),
+              generateAutoUserId(),
               "",
-              generateAutoId(),
+              generateAutoObjectId(),
               NotificationContent.InvitationNotification(
                   "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
-              generateAutoId(),
-              generateAutoId(),
-              generateAutoId(),
+              generateAutoObjectId(),
+              generateAutoUserId(),
+              generateAutoUserId(),
               "",
               NotificationContent.InvitationNotification(
                   "John Doe", "Trip to Paris", Role.PARTICIPANT)),
           arrayOf(
-              generateAutoId(),
-              "6NU2zp2oGdA34s1Q1q5h",
-              "6NU2zp2oGdA34s1Q1q5h",
-              generateAutoId(),
+              generateAutoObjectId(),
+              "6NU2zp2oGdA34s1Q1q5h12345678",
+              "6NU2zp2oGdA34s1Q1q5h12345678",
+              generateAutoObjectId(),
               NotificationContent.InvitationNotification(
                   "TheName", "Trip to Paris", Role.PARTICIPANT)),
       )
