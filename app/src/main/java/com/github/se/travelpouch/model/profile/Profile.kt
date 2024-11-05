@@ -37,8 +37,7 @@ object ErrorProfile {
 }
 
 object CurrentProfile {
-  var currentProfileUidForProfileFetch = "0000000000000000000000000000"
-  var currentProfileUidForTravelFetch = "0000000000000000000000000000"
+  var currentProfileUid = "0000000000000000000000000000"
 }
 
 object NobodyLoginProfile {

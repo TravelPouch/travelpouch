@@ -32,6 +32,7 @@ import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 /**
@@ -54,6 +55,12 @@ fun SignInScreen(
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
+            GlobalScope.launch {
+              profileModelView.initAfterLogin()
+              Log.d("SignInScreen", "profile available")
+            }
+
+            travelViewModel.initAfterLogin()
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },

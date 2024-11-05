@@ -90,7 +90,8 @@ fun TravelPouchApp() {
             listTravelViewModel,
             activityModelView,
             eventsViewModel,
-            documentViewModel)
+            documentViewModel,
+            profileModelView)
       }
       composable(Screen.TRAVEL_ACTIVITIES) {
         TravelActivitiesScreen(navigationActions, activityModelView)

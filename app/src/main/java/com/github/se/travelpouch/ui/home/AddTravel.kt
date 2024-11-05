@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
+import com.github.se.travelpouch.model.profile.CurrentProfile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
@@ -80,8 +81,6 @@ fun AddTravelScreen(
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
   val context = LocalContext.current
-
-  val currentProfile = profileModelView.profile.collectAsState()
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("addTravelScreen"), // Tag for entire screen
@@ -241,9 +240,9 @@ fun AddTravelScreen(
                                 allAttachments = emptyMap(),
                                 allParticipants =
                                     mapOf(
-                                        Participant(fsUid = profileModelView.profile.value.fsUid) to
+                                        Participant(fsUid = CurrentProfile.currentProfileUid) to
                                             Role.OWNER),
-                                listParticipant = listOf(currentProfile.value.fsUid))
+                                listParticipant = listOf(CurrentProfile.currentProfileUid))
 
                         Log.d("AddTravelScreen", "TravelContainer created successfully.")
                       } catch (e: Exception) {

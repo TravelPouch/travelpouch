@@ -30,9 +30,8 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   private var lastFetchedTravel: TravelContainer? = null
   private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
 
-  init {
-    Log.d("ProfileUID", "init MV")
-    repository.init { getTravels() }
+  fun initAfterLogin() {
+    repository.initAfterLogin { getTravels() }
   }
 
   // create factory
