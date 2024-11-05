@@ -20,14 +20,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.text.isDigitsOnly
-
-import com.github.se.travelpouch.model.travels.Location
-
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
-
+import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -146,7 +143,8 @@ fun AddActivityScreen(
                         value = timeText,
                         onValueChange = {},
                         label = {
-                          Text("Time (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                          Text(
+                              "Time (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         },
                         placeholder = {
                           Text(
@@ -167,7 +165,8 @@ fun AddActivityScreen(
                       showDropdown = true // Show dropdown when user starts typing
                     },
                     label = {
-                      Text("Location (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                      Text(
+                          "Location (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     },
                     placeholder = {
                       Text(

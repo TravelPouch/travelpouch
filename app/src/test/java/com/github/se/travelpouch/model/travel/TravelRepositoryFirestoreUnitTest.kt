@@ -36,6 +36,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -762,6 +763,82 @@ class TravelRepositoryFirestoreUnitTest {
       assertTrue(failureCalled)
       logMock.verify { Log.e("TravelRepositoryFirestore", "Error getting documents", exception) }
     }
+  }
+
+  @Test
+  fun getParticipantFromUidTest() {
+    val task: Task<DocumentSnapshot> = mock()
+    val documentReferenceProfile: DocumentReference = mock()
+    val documentSnapshot: DocumentSnapshot = mock()
+
+    val mockFirestoreBis: FirebaseFirestore = mock()
+    val travelRepositoryFirestoreBis = TravelRepositoryFirestore(mockFirestoreBis)
+    val collectionReferenceProfiles: CollectionReference = mock()
+
+    `when`(mockFirestoreBis.collection(anyOrNull())).thenReturn(collectionReferenceProfiles)
+    `when`(collectionReferenceProfiles.document(anyOrNull())).thenReturn(documentReferenceProfile)
+    `when`(documentReferenceProfile.get()).thenReturn(task)
+
+    `when`(documentSnapshot.id).thenReturn(profile.fsUid)
+    `when`(documentSnapshot.getString("email")).thenReturn(profile.email)
+    `when`(documentSnapshot.getString("name")).thenReturn(profile.name)
+    `when`(documentSnapshot.getString("username")).thenReturn(profile.username)
+    `when`(documentSnapshot.get("userTravelList")).thenReturn(profile.userTravelList)
+    `when`(documentSnapshot.get("friends")).thenReturn(profile.friends)
+
+    whenever(task.isSuccessful).thenReturn(true)
+    whenever(task.result).thenReturn(documentSnapshot)
+
+    var profileGot: Profile? = null
+    travelRepositoryFirestoreBis.getParticipantFromfsUid(
+        profile.fsUid, { profileGot = it }, { fail("Should not call onFailure") })
+
+    // Simulate task completion
+    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<DocumentSnapshot>>()
+    verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onComplete(task)
+
+    assertEquals(profileGot, profile)
+  }
+
+  @Test
+  fun checkParticipantExists() {
+    val mockFirestoreBis: FirebaseFirestore = mock()
+    val travelRepositoryFirestoreBis = TravelRepositoryFirestore(mockFirestoreBis)
+    val collectionReferenceProfiles: CollectionReference = mock()
+    val queryProfiles: Query = mock()
+
+    val task: Task<QuerySnapshot> = mock()
+    val query: QuerySnapshot = mock()
+    val documentSnapshot: DocumentSnapshot = mock()
+
+    `when`(mockFirestoreBis.collection(anyOrNull())).thenReturn(collectionReferenceProfiles)
+    `when`(collectionReferenceProfiles.whereEqualTo(eq("email"), anyOrNull()))
+        .thenReturn(queryProfiles)
+    `when`(queryProfiles.get()).thenReturn(task)
+
+    `when`(documentSnapshot.id).thenReturn(profile.fsUid)
+    `when`(documentSnapshot.getString("email")).thenReturn(profile.email)
+    `when`(documentSnapshot.getString("name")).thenReturn(profile.name)
+    `when`(documentSnapshot.getString("username")).thenReturn(profile.username)
+    `when`(documentSnapshot.get("userTravelList")).thenReturn(profile.userTravelList)
+    `when`(documentSnapshot.get("friends")).thenReturn(profile.friends)
+
+    whenever(task.isSuccessful).thenReturn(true)
+    whenever(task.result).thenReturn(query)
+    whenever(query.documents).thenReturn(listOf(documentSnapshot))
+    whenever(query.isEmpty).thenReturn(false)
+
+    var profileGot: Profile? = null
+    travelRepositoryFirestoreBis.checkParticipantExists(
+        profile.email, { profileGot = it }, { fail("Should not call onFailure") })
+
+    // Simulate task completion
+    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<QuerySnapshot>>()
+    verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onComplete(task)
+
+    assertEquals(profileGot, profile)
   }
 
   //  @Test
