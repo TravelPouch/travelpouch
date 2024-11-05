@@ -2,7 +2,6 @@ package com.github.se.travelpouch.model.travel
 
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
-import com.github.se.travelpouch.model.profile.CurrentProfile
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
@@ -92,7 +91,6 @@ class TravelRepositoryFirestoreUnitTest {
     if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
       FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
     }
-    CurrentProfile.profile = profile
 
     travelRepositoryFirestore = TravelRepositoryFirestore(mockFirestore)
     mockTaskQuerySnapshot = mock()
@@ -101,7 +99,8 @@ class TravelRepositoryFirestoreUnitTest {
     mockDocumentSnapshotNotInitialised = mock()
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.where(any())).thenReturn(mockQuery)
+    `when`(mockCollectionReference.whereArrayContains(eq("listParticipant"), anyOrNull()))
+        .thenReturn(mockQuery)
     `when`(mockQuery.get()).thenReturn(mockTaskQuerySnapshot)
     `when`(mockCollectionReference.document(anyOrNull())).thenReturn(mockDocumentReference)
     `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)

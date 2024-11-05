@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.github.se.travelpouch.model.profile.CurrentProfile
 import com.github.se.travelpouch.model.profile.Profile
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -31,8 +30,9 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   private var lastFetchedTravel: TravelContainer? = null
   private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
 
-  fun initAfterLogin() {
-    repository.initAfterLogin { getTravels() }
+  init {
+    Log.d("ProfileUID", "init MV")
+    repository.init { getTravels() }
   }
 
   // create factory
@@ -116,6 +116,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   /** Gets all Travel documents. */
   fun getTravels() {
 
+    Log.d("ProfileUID", "gettravel MV")
     repository.getTravels(
         onSuccess = { travels_.value = it },
         onFailure = { Log.e("ListTravelViewModel", "Failed to get travels", it) })
@@ -151,8 +152,6 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
    * @param id The ID of the Travel document to be deleted.
    */
   fun deleteTravelById(id: String) {
-    CurrentProfile.profile.userTravelList =
-        CurrentProfile.profile.userTravelList.filter { it != id }
     repository.deleteTravelById(
         id = id,
         onSuccess = { getTravels() },

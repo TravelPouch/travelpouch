@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.profile
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
@@ -7,7 +8,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
 /**
  * The class representing the communication scheme between our project and the database that will
@@ -20,14 +20,25 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   private var collectionPath = "userslist"
   private var documentPath = ""
 
-  override suspend fun initAfterLogin() {
+  override fun init(onSuccess: () -> Unit) {
     Log.d("ProfileRepo", "init after login")
-    val user = Firebase.auth.currentUser
-    if (user != null) {
-      gettingUserProfile(user)
-    } else {
-      Firebase.auth.signOut()
+
+    Firebase.auth.addAuthStateListener {
+      val user = it.currentUser
+      if (user != null) {
+        gettingUserProfile(user)
+        onSuccess()
+      } else {
+        Firebase.auth.signOut()
+      }
     }
+
+    //    val user = Firebase.auth.currentUser
+    //    if (user != null) {
+    //      gettingUserProfile(user)
+    //    } else {
+    //      Firebase.auth.signOut()
+    //    }
   }
 
   /**
@@ -42,7 +53,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
       try {
         addProfile(user.email!!, user.uid)
       } catch (e: Exception) {
-        Log.e("nullEmail", "Email of user was null")
+        Log.e("nullEmail", "Email of user was null, deleting user")
         user.delete()
         Firebase.auth.signOut()
       }
@@ -56,18 +67,18 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param user (FirebaseUser) : the currently connected user on the application
    * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
    */
-  suspend fun gettingUserProfile(user: FirebaseUser) {
+  @SuppressLint("SuspiciousIndentation")
+  fun gettingUserProfile(user: FirebaseUser) {
 
     Log.d("Profile repo", "getting profile")
     documentPath = user.uid
-    try {
-      val document = db.collection(collectionPath).document(documentPath).get().await()
-      Log.d("ProfileRepository", "in try og getting profile")
-      addingUserIfNotRegistered(user, document)
-      CurrentProfile.profile = ProfileRepositoryConvert.documentToProfile(document)
-    } catch (e: Exception) {
-      Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
-    }
+    db.collection(collectionPath)
+        .document(documentPath)
+        .get()
+        .addOnSuccessListener { addingUserIfNotRegistered(user, it) }
+        .addOnFailureListener {
+          Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
+        }
   }
 
   /**

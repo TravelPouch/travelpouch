@@ -27,5 +27,5 @@ interface ProfileRepository {
   fun updateProfile(newProfile: Profile, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   /** This is the initialisation function of the profile repository */
-  suspend fun initAfterLogin()
+  fun init(onSuccess: () -> Unit)
 }

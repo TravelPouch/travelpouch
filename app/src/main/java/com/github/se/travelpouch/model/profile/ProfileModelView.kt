@@ -36,19 +36,15 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
   val profile: StateFlow<Profile> = profile_.asStateFlow()
 
   /** The initialisation function of the profile model view. It fetches the profile of the user */
-  suspend fun initAfterLogin() {
-    repository.initAfterLogin()
-    profile_.value = CurrentProfile.profile
+  init {
+    repository.init { getProfile() }
   }
 
   /** This function fetches the profile information of the user */
   fun getProfile() {
     Log.d("ProfileViewModel", "getting profile")
     repository.getProfileElements(
-        onSuccess = {
-          CurrentProfile.profile = it
-          profile_.value = it
-        },
+        onSuccess = { profile_.value = it },
         onFailure = { Log.e(onFailureTag, "Failed to get profile", it) })
   }
 
@@ -59,7 +55,6 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
    * @param context (Context) : the context of the editing profile screen
    */
   fun updateProfile(profile: Profile, context: Context) {
-    CurrentProfile.profile = profile
     repository.updateProfile(
         profile,
         onSuccess = { getProfile() },

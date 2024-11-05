@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.model.profile
 
 import androidx.core.util.PatternsCompat
-import com.github.se.travelpouch.model.profile.NobodyLoginProfile.nobodyLoginProfile
 import com.github.se.travelpouch.model.travels.isValidUserUid
 
 /**
@@ -38,7 +37,8 @@ object ErrorProfile {
 }
 
 object CurrentProfile {
-  var profile = nobodyLoginProfile
+  var currentProfileUidForProfileFetch = "0000000000000000000000000000"
+  var currentProfileUidForTravelFetch = "0000000000000000000000000000"
 }
 
 object NobodyLoginProfile {

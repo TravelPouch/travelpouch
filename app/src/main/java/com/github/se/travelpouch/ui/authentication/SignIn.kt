@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.travelpouch.R
-import com.github.se.travelpouch.model.profile.CurrentProfile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -33,9 +32,7 @@ import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * A composable function that displays the sign-in screen.
@@ -56,18 +53,7 @@ fun SignInScreen(
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
-            val job =
-                GlobalScope.launch {
-                  profileModelView.initAfterLogin()
-                  Log.d("SignInScreen", "profile available")
-                }
 
-            runBlocking { job.join() }
-
-            Log.d("problem", "Already skipping profile")
-            Log.d("profile", "${CurrentProfile.profile}")
-            travelViewModel.initAfterLogin()
-            // notificationViewModel.initAfterLogin()
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
