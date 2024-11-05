@@ -2,18 +2,19 @@ package com.github.se.travelpouch.model.location
 
 import android.util.Log
 import com.github.se.travelpouch.model.travels.Location
+
+import com.github.se.travelpouch.helper.NetworkManager
+
 import com.google.firebase.Timestamp
-import java.io.IOException
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import org.json.JSONArray
 
 /** Repository for searching locations using the Nominatim API. */
 class NominatimLocationRepository(val client: OkHttpClient) : LocationRepository {
+
+  private val networkManager: NetworkManager = NetworkManager(client)
 
   /**
    * Parses the JSON response from the Nominatim API.
@@ -63,33 +64,22 @@ class NominatimLocationRepository(val client: OkHttpClient) : LocationRepository
                 "User-Agent",
                 "TravelPouchApp/1.0 (travelpouchswent@gmail.com)") // Set a proper User-Agent
             .build()
-    client
-        .newCall(request)
-        .enqueue(
-            object : Callback {
-              override fun onFailure(call: Call, e: IOException) {
-                Log.e("NominatimLocationRepository", "Failed to execute request", e)
-                onFailure(e)
-              }
-
-              override fun onResponse(call: Call, response: Response) {
-                response.use {
-                  if (!response.isSuccessful) {
-                    onFailure(Exception("Unexpected code $response"))
-                    Log.d("NominatimLocationRepository", "Unexpected code $response")
-                    return
-                  }
-
-                  val body = response.body?.string()
-                  if (body != null) {
-                    onSuccess(parseBody(body))
-                    Log.d("NominatimLocationRepository", "Body: $body")
-                  } else {
-                    Log.d("NominatimLocationRepository", "Empty body")
-                    onSuccess(emptyList())
-                  }
-                }
-              }
-            })
+    // Use NetworkManager to make the network call
+    networkManager.executeRequest(
+        request,
+        onSuccess = { body ->
+          try {
+            val locations = parseBody(body)
+            onSuccess(locations)
+            Log.d("NominatimLocationRepository", "Body: $body")
+          } catch (e: Exception) {
+            Log.e("NominatimLocationRepository", "Failed to parse response", e)
+            onFailure(e)
+          }
+        },
+        onFailure = { e ->
+          Log.e("NominatimLocationRepository", "Network request failed", e)
+          onFailure(e)
+        })
   }
 }
