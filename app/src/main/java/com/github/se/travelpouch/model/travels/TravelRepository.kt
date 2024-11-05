@@ -18,7 +18,7 @@ interface TravelRepository {
       onFailure: (Exception) -> Unit
   )
 
-  fun init(onSuccess: () -> Unit)
+  fun initAfterLogin(onSuccess: () -> Unit)
 
   fun getTravels(onSuccess: (List<TravelContainer>) -> Unit, onFailure: (Exception) -> Unit)
 

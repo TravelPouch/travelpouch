@@ -27,15 +27,13 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   //    onSuccess()
   //  }
 
-  override fun init(onSuccess: () -> Unit) {
-    Log.d("ProfileUID", "in init repo")
-    Firebase.auth.addAuthStateListener {
-      Log.d("ProfileUID", "in listener")
-      if (it.currentUser != null) {
-        Log.d("ProfileUID", "near setting")
-        profileUid = it.currentUser!!.uid
-        onSuccess()
-      }
+  override fun initAfterLogin(onSuccess: () -> Unit) {
+    Log.d("ProfileUID", "in listener")
+    val user = Firebase.auth.currentUser
+    if (user != null) {
+      Log.d("ProfileUID", "near setting")
+      profileUid = user.uid
+      onSuccess()
     }
   }
 
