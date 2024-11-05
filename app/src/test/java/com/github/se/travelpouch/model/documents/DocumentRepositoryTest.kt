@@ -89,36 +89,6 @@ class DocumentRepositoryTest {
     assertEquals(true, flag)
   }
 
-  //  @Test
-  //  fun initCallsOnSuccessWhenUserIsAuthenticated() {
-  //    val authListenerCaptor = argumentCaptor<FirebaseAuth.AuthStateListener>()
-  //    whenever(mockAuth.currentUser).thenReturn(mockUser)
-  //
-  //    var successCalled = false
-  //
-  //    documentRepository.initAfterTravelAccess({ successCalled = true }, "qwertzuiopasdfghjkly")
-  //
-  //    verify(mockAuth).addAuthStateListener(authListenerCaptor.capture())
-  //    authListenerCaptor.firstValue.onAuthStateChanged(mockAuth)
-  //
-  //    assertTrue(successCalled)
-  //  }
-  //
-  //  @Test
-  //  fun initDoesNotCallOnSuccessWhenUserIsNotAuthenticated() {
-  //    val authListenerCaptor = argumentCaptor<FirebaseAuth.AuthStateListener>()
-  //    whenever(mockAuth.currentUser).thenReturn(null)
-  //
-  //    var successCalled = false
-  //
-  //    documentRepository.initAfterTravelAccess({ successCalled = true }, "qwertzuiopasdfghjkly")
-  //
-  //    verify(mockAuth).addAuthStateListener(authListenerCaptor.capture())
-  //    authListenerCaptor.firstValue.onAuthStateChanged(mockAuth)
-  //
-  //    assertFalse(successCalled)
-  //  }
-
   @Test
   fun failsToGetDocuments() {
     val task: Task<QuerySnapshot> = mock()

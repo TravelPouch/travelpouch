@@ -8,13 +8,12 @@ import com.github.se.travelpouch.model.profile.ProfileRepositoryConvert
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 
 class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepository {
 
-  private var collectionPath = ""
-  private var userCollectionPath = ""
+  private val collectionPath = FirebasePaths.TravelsSuperCollection
+  private val userCollectionPath = FirebasePaths.ProfilesSuperCollection
   /**
    * Initializes the repository by adding an authentication state listener. The listener triggers
    * the onSuccess callback if the user is authenticated.
@@ -22,8 +21,6 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    * @param onSuccess The callback to call if the user is authenticated.
    */
   override fun initAfterLogin(onSuccess: () -> Unit) {
-    userCollectionPath = FirebasePaths.ProfilesSuperCollection
-    collectionPath = FirebasePaths.TravelsSuperCollection
     onSuccess()
   }
 
@@ -170,7 +167,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   ) {
     Log.d("TravelRepositoryFirestore", "getTravels")
     db.collection(collectionPath)
-        .where(Filter.arrayContains("listParticipant", CurrentProfile.profile.fsUid))
+        .whereArrayContains("listParticipant", CurrentProfile.profile.fsUid)
         .get()
         .addOnCompleteListener { task ->
           if (task.isSuccessful) {

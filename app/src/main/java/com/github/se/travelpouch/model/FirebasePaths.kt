@@ -10,8 +10,6 @@ object FirebasePaths {
   val events = "events"
 
   fun constructPath(vararg paths: String): String {
-    var completePath = ""
-    for (s in paths) completePath += "$s/"
-    return completePath.dropLast(1)
+    return paths.joinToString("/")
   }
 }

@@ -70,29 +70,6 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     }
   }
 
-  //    AtomicBoolean done = new AtomicBoolean(false);
-  //    Global ans; // the return value holder
-  //    try{
-  //        result = someAsyncCall(query, new Thread()); // this new thread is for listener callback
-  //        result.setResultListener(result -> {
-  //            // do something with result.
-  //            ans = result.getAns() ; // set global ans
-  //            done.set(true);
-  //            synchronized (done) {
-  //                done.notifyAll(); // notify the main thread which is waiting
-  //            }
-  //        });
-  //    }
-  //    catch (Exception e ) {
-  //        Log(e);
-  //    }
-  //    synchronized (done) {
-  //        while (done.get() == false) {
-  //            done.wait(); // wait here until the listener fires
-  //        }
-  //    }
-  //    return ans; // return global ans
-
   /**
    * This function adds a profile to Firebase
    *

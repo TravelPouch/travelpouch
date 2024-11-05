@@ -2,7 +2,6 @@ package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -74,11 +73,9 @@ fun TravelListScreen(
       },
       content = { pd ->
         Column {
-          Log.d("Column", "in travel list column")
           if (travelList.value.isNotEmpty()) {
             // Add the map to display the travels
 
-            Log.d("IF", "in the if")
             MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), travelList.value)
 
             LazyColumn(
@@ -96,7 +93,6 @@ fun TravelListScreen(
                   }
                 }
           } else {
-            Log.d("IF", "in the else")
             MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), emptyList())
 
             Text(
