@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -74,6 +75,13 @@ class ActivityRepositoryUnitTest {
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
     `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
+  }
+
+  @Test
+  fun initTest() {
+    var flag = false
+    activityRepositoryFirestore.initAfterTravelAccess({ flag = true }, "uid")
+    assertEquals(true, flag)
   }
 
   @Test

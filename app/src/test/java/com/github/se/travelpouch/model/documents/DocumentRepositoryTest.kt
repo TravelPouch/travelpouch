@@ -13,6 +13,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.junit.Before
@@ -79,6 +80,13 @@ class DocumentRepositoryTest {
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
     `when`(mockCollectionReference.document(anyString())).thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.delete()).thenReturn(mock())
+  }
+
+  @Test
+  fun initTest() {
+    var flag = false
+    documentRepository.initAfterTravelAccess({ flag = true }, "uid")
+    assertEquals(true, flag)
   }
 
   //  @Test
