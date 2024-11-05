@@ -45,7 +45,10 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
   fun getProfile() {
     Log.d("ProfileViewModel", "getting profile")
     repository.getProfileElements(
-        onSuccess = { CurrentProfile.profile = it },
+        onSuccess = {
+          CurrentProfile.profile = it
+          profile_.value = it
+        },
         onFailure = { Log.e(onFailureTag, "Failed to get profile", it) })
   }
 

@@ -53,7 +53,8 @@ class NotificationSimulationBetweenTwoUsers {
             Timestamp(Date(2024, 1, 2)),
             Location(45.00, 45.00, Timestamp(Date(2024, 1, 1)), "Moon"),
             emptyMap(),
-            mapOf(Participant(user1Uid) to Role.OWNER))
+            mapOf(Participant(user1Uid) to Role.OWNER),
+            emptyList())
     val user1 = UserInfo(user1Uid, "Donkey Kong", listOf(travelUid), "donkey.kong@epfl.ch")
     val user2 = UserInfo(user2Uid, "Diddy Kong", emptyList(), "diddy.kong@epfl.ch")
 

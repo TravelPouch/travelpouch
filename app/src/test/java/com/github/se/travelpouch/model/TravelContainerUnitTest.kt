@@ -38,7 +38,8 @@ class TravelContainerUnitTest {
             Timestamp(1234567890L, 0),
             location,
             attachments,
-            participants)
+            participants,
+            emptyList())
 
     assertEquals(travelID, travelContainer.fsUid)
     assertEquals("Test Title", travelContainer.title)
@@ -68,7 +69,8 @@ class TravelContainerUnitTest {
             Timestamp(1234567890L, 0),
             location,
             attachments,
-            participants)
+            participants,
+            emptyList())
 
     val map: Map<String, Any> = travelContainer.toMap()
 
@@ -104,7 +106,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              HashMap<Participant, Role>())
+              HashMap<Participant, Role>(),
+              emptyList())
         }
     assertEquals("At least one participant is required", exception.message)
 
@@ -125,7 +128,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants)
+              participants,
+              emptyList())
         }
     assertEquals("At least one owner is required", exception.message)
 
@@ -146,7 +150,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants2)
+              participants2,
+              emptyList())
         }
     assertEquals("Title cannot be blank", exception.message)
 
@@ -167,7 +172,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants3)
+              participants3,
+              emptyList())
         }
     assertEquals("startTime must be strictly before endTime", exception.message)
     exception =
@@ -180,7 +186,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants3)
+              participants3,
+              emptyList())
         }
     assertEquals("startTime must be strictly before endTime", exception.message)
     exception =
@@ -193,7 +200,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants3)
+              participants3,
+              emptyList())
         }
     assertEquals("Invalid fsUid format", exception.message)
   }

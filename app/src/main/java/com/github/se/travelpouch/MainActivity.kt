@@ -81,8 +81,7 @@ fun TravelPouchApp() {
         route = Route.DEFAULT,
     ) {
       composable(Screen.AUTH) {
-        SignInScreen(
-            navigationActions, profileModelView, listTravelViewModel, notificationViewModel)
+        SignInScreen(navigationActions, profileModelView, listTravelViewModel)
       }
 
       composable(Screen.TRAVEL_LIST) {

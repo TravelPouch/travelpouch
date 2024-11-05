@@ -11,6 +11,7 @@ import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.documents.DocumentVisibility
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
@@ -78,7 +79,8 @@ class DocumentListTest {
             Timestamp.now(),
             Location(40.4114, 40.43321, Timestamp.now(), "Here"),
             HashMap(),
-            participants)
+            participants,
+            emptyList())
     navigationActions = mock(NavigationActions::class.java)
     mockFileDownloader = mock(FileDownloader::class.java)
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)

@@ -124,7 +124,9 @@ class CalendarScreenTest {
     composeTestRule.waitForIdle()
 
     // Click on the Map icon to test navigation
-    composeTestRule.onNodeWithTag("Travels").performClick()
+    composeTestRule.onNodeWithTag("Activities").performClick()
+    composeTestRule.onNodeWithTag("Calendar").performClick()
+    composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()
   }
 }

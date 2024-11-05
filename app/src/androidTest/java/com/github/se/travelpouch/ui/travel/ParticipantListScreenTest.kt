@@ -64,7 +64,8 @@ class ParticipantListScreenTest {
             Timestamp(1234567890L + 200_000L, 0),
             location,
             attachments,
-            participants)
+            participants,
+            listParticipant = emptyList())
     return travelContainer
   }
 

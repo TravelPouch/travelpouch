@@ -12,6 +12,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -227,8 +228,7 @@ class ProfileRepositoryTest {
   }
 
   @Test
-  fun gettingProfileUserCallsTheDocumentReference() {
-
+  fun gettingProfileUserCallsTheDocumentReference() = runTest {
     `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockFirebaseUser.email).thenReturn("email@test.ch")
 
@@ -236,7 +236,7 @@ class ProfileRepositoryTest {
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(null))
 
-    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
+    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser)
     verify(timeout(1000)) { (mockDocumentReference) }
   }
 

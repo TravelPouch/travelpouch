@@ -11,10 +11,12 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -44,6 +46,7 @@ class EditTravelSettingsScreenTest {
     val user1ID = "rythwEmprFhOOgsANXnv12345678"
     val user2ID = "sigmasigmasigmasigma12345678"
     val participants: MutableMap<Participant, Role> = HashMap()
+    val listParticipant = emptyList<String>()
     participants[Participant(user1ID)] = Role.OWNER
     participants[Participant(user2ID)] = Role.PARTICIPANT
     val travelContainer =
@@ -55,7 +58,8 @@ class EditTravelSettingsScreenTest {
             Timestamp(1234567890L + 200_000L, 0),
             location,
             attachments,
-            participants)
+            participants,
+            listParticipant)
     return travelContainer
   }
 

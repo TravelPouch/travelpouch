@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,10 +56,10 @@ fun TravelListScreen(
     documentViewModel: DocumentViewModel
 ) {
   // Fetch travels when the screen is launched
-  //  LaunchedEffect(Unit) {
-  //    listTravelViewModel.getTravels()
-  //    // sleep the thread for 1 second to allow the data to be fetched
-  //  }
+  LaunchedEffect(Unit) {
+    listTravelViewModel.getTravels()
+    // sleep the thread for 1 second to allow the data to be fetched
+  }
   // travelContainers.getTravels()
   val travelList = listTravelViewModel.travels.collectAsState()
 

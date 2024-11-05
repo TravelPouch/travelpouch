@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
-import com.github.se.travelpouch.model.FirebasePaths
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -13,16 +12,10 @@ import com.google.firebase.firestore.Query
 class NotificationRepository(private val firestore: FirebaseFirestore) {
 
   // Reference to the "notifications" collection in Firestore
-  private var notificationCollection = ""
+  private val notificationCollection = firestore.collection("notifications")
 
   fun getNewUid(): String {
-    return firestore.collection(notificationCollection).document().id
-  }
-
-  fun initAfterLogin() {
-    val p1 = FirebasePaths.ProfilesSuperCollection
-    val p2 = FirebasePaths.notifications
-    notificationCollection = FirebasePaths.constructPath(p1, p2)
+    return notificationCollection.document().id
   }
 
   /**
@@ -31,8 +24,7 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
    * @param notification The notification to be added.
    */
   fun addNotification(notification: Notification) {
-    firestore
-        .collection(notificationCollection)
+    notificationCollection
         .document(notification.notificationUid)
         .set(notification)
         .addOnSuccessListener { Log.d("NotificationRepository", "Notification added successfully") }
@@ -52,8 +44,7 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
       userId: String,
       onNotificationFetched: (List<Notification>) -> Unit
   ) {
-    firestore
-        .collection(notificationCollection)
+    notificationCollection
         .whereEqualTo("receiverId", userId)
         .orderBy("timestamp", Query.Direction.DESCENDING)
         .get()
@@ -73,10 +64,7 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
    * @param notificationUid The UID of the notification to be marked as read.
    */
   fun markNotificationAsRead(notificationUid: String) {
-    firestore
-        .collection(notificationCollection)
-        .document(notificationUid)
-        .update("status", NotificationStatus.READ)
+    notificationCollection.document(notificationUid).update("status", NotificationStatus.READ)
   }
 
   /**
@@ -86,9 +74,6 @@ class NotificationRepository(private val firestore: FirebaseFirestore) {
    * @param notificationType The new type of the notification.
    */
   fun changeNotificationType(notificationUid: String, notificationType: NotificationType) {
-    firestore
-        .collection(notificationCollection)
-        .document(notificationUid)
-        .update("notificationType", notificationType)
+    notificationCollection.document(notificationUid).update("notificationType", notificationType)
   }
 }
