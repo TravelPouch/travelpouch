@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travel
 
 import android.util.Log
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
