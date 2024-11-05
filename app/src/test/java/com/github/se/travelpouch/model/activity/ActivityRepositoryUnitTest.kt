@@ -80,7 +80,7 @@ class ActivityRepositoryUnitTest {
   @Test
   fun initTest() {
     var flag = false
-    activityRepositoryFirestore.initAfterTravelAccess({ flag = true }, "uid")
+    activityRepositoryFirestore.setIdTravel({ flag = true }, "uid")
     assertEquals(true, flag)
   }
 

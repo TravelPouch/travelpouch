@@ -14,7 +14,7 @@ import com.google.firebase.storage.FirebaseStorage
 
 /** Interface for the DocumentRepository. */
 interface DocumentRepository {
-  fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String)
+  fun setIdTravel(onSuccess: () -> Unit, travelId: String)
 
   fun getDocuments(onSuccess: (List<DocumentContainer>) -> Unit, onFailure: (Exception) -> Unit)
 
@@ -55,7 +55,7 @@ class DocumentRepositoryFirestore(
 ) : DocumentRepository {
   private var collectionPath = ""
 
-  override fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String) {
+  override fun setIdTravel(onSuccess: () -> Unit, travelId: String) {
     val p1 = FirebasePaths.TravelsSuperCollection
     val p2 = FirebasePaths.documents
     collectionPath = FirebasePaths.constructPath(p1, travelId, p2)

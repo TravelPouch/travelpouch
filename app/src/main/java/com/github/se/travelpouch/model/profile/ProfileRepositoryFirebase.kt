@@ -21,7 +21,6 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   private var documentPath = ""
 
   override suspend fun initAfterLogin() {
-    Log.d("ProfileRepo", "init after login")
     val user = Firebase.auth.currentUser
 
     if (user != null) {
@@ -62,9 +61,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   suspend fun gettingUserProfile(user: FirebaseUser) {
     try {
       val document = db.collection(collectionPath).document(documentPath).get().await()
-      Log.d("ProfileRepository", "in try og getting profile")
       addingUserIfNotRegistered(user, document)
-      Log.d("FINISH", "profile created")
     } catch (e: Exception) {
       Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
     }
@@ -95,12 +92,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   }
 
   override fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit) {
-    Log.d("ProfileRepository", "getProfile")
     db.collection(collectionPath)
         .document(documentPath)
         .get()
         .addOnSuccessListener { result ->
-          Log.d("ProfileRepository", "in lambda")
           val profile = ProfileRepositoryConvert.documentToProfile(result)
           onSuccess(profile)
         }
@@ -157,7 +152,6 @@ class ProfileRepositoryConvert {
      *   the error profile is returned.
      */
     fun documentToProfile(document: DocumentSnapshot): Profile {
-      Log.d("ProfileRepository", "converting doc to profile")
       return try {
         val uid = document.id
         val username = document.getString("username")

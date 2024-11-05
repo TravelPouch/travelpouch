@@ -42,7 +42,6 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
 
   /** This function fetches the profile information of the user */
   fun getProfile() {
-    Log.d("ProfileViewModel", "getting profile")
     repository.getProfileElements(
         onSuccess = { profile_.value = it },
         onFailure = { Log.e(onFailureTag, "Failed to get profile", it) })

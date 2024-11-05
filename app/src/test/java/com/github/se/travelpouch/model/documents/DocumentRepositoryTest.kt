@@ -85,7 +85,7 @@ class DocumentRepositoryTest {
   @Test
   fun initTest() {
     var flag = false
-    documentRepository.initAfterTravelAccess({ flag = true }, "uid")
+    documentRepository.setIdTravel({ flag = true }, "uid")
     assertEquals(true, flag)
   }
 

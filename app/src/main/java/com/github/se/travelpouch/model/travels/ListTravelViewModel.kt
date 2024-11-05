@@ -115,7 +115,6 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   /** Gets all Travel documents. */
   fun getTravels() {
 
-    Log.d("ProfileUID", "gettravel MV")
     repository.getTravels(
         onSuccess = { travels_.value = it },
         onFailure = { Log.e("ListTravelViewModel", "Failed to get travels", it) })

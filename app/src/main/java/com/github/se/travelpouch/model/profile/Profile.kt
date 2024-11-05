@@ -40,17 +40,6 @@ object CurrentProfile {
   var currentProfileUid = "0000000000000000000000000000"
 }
 
-object NobodyLoginProfile {
-  val nobodyLoginProfile =
-      Profile(
-          "0000000000000000000000000000",
-          "nobody",
-          "nobody@nobody.com",
-          null,
-          "nobody",
-          emptyList())
-}
-
 fun checkProfileValidity(profile: Profile): Boolean {
   return isValidUserUid(profile.fsUid) && isValidEmail(profile.email)
 }

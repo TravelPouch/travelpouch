@@ -75,7 +75,7 @@ class EventRepositoryUnitTest {
   @Test
   fun initTest() {
     var flag = false
-    eventRepositoryFirestore.initAfterTravelAccess({ flag = true }, "uid")
+    eventRepositoryFirestore.setIdTravel({ flag = true }, "uid")
     assertEquals(true, flag)
   }
 

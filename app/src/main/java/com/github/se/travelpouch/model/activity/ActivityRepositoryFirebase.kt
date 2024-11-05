@@ -30,7 +30,7 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
    *
    * @param onSuccess (() -> Unit) : the function to call when the initialisation is successful
    */
-  override fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String) {
+  override fun setIdTravel(onSuccess: () -> Unit, travelId: String) {
     val p1 = FirebasePaths.TravelsSuperCollection
     val p2 = FirebasePaths.activities
     collectionPath = FirebasePaths.constructPath(p1, travelId, p2)

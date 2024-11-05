@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -67,7 +66,6 @@ data class LineParameters(val strokeWidth: Dp, val brush: Brush)
  *
  * @param eventsViewModel (EventViewModel) : the view model used to manage the events
  */
-@Preview
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)) {

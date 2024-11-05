@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,7 +26,6 @@ fun ParticipantRow(
     selectedTravel: TravelContainer,
     onClick: () -> Unit
 ) {
-  val context = LocalContext.current
 
   Row(
       modifier = Modifier.fillMaxWidth().testTag("participantRow").clickable { onClick() },

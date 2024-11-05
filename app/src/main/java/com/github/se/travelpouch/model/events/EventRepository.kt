@@ -31,7 +31,7 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    *
    * @param (() -> Unit) : the function to apply when the authentication goes without a trouble
    */
-  override fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String) {
+  override fun setIdTravel(onSuccess: () -> Unit, travelId: String) {
     val p1 = FirebasePaths.TravelsSuperCollection
     val p2 = FirebasePaths.events
     collectionPath = FirebasePaths.constructPath(p1, travelId, p2)

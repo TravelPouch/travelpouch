@@ -38,8 +38,8 @@ class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : Vi
   private val onFailureTag = "ActivityViewModel"
 
   /** This is the initialisation function of the model view */
-  fun initAfterTravelAccess(travelId: String) {
-    activityRepositoryFirebase.initAfterTravelAccess({ getAllActivities() }, travelId)
+  fun setIdTravel(travelId: String) {
+    activityRepositoryFirebase.setIdTravel({ getAllActivities() }, travelId)
   }
 
   /** This function gets all the activities from the database */

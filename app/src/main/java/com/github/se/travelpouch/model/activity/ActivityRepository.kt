@@ -34,7 +34,7 @@ interface ActivityRepository {
    *
    * @param onSuccess (() -> Unit) : the function to call when the initialisation is successful
    */
-  fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String)
+  fun setIdTravel(onSuccess: () -> Unit, travelId: String)
 
   /**
    * This function updates an activity already present in the database.

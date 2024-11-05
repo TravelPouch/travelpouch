@@ -40,5 +40,5 @@ interface EventRepository {
    *
    * @param (() -> Unit) : the function to apply when the authentication goes without a trouble
    */
-  fun initAfterTravelAccess(onSuccess: () -> Unit, travelId: String)
+  fun setIdTravel(onSuccess: () -> Unit, travelId: String)
 }
