@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.model.activity.map
 
-import android.annotation.SuppressLint
 import android.util.Log
 import com.github.se.travelpouch.helper.NetworkManager
 import okhttp3.HttpUrl
@@ -51,7 +50,6 @@ class DirectionsRepository(private val client: OkHttpClient) : DirectionsReposit
    * @param onSuccess Callback that is called when the request is successful.
    * @param onFailure Callback that is called when the request fails.
    */
-  @SuppressLint("SuspiciousIndentation")
   override fun getDirections(
       origin: String,
       destination: String,
