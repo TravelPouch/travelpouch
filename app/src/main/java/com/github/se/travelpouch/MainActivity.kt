@@ -21,6 +21,7 @@ import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.ui.authentication.SignInEmailPassword
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
@@ -82,6 +83,9 @@ fun TravelPouchApp() {
     ) {
       composable(Screen.AUTH) {
         SignInScreen(navigationActions, profileModelView, listTravelViewModel)
+      }
+      composable(Screen.AUTH_EMAIL_PASSWORD) {
+        SignInEmailPassword(navigationActions, profileModelView, listTravelViewModel)
       }
 
       composable(Screen.TRAVEL_LIST) {

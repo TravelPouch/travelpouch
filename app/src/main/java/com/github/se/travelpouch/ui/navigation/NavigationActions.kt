@@ -13,6 +13,7 @@ object Route {
 
 object Screen {
   const val AUTH = "Auth Screen"
+  const val AUTH_EMAIL_PASSWORD = "Auth with Email/Password"
   const val TRAVEL_LIST = "TravelList Screen"
   const val EDIT_TRAVEL_SETTINGS = "Edit Screen"
   const val PARTICIPANT_LIST = "Participant List Screen"
