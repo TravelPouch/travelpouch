@@ -1,7 +1,7 @@
 package com.github.se.travelpouch.model.notifications
 
-import com.github.se.travelpouch.model.isValidObjectUid
-import com.github.se.travelpouch.model.isValidUserUid
+import com.github.se.travelpouch.model.travels.isValidObjectUid
+import com.github.se.travelpouch.model.travels.isValidUserUid
 import com.google.firebase.Timestamp
 
 /**

@@ -21,8 +21,8 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
   val events: StateFlow<List<Event>> = events_.asStateFlow()
 
   /** The initialisation function of the class */
-  init {
-    repository.init { getEvents() }
+  fun setIdTravel(travelId: String) {
+    repository.setIdTravel({ getEvents() }, travelId)
   }
 
   /**

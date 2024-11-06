@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 /**
  * The class representing the communication scheme between our project and the database that will
@@ -19,12 +20,15 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   private var collectionPath = "userslist"
   private var documentPath = ""
 
-  override fun init(onSuccess: () -> Unit) {
-    Firebase.auth.addAuthStateListener {
-      val user = it.currentUser
-      if (user != null) {
-        gettingUserProfile(user, onSuccess)
-      }
+  override suspend fun initAfterLogin() {
+    val user = Firebase.auth.currentUser
+
+    if (user != null) {
+      documentPath = user.uid
+      CurrentProfile.currentProfileUid = user.uid
+      gettingUserProfile(user)
+    } else {
+      Firebase.auth.signOut()
     }
   }
 
@@ -40,7 +44,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
       try {
         addProfile(user.email!!, user.uid)
       } catch (e: Exception) {
-        Log.e("nullEmail", "Email of user was null")
+        Log.e("nullEmail", "Email of user was null, deleting user")
         user.delete()
         Firebase.auth.signOut()
       }
@@ -54,19 +58,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param user (FirebaseUser) : the currently connected user on the application
    * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
    */
-  fun gettingUserProfile(user: FirebaseUser, onSuccess: () -> Unit) {
-
-    documentPath = user.uid
-    db.collection(collectionPath)
-        .document(documentPath)
-        .get()
-        .addOnSuccessListener { result ->
-          addingUserIfNotRegistered(user, result)
-          onSuccess()
-        }
-        .addOnFailureListener {
-          Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
-        }
+  suspend fun gettingUserProfile(user: FirebaseUser) {
+    try {
+      val document = db.collection(collectionPath).document(documentPath).get().await()
+      addingUserIfNotRegistered(user, document)
+    } catch (e: Exception) {
+      Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
+    }
   }
 
   /**
@@ -94,7 +92,6 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   }
 
   override fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit) {
-    Log.d("ProfileRepository", "getProfile")
     db.collection(collectionPath)
         .document(documentPath)
         .get()
@@ -169,7 +166,7 @@ class ProfileRepositoryConvert {
             username = username!!,
             email = email!!,
             friends = friends,
-            name!!,
+            name = name!!,
             userTravelList = userTravelList ?: emptyList())
       } catch (e: Exception) {
         Log.e("ProfileRepository", "Error converting document to Profile", e)

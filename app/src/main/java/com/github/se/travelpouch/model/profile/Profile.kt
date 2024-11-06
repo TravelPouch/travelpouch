@@ -1,7 +1,7 @@
 package com.github.se.travelpouch.model.profile
 
 import androidx.core.util.PatternsCompat
-import com.github.se.travelpouch.model.isValidUserUid
+import com.github.se.travelpouch.model.travels.isValidUserUid
 
 /**
  * A data class representing a profile
@@ -20,7 +20,7 @@ data class Profile(
     val email: String,
     val friends: Map<Int, String>?,
     val name: String,
-    val userTravelList: List<String>
+    var userTravelList: List<String>
 ) {
   init {
     require(fsUid.isNotBlank() && isValidUserUid(fsUid)) { "Invalid fsUid" }
@@ -34,6 +34,10 @@ data class Profile(
 object ErrorProfile {
   val errorProfile =
       Profile("000errorerrorerrorerrorerror", "error", "error@error.ch", null, "error", emptyList())
+}
+
+object CurrentProfile {
+  var currentProfileUid = "0000000000000000000000000000"
 }
 
 fun checkProfileValidity(profile: Profile): Boolean {

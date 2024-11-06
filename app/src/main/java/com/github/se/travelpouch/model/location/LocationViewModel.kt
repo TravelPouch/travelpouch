@@ -3,7 +3,7 @@ package com.github.se.travelpouch.model.location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.travels.Location
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import okhttp3.OkHttpClient

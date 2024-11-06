@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -37,6 +37,7 @@ fun MapScreen(travelContainers: List<TravelContainer>) {
  */
 @Composable
 fun MapContent(modifier: Modifier = Modifier, travelContainers: List<TravelContainer>) {
+
   val markers = travelContainers.filter { true }
 
   val cameraPositionState = rememberCameraPositionState {

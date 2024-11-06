@@ -13,7 +13,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
-import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
 import org.junit.Before
@@ -83,33 +83,10 @@ class DocumentRepositoryTest {
   }
 
   @Test
-  fun initCallsOnSuccessWhenUserIsAuthenticated() {
-    val authListenerCaptor = argumentCaptor<FirebaseAuth.AuthStateListener>()
-    whenever(mockAuth.currentUser).thenReturn(mockUser)
-
-    var successCalled = false
-
-    documentRepository.init { successCalled = true }
-
-    verify(mockAuth).addAuthStateListener(authListenerCaptor.capture())
-    authListenerCaptor.firstValue.onAuthStateChanged(mockAuth)
-
-    assertTrue(successCalled)
-  }
-
-  @Test
-  fun initDoesNotCallOnSuccessWhenUserIsNotAuthenticated() {
-    val authListenerCaptor = argumentCaptor<FirebaseAuth.AuthStateListener>()
-    whenever(mockAuth.currentUser).thenReturn(null)
-
-    var successCalled = false
-
-    documentRepository.init { successCalled = true }
-
-    verify(mockAuth).addAuthStateListener(authListenerCaptor.capture())
-    authListenerCaptor.firstValue.onAuthStateChanged(mockAuth)
-
-    assertFalse(successCalled)
+  fun initTest() {
+    var flag = false
+    documentRepository.setIdTravel({ flag = true }, "uid")
+    assertEquals(true, flag)
   }
 
   @Test

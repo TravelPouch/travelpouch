@@ -68,7 +68,11 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
       },
       bottomBar = {
         BottomNavigationMenu(
-            tabList = listOf(TopLevelDestinations.TRAVELS, TopLevelDestinations.CALENDAR),
+            tabList =
+                listOf(
+                    TopLevelDestinations.ACTIVITIES,
+                    TopLevelDestinations.CALENDAR,
+                    TopLevelDestinations.MAP),
             navigationActions = navigationActions)
       }) { innerPadding ->
         Column(
