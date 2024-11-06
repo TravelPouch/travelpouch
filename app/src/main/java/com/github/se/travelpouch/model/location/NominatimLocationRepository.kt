@@ -2,7 +2,7 @@ package com.github.se.travelpouch.model.location
 
 import android.util.Log
 import com.github.se.travelpouch.helper.NetworkManager
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.travels.Location
 import com.google.firebase.Timestamp
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient

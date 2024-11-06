@@ -3,8 +3,8 @@ package com.github.se.travelpouch.ui.home
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.model.TravelContainerMock
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelContainerMock
 import org.junit.Rule
 import org.junit.Test
 

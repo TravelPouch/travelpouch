@@ -1,7 +1,11 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travel
 
-import com.github.se.travelpouch.model.TravelContainerMock.generateAutoObjectId
-import com.github.se.travelpouch.model.TravelContainerMock.generateAutoUserId
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import com.google.firebase.Timestamp
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
@@ -34,7 +38,8 @@ class TravelContainerUnitTest {
             Timestamp(1234567890L, 0),
             location,
             attachments,
-            participants)
+            participants,
+            emptyList())
 
     assertEquals(travelID, travelContainer.fsUid)
     assertEquals("Test Title", travelContainer.title)
@@ -64,7 +69,8 @@ class TravelContainerUnitTest {
             Timestamp(1234567890L, 0),
             location,
             attachments,
-            participants)
+            participants,
+            emptyList())
 
     val map: Map<String, Any> = travelContainer.toMap()
 
@@ -100,7 +106,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              HashMap<Participant, Role>())
+              HashMap<Participant, Role>(),
+              emptyList())
         }
     assertEquals("At least one participant is required", exception.message)
 
@@ -121,7 +128,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants)
+              participants,
+              emptyList())
         }
     assertEquals("At least one owner is required", exception.message)
 
@@ -142,7 +150,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants2)
+              participants2,
+              emptyList())
         }
     assertEquals("Title cannot be blank", exception.message)
 
@@ -163,7 +172,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants3)
+              participants3,
+              emptyList())
         }
     assertEquals("startTime must be strictly before endTime", exception.message)
     exception =
@@ -176,7 +186,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants3)
+              participants3,
+              emptyList())
         }
     assertEquals("startTime must be strictly before endTime", exception.message)
     exception =
@@ -189,7 +200,8 @@ class TravelContainerUnitTest {
               Timestamp(1234567890L, 0),
               location,
               attachments,
-              participants3)
+              participants3,
+              emptyList())
         }
     assertEquals("Invalid fsUid format", exception.message)
   }
