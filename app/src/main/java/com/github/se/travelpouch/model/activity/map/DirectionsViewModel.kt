@@ -65,9 +65,12 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
             val numberOfRoutes = directionsResponse.routes.size
             Log.d("DirectionsViewModel", "Number of routes fetched: $numberOfRoutes")
 
-            val points = extractPathPoints(directionsResponse)
-            // Accumulate new routes with old ones
-            _routeOptionsList.value += RouteOptions(origin, destination, points)
+            val routes = extractPathPoints(directionsResponse)
+
+            if (routes.isNotEmpty()) {
+              // Accumulate new routes with old ones
+              _routeOptionsList.value += RouteOptions(origin, destination, routes)
+            }
           },
           onFailure = { exception ->
             Log.e("DirectionsViewModel", "Failed to fetch directions", exception)
@@ -101,7 +104,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
   }
 
   /** Clears the list of routes by setting it to an empty list. */
-  fun clearRoutes() {
+  fun clearRoutesOptions() {
     _routeOptionsList.value = emptyList() // Set the value to an empty list
     Log.d("DirectionsViewModel", "Route paths have been cleared")
   }
