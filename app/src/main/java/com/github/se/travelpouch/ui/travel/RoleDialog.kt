@@ -8,11 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.model.fsUid
 import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.fsUid
 
 /**
  * A composable function that displays a dialog for changing the role of a participant.

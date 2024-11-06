@@ -1,11 +1,10 @@
 package com.github.se.travelpouch.model.activity
 
 import android.util.Log
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.travels.Location
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -15,7 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
  */
 class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRepository {
 
-  private val collectionPath = "activities"
+  private var collectionPath = ""
 
   /**
    * This function gives us an unused unique identifier.
@@ -31,12 +30,11 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
    *
    * @param onSuccess (() -> Unit) : the function to call when the initialisation is successful
    */
-  override fun init(onSuccess: () -> Unit) {
-    Firebase.auth.addAuthStateListener {
-      if (it.currentUser != null) {
-        onSuccess()
-      }
-    }
+  override fun setIdTravel(onSuccess: () -> Unit, travelId: String) {
+    val p1 = FirebasePaths.TravelsSuperCollection
+    val p2 = FirebasePaths.activities
+    collectionPath = FirebasePaths.constructPath(p1, travelId, p2)
+    onSuccess()
   }
 
   /**

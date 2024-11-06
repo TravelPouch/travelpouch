@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travels
 
 import com.github.se.travelpouch.model.profile.Profile
 
@@ -18,7 +18,7 @@ interface TravelRepository {
       onFailure: (Exception) -> Unit
   )
 
-  fun init(onSuccess: () -> Unit)
+  fun initAfterLogin(onSuccess: () -> Unit)
 
   fun getTravels(onSuccess: (List<TravelContainer>) -> Unit, onFailure: (Exception) -> Unit)
 

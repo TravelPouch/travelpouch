@@ -47,9 +47,9 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.SCANNER_MODE_FULL

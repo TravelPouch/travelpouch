@@ -1,6 +1,6 @@
 package com.github.se.travelpouch.model.activity
 
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.travels.Location
 import com.google.firebase.Timestamp
 
 /**
