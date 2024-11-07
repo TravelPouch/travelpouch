@@ -218,9 +218,9 @@ async function storeFile(
   travelId: string,
   size: number) {
   const fs = getFirestore();
-  const reference = fs.collection("travels")
+  const reference = fs.collection("allTravels")
     .doc(travelId);
-  const document = await fs.collection("documents").add({
+  const document = await reference.collection("documents").add({
     addedAt: Timestamp.now(),
     fileFormat: format,
     fileSize: size,
