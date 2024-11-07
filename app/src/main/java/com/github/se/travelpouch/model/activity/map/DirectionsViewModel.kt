@@ -18,7 +18,7 @@ typealias Path = List<LatLng>
 data class RouteOptions(
     val origin: LatLng,
     val destination: LatLng,
-    var routes: List<Path> // List of routes, where each route is a list of LatLng points
+    val routes: List<Path> // List of routes, where each route is a list of LatLng points
 )
 
 /** ViewModel for fetching and managing directions data from the Google Maps Directions API. */
