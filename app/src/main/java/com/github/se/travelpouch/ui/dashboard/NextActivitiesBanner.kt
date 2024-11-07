@@ -50,19 +50,20 @@ fun NextActivitiesBanner(
     modifier: Modifier = Modifier,
     localConfig: Configuration = LocalConfiguration.current
 ) {
+  // this variable is used to determine the screen orientation
   var isPortrait = localConfig.orientation == ORIENTATION_PORTRAIT
   var screenSize = if (isPortrait) localConfig.screenHeightDp else localConfig.screenWidthDp
   val dismissButtonSize = (screenSize * 0.05).dp // 5% of the screen size
   val showOutline = remember { mutableStateOf(false) }
-  // Filter activities due within the next 24 hours
-  val reminderRange = 86400L // 2400 hours in milliseconds
+  val reminderRange = 86400L // 24 hours in milliseconds
   val nowTime = Timestamp.now().seconds
 
+  // Filter activities due within the next 24 hours
   val upcomingActivities =
       activities
           .filter { activity ->
             val timeDiff: Long = activity.date.seconds - nowTime
-            timeDiff in 0..reminderRange // 24 hours in milliseconds
+            timeDiff in 0..reminderRange // 0 - 24 hours in milliseconds
           }
           .sortedBy { it.date } // Sort by due time
 
@@ -84,7 +85,6 @@ fun NextActivitiesBanner(
                   Arrangement.SpaceBetween, // Spread content with space in between
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier = Modifier.fillMaxWidth()) {
-                // Title
                 Text(
                     text = "Upcoming Activities in the next 24 hours",
                     color = Color.DarkGray,
@@ -96,7 +96,7 @@ fun NextActivitiesBanner(
 
                 // Scrollable list of upcoming activities
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().weight(1f) // Fill available vertical space
+                    modifier = Modifier.fillMaxWidth().weight(1f) // Fill available horizontal space
                     ) {
                       items(upcomingActivities) { activity ->
                         Text(
@@ -114,7 +114,8 @@ fun NextActivitiesBanner(
           Box(
               modifier =
                   Modifier.align(if (isPortrait) Alignment.BottomEnd else Alignment.CenterEnd)
-                      .padding(8.dp) // Add padding to ensure it doesn't touch the edges
+                      .padding(8.dp) // Add padding to ensure the border doesn't touch the edges of
+              // the box
               ) {
                 IconButton(
                     onClick = onDismiss,
@@ -125,7 +126,9 @@ fun NextActivitiesBanner(
                                 color = if (showOutline.value) Color.Black else Color.Transparent,
                                 shape = CircleShape)
                             .testTag("NextActivitiesBannerDismissButton")
-                            .padding(8.dp) // Add padding to ensure it doesn't touch the edges
+                            .padding(
+                                8.dp) // Add padding to ensure the border doesn't touch the edges
+                    // of the box
                     ) {
                       Icon(
                           imageVector = Icons.Default.Close,
