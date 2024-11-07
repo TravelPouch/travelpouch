@@ -7,10 +7,10 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -122,7 +122,9 @@ class TravelActivityScreen {
     composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("NextActivitiesBannerBox")
-        .assertTextContains("Next activities due: title1, title2 in the next 24 hours.")
+        .assertTextContains("Upcoming Activities in the next 24 hours")
+    composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertTextContains("- title1")
+    composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertTextContains("- title2")
     composeTestRule.onNodeWithTag("NextActivitiesBannerDismissButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("NextActivitiesBannerBox").performClick()
     composeTestRule.onNodeWithTag("NextActivitiesBannerDismissButton").performClick()

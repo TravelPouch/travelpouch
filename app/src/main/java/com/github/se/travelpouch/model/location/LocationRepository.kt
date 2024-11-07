@@ -1,6 +1,6 @@
 package com.github.se.travelpouch.model.location
 
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.travels.Location
 
 /** Repository for searching locations. */
 interface LocationRepository {

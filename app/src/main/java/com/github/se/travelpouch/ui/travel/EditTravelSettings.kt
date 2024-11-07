@@ -58,9 +58,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.travelpouch.R
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.google.firebase.Timestamp
@@ -305,30 +305,30 @@ fun EditTravelSettingsScreen(
 
                             val newStart = parseDateToTimestamp(startTime.value)
                             val newEnd = parseDateToTimestamp(endTimeText.value)
-
-                            val newTravel = TravelContainer(
-                                fsUid = fsUid,
-                                title = titleText.value,
-                                description = descriptionText.value,
-                                startTime = newStart,
-                                endTime = newEnd,
-                                location = newLocation,
-                                allAttachments = selectedTravel!!.allAttachments,
-                                allParticipants = selectedTravel!!.allParticipants,
-                            )
-                            listTravelViewModel.updateTravel(newTravel)
-                            Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
-                        } catch (e: ParseException) {
-                            Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
-                            return@Button
-                        } catch (e: Exception) {
-                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                            return@Button
-                        }
-                    },
-                    modifier = Modifier.testTag("travelSaveButton")
-                ) {
-                    Text("Save")
+                            
+                    val newTravel =
+                        TravelContainer(
+                            fsUid = fsUid,
+                            title = titleText.value,
+                            description = descriptionText.value,
+                            startTime = newStart,
+                            endTime = newEnd,
+                            location = newLocation,
+                            allAttachments = selectedTravel!!.allAttachments,
+                            allParticipants = selectedTravel!!.allParticipants,
+                            listParticipant = selectedTravel!!.listParticipant)
+                    listTravelViewModel.updateTravel(newTravel)
+                    Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
+                  } catch (e: ParseException) {
+                    Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
+                    return@Button
+                  } catch (e: Exception) {
+                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    return@Button
+                  }
+                },
+                modifier = Modifier.testTag("travelSaveButton")) {
+                  Text("Save")
                 }
 
                 Button(

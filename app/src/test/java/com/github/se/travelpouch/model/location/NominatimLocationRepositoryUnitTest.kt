@@ -1,5 +1,5 @@
-import com.github.se.travelpouch.model.Location
 import com.github.se.travelpouch.model.location.NominatimLocationRepository
+import com.github.se.travelpouch.model.travels.Location
 import java.io.IOException
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -175,8 +175,8 @@ class NominatimLocationRepositoryUnitTest {
     repository.search("Paris", { result -> locations = result }, { e -> failureException = e })
 
     // Verification
-    assertTrue(locations != null) // The locations list should not be null
-    assertTrue(locations!!.isEmpty()) // The list should be empty if the body is null
-    assertTrue(failureException == null) // No exception should be thrown
+    assertTrue(locations == null) // The locations list should not be null
+    assertTrue(failureException != null)
+    assertEquals("Empty response body", failureException?.message)
   }
 }

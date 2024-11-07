@@ -14,12 +14,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
@@ -71,22 +72,32 @@ fun TravelPouchApp() {
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
+  val notificationViewModel: NotificationViewModel =
+      viewModel(factory = NotificationViewModel.Factory)
+
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
         startDestination = Screen.AUTH,
         route = Route.DEFAULT,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+      composable(Screen.AUTH) {
+        SignInScreen(navigationActions, profileModelView, listTravelViewModel)
+      }
 
-      composable(Screen.TRAVEL_LIST) { TravelListScreen(navigationActions, listTravelViewModel) }
+      composable(Screen.TRAVEL_LIST) {
+        TravelListScreen(
+            navigationActions,
+            listTravelViewModel,
+            activityModelView,
+            eventsViewModel,
+            documentViewModel)
+      }
       composable(Screen.TRAVEL_ACTIVITIES) {
         TravelActivitiesScreen(navigationActions, activityModelView)
       }
       composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
       composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
-      composable(Screen.ADD_TRAVEL) {
-        AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
-      }
+      composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions) }
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
         EditTravelSettingsScreen(listTravelViewModel, navigationActions)
       }

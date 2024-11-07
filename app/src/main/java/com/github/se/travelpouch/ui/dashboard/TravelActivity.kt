@@ -27,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
@@ -100,7 +102,11 @@ fun TravelActivitiesScreen(
       },
       bottomBar = {
         BottomNavigationMenu(
-            tabList = listOf(TopLevelDestinations.ACTIVITIES, TopLevelDestinations.MAP),
+            tabList =
+                listOf(
+                    TopLevelDestinations.ACTIVITIES,
+                    TopLevelDestinations.CALENDAR,
+                    TopLevelDestinations.MAP),
             navigationActions = navigationActions)
       },
       floatingActionButton = {
@@ -111,8 +117,9 @@ fun TravelActivitiesScreen(
             }
       }) { pd ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(pd) // Apply scaffold padding to the whole box
-            ) {
+            modifier =
+                Modifier.fillMaxSize().padding(pd), // Apply scaffold padding to the whole box
+            contentAlignment = Alignment.Center) {
               LazyColumn(
                   verticalArrangement = Arrangement.spacedBy(8.dp),
                   contentPadding = PaddingValues(vertical = 8.dp),
@@ -142,7 +149,7 @@ fun TravelActivitiesScreen(
                 NextActivitiesBanner(
                     activities = listOfActivities.value,
                     onDismiss = { showBanner.value = false },
-                )
+                    localConfig = LocalConfiguration.current)
               }
             }
       }

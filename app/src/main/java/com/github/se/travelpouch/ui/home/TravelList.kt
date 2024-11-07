@@ -30,12 +30,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
+import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.util.Locale
 
 /**
@@ -48,15 +49,17 @@ import java.util.Locale
 @Composable
 fun TravelListScreen(
     navigationActions: NavigationActions,
-    listTravelViewModel: ListTravelViewModel
+    listTravelViewModel: ListTravelViewModel,
+    activityViewModel: ActivityViewModel,
+    eventViewModel: EventViewModel,
+    documentViewModel: DocumentViewModel,
 ) {
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
     listTravelViewModel.getTravels()
     // sleep the thread for 1 second to allow the data to be fetched
   }
-  // travelContainers.getTravels()
-  val travelList = listTravelViewModel.travels.collectAsState().value
+  val travelList = listTravelViewModel.travels.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
@@ -67,29 +70,30 @@ fun TravelListScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
       },
-      bottomBar = {
-        BottomNavigationMenu(
-            tabList = listOf(TopLevelDestinations.TRAVELS, TopLevelDestinations.CALENDAR),
-            navigationActions = navigationActions)
-      },
       content = { pd ->
         Column {
-          // Add the map to display the travels
-          MapContent(
-              modifier = Modifier.fillMaxWidth().height(300.dp), travelContainers = travelList)
+          if (travelList.value.isNotEmpty()) {
+            // Add the map to display the travels
 
-          if (travelList.isNotEmpty()) {
+            MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), travelList.value)
+
             LazyColumn(
                 contentPadding = PaddingValues(vertical = 8.dp),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
-                  items(travelList.size) { index ->
-                    TravelItem(travelContainer = travelList[index]) {
-                      listTravelViewModel.selectTravel(travelList[index])
+                  items(travelList.value.size) { index ->
+                    TravelItem(travelContainer = travelList.value[index]) {
+                      val travelId = travelList.value[index].fsUid
+                      listTravelViewModel.selectTravel(travelList.value[index])
                       navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      eventViewModel.setIdTravel(travelId)
+                      activityViewModel.setIdTravel(travelId)
+                      documentViewModel.setIdTravel(travelId)
                     }
                   }
                 }
           } else {
+            MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), emptyList())
+
             Text(
                 modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
                 text = "You have no travels yet.")
