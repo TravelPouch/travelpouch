@@ -6,16 +6,16 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import com.github.se.travelpouch.helper.FileDownloader
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.documents.DocumentVisibility
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
@@ -69,7 +69,7 @@ class DocumentListTest {
                 DocumentVisibility.ORGANIZERS),
         )
     val participants: MutableMap<Participant, Role> = HashMap()
-    participants[Participant("rythwEmprFhOOgsANXnv")] = Role.OWNER
+    participants[Participant("rythwEmprFhOOgsANXnv12345678")] = Role.OWNER
     travelContainer =
         TravelContainer(
             "rythwEmprFhOOgsANXnv",
@@ -79,7 +79,8 @@ class DocumentListTest {
             Timestamp.now(),
             Location(40.4114, 40.43321, Timestamp.now(), "Here"),
             HashMap(),
-            participants)
+            participants,
+            emptyList())
     navigationActions = mock(NavigationActions::class.java)
     mockFileDownloader = mock(FileDownloader::class.java)
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)

@@ -3,12 +3,13 @@ package com.github.se.travelpouch.model.notifications
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.model.UserInfo
-import com.github.se.travelpouch.model.generateAutoId
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
+import com.github.se.travelpouch.model.travels.UserInfo
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -39,9 +40,9 @@ class NotificationSimulationBetweenTwoUsers {
   @Test
   fun simulate_invitationNotification_accept() {
     // Uids
-    val travelUid = generateAutoId()
-    val user1Uid = generateAutoId()
-    val user2Uid = generateAutoId()
+    val travelUid = generateAutoObjectId()
+    val user1Uid = generateAutoUserId()
+    val user2Uid = generateAutoUserId()
 
     val travel =
         TravelContainer(
@@ -52,7 +53,8 @@ class NotificationSimulationBetweenTwoUsers {
             Timestamp(Date(2024, 1, 2)),
             Location(45.00, 45.00, Timestamp(Date(2024, 1, 1)), "Moon"),
             emptyMap(),
-            mapOf(Participant(user1Uid) to Role.OWNER))
+            mapOf(Participant(user1Uid) to Role.OWNER),
+            emptyList())
     val user1 = UserInfo(user1Uid, "Donkey Kong", listOf(travelUid), "donkey.kong@epfl.ch")
     val user2 = UserInfo(user2Uid, "Diddy Kong", emptyList(), "diddy.kong@epfl.ch")
 
@@ -60,7 +62,7 @@ class NotificationSimulationBetweenTwoUsers {
     // This situation happens when User 1 adds User 2 to the travel participants
     val invitationNotification =
         Notification(
-            generateAutoId(), // notification uid
+            generateAutoObjectId(), // notification uid
             user1Uid,
             user2Uid,
             travelUid,

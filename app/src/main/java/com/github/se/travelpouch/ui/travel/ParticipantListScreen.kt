@@ -38,11 +38,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.UserInfo
-import com.github.se.travelpouch.model.fsUid
+import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -59,7 +59,7 @@ fun ParticipantListScreen(
   val (expanded, setExpanded) = remember { mutableStateOf(false) }
   val (expandedRoleDialog, setExpandedRoleDialog) = remember { mutableStateOf(false) }
   val (selectedParticipant, setSelectedParticipant) =
-      remember { mutableStateOf<Map.Entry<fsUid, UserInfo>?>(null) }
+      remember { mutableStateOf<Map.Entry<fsUid, Profile>?>(null) }
 
   Scaffold(
       modifier = Modifier.testTag("participantListScreen"),

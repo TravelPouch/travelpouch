@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Folder
@@ -26,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.Activity
@@ -51,6 +54,9 @@ fun TravelActivitiesScreen(
     navigationActions: NavigationActions,
     activityModelView: ActivityViewModel
 ) {
+
+  activityModelView.getAllActivities()
+
   val showBanner = remember { mutableStateOf(true) }
   val listOfActivities = activityModelView.activities.collectAsState()
 
@@ -86,11 +92,21 @@ fun TravelActivitiesScreen(
                   modifier = Modifier.testTag("documentListButton")) {
                     Icon(imageVector = Icons.Default.Folder, contentDescription = null)
                   }
+
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
+                  modifier = Modifier.testTag("ProfileButton")) {
+                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
+                  }
             })
       },
       bottomBar = {
         BottomNavigationMenu(
-            tabList = listOf(TopLevelDestinations.ACTIVITIES, TopLevelDestinations.MAP),
+            tabList =
+                listOf(
+                    TopLevelDestinations.ACTIVITIES,
+                    TopLevelDestinations.CALENDAR,
+                    TopLevelDestinations.MAP),
             navigationActions = navigationActions)
       },
       floatingActionButton = {
@@ -101,8 +117,9 @@ fun TravelActivitiesScreen(
             }
       }) { pd ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(pd) // Apply scaffold padding to the whole box
-            ) {
+            modifier =
+                Modifier.fillMaxSize().padding(pd), // Apply scaffold padding to the whole box
+            contentAlignment = Alignment.Center) {
               LazyColumn(
                   verticalArrangement = Arrangement.spacedBy(8.dp),
                   contentPadding = PaddingValues(vertical = 8.dp),
@@ -132,7 +149,7 @@ fun TravelActivitiesScreen(
                 NextActivitiesBanner(
                     activities = listOfActivities.value,
                     onDismiss = { showBanner.value = false },
-                )
+                    localConfig = LocalConfiguration.current)
               }
             }
       }

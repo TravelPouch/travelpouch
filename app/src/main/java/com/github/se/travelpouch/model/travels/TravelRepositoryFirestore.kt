@@ -1,32 +1,33 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travels
 
 import android.util.Log
+import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.profile.ProfileRepositoryConvert
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class TravelRepositoryFirestore(
-    private val db: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth = Firebase.auth
-) : TravelRepository {
+class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepository {
 
-  private val collectionPath = "travels"
-  private val userCollectionPath = "userslist"
+  private val collectionPath = FirebasePaths.TravelsSuperCollection
+  private val userCollectionPath = FirebasePaths.ProfilesSuperCollection
+
+  private var profileUid = "0000000000000000000000000000"
   /**
    * Initializes the repository by adding an authentication state listener. The listener triggers
    * the onSuccess callback if the user is authenticated.
    *
    * @param onSuccess The callback to call if the user is authenticated.
    */
-  override fun init(onSuccess: () -> Unit) {
-    firebaseAuth.addAuthStateListener {
-      if (it.currentUser != null) {
-        onSuccess()
-      }
+  override fun initAfterLogin(onSuccess: () -> Unit) {
+    val user = Firebase.auth.currentUser
+    if (user != null) {
+      profileUid = user.uid
+      onSuccess()
     }
   }
 
@@ -48,14 +49,15 @@ class TravelRepositoryFirestore(
    */
   override fun getParticipantFromfsUid(
       fsUid: fsUid,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid")
     db.collection(userCollectionPath).document(fsUid).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         Log.d("TravelRepositoryFirestore", "getParticipantFromfsUid success")
-        val user = task.result?.let { userEntry -> documentToUserInfo(userEntry) }
+        val user =
+            task.result?.let { userEntry -> ProfileRepositoryConvert.documentToProfile(userEntry) }
         onSuccess(user)
       } else {
         task.exception?.let { e ->
@@ -80,7 +82,7 @@ class TravelRepositoryFirestore(
    */
   override fun checkParticipantExists(
       email: String,
-      onSuccess: (UserInfo?) -> Unit,
+      onSuccess: (Profile?) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     db.collection(userCollectionPath).whereEqualTo("email", email).get().addOnCompleteListener {
@@ -95,7 +97,7 @@ class TravelRepositoryFirestore(
                 if (userEntries.size() > 1) {
                   Log.e("TravelRepositoryFirestore", "Multiple users with same email")
                 }
-                documentToUserInfo(userEntries.documents[0])
+                ProfileRepositoryConvert.documentToProfile(userEntries.documents[0])
               }
             }
         onSuccess(user)
@@ -170,20 +172,24 @@ class TravelRepositoryFirestore(
       onSuccess: (List<TravelContainer>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
+
     Log.d("TravelRepositoryFirestore", "getTravels")
-    db.collection(collectionPath).get().addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        val travels =
-            task.result?.documents?.mapNotNull { document -> documentToTravel(document) }
-                ?: emptyList()
-        onSuccess(travels)
-      } else {
-        task.exception?.let { e ->
-          Log.e("TravelRepositoryFirestore", "Error getting documents", e)
-          onFailure(e)
+    db.collection(collectionPath)
+        .whereArrayContains("listParticipant", profileUid)
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            val travels =
+                task.result?.documents?.mapNotNull { document -> documentToTravel(document) }
+                    ?: emptyList()
+            onSuccess(travels)
+          } else {
+            task.exception?.let { e ->
+              Log.e("TravelRepositoryFirestore", "Error getting documents", e)
+              onFailure(e)
+            }
+          }
         }
-      }
-    }
   }
 
   /**
@@ -239,6 +245,7 @@ class TravelRepositoryFirestore(
           allParticipantsData
               ?.map { (key, value) -> Participant(key as String) to Role.valueOf(value as String) }
               ?.toMap()
+      val listParticipant = document.get("listParticipant") as? List<String>
 
       TravelContainer(
           fsUid = fsUid,
@@ -248,33 +255,10 @@ class TravelRepositoryFirestore(
           endTime = endTime!!,
           location = location,
           allAttachments = allAttachments!!,
-          allParticipants = allParticipants!!)
+          allParticipants = allParticipants!!,
+          listParticipant = listParticipant ?: emptyList())
     } catch (e: Exception) {
       Log.e("TravelRepositoryFirestore", "Error converting document to TravelContainer", e)
-      null
-    }
-  }
-
-  /**
-   * Converts a Firestore document to a UserInfo object.
-   *
-   * @param document The Firestore document to convert.
-   * @return A UserInfo object if the conversion is successful, or null if any required field is
-   *   missing or an error occurs.
-   */
-  private fun documentToUserInfo(document: DocumentSnapshot): UserInfo? {
-    return try {
-      val fsUid = document.id
-      val name = document.getString("name")
-      val email = document.getString("email")
-      val userTravelList = document.get("listoftravellinked") as? List<String>
-      UserInfo(
-          fsUid = fsUid,
-          name = name!!,
-          userTravelList = userTravelList ?: emptyList(),
-          email = email!!)
-    } catch (e: Exception) {
-      Log.e("TravelRepositoryFirestore", "Error converting document to UserInfo", e)
       null
     }
   }

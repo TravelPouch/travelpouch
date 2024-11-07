@@ -46,9 +46,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.google.firebase.Timestamp
@@ -249,7 +249,7 @@ fun EditTravelSettingsScreen(
                             location = newLocation,
                             allAttachments = selectedTravel!!.allAttachments,
                             allParticipants = selectedTravel!!.allParticipants,
-                        )
+                            listParticipant = selectedTravel!!.listParticipant)
                     listTravelViewModel.updateTravel(newTravel)
                     Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
                   } catch (e: ParseException) {

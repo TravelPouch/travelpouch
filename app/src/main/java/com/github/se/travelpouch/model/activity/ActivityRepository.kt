@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.model.activity
 
 interface ActivityRepository {
-
   /**
    * This function allows us to retrieve all the activities from Firebase.
    *
@@ -35,7 +34,7 @@ interface ActivityRepository {
    *
    * @param onSuccess (() -> Unit) : the function to call when the initialisation is successful
    */
-  fun init(onSuccess: () -> Unit)
+  fun setIdTravel(onSuccess: () -> Unit, travelId: String)
 
   /**
    * This function updates an activity already present in the database.

@@ -1,6 +1,12 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travel
 
 import android.util.Log
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelRepository
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
@@ -39,7 +45,8 @@ class ListTravelViewModelTest {
               "Test Location",
           ),
           mapOf("Test Key item" to "Test Value item"),
-          mapOf(Participant("SGzOL8yn0JmAVaTdvG9v") to Role.OWNER))
+          mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER),
+          emptyList())
 
   @Before
   fun setUp() {

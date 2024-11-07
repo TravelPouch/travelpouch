@@ -4,8 +4,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.generateAutoId
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import com.google.firebase.firestore.FirebaseFirestore
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.instanceOf
@@ -37,14 +38,14 @@ class NotificationViewModelUnitTest {
 
   @Test
   fun loadNotificationsForUser() {
-    val userId = generateAutoId()
+    val userId = generateAutoUserId()
     val notifications =
         listOf(
             Notification(
-                notificationUid = generateAutoId(),
-                senderUid = generateAutoId(),
+                notificationUid = generateAutoObjectId(),
+                senderUid = generateAutoUserId(),
                 receiverUid = userId,
-                travelUid = generateAutoId(),
+                travelUid = generateAutoObjectId(),
                 content =
                     NotificationContent.InvitationNotification(
                         "John Doe", "Trip to Paris", Role.PARTICIPANT),
@@ -65,7 +66,7 @@ class NotificationViewModelUnitTest {
 
   @Test
   fun markNotificationAsRead() {
-    val notificationUid = generateAutoId()
+    val notificationUid = generateAutoObjectId()
     notificationViewModel.markNotificationAsRead(notificationUid)
     verify(notificationRepository, times(1)).markNotificationAsRead(eq(notificationUid))
   }
@@ -74,10 +75,10 @@ class NotificationViewModelUnitTest {
   fun sendNotification() {
     val notification =
         Notification(
-            notificationUid = generateAutoId(),
-            senderUid = generateAutoId(),
-            receiverUid = generateAutoId(),
-            travelUid = generateAutoId(),
+            notificationUid = generateAutoObjectId(),
+            senderUid = generateAutoUserId(),
+            receiverUid = generateAutoUserId(),
+            travelUid = generateAutoObjectId(),
             content =
                 NotificationContent.InvitationNotification(
                     "John Doe", "Trip to Paris", Role.PARTICIPANT),

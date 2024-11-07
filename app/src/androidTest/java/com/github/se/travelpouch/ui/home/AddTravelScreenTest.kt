@@ -9,11 +9,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.TravelRepository
 import com.github.se.travelpouch.model.location.LocationRepository
 import com.github.se.travelpouch.model.location.LocationViewModel
+import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -55,6 +56,10 @@ class AddTravelScreenTest {
 
   @Before
   fun setUp() {
+    val profile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", null, "name", emptyList())
+
     // Mocking objects for ViewModel and NavigationActions
     travelRepository = mock(TravelRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)

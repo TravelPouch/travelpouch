@@ -1,7 +1,7 @@
 package com.github.se.travelpouch.model.activity
 
 import android.content.Context
-import com.github.se.travelpouch.model.Location
+import com.github.se.travelpouch.model.travels.Location
 import com.google.firebase.Timestamp
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat

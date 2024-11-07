@@ -12,22 +12,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.model.UserInfo
-import com.github.se.travelpouch.model.fsUid
+import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.fsUid
 
 @Composable
 fun ParticipantRow(
-    participant: Map.Entry<fsUid, UserInfo>,
+    participant: Map.Entry<fsUid, Profile>,
     selectedTravel: TravelContainer,
     onClick: () -> Unit
 ) {
-  val context = LocalContext.current
 
   Row(
       modifier = Modifier.fillMaxWidth().testTag("participantRow").clickable { onClick() },

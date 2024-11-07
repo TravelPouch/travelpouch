@@ -14,11 +14,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.github.se.travelpouch.model.ListTravelViewModel
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
+import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
@@ -33,6 +35,8 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
+import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
@@ -63,17 +67,31 @@ fun TravelPouchApp() {
       viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
+  val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
+
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
+
+  val notificationViewModel: NotificationViewModel =
+      viewModel(factory = NotificationViewModel.Factory)
 
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
         startDestination = Screen.AUTH,
         route = Route.DEFAULT,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+      composable(Screen.AUTH) {
+        SignInScreen(navigationActions, profileModelView, listTravelViewModel)
+      }
 
-      composable(Screen.TRAVEL_LIST) { TravelListScreen(navigationActions, listTravelViewModel) }
+      composable(Screen.TRAVEL_LIST) {
+        TravelListScreen(
+            navigationActions,
+            listTravelViewModel,
+            activityModelView,
+            eventsViewModel,
+            documentViewModel)
+      }
       composable(Screen.TRAVEL_ACTIVITIES) {
         TravelActivitiesScreen(navigationActions, activityModelView)
       }
@@ -100,6 +118,12 @@ fun TravelPouchApp() {
       }
       composable(Screen.DOCUMENT_PREVIEW) { DocumentPreview(documentViewModel, navigationActions) }
       composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
+
+      composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
+      composable(Screen.EDIT_PROFILE) {
+        ModifyingProfileScreen(navigationActions, profileModelView)
+      }
+
       composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
     }
   }

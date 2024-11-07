@@ -41,12 +41,13 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.TravelContainer
 import com.github.se.travelpouch.model.location.LocationViewModel
+import com.github.se.travelpouch.model.profile.CurrentProfile
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 
@@ -64,7 +65,7 @@ import com.google.firebase.Timestamp
 fun AddTravelScreen(
     listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
     navigationActions: NavigationActions,
-    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory),
 ) {
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
@@ -237,8 +238,9 @@ fun AddTravelScreen(
                                 allAttachments = emptyMap(),
                                 allParticipants =
                                     mapOf(
-                                        Participant(fsUid = listTravelViewModel.getNewUid()) to
-                                            Role.OWNER))
+                                        Participant(fsUid = CurrentProfile.currentProfileUid) to
+                                            Role.OWNER),
+                                listParticipant = listOf(CurrentProfile.currentProfileUid))
 
                         Log.d("AddTravelScreen", "TravelContainer created successfully.")
                       } catch (e: Exception) {
