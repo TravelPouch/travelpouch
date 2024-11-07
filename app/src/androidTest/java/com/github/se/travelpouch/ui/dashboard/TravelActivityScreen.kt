@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -89,13 +90,21 @@ class TravelActivityScreen {
   @Test
   fun verifyActivityCardWorksCorrectly() {
     val activity = activites_test[0]
-
-    composeTestRule.setContent { ActivityItem(activity) }
-
+    composeTestRule.setContent { ActivityItem(activity, {}, LocalContext.current) }
+    Thread.sleep(500)
     composeTestRule.onNodeWithTag("activityItem").assertIsDisplayed()
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.title)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.location.name)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains("1/1/1970")
+  }
+
+  @Test
+  fun runDefaultErrorUIToCheckFailure(){
+      composeTestRule.setContent { DefaultErrorUI() }
+  }
+
+  fun runAsyncLoadingSpinner(){
+        composeTestRule.setContent { AdvancedImageDisplayWithEffects("https://epic.gamer.huh") }
   }
 
   @Test
