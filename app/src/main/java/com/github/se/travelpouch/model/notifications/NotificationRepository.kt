@@ -1,7 +1,7 @@
 package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
-import com.github.se.travelpouch.model.Role
+import com.github.se.travelpouch.model.travels.Role
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query

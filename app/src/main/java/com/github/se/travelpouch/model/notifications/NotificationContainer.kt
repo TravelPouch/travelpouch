@@ -36,7 +36,7 @@ data class Notification(
     // Todo: need to check if the travel exists in the database
     require(isValidObjectUid(travelUid)) { "Travel UID cannot be blank" }
 
-    require(senderUid != receiverUid) { "Sender and receiver cannot be the same" }
+    //require(senderUid != receiverUid) { "Sender and receiver cannot be the same" }
   }
 
   /**

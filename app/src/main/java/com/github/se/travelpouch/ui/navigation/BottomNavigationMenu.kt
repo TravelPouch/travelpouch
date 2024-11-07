@@ -25,6 +25,7 @@ fun BottomNavigationMenu(tabList: List<TopLevelDestination>, navigationActions: 
               "Map" -> navigationActions.navigateTo(Screen.ACTIVITIES_MAP)
               "Calendar" -> navigationActions.navigateTo(Screen.CALENDAR)
               "Notifications" -> navigationActions.navigateTo(Screen.NOTIFICATION)
+                "Travels" -> navigationActions.navigateTo(Screen.TRAVEL_LIST)
             }
           },
           icon = { Icon(destination.icon, contentDescription = null) },

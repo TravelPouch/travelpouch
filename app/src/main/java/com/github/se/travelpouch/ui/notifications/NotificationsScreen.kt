@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.se.travelpouch.model.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationType

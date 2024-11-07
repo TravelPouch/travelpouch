@@ -71,12 +71,9 @@ fun TravelPouchApp() {
   val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
   val notificationViewModel: NotificationViewModel =
       viewModel(factory = NotificationViewModel.Factory)
-
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
-  val notificationViewModel: NotificationViewModel =
-      viewModel(factory = NotificationViewModel.Factory)
 
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
