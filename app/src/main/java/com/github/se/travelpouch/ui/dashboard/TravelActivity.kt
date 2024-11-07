@@ -74,7 +74,11 @@ fun TravelActivitiesScreen(
 
   val showBanner = remember { mutableStateOf(true) }
   val listOfActivities = activityModelView.activities.collectAsState()
-
+  val images =
+      listOf(
+          "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
+          "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
+          "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
   Scaffold(
       modifier = Modifier.testTag("travelActivitiesScreen"),
       topBar = {
@@ -156,7 +160,8 @@ fun TravelActivitiesScreen(
                               activityModelView.selectActivity(listOfActivities.value[idx])
                               navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
                             },
-                            LocalContext.current)
+                            LocalContext.current,
+                            images)
                       }
                     }
                   }
@@ -172,20 +177,22 @@ fun TravelActivitiesScreen(
 }
 
 /**
- * This function displays the date of an activity, its title, its location and first 2 images.
+ * Composable function to display an activity item.
  *
- * @param activity (Activity) : the activity to display
- * @param onClick (() -> Unit) : the function to apply when we click on an activity.
+ * @param activity The activity to display.
+ * @param onClick Lambda function to handle click events on the activity item.
+ * @param context The context in which the composable is called.
+ * @param images A list of image URLs to display for the activity.
  */
 @Composable
-fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.content.Context) {
+fun ActivityItem(
+    activity: Activity,
+    onClick: () -> Unit = {},
+    context: android.content.Context,
+    images: List<String>
+) {
   val calendar = GregorianCalendar().apply { time = activity.date.toDate() }
   // we hardcode for the moment placeholder images
-  val images =
-      listOf(
-          "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
-          "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
-          "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
   Card(
       modifier = Modifier.testTag("activityItem").fillMaxSize(),
       onClick = onClick,
@@ -271,6 +278,7 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.
                                 shape =
                                     androidx.compose.foundation.shape.RoundedCornerShape(
                                         10)) // Rounded background
+                            .testTag("extraDocumentButton") // Add padding to the button
                     ) {
                       Icon(
                           imageVector = Icons.Default.MoreVert,
@@ -284,10 +292,16 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.
       }
 }
 
-// Large parts of this code was taken without shame from
+// 98% of the following code down here was taken without shame from
 // https://medium.com/@ramadan123sayed/comprehensive-guide-to-utilizing-icons-and-images-in-jetpack-compose-with-coil-7fd2686e491e
-// This is good stuff
-
+// This is really good stuff
+/**
+ * Composable function to display an image from a URL with loading and error handling.
+ *
+ * @param imageUrl The URL of the image to display.
+ * @param loadingContent A composable function to display while the image is loading.
+ * @param errorContent A composable function to display if the image fails to load.
+ */
 @Composable
 fun AdvancedImageDisplayWithEffects(
     imageUrl: String,
