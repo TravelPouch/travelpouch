@@ -78,7 +78,7 @@ class EditTravelSettingsScreenTest {
 
   @Test
   fun checkNoSelectedTravel() {
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, noti) }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editTravelText").assertIsDisplayed()

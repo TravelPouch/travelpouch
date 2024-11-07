@@ -10,6 +10,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepository {
 
@@ -200,15 +201,19 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
     ) {
         db.collection(collectionPath).document(id).get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val travel = task.result?.let { documentToTravel(it) }
-                if (travel != null) {
-                    onSuccess(travel)
+                val document = task.result
+                if (document.exists()) {
+                    val travel = documentToTravel(document)
+                    if (travel != null) {
+                        onSuccess(travel)
+                    } else {
+                        onFailure(Exception("Travel not found"))
+                    }
                 } else {
-                    onFailure(Exception("Travel not found"))
+                    onFailure(Exception("Document does not exist"))
                 }
             } else {
                 task.exception?.let { e ->
-                    Log.e("TravelRepositoryFirestore", "Error getting travel", e)
                     onFailure(e)
                 }
             }

@@ -245,13 +245,9 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
         onFailure = { onFailure() })
   }
 
-    fun getTravelById(id: String): TravelContainer? {
-        var travelContainer : TravelContainer? = null
-        repository.getTravelById(
-            id = id,
-            onSuccess = { travelContainer = it },
-            onFailure = { Log.e("ListTravelViewModel", "Failed to get travel", it) })
-        return travelContainer
+    fun getTravelById(id: String, onSuccess: (TravelContainer?) -> Unit, onFailure: (Exception) -> Unit) {
+        repository.getTravelById(id, onSuccess, onFailure)
     }
+
 
 }
