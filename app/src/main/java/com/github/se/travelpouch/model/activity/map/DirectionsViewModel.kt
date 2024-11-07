@@ -26,7 +26,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
   // StateFlow to hold all fetched routes for different origin-destination pairs
   private val _routeOptionsList = MutableStateFlow<List<RouteOptions>>(emptyList())
   val pathPoints: MutableStateFlow<List<RouteOptions>>
-    get() = _routeOptionsList
+    val routeOptions: StateFlow<List<RouteOptions>> get() = _routeOptionsList
 
   /** Factory class for creating DirectionsViewModel instances. */
   // create factory
