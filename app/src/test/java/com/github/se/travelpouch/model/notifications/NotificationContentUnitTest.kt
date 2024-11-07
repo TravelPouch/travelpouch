@@ -1,6 +1,6 @@
 package com.github.se.travelpouch.model.notifications
 
-import com.github.se.travelpouch.model.Role
+import com.github.se.travelpouch.model.travels.Role
 import org.junit.Test
 
 class NotificationContentUnitTest {

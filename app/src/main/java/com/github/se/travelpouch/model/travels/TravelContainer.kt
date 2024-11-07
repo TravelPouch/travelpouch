@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travels
 
 import com.google.firebase.Timestamp
 import java.util.Date
@@ -35,6 +35,7 @@ data class TravelContainer(
         Map<
             Participant,
             Role>, // One owner must exist at all times unless travel container is deleted
+    val listParticipant: List<String>
 ) {
   init {
     require(allParticipants.isNotEmpty()) { "At least one participant is required" }
@@ -65,7 +66,8 @@ data class TravelContainer(
                 "insertTime" to location.insertTime,
                 "name" to location.name),
         "allAttachments" to allAttachments,
-        "allParticipants" to allParticipants.mapKeys { it.key.fsUid }.mapValues { it.value.name })
+        "allParticipants" to allParticipants.mapKeys { it.key.fsUid }.mapValues { it.value.name },
+        "listParticipant" to listParticipant)
   }
 }
 
@@ -195,7 +197,8 @@ object TravelContainerMock {
       location: Location = Location(46.5191, 6.5668, Timestamp.now(), "EPFL"),
       allAttachments: Map<String, String> = mapOf("Attachment1" to "mockAttachmentUid1"),
       allParticipants: Map<Participant, Role> =
-          mapOf(Participant(generateAutoUserId()) to Role.OWNER)
+          mapOf(Participant(generateAutoUserId()) to Role.OWNER),
+      listParticipant: List<String>
   ): TravelContainer {
     return TravelContainer(
         fsUid = fsUid,
@@ -205,7 +208,8 @@ object TravelContainerMock {
         endTime = endTime,
         location = location,
         allAttachments = allAttachments,
-        allParticipants = allParticipants)
+        allParticipants = allParticipants,
+        listParticipant = emptyList<String>())
   }
 
   /**
@@ -232,7 +236,7 @@ object TravelContainerMock {
    */
   fun createMockTravelContainersList(
       size: Int,
-      fsUidGenerator: () -> String = ::generateAutoObjectId,
+      fsUidGenerator: () -> String = TravelContainerMock::generateAutoObjectId,
       titleGenerator: (Int) -> String = { "Mock Travel $it" },
       descriptionGenerator: (Int) -> String = { "This is mock travel container $it" },
       startTimeGenerator: (Int) -> Timestamp = { Timestamp.now() },
@@ -256,7 +260,8 @@ object TravelContainerMock {
           endTime = endTimeGenerator(index),
           location = locationGenerator(index),
           allAttachments = allAttachmentsGenerator(index),
-          allParticipants = allParticipantsGenerator(index))
+          allParticipants = allParticipantsGenerator(index),
+          listParticipant = emptyList())
     }
   }
 }
