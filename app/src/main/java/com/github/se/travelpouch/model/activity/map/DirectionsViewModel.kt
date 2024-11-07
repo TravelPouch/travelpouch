@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
@@ -25,8 +26,8 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
 
   // StateFlow to hold all fetched routes for different origin-destination pairs
   private val _routeOptionsList = MutableStateFlow<List<RouteOptions>>(emptyList())
-  val pathPoints: MutableStateFlow<List<RouteOptions>>
-    val routeOptions: StateFlow<List<RouteOptions>> get() = _routeOptionsList
+  val routeOptionsList: StateFlow<List<RouteOptions>>
+    get() = _routeOptionsList
 
   /** Factory class for creating DirectionsViewModel instances. */
   // create factory
