@@ -46,15 +46,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Location
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.TravelContainer
+import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.google.firebase.Timestamp
@@ -257,7 +257,7 @@ fun EditTravelSettingsScreen(
                             location = newLocation,
                             allAttachments = selectedTravel!!.allAttachments,
                             allParticipants = selectedTravel!!.allParticipants,
-                        )
+                            listParticipant = selectedTravel!!.listParticipant)
                     listTravelViewModel.updateTravel(newTravel)
                     Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
                   } catch (e: ParseException) {

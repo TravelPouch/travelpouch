@@ -38,16 +38,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.Participant
-import com.github.se.travelpouch.model.Role
-import com.github.se.travelpouch.model.fsUid
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -194,6 +194,7 @@ fun ParticipantListScreen(
                       setExpanded(false)
                       return@ChangeRoleDialog
                     }
+                    // we have an actual role change
                     if (oldRole == Role.OWNER &&
                         selectedTravel!!.allParticipants.values.count { it == Role.OWNER } == 1) {
                       Toast.makeText(

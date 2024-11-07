@@ -1,34 +1,33 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travels
 
 import android.util.Log
+import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileRepositoryConvert
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class TravelRepositoryFirestore(
-    private val db: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth = Firebase.auth
-) : TravelRepository {
+class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepository {
 
-  private val collectionPath = "travels"
-  private val userCollectionPath = "userslist"
+  private val collectionPath = FirebasePaths.TravelsSuperCollection
+  private val userCollectionPath = FirebasePaths.ProfilesSuperCollection
+
+  private var profileUid = "0000000000000000000000000000"
   /**
    * Initializes the repository by adding an authentication state listener. The listener triggers
    * the onSuccess callback if the user is authenticated.
    *
    * @param onSuccess The callback to call if the user is authenticated.
    */
-  override fun init(onSuccess: () -> Unit) {
-    firebaseAuth.addAuthStateListener {
-      if (it.currentUser != null) {
-        onSuccess()
-      }
+  override fun initAfterLogin(onSuccess: () -> Unit) {
+    val user = Firebase.auth.currentUser
+    if (user != null) {
+      profileUid = user.uid
+      onSuccess()
     }
   }
 
@@ -174,20 +173,24 @@ class TravelRepositoryFirestore(
       onSuccess: (List<TravelContainer>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
+
     Log.d("TravelRepositoryFirestore", "getTravels")
-    db.collection(collectionPath).get().addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        val travels =
-            task.result?.documents?.mapNotNull { document -> documentToTravel(document) }
-                ?: emptyList()
-        onSuccess(travels)
-      } else {
-        task.exception?.let { e ->
-          Log.e("TravelRepositoryFirestore", "Error getting documents", e)
-          onFailure(e)
+    db.collection(collectionPath)
+        .whereArrayContains("listParticipant", profileUid)
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            val travels =
+                task.result?.documents?.mapNotNull { document -> documentToTravel(document) }
+                    ?: emptyList()
+            onSuccess(travels)
+          } else {
+            task.exception?.let { e ->
+              Log.e("TravelRepositoryFirestore", "Error getting documents", e)
+              onFailure(e)
+            }
+          }
         }
-      }
-    }
   }
 
   /**
@@ -243,6 +246,7 @@ class TravelRepositoryFirestore(
           allParticipantsData
               ?.map { (key, value) -> Participant(key as String) to Role.valueOf(value as String) }
               ?.toMap()
+      val listParticipant = document.get("listParticipant") as? List<String>
 
       TravelContainer(
           fsUid = fsUid,
@@ -252,7 +256,8 @@ class TravelRepositoryFirestore(
           endTime = endTime!!,
           location = location,
           allAttachments = allAttachments!!,
-          allParticipants = allParticipants!!)
+          allParticipants = allParticipants!!,
+          listParticipant = listParticipant ?: emptyList())
     } catch (e: Exception) {
       Log.e("TravelRepositoryFirestore", "Error converting document to TravelContainer", e)
       null

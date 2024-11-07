@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.model
+package com.github.se.travelpouch.model.travels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -30,8 +30,8 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   private var lastFetchedTravel: TravelContainer? = null
   private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
 
-  init {
-    repository.init { getTravels() }
+  fun initAfterLogin() {
+    repository.initAfterLogin { getTravels() }
   }
 
   // create factory
@@ -116,6 +116,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
 
   /** Gets all Travel documents. */
   fun getTravels() {
+
     repository.getTravels(
         onSuccess = { travels_.value = it },
         onFailure = { Log.e("ListTravelViewModel", "Failed to get travels", it) })
@@ -229,7 +230,14 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
           val newParticipant = Participant(user.fsUid)
           val newParticipantMap = selectedTravel.allParticipants.toMutableMap()
           newParticipantMap[newParticipant] = Role.PARTICIPANT
-          val newTravel = selectedTravel.copy(allParticipants = newParticipantMap.toMap())
+
+          val newParticipantList = selectedTravel.listParticipant.toMutableList()
+          newParticipantList.plus(user.fsUid)
+
+          val newTravel =
+              selectedTravel.copy(
+                  allParticipants = newParticipantMap.toMap(),
+                  listParticipant = newParticipantList.toList())
           updateTravel(newTravel)
           onSuccess(newTravel)
         },
