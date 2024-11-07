@@ -34,12 +34,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.model.ListTravelViewModel
-import com.github.se.travelpouch.model.TravelContainer
-import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
+import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.util.Locale
 
 /**
@@ -52,15 +53,17 @@ import java.util.Locale
 @Composable
 fun TravelListScreen(
     navigationActions: NavigationActions,
-    listTravelViewModel: ListTravelViewModel
+    listTravelViewModel: ListTravelViewModel,
+    activityViewModel: ActivityViewModel,
+    eventViewModel: EventViewModel,
+    documentViewModel: DocumentViewModel,
 ) {
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
     listTravelViewModel.getTravels()
     // sleep the thread for 1 second to allow the data to be fetched
   }
-
-  val travelList = listTravelViewModel.travels.collectAsState().value
+  val travelList = listTravelViewModel.travels.collectAsState()
 
   // Used for the screen orientation redraw
   val configuration = LocalConfiguration.current
@@ -76,39 +79,35 @@ fun TravelListScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
       },
-      bottomBar = {
-        BottomNavigationMenu(
-            tabList = listOf(TopLevelDestinations.TRAVELS, TopLevelDestinations.CALENDAR),
-            navigationActions = navigationActions)
-      },
       content = { pd ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(pd),
-            contentPadding = PaddingValues(bottom = 80.dp)) {
-              item {
-                MapContent(
-                    modifier = Modifier.fillMaxWidth().height(mapHeight),
-                    travelContainers = travelList)
-              }
-              if (travelList.isNotEmpty()) {
-                items(travelList.size) { index ->
-                  TravelItem(travelContainer = travelList[index]) {
-                    listTravelViewModel.selectTravel(travelList[index])
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+        Column {
+          if (travelList.value.isNotEmpty()) {
+            // Add the map to display the travels
+
+            MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), travelList.value)
+
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
+                  items(travelList.value.size) { index ->
+                    TravelItem(travelContainer = travelList.value[index]) {
+                      val travelId = travelList.value[index].fsUid
+                      listTravelViewModel.selectTravel(travelList.value[index])
+                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      eventViewModel.setIdTravel(travelId)
+                      activityViewModel.setIdTravel(travelId)
+                      documentViewModel.setIdTravel(travelId)
+                    }
                   }
                 }
-              } else {
-                item {
-                  Box(
-                      modifier = Modifier.fillMaxSize().padding(16.dp),
-                      contentAlignment = Alignment.Center) {
-                        Text(
-                            modifier = Modifier.testTag("emptyTravelPrompt"),
-                            text = "You have no travels yet.")
-                      }
-                }
-              }
-            }
+          } else {
+            MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), emptyList())
+
+            Text(
+                modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
+                text = "You have no travels yet.")
+          }
+        }
       })
 }
 

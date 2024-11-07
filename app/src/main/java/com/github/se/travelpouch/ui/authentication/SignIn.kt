@@ -25,18 +25,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.travelpouch.R
+import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * A composable function that displays the sign-in screen.
  *
  * @param navigationActions An instance of `NavigationActions` to handle navigation events.
  */
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) {
+fun SignInScreen(
+    navigationActions: NavigationActions,
+    profileModelView: ProfileModelView,
+    travelViewModel: ListTravelViewModel
+) {
   val context = LocalContext.current
 
   // launcher for Firebase authentication
@@ -44,6 +54,13 @@ fun SignInScreen(navigationActions: NavigationActions) {
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
+
+            GlobalScope.launch {
+              profileModelView.initAfterLogin()
+              Log.d("SignInScreen", "profile available")
+            }
+
+            travelViewModel.initAfterLogin()
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
