@@ -85,7 +85,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
    * @param directionsResponse The response from the Directions API.
    * @return A list of lists, where each inner list represents the LatLng points for one route.
    */
-  private fun extractPathPoints(directionsResponse: DirectionsResponse): List<List<LatLng>> {
+  private fun extractPathPoints(directionsResponse: DirectionsResponse): List<Path> {
     val allRoutesPoints = mutableListOf<Path>()
 
     // Loop through each route in the DirectionsResponse
