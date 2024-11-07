@@ -50,9 +50,8 @@ fun NextActivitiesBanner(
     modifier: Modifier = Modifier,
     localConfig: Configuration = LocalConfiguration.current
 ) {
-  val screenSize =
-      if (localConfig.orientation == ORIENTATION_PORTRAIT) localConfig.screenHeightDp
-      else localConfig.screenWidthDp
+  var isPortrait = localConfig.orientation == ORIENTATION_PORTRAIT
+  var screenSize = if (isPortrait) localConfig.screenHeightDp else localConfig.screenWidthDp
   val dismissButtonSize = (screenSize * 0.05).dp // 5% of the screen size
   val showOutline = remember { mutableStateOf(false) }
   // Filter activities due within the next 24 hours
@@ -75,9 +74,9 @@ fun NextActivitiesBanner(
                     max =
                         (0.3f * LocalConfiguration.current.screenHeightDp.dp.value)
                             .dp) // 30% of screen height
-                .background(Color.Gray.copy(alpha = 0.9f), RoundedCornerShape(8.dp))
+                .background(Color.Gray.copy(alpha = 0.85f), RoundedCornerShape(8.dp))
                 .clickable { showOutline.value = true } // Set the outline on first tap
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .testTag("NextActivitiesBannerBox"),
         contentAlignment = Alignment.Center) {
           Column(
@@ -90,7 +89,7 @@ fun NextActivitiesBanner(
                     text = "Upcoming Activities in the next 24 hours",
                     color = Color.DarkGray,
                     style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-                    modifier = Modifier.padding(bottom = 8.dp))
+                    modifier = Modifier.padding(bottom = 8.dp, start = 2.dp, end = 2.dp).testTag("reminderTitle").background(Color.LightGray, RoundedCornerShape(4.dp)))
 
                 // Scrollable list of upcoming activities
                 LazyColumn(
@@ -101,11 +100,19 @@ fun NextActivitiesBanner(
                             text = "- ${activity.title}",
                             color = Color.White,
                             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
-                            modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth())
+                            modifier =
+                                Modifier.padding(vertical = 4.dp)
+                                    .fillMaxWidth()
+                                    .testTag("reminderEntry"))
                       }
                     }
-
-                // Dismiss button
+              }
+          // Dismiss button in the bottom right corner
+          Box(
+              modifier =
+                  Modifier.align(if (isPortrait) Alignment.BottomEnd else Alignment.CenterEnd)
+                      .padding(8.dp) // Add padding to ensure it doesn't touch the edges
+              ) {
                 IconButton(
                     onClick = onDismiss,
                     modifier =
@@ -114,7 +121,9 @@ fun NextActivitiesBanner(
                                 width = if (showOutline.value) 2.dp else 0.dp,
                                 color = if (showOutline.value) Color.Black else Color.Transparent,
                                 shape = CircleShape)
-                            .testTag("NextActivitiesBannerDismissButton")) {
+                            .testTag("NextActivitiesBannerDismissButton")
+                            .padding(8.dp) // Add padding to ensure it doesn't touch the edges
+                    ) {
                       Icon(
                           imageVector = Icons.Default.Close,
                           contentDescription = "Dismiss",
