@@ -202,6 +202,38 @@ export const storeDocument = onCall(
   }
 );
 
+import * as mupdf from 'mupdf'
+// import Vips = require('wasm-vips')
+
+async function convertPdfToJpeg(): Promise<void> {
+  
+  const doc = mupdf.Document.openDocument(new Uint8Array([0,0,0,0]), "application/pdf")
+  logger.debug(doc.countPages())
+  
+  // const vips = await Vips()
+  // const mask = vips.Image.newFromArray([
+  //   -1, -1, -1,
+  //   -1, 16, -1,
+  //   -1, -1, -1
+  // ], 8.0);
+  
+  // // Finally, write the result to a buffer
+  // const outBuffer = mask.writeToBuffer('.jpg');
+  // logger.debug(outBuffer.byteLength)
+}
+
+export const test = onRequest(
+  {region: "europe-west9"},
+  async (req, res) => {
+    logger.debug(req.headers);
+    
+    convertPdfToJpeg().then(() => {
+      res.json({result: "Ok"});
+    }).catch((err) => {
+      res.json({result: "Fuck"});
+    })    
+  })
+
 /**
  * Store a file in the cloud
  * @param {string} contentBase64url

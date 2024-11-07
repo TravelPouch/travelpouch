@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "firebase-functions": "^6.0.1"
+    "firebase-functions": "^6.0.1",
+    "jimp": "^1.6.0",
+    "mupdf": "^0.3.0",
+    "wasm-vips": "^0.0.11"
   }
 }
