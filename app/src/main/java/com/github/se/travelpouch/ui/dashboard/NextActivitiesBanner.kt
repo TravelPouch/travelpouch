@@ -89,7 +89,10 @@ fun NextActivitiesBanner(
                     text = "Upcoming Activities in the next 24 hours",
                     color = Color.DarkGray,
                     style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-                    modifier = Modifier.padding(bottom = 8.dp, start = 2.dp, end = 2.dp).testTag("reminderTitle").background(Color.LightGray, RoundedCornerShape(4.dp)))
+                    modifier =
+                        Modifier.padding(bottom = 8.dp, start = 2.dp, end = 2.dp)
+                            .testTag("reminderTitle")
+                            .background(Color.LightGray, RoundedCornerShape(4.dp)))
 
                 // Scrollable list of upcoming activities
                 LazyColumn(
