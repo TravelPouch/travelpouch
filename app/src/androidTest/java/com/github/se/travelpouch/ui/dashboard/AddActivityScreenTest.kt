@@ -203,6 +203,17 @@ class AddActivityScreenTest {
 
   @Test
   fun timePickerDialogOpensOnClick() {
+
+    // Since TimePickerDialog is a platform dialog, we cannot directly test its display.
+
+    // However, we can test that the timeText state variable updates after interaction.
+
+    // For this test, assume that the TimePickerDialog sets the time to "12:34"
+    // We need to simulate this by updating the timeText state.
+
+    // Unfortunately, Compose UI testing cannot interact with platform dialogs like
+    // TimePickerDialog.
+
     composeTestRule.setContent {
       AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
     }
