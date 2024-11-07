@@ -180,6 +180,7 @@ fun TravelActivitiesScreen(
 @Composable
 fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.content.Context) {
   val calendar = GregorianCalendar().apply { time = activity.date.toDate() }
+    // we hardcode for the moment placeholder images
   val images =
       listOf(
           "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
@@ -200,7 +201,7 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.
           if (images.isEmpty()) {
             // No images to show, do nothing
           } else if (images.size == 1) {
-            // Single image - crop to A4 aspect ratio
+            // Single image
             Box(
                 modifier =
                     Modifier.fillMaxWidth() // Fill the width of the parent
@@ -213,7 +214,7 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.
                       errorContent = { DefaultErrorUI() })
                 }
           } else if (images.size == 2) {
-            // Two images - display side by side with a vertical separator
+            // Two images - display side by side with space in between
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -234,7 +235,7 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.
           } else if (images.size >= 3) {
             // Three or more images - show the first two with a button above them
             Column(modifier = Modifier.fillMaxWidth()) {
-              Box { // Use Box to layer the images and the button
+              Box { // Box to layer
                 // Display the first two images inside a Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -263,7 +264,7 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.
                           .show()
                     },
                     modifier =
-                        Modifier.align(Alignment.BottomEnd) // Position the button on the top right
+                        Modifier.align(Alignment.BottomEnd) // Position the button on the bottom right
                             .background(
                                 Color.Gray,
                                 shape =
