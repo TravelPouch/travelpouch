@@ -143,7 +143,6 @@ fun AddActivityScreen(
                         value = timeText,
                         onValueChange = {},
                         label = {
-
                           Text(
                               "Time (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         },
@@ -154,7 +153,6 @@ fun AddActivityScreen(
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         readOnly = true,
-
                         modifier = Modifier.fillMaxWidth())
                   }
 

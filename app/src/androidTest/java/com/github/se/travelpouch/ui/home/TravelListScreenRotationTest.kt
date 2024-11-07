@@ -35,7 +35,6 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 class TravelListScreenRotationTest {
 
-  // @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var navigationActions: NavigationActions
