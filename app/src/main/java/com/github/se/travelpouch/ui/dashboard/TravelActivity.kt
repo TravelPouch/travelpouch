@@ -180,7 +180,7 @@ fun TravelActivitiesScreen(
 @Composable
 fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.content.Context) {
   val calendar = GregorianCalendar().apply { time = activity.date.toDate() }
-    // we hardcode for the moment placeholder images
+  // we hardcode for the moment placeholder images
   val images =
       listOf(
           "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
@@ -264,7 +264,8 @@ fun ActivityItem(activity: Activity, onClick: () -> Unit = {}, context: android.
                           .show()
                     },
                     modifier =
-                        Modifier.align(Alignment.BottomEnd) // Position the button on the bottom right
+                        Modifier.align(
+                                Alignment.BottomEnd) // Position the button on the bottom right
                             .background(
                                 Color.Gray,
                                 shape =
