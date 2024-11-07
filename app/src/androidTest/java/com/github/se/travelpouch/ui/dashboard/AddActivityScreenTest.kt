@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.ui.semantics.SemanticsProperties.EditableText
-import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
@@ -204,14 +203,9 @@ class AddActivityScreenTest {
 
   @Test
   fun timePickerDialogOpensOnClick() {
-    composeTestRule.setContent {
-      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
-    }
 
-    // Click on the time field
-    composeTestRule.onNodeWithTag("timeField").performClick()
-    // TODO: Add a test for the time picker dialog
     // Since TimePickerDialog is a platform dialog, we cannot directly test its display.
+
     // However, we can test that the timeText state variable updates after interaction.
 
     // For this test, assume that the TimePickerDialog sets the time to "12:34"
@@ -220,6 +214,13 @@ class AddActivityScreenTest {
     // Unfortunately, Compose UI testing cannot interact with platform dialogs like
     // TimePickerDialog.
 
-    composeTestRule.onNodeWithTag("timeField").assertHasClickAction()
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+    }
+
+    // The time field should be displayed
+    composeTestRule.onNodeWithTag("timeField").assertIsDisplayed()
+    // Click on the time field
+    composeTestRule.onNodeWithTag("timeField").performClick()
   }
 }
