@@ -71,6 +71,8 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
             if (routes.isNotEmpty()) {
               // Accumulate new routes with old ones
               _routeOptionsList.value += RouteOptions(origin, destination, routes)
+            } else {
+              Log.e("DirectionsViewModel", "No routes found")
             }
           },
           onFailure = { exception ->
