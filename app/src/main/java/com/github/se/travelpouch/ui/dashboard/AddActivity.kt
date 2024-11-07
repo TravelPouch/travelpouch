@@ -57,7 +57,7 @@ fun AddActivityScreen(
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   var dateText by remember { mutableStateOf("") }
-  var timeText by remember { mutableStateOf("") }
+  var timeText by remember { mutableStateOf("Time") }
 
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
