@@ -57,7 +57,7 @@ fun AddActivityScreen(
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   var dateText by remember { mutableStateOf("") }
-  var timeText by remember { mutableStateOf("Time") }
+  var timeText by remember { mutableStateOf("") }
 
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
@@ -125,7 +125,7 @@ fun AddActivityScreen(
                           .background(Color.Transparent, shape = MaterialTheme.shapes.extraSmall)
                           .padding(16.dp)) {
                     ClickableText(
-                        text = AnnotatedString(timeText),
+                        text = AnnotatedString(if (timeText.isBlank()) "Time" else timeText),
                         onClick = {
                           TimePickerDialog(
                                   context,
@@ -141,8 +141,8 @@ fun AddActivityScreen(
                         },
                         style =
                             LocalTextStyle.current.copy(
-                                color = MaterialTheme.colorScheme.onSurface),
-                        modifier = Modifier.fillMaxWidth())
+                                color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        modifier = Modifier.fillMaxWidth().testTag("timeField"))
                   }
 
               // Location Input with dropdown (Optional)
