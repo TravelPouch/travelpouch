@@ -1,8 +1,10 @@
+package com.github.se.travelpouch.ui.home
+
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
@@ -17,10 +19,7 @@ import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelContainerMock
 import com.github.se.travelpouch.model.travels.TravelRepository
-import com.github.se.travelpouch.ui.home.MapScreen
-import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,14 +28,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class TravelListScreenTest {
+class TravelListScreenRotationTest {
 
+  // @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var navigationActions: NavigationActions
@@ -48,6 +47,7 @@ class TravelListScreenTest {
   private lateinit var documentRepository: DocumentRepository
   private lateinit var eventViewModel: EventViewModel
   private lateinit var eventRepository: EventRepository
+
   @Mock private lateinit var mockFileDownloader: FileDownloader
 
   @Before
@@ -99,8 +99,15 @@ class TravelListScreenTest {
   }
 
   @Test
-  fun hasRequiredComponents() {
-    // Act
+  fun travelListScreen_rotate() {
+    val uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    // Rotate the screen to landscape
+    uiDevice.setOrientationLeft()
+
+    // Wait for the UI to settle after rotation
+    uiDevice.waitForIdle(3000) // Waits up to 3 seconds
+
+    // Set up the content within the activity's context
     composeTestRule.setContent {
       TravelListScreen(
           navigationActions = navigationActions,
@@ -109,120 +116,18 @@ class TravelListScreenTest {
           eventViewModel,
           documentViewModel)
     }
-    Thread.sleep(3000)
-    // Assert
+
+    // Assert that the UI components are still displayed correctly
     composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-  }
 
-  @Test
-  fun displayTravelListWhenNotEmpty() {
-    // Act
-    composeTestRule.setContent {
-      TravelListScreen(
-          navigationActions = navigationActions,
-          listTravelViewModel = listTravelViewModel,
-          activityViewModel,
-          eventViewModel,
-          documentViewModel)
-    }
+    // Reset the orientation after the test
+    uiDevice.unfreezeRotation()
 
-    // Assert
-    composeTestRule.onNodeWithTag("travelListItem").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Trip to Paris").assertIsDisplayed()
-    composeTestRule.onNodeWithText("A wonderful trip to Paris").assertIsDisplayed()
-  }
+    // Wait for the UI to settle after rotation
+    uiDevice.waitForIdle(3000) // Waits up to 3 seconds
 
-  @Test
-  fun displayMapWithMarkers() {
-    // Arrange
-    val startTime = Timestamp(Date())
-    val endTime = Timestamp(Date(startTime.toDate().time + 86400000))
-    val participant = Participant(fsUid = TravelContainerMock.generateAutoUserId())
-    val participants = mapOf(participant to Role.OWNER)
-    val attachments = mapOf<String, String>()
-
-    val locationParis =
-        Location(latitude = 48.8566, longitude = 2.3522, insertTime = startTime, name = "Paris")
-    val travelParis =
-        TravelContainer(
-            fsUid = TravelContainerMock.generateAutoObjectId(),
-            title = "Trip to Paris",
-            description = "A wonderful trip to Paris",
-            startTime = startTime,
-            endTime = endTime,
-            location = locationParis,
-            allAttachments = attachments,
-            allParticipants = participants,
-            emptyList())
-
-    val locationNYC =
-        Location(
-            latitude = 40.7128, longitude = -74.0060, insertTime = startTime, name = "New York")
-    val travelNYC =
-        TravelContainer(
-            fsUid = TravelContainerMock.generateAutoObjectId(),
-            title = "Visit New York",
-            description = "Exploring NYC",
-            startTime = startTime,
-            endTime = endTime,
-            location = locationNYC,
-            allAttachments = attachments,
-            allParticipants = participants,
-            emptyList())
-
-    val travelContainers = listOf(travelParis, travelNYC)
-
-    // Act
-    composeTestRule.setContent { MapScreen(travelContainers = travelContainers) }
     composeTestRule.waitForIdle()
-    Thread.sleep(3000)
-
-    // Assert
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-  }
-
-  @Test
-  fun testTravelItemClickNavigatesToTravelActivities() {
-    // Act
-    composeTestRule.setContent {
-      TravelListScreen(
-          navigationActions = navigationActions,
-          listTravelViewModel = listTravelViewModel,
-          activityViewModel,
-          eventViewModel,
-          documentViewModel)
-    }
-    composeTestRule.waitForIdle()
-
-    // Find and click on a travel list item
-    composeTestRule.onNodeWithTag("travelListItem").performClick()
-    composeTestRule.waitForIdle()
-
-    // Verify that the navigation action was called for TRAVEL_ACTIVITIES
-    verify(navigationActions).navigateTo(Screen.TRAVEL_ACTIVITIES)
-  }
-
-  @Test
-  fun testCreateTravelFabClickNavigatesToAddTravel() {
-    // Act
-    composeTestRule.setContent {
-      TravelListScreen(
-          navigationActions = navigationActions,
-          listTravelViewModel = listTravelViewModel,
-          activityViewModel,
-          eventViewModel,
-          documentViewModel)
-    }
-    composeTestRule.waitForIdle()
-
-    // Find and click on the create travel FAB
-    composeTestRule.onNodeWithTag("createTravelFab").performClick()
-    composeTestRule.waitForIdle()
-
-    // Verify that the navigation action was called for ADD_TRAVEL
-    verify(navigationActions).navigateTo(Screen.ADD_TRAVEL)
   }
 }
