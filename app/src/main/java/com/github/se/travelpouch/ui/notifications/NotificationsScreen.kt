@@ -177,6 +177,7 @@ fun NotificationItem(
                     horizontalArrangement = Arrangement.Center) {
                       Button(
                           onClick = {
+                              val travel = listTravelViewModel.getTravelById(notification.travelUid)
                             notificationViewModel.sendNotification(
                                 Notification(
                                     notification.notificationUid,
@@ -185,14 +186,13 @@ fun NotificationItem(
                                     notification.travelUid,
                                     NotificationContent.InvitationResponseNotification(
                                         profileViewModel.profile.value.name,
-                                        listTravelViewModel.getNameOfTravelByUid(
-                                            notification.travelUid),
+                                        travel!!.title,
                                         true),
                                     NotificationType.ACCEPTED))
 
                             listTravelViewModel.addUserToTravel(
                                 profileViewModel.profile.value.fsUid,
-                                notification.travelUid,
+                                travel,
                                 { updatedContainer ->
                                   listTravelViewModel.selectTravel(updatedContainer)
                                   Toast.makeText(
@@ -226,8 +226,7 @@ fun NotificationItem(
                                     notification.travelUid,
                                     NotificationContent.InvitationResponseNotification(
                                         profileViewModel.profile.value.name,
-                                        listTravelViewModel.getNameOfTravelByUid(
-                                            notification.travelUid),
+                                        listTravelViewModel.getTravelById(notification.travelUid)!!.title,
                                         false),
                                     NotificationType.DECLINED))
 

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.profile.Profile
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -244,31 +245,13 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
         onFailure = { onFailure() })
   }
 
-  fun addUserToTravel(
-      userFsUid: String,
-      travelFsUid: String,
-      onSuccess: (TravelContainer) -> Unit,
-      onFailure: () -> Unit
-  ) {
-    val selectedTravel = travels.value.find { it.fsUid == travelFsUid }
-    if (selectedTravel != null) {
-      repository.getParticipantFromfsUid(
-          userFsUid,
-          onSuccess = { user ->
-            val newParticipant = Participant(user!!.fsUid)
-            val newParticipantMap = selectedTravel.allParticipants.toMutableMap()
-            newParticipantMap[newParticipant] = Role.PARTICIPANT
-            val newTravel = selectedTravel.copy(allParticipants = newParticipantMap.toMap())
-            updateTravel(newTravel)
-            onSuccess(newTravel)
-          },
-          onFailure = { onFailure() })
-    } else {
-      onFailure()
+    fun getTravelById(id: String): TravelContainer? {
+        var travelContainer : TravelContainer? = null
+        repository.getTravelById(
+            id = id,
+            onSuccess = { travelContainer = it },
+            onFailure = { Log.e("ListTravelViewModel", "Failed to get travel", it) })
+        return travelContainer
     }
-  }
 
-  fun getNameOfTravelByUid(uid: String): String {
-    return travels.value.find { it.fsUid == uid }?.title ?: "Travel not found"
-  }
 }

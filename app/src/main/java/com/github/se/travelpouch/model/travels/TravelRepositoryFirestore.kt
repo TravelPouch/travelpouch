@@ -193,6 +193,28 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
         }
   }
 
+    override fun getTravelById(
+        id: String,
+        onSuccess: (TravelContainer?) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection(collectionPath).document(id).get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val travel = task.result?.let { documentToTravel(it) }
+                if (travel != null) {
+                    onSuccess(travel)
+                } else {
+                    onFailure(Exception("Travel not found"))
+                }
+            } else {
+                task.exception?.let { e ->
+                    Log.e("TravelRepositoryFirestore", "Error getting travel", e)
+                    onFailure(e)
+                }
+            }
+        }
+    }
+
   /**
    * Performs a Firestore operation and calls the appropriate callback based on the result.
    *

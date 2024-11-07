@@ -22,6 +22,8 @@ interface TravelRepository {
 
   fun getTravels(onSuccess: (List<TravelContainer>) -> Unit, onFailure: (Exception) -> Unit)
 
+  fun getTravelById(id: String, onSuccess: (TravelContainer?) -> Unit, onFailure: (Exception) -> Unit)
+
   fun addTravel(travel: TravelContainer, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   fun updateTravel(travel: TravelContainer, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
