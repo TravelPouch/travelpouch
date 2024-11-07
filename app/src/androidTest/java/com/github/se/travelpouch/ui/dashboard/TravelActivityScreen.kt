@@ -99,12 +99,12 @@ class TravelActivityScreen {
   }
 
   @Test
-  fun runDefaultErrorUIToCheckFailure(){
-      composeTestRule.setContent { DefaultErrorUI() }
+  fun runDefaultErrorUIToCheckFailure() {
+    composeTestRule.setContent { DefaultErrorUI() }
   }
 
-  fun runAsyncLoadingSpinner(){
-        composeTestRule.setContent { AdvancedImageDisplayWithEffects("https://epic.gamer.huh") }
+  fun runAsyncLoadingSpinner() {
+    composeTestRule.setContent { AdvancedImageDisplayWithEffects("https://epic.gamer.huh") }
   }
 
   @Test
