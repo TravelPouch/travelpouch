@@ -66,7 +66,7 @@ class DirectionsViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert
-    val pathPoints = viewModel.pathPoints.value
+    val pathPoints = viewModel.routeOptionsList.value
     assertTrue(pathPoints.isNotEmpty())
   }
 
@@ -95,7 +95,7 @@ class DirectionsViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert
-    val pathPoints = viewModel.pathPoints.value
+    val pathPoints = viewModel.routeOptionsList.value
     assertTrue(pathPoints.isEmpty()) // Expect pathPoints to remain empty on failure
   }
 
@@ -127,7 +127,7 @@ class DirectionsViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert
-    val pathPoints = viewModel.pathPoints.value
+    val pathPoints = viewModel.routeOptionsList.value
     assertTrue(pathPoints.isEmpty())
   }
 
@@ -159,12 +159,12 @@ class DirectionsViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert that the route options list is not empty
-    assertTrue(viewModel.pathPoints.value.isNotEmpty())
+    assertTrue(viewModel.routeOptionsList.value.isNotEmpty())
 
     // Act
     viewModel.clearRoutesOptions()
 
     // Assert that the route options list is now empty
-    assertTrue(viewModel.pathPoints.value.isEmpty())
+    assertTrue(viewModel.routeOptionsList.value.isEmpty())
   }
 }
