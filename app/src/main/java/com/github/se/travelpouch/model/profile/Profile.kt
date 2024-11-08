@@ -36,11 +36,6 @@ object ErrorProfile {
       Profile("000errorerrorerrorerrorerror", "error", "error@error.ch", null, "error", emptyList())
 }
 
-object CurrentProfile {
-  var currentProfileUid = "0000000000000000000000000000"
-    var currentProfile: Profile = ErrorProfile.errorProfile
-}
-
 fun checkProfileValidity(profile: Profile): Boolean {
   return isValidUserUid(profile.fsUid) && isValidEmail(profile.email)
 }

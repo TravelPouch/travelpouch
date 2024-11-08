@@ -236,7 +236,7 @@ class ProfileRepositoryTest {
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(null))
 
-    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser)
+    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
     verify(timeout(1000)) { (mockDocumentReference) }
   }
 
