@@ -124,6 +124,14 @@ open class DocumentViewModel(
         onFailure = { Log.e("DocumentsViewModel", "Failed to upload Document") })
   }
 
+
+  /**
+   * Uploads a file to the selected travel.
+   *
+   * @param inputStream The input stream of the file to upload.
+   * @param selectedTravel The travel to which the file should be uploaded.
+   * @param mimeType The mime type of the file.
+   */
   fun uploadFile(inputStream: InputStream?, selectedTravel: TravelContainer?, mimeType: String?) {
     if (inputStream == null) {
       Log.e("DocumentViewModel", "No input stream")

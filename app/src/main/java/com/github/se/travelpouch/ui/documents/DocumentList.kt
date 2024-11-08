@@ -107,6 +107,8 @@ fun DocumentListScreen(
               }
             }
           }
+
+  // Create a launcher of the file picker to select a file
   val filePickerLauncher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
           uri: Uri? ->
