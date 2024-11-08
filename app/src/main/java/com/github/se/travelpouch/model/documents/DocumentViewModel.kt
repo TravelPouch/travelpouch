@@ -135,7 +135,7 @@ open class DocumentViewModel(
     }
     val format = DocumentFileFormat.fromMimeType(mimeType)
     if (format == null) {
-      Log.e("DocumentViewModel", "No mime type found")
+      Log.e("DocumentViewModel", "No or invalid mime type")
       return
     }
     val travelId = selectedTravel.fsUid
