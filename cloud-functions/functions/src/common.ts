@@ -1,4 +1,4 @@
-import { Timestamp, DocumentReference } from "firebase-admin/firestore";
+import {Timestamp, DocumentReference} from "firebase-admin/firestore";
 
 /**
  * This error is used for parsing errors
