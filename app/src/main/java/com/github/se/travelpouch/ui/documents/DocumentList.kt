@@ -231,7 +231,7 @@ fun DocumentListScreen(
               modifier = Modifier.align(Alignment.Center).fillMaxSize(0.2f),
               visible = isLoading.value,
               enter = fadeIn(animationSpec = tween(50)),
-              exit = fadeOut(animationSpec = tween(300))) {
+              exit = fadeOut(animationSpec = tween(500))) {
                 CircularProgressIndicator(
                     modifier =
                         Modifier // Adjust spinner size fifth of screen height

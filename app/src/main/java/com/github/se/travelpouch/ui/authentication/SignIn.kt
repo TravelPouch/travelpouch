@@ -8,9 +8,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -108,34 +110,41 @@ fun SignInScreen(
 
           Spacer(modifier = Modifier.height(48.dp))
 
-          // Use AnimatedVisibility to smoothly transition between button and progress indicator
-          AnimatedVisibility(
-              visible = !isLoading.value,
-              enter = fadeIn(animationSpec = tween(150)),
-              exit = fadeOut(animationSpec = tween(300))) {
-                GoogleSignInButton(
-                    onSignInClick = {
-                      val gso =
-                          GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                              .requestIdToken(token)
-                              .requestEmail()
-                              .build()
-                      val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                      launcher.launch(googleSignInClient.signInIntent)
-                      isLoading.value = true
-                    })
-                // Authenticate With Google Button
-              }
+          Box(
+              modifier =
+                  Modifier.fillMaxWidth(0.8f) // Fixed width for both button and spinner
+                      .height(64.dp), // Fixed height for both button and spinner
+              contentAlignment = Alignment.Center) {
 
-          // Show CircularProgressIndicator when loading
-          AnimatedVisibility(
-              visible = isLoading.value,
-              enter = fadeIn(animationSpec = tween(300)),
-              exit = fadeOut(animationSpec = tween(300))) {
-                CircularProgressIndicator(
-                    modifier = Modifier.fillMaxSize(0.25f).testTag("loadingSpinner"),
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 5.dp)
+                // Google Sign-In Button (before the loading state)
+                this@Column.AnimatedVisibility(
+                    visible = !isLoading.value,
+                    enter = fadeIn(animationSpec = tween(150)),
+                    exit = fadeOut(animationSpec = tween(300))) {
+                      // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
+                      GoogleSignInButton(
+                          onSignInClick = {
+                            val gso =
+                                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                    .requestIdToken(token)
+                                    .requestEmail()
+                                    .build()
+                            val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                            launcher.launch(googleSignInClient.signInIntent)
+                            isLoading.value = true
+                          })
+                    }
+
+                // CircularProgressIndicator (when loading)
+                this@Column.AnimatedVisibility(
+                    visible = isLoading.value,
+                    enter = fadeIn(animationSpec = tween(300)),
+                    exit = fadeOut(animationSpec = tween(300))) {
+                      CircularProgressIndicator(
+                          modifier = Modifier.height(28.dp), // Same height as Google Sign-In button
+                          color = MaterialTheme.colorScheme.primary,
+                          strokeWidth = 5.dp)
+                    }
               }
         }
       })
