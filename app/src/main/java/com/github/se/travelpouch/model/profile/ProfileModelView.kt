@@ -36,8 +36,11 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
   val profile: StateFlow<Profile> = profile_.asStateFlow()
 
   /** The initialisation function of the profile model view. It fetches the profile of the user */
-  suspend fun initAfterLogin() {
-    repository.initAfterLogin()
+  suspend fun initAfterLogin(onSuccess: () -> Unit) {
+    repository.initAfterLogin {
+        profile_.value = it
+        onSuccess()
+    }
   }
 
   /** This function fetches the profile information of the user */

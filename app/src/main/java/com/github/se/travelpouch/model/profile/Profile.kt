@@ -38,6 +38,7 @@ object ErrorProfile {
 
 object CurrentProfile {
   var currentProfileUid = "0000000000000000000000000000"
+    var currentProfile: Profile = ErrorProfile.errorProfile
 }
 
 fun checkProfileValidity(profile: Profile): Boolean {
