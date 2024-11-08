@@ -7,11 +7,14 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
 /**
  * ViewModel for managing documents and related operations.
@@ -119,5 +122,27 @@ open class DocumentViewModel(
         format,
         onSuccess = { getDocuments() },
         onFailure = { Log.e("DocumentsViewModel", "Failed to upload Document") })
+  }
+
+  fun uploadFile(inputStream: InputStream?, selectedTravel: TravelContainer?, mimeType: String?) {
+    if (inputStream == null) {
+      Log.e("DocumentViewModel", "No input stream")
+      return
+    }
+    if (selectedTravel == null) {
+      Log.e("DocumentViewModel", "No travel selected")
+      return
+    }
+    val format = DocumentFileFormat.fromMimeType(mimeType)
+    if (format == null) {
+      Log.e("DocumentViewModel", "No mime type found")
+      return
+    }
+    val travelId = selectedTravel.fsUid
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    inputStream.copyTo(byteArrayOutputStream)
+    val bytes: ByteArray = byteArrayOutputStream.toByteArray()
+
+    uploadDocument(travelId, bytes, format)
   }
 }
