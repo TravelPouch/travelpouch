@@ -108,7 +108,7 @@ jobs:
       - name : Start Firebase Emulators
         if: steps.cache.firebase-emulators.outputs.cache-hit != 'true'
         run: |
-          firebase emulators:start --only auth,storage
+          firebase emulators:exec
 
       # Run Unit tests
       - name: Run tests
