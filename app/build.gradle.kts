@@ -73,7 +73,7 @@ android {
     }
 
     testCoverage {
-        jacocoVersion = "0.8.8"
+        jacocoVersion = "0.8.12"
     }
 
     buildFeatures {
@@ -298,6 +298,15 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
+    // strange workaround to fix the 65535 issue
+    // https://github.com/EPFLSWENT2024G1/partagix/pull/78 taken from this PR of a previous year
+    doLast {
+        val reportFile = reports.xml.outputLocation.asFile.get()
+        val newContent = reportFile.readText().replace("<line[^>]+nr=\"65535\"[^>]*>".toRegex(), "")
+        reportFile.writeText(newContent)
+
+        logger.quiet("Wrote summarized jacoco test coverage report xml to $reportFile.absolutePath}")
+    }
 }
 
 tasks.register("beforeCommitCheck") {
