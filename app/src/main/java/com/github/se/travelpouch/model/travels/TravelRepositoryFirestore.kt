@@ -2,6 +2,7 @@ package com.github.se.travelpouch.model.travels
 
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.profile.CurrentProfile
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileRepositoryConvert
 import com.google.android.gms.tasks.Task
@@ -16,7 +17,6 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   private val collectionPath = FirebasePaths.TravelsSuperCollection
   private val userCollectionPath = FirebasePaths.ProfilesSuperCollection
 
-  private var profileUid = "0000000000000000000000000000"
   /**
    * Initializes the repository by adding an authentication state listener. The listener triggers
    * the onSuccess callback if the user is authenticated.
@@ -26,7 +26,6 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   override fun initAfterLogin(onSuccess: () -> Unit) {
     val user = Firebase.auth.currentUser
     if (user != null) {
-      profileUid = user.uid
       onSuccess()
     }
   }
@@ -175,7 +174,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
 
     Log.d("TravelRepositoryFirestore", "getTravels")
     db.collection(collectionPath)
-        .whereArrayContains("listParticipant", profileUid)
+        .whereArrayContains("listParticipant", CurrentProfile.currentProfile.fsUid)
         .get()
         .addOnCompleteListener { task ->
           if (task.isSuccessful) {

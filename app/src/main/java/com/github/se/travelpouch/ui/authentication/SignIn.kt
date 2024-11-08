@@ -56,11 +56,11 @@ fun SignInScreen(
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
             GlobalScope.launch {
-              profileModelView.initAfterLogin({
+              profileModelView.initAfterLogin {
                   travelViewModel.initAfterLogin()
                   Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
                   navigationActions.navigateTo(Screen.TRAVEL_LIST)
-              })
+              }
             }
           },
           onAuthError = {
