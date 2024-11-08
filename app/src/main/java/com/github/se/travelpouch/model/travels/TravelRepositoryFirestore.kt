@@ -16,7 +16,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   private val collectionPath = FirebasePaths.TravelsSuperCollection
   private val userCollectionPath = FirebasePaths.ProfilesSuperCollection
 
-    private var currentUserUid = ""
+  private var currentUserUid = ""
 
   /**
    * Initializes the repository by adding an authentication state listener. The listener triggers
@@ -27,7 +27,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   override fun initAfterLogin(onSuccess: () -> Unit) {
     val user = Firebase.auth.currentUser
     if (user != null) {
-        currentUserUid = user.uid
+      currentUserUid = user.uid
       onSuccess()
     }
   }

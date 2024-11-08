@@ -1,39 +1,39 @@
-//package com.github.se.travelpouch.model.profile
+// package com.github.se.travelpouch.model.profile
 //
-//import android.os.Looper
-//import androidx.core.util.Function
-//import androidx.test.core.app.ApplicationProvider
-//import com.google.android.gms.tasks.Task
-//import com.google.android.gms.tasks.Tasks
-//import com.google.firebase.FirebaseApp
-//import com.google.firebase.auth.FirebaseAuth
-//import com.google.firebase.auth.FirebaseUser
-//import com.google.firebase.firestore.CollectionReference
-//import com.google.firebase.firestore.DocumentReference
-//import com.google.firebase.firestore.DocumentSnapshot
-//import com.google.firebase.firestore.FirebaseFirestore
-//import junit.framework.TestCase.fail
-//import kotlinx.coroutines.test.runTest
-//import org.hamcrest.CoreMatchers.`is`
-//import org.hamcrest.MatcherAssert.assertThat
-//import org.junit.Before
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import org.mockito.Mock
-//import org.mockito.Mockito.mock
-//import org.mockito.Mockito.`when`
-//import org.mockito.MockitoAnnotations
-//import org.mockito.kotlin.any
-//import org.mockito.kotlin.anyOrNull
-//import org.mockito.kotlin.never
-//import org.mockito.kotlin.timeout
-//import org.mockito.kotlin.verify
-//import org.robolectric.RobolectricTestRunner
-//import org.robolectric.Shadows.shadowOf
-//import java.lang.reflect.Method
+// import android.os.Looper
+// import androidx.core.util.Function
+// import androidx.test.core.app.ApplicationProvider
+// import com.google.android.gms.tasks.Task
+// import com.google.android.gms.tasks.Tasks
+// import com.google.firebase.FirebaseApp
+// import com.google.firebase.auth.FirebaseAuth
+// import com.google.firebase.auth.FirebaseUser
+// import com.google.firebase.firestore.CollectionReference
+// import com.google.firebase.firestore.DocumentReference
+// import com.google.firebase.firestore.DocumentSnapshot
+// import com.google.firebase.firestore.FirebaseFirestore
+// import junit.framework.TestCase.fail
+// import kotlinx.coroutines.test.runTest
+// import org.hamcrest.CoreMatchers.`is`
+// import org.hamcrest.MatcherAssert.assertThat
+// import org.junit.Before
+// import org.junit.Test
+// import org.junit.runner.RunWith
+// import org.mockito.Mock
+// import org.mockito.Mockito.mock
+// import org.mockito.Mockito.`when`
+// import org.mockito.MockitoAnnotations
+// import org.mockito.kotlin.any
+// import org.mockito.kotlin.anyOrNull
+// import org.mockito.kotlin.never
+// import org.mockito.kotlin.timeout
+// import org.mockito.kotlin.verify
+// import org.robolectric.RobolectricTestRunner
+// import org.robolectric.Shadows.shadowOf
+// import java.lang.reflect.Method
 //
-//@RunWith(RobolectricTestRunner::class)
-//class ProfileRepositoryTest {
+// @RunWith(RobolectricTestRunner::class)
+// class ProfileRepositoryTest {
 //  private lateinit var mockFirebaseUser: FirebaseUser
 //  private lateinit var mockFirebaseAuth: FirebaseAuth
 //  @Mock private lateinit var mockFirestore: FirebaseFirestore
@@ -164,7 +164,8 @@
 //  fun addingUserWhenDoesNotExistTest() {
 //    val privateFunc =
 //        profileRepositoryFirestore.javaClass.getDeclaredMethod(
-//            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java, Function1::class.java)
+//            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java,
+// Function1::class.java)
 //    privateFunc.isAccessible = true
 //    val parameters = arrayOfNulls<Any>(2)
 //    parameters[0] = mockFirebaseUser
@@ -189,7 +190,8 @@
 //  fun addingUserTest() {
 //    val privateFunc =
 //        profileRepositoryFirestore.javaClass.getDeclaredMethod(
-//            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java, Function1::class.java)
+//            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java,
+// Function1::class.java)
 //    privateFunc.isAccessible = true
 //    val parameters = arrayOfNulls<Any>(2)
 //    parameters[0] = mockFirebaseUser
@@ -214,7 +216,8 @@
 //  fun addingUserWithNullEmailTriggersExceptionTest() {
 //    val privateFunc =
 //        profileRepositoryFirestore.javaClass.getDeclaredMethod(
-//            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java, Method::class.java, Function1::class.java)
+//            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java,
+// Method::class.java, Function1::class.java)
 //    privateFunc.isAccessible = true
 //    val parameters = arrayOfNulls<Any>(2)
 //    parameters[0] = mockFirebaseUser
@@ -269,4 +272,4 @@
 //  //    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
 //  //    verify(mockDocumentSnapshot).exists()
 //  //  }
-//}
+// }

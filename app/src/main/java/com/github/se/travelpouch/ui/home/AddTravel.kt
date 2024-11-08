@@ -81,7 +81,7 @@ fun AddTravelScreen(
 
   val context = LocalContext.current
 
-    val currentProfile = profileModelView.profile.collectAsState()
+  val currentProfile = profileModelView.profile.collectAsState()
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("addTravelScreen"), // Tag for entire screen

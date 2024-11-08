@@ -34,7 +34,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * A composable function that displays the sign-in screen.
@@ -56,20 +55,13 @@ fun SignInScreen(
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
-            val job = GlobalScope.launch {
-              profileModelView.initAfterLogin {
-                  travelViewModel.initAfterLogin()
-                  Log.d("FINISH1", "Everything finished")
+            val job =
+                GlobalScope.launch {
+                  profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                }
 
-              }
-            }
-
-
-              Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-              navigationActions.navigateTo(Screen.TRAVEL_LIST)
-
-
-
+            Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
+            navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")

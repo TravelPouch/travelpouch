@@ -1,13 +1,13 @@
-//package com.github.se.travelpouch.model.profile
+// package com.github.se.travelpouch.model.profile
 //
-//import android.content.Context
-//import org.junit.Before
-//import org.junit.Test
-//import org.mockito.Mockito.mock
-//import org.mockito.Mockito.verify
-//import org.mockito.kotlin.anyOrNull
+// import android.content.Context
+// import org.junit.Before
+// import org.junit.Test
+// import org.mockito.Mockito.mock
+// import org.mockito.Mockito.verify
+// import org.mockito.kotlin.anyOrNull
 //
-//class ProfileModelViewTest {
+// class ProfileModelViewTest {
 //  private lateinit var repository: ProfileRepository
 //  private lateinit var profileViewModel: ProfileModelView
 //  private lateinit var context: Context
@@ -34,4 +34,4 @@
 //    profileViewModel.updateProfile(profile, context)
 //    verify(repository).updateProfile(anyOrNull(), anyOrNull(), anyOrNull())
 //  }
-//}
+// }

@@ -2,7 +2,6 @@ package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,11 +59,11 @@ fun TravelListScreen(
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
     listTravelViewModel.getTravels()
-      profileModelView.getProfile()
+    profileModelView.getProfile()
     // sleep the thread for 1 second to allow the data to be fetched
   }
   val travelList = listTravelViewModel.travels.collectAsState()
-    val currentProfile = profileModelView.profile.collectAsState()
+  val currentProfile = profileModelView.profile.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),

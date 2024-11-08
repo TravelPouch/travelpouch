@@ -25,7 +25,6 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
 
     if (user != null) {
       documentPath = user.uid
-      //CurrentProfile.currentProfileUid = user.uid
       gettingUserProfile(user, onSuccess)
     } else {
       Firebase.auth.signOut()
@@ -39,15 +38,19 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param user (FirebaseUser) : the FirebaseUser that is connected on the application
    * @param document (DocumentSnapshot) : the document containing the profile of the connected user.
    */
-  private fun addingUserIfNotRegistered(user: FirebaseUser, document: DocumentSnapshot, onSuccess: (Profile) -> Unit) {
+  private fun addingUserIfNotRegistered(
+      user: FirebaseUser,
+      document: DocumentSnapshot,
+      onSuccess: (Profile) -> Unit
+  ) {
     if (!document.exists()) {
       try {
         addProfile(user.email!!, user.uid, onSuccess)
       } catch (e: Exception) {
         Log.e("nullEmail", "Email of user was null, deleting user")
       }
-    }else{
-        onSuccess(ProfileRepositoryConvert.documentToProfile(document))
+    } else {
+      onSuccess(ProfileRepositoryConvert.documentToProfile(document))
     }
   }
 
@@ -84,9 +87,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             emptyList())
     performFirestoreOperation(
         db.collection(collectionPath).document(uid).set(profile),
-        onSuccess = { Log.d("ProfileCreated", "profile created")
-                    onSuccess(profile)
-                    },
+        onSuccess = {
+          Log.d("ProfileCreated", "profile created")
+          onSuccess(profile)
+        },
         onFailure = {
           Log.e("ErrorProfile", "Error while creating profile")
           // has to correct thing

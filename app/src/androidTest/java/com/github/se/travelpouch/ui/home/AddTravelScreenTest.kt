@@ -83,7 +83,9 @@ class AddTravelScreenTest {
 
   @Test
   fun displayAllComponents() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
     composeTestRule.onNodeWithTag("addTravelScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
@@ -102,7 +104,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithInvalidStartDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -128,7 +134,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithEndInvalidDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -150,7 +160,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithInvalidStartAndEndDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -176,7 +190,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithNonNumericDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -204,7 +222,11 @@ class AddTravelScreenTest {
 
     // Set up the content for the test
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     composeTestRule.waitForIdle() // Ensures inputs are registered
@@ -231,7 +253,9 @@ class AddTravelScreenTest {
 
   @Test
   fun backButtonNavigatesCorrectly() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
     // Click the go back button
     composeTestRule.onNodeWithTag("goBackButton").performClick()
@@ -242,7 +266,9 @@ class AddTravelScreenTest {
 
   @Test
   fun saveButtonNotEnabled() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
     // Initially, the save button should be disabled
     composeTestRule.onNodeWithTag("travelSaveButton").assertIsNotEnabled()
@@ -257,7 +283,11 @@ class AddTravelScreenTest {
 
     // Set up the content for the test
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid travel details

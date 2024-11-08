@@ -98,7 +98,9 @@ fun TravelPouchApp() {
       }
       composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
       composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
-      composable(Screen.ADD_TRAVEL) { AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView) }
+      composable(Screen.ADD_TRAVEL) {
+        AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+      }
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
         EditTravelSettingsScreen(listTravelViewModel, navigationActions)
       }

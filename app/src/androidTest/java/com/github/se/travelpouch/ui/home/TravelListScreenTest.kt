@@ -41,8 +41,8 @@ class TravelListScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-    private lateinit var profileRepository: ProfileRepository
-    private lateinit var profileModelView: ProfileModelView
+  private lateinit var profileRepository: ProfileRepository
+  private lateinit var profileModelView: ProfileModelView
 
   private lateinit var navigationActions: NavigationActions
   private lateinit var listTravelViewModel: ListTravelViewModel
@@ -64,8 +64,8 @@ class TravelListScreenTest {
     eventRepository = mock(EventRepository::class.java)
     mockFileDownloader = mock()
 
-      profileRepository = mock(ProfileRepository::class.java)
-      profileModelView = ProfileModelView((profileRepository))
+    profileRepository = mock(ProfileRepository::class.java)
+    profileModelView = ProfileModelView((profileRepository))
 
     listTravelViewModel = ListTravelViewModel(travelRepository)
     activityViewModel = ActivityViewModel(activityRepository)
