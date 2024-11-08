@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.travelpouch.R
+import com.github.se.travelpouch.model.profile.CurrentProfile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -34,6 +35,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * A composable function that displays the sign-in screen.
@@ -55,13 +57,20 @@ fun SignInScreen(
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
-            GlobalScope.launch {
+            val job = GlobalScope.launch {
               profileModelView.initAfterLogin {
                   travelViewModel.initAfterLogin()
-                  Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-                  navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                  Log.d("FINISH1", "Everything finished")
+
               }
             }
+
+
+              Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
+              navigationActions.navigateTo(Screen.TRAVEL_LIST)
+
+
+
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")

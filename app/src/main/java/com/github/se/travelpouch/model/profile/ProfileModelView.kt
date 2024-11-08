@@ -39,6 +39,7 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
   suspend fun initAfterLogin(onSuccess: () -> Unit) {
     repository.initAfterLogin {
         profile_.value = it
+        CurrentProfile.currentProfile = it
         onSuccess()
     }
   }
