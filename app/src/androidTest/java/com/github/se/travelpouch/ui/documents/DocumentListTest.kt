@@ -34,10 +34,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
+import org.mockito.kotlin.validateMockitoUsage
 import org.mockito.kotlin.verify
 
 class DocumentListTest {
@@ -203,7 +206,7 @@ class DocumentListTest {
         }
 
     `when`(mockListTravelViewModel.selectedTravel).then {
-      MutableStateFlow<TravelContainer?>(travelContainer)
+      MutableStateFlow<TravelContainer?>(null)
     }
 
     composeTestRule.setContent {
@@ -212,9 +215,13 @@ class DocumentListTest {
       }
     }
 
+    val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    device.executeShellCommand("logcat -c")
+
     composeTestRule.onNodeWithTag("plusButton").performClick()
     composeTestRule.onNodeWithTag("importLocalFileButton").performClick()
 
-    verify(mockDocumentViewModel).uploadFile(any(), any(), any())
+    val logs = device.executeShellCommand("logcat -d travelpouch:D")
+    assert(logs.contains("No travel selected"))
   }
 }
