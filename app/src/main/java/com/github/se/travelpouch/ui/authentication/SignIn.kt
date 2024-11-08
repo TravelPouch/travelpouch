@@ -2,6 +2,10 @@ package com.github.se.travelpouch.ui.authentication
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,10 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +55,7 @@ fun SignInScreen(
     travelViewModel: ListTravelViewModel
 ) {
   val context = LocalContext.current
+  val isLoading = rememberSaveable { mutableStateOf(false) }
 
   // launcher for Firebase authentication
   val launcher =
@@ -58,18 +66,21 @@ fun SignInScreen(
             val job =
                 GlobalScope.launch {
                   profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                  isLoading.value = false
                 }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
+            isLoading.value = false
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
           })
+
   val token = stringResource(R.string.default_web_client_id)
+
   // The main container for the screen
-  // A surface container using the 'background' color from the theme
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("loginScreenScaffold"),
       content = { padding ->
@@ -97,17 +108,35 @@ fun SignInScreen(
 
           Spacer(modifier = Modifier.height(48.dp))
 
-          // Authenticate With Google Button
-          GoogleSignInButton(
-              onSignInClick = {
-                val gso =
-                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(token)
-                        .requestEmail()
-                        .build()
-                val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                launcher.launch(googleSignInClient.signInIntent)
-              })
+          // Use AnimatedVisibility to smoothly transition between button and progress indicator
+          AnimatedVisibility(
+              visible = !isLoading.value,
+              enter = fadeIn(animationSpec = tween(150)),
+              exit = fadeOut(animationSpec = tween(300))) {
+                GoogleSignInButton(
+                    onSignInClick = {
+                      val gso =
+                          GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                              .requestIdToken(token)
+                              .requestEmail()
+                              .build()
+                      val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                      launcher.launch(googleSignInClient.signInIntent)
+                      isLoading.value = true
+                    })
+                // Authenticate With Google Button
+              }
+
+          // Show CircularProgressIndicator when loading
+          AnimatedVisibility(
+              visible = isLoading.value,
+              enter = fadeIn(animationSpec = tween(300)),
+              exit = fadeOut(animationSpec = tween(300))) {
+                CircularProgressIndicator(
+                    modifier = Modifier.fillMaxSize(0.25f).testTag("loadingSpinner"),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 5.dp)
+              }
         }
       })
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,11 +60,14 @@ fun TravelListScreen(
     profileModelView: ProfileModelView
 ) {
   // Fetch travels when the screen is launched
+  val isLoading = rememberSaveable { mutableStateOf(false) }
   LaunchedEffect(Unit) {
+    isLoading.value = true
     listTravelViewModel.getTravels()
     profileModelView.getProfile()
-    // sleep the thread for 1 second to allow the data to be fetched
+    isLoading.value = false
   }
+
   val travelList = listTravelViewModel.travels.collectAsState()
   val currentProfile = profileModelView.profile.collectAsState()
 
@@ -77,6 +83,7 @@ fun TravelListScreen(
       content = { pd ->
         Column {
           if (travelList.value.isNotEmpty()) {
+            isLoading.value = false
             // Add the map to display the travels
 
             MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), travelList.value)
@@ -101,6 +108,10 @@ fun TravelListScreen(
             Text(
                 modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
                 text = "You have no travels yet.")
+            CircularProgressIndicator(
+                modifier = Modifier.testTag("loadingSpinner"),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 5.dp)
           }
         }
       })
