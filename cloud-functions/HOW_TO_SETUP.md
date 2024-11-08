@@ -15,7 +15,7 @@
 
 ### ... with the Android app
 
-Typical IP address of the Android Emulator is `10.0.22.2`
+Typical IP address of the Android Emulator is `10.0.2.2`
 
 - Start the Firebase Emulator using `npm run serve`
 - Add the Kotlin instruction `functions.useEmulator("10.0.2.2", 5001)` to use the Emulator for this instance of Firebase Functions
