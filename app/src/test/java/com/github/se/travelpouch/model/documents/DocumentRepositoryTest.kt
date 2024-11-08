@@ -7,7 +7,6 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,7 +38,6 @@ class DocumentRepositoryTest {
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockAuth: FirebaseAuth
-  @Mock private lateinit var mockUser: FirebaseUser
   @Mock private lateinit var documentContainer: DocumentContainer
 
   private lateinit var documentRepository: DocumentRepositoryFirestore
