@@ -326,19 +326,18 @@ fun EditTravelSettingsScreen(
                           onSuccess = { fsUid ->
                             val isUserAlreadyAdded =
                                 selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
-                            /*if (fsUid == profileViewModel.profile.value.fsUid) {
+                            if (fsUid == profileViewModel.profile.value.fsUid) {
                                 Toast.makeText(
                                     context,
                                     "Error: You can't invite yourself",
                                     Toast.LENGTH_SHORT
                                 )
                                     .show()
-                            } else */ if (isUserAlreadyAdded) {
+                            } else if (isUserAlreadyAdded) {
                               Toast.makeText(
                                       context, "Error: User already added", Toast.LENGTH_SHORT)
                                   .show()
-                            } else if (fsUid !=
-                                null) { // TODO : && fsUid != profileViewModel.profile.value.fsUid
+                            } else if (fsUid != null) {
                               notificationViewModel.sendNotification(
                                   Notification(
                                       listTravelViewModel.getNewUid(),

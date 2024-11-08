@@ -202,11 +202,11 @@ fun NotificationItem(
                                 notificationViewModel.sendNotification(
                                     Notification(
                                         notification.notificationUid,
-                                        CurrentProfile.currentProfileUid,
+                                        profileViewModel.profile.value.fsUid,
                                         notification.senderUid,
                                         notification.travelUid,
                                         NotificationContent.InvitationResponseNotification(
-                                            "Antoine",
+                                            profileViewModel.profile.value.name,
                                             travel!!.title,
                                             true
                                         ),
@@ -215,14 +215,13 @@ fun NotificationItem(
                                 )
 
                                 listTravelViewModel.addUserToTravel(
-                                    CurrentProfile.currentProfileUid,
+                                    profileViewModel.profile.value.email,
                                     travel,
                                     { updatedContainer ->
                                         listTravelViewModel.selectTravel(updatedContainer)
                                         Toast.makeText(
                                             context, "User added successfully!", Toast.LENGTH_SHORT
-                                        )
-                                            .show()
+                                        ).show()
                                     },
                                     {
                                         Toast.makeText(
@@ -233,9 +232,6 @@ fun NotificationItem(
                                             .show()
                                     })
 
-                                // profileViewModel.profile.value.userTravelList +=
-                                // notification.travelUid TODO : is the userList in profile really
-                                // necessary ?
                                 Toast.makeText(context, "ACCEPTED", Toast.LENGTH_SHORT).show()
                             }, onFailure = {
                                 Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT)
@@ -258,11 +254,11 @@ fun NotificationItem(
                                 notificationViewModel.sendNotification(
                                     Notification(
                                         notification.notificationUid,
-                                        CurrentProfile.currentProfileUid,
+                                        profileViewModel.profile.value.fsUid,
                                         notification.senderUid,
                                         notification.travelUid,
                                         NotificationContent.InvitationResponseNotification(
-                                            "Antoine",
+                                            profileViewModel.profile.value.name,
                                             travel!!.title,
                                             false
                                         ),
