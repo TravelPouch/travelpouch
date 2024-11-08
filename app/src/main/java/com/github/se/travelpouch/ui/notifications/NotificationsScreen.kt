@@ -36,7 +36,6 @@ import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
-import com.github.se.travelpouch.model.profile.CurrentProfile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions

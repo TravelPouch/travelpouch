@@ -233,7 +233,7 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
           newParticipantMap[newParticipant] = Role.PARTICIPANT
 
           val newParticipantList = selectedTravel.listParticipant.toMutableList()
-          newParticipantList.plus(user.fsUid)
+          newParticipantList.add(user.fsUid)
 
           val newTravel =
               selectedTravel.copy(
