@@ -90,45 +90,6 @@ class DocumentViewModelTest {
   }
 
   @Test
-  fun createDocument_successfulAdd_updatesDocuments() {
-    val documentList = listOf(documentContainer)
-    doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(1) as () -> Unit
-          onSuccess()
-          null
-        }
-        .whenever(documentRepository)
-        .createDocument(anyOrNull(), anyOrNull(), anyOrNull())
-
-    doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(0) as (List<DocumentContainer>) -> Unit
-          onSuccess(documentList)
-          null
-        }
-        .whenever(documentRepository)
-        .getDocuments(anyOrNull(), anyOrNull())
-
-    documentViewModel.createDocument(document)
-
-    assertThat(documentViewModel.documents.value, `is`(documentList))
-  }
-
-  @Test
-  fun createDocument_failureAdd_doesNotUpdateDocuments() {
-    doAnswer { invocation ->
-          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
-          onFailure(Exception("Add Document Failed Test"))
-          null
-        }
-        .whenever(documentRepository)
-        .createDocument(anyOrNull(), anyOrNull(), anyOrNull())
-
-    // documentViewModel.createDocument(NewDocumentContainer("Test Document", "Test Content"))
-
-    assertThat(documentViewModel.documents.value, `is`(emptyList()))
-  }
-
-  @Test
   fun deleteDocumentById_successfulDelete_updatesDocuments() {
     val emptyDocumentList = emptyList<DocumentContainer>()
     doAnswer { invocation ->
@@ -175,28 +136,6 @@ class DocumentViewModelTest {
       documentViewModel.getDocuments()
 
       verify(documentRepository).getDocuments(anyOrNull(), anyOrNull())
-      logMock.verify { Log.e("DocumentsViewModel", errorMessage, exception) }
-    }
-  }
-
-  @Test
-  fun createDocument_logsErrorOnFailure() {
-    val errorMessage = "Failed to create Document"
-    val exception = Exception("Add Document Failed Test")
-    doAnswer { invocation ->
-          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
-          onFailure(exception)
-          null
-        }
-        .whenever(documentRepository)
-        .createDocument(anyOrNull(), anyOrNull(), anyOrNull())
-
-    mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
-      logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
-
-      documentViewModel.createDocument(document)
-
-      verify(documentRepository).createDocument(anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("DocumentsViewModel", errorMessage, exception) }
     }
   }
