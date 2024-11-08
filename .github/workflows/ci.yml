@@ -51,7 +51,7 @@ jobs:
       - name: Decode secrets
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
-          # LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }} 
+          # LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: |
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
       #   echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
@@ -93,6 +93,18 @@ jobs:
           # To run the CI with debug information, add --info
           ./gradlew assemble lint --parallel --build-cache
 
+      - name: Cache firebase emulators
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-firebase-emulators-
+
+      - name : Install Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
+
       # Run Unit tests
       - name: Run tests
         run: |
@@ -109,7 +121,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --parallel --build-cache
+          script: firebase emulators:exec "./gradlew connectedCheck --parallel --build-cache"
 
       # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
