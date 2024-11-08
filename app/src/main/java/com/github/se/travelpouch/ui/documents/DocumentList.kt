@@ -108,12 +108,15 @@ fun DocumentListScreen(
             }
           }
   val filePickerLauncher =
-    rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
-        uri: Uri? ->
-      if (uri != null)
-          documentViewModel.uploadFile(context.contentResolver.openInputStream(uri), selectedTravel.value, context.contentResolver.getType(uri))
-      else Log.d("DocumentList", "No file selected")
-    }
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+          uri: Uri? ->
+        if (uri != null)
+            documentViewModel.uploadFile(
+                context.contentResolver.openInputStream(uri),
+                selectedTravel.value,
+                context.contentResolver.getType(uri))
+        else Log.d("DocumentList", "No file selected")
+      }
 
   Scaffold(
       modifier = Modifier.testTag("documentListScreen"),

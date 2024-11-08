@@ -29,6 +29,7 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import java.io.File
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -38,22 +39,21 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
-import java.io.File
 
 class DocumentListTest {
   @Composable
   fun withActivityResultRegistry(
-    activityResultRegistry: ActivityResultRegistry,
-    content: @Composable () -> Unit
+      activityResultRegistry: ActivityResultRegistry,
+      content: @Composable () -> Unit
   ) {
     val activityResultRegistryOwner =
-      object : ActivityResultRegistryOwner {
-        override val activityResultRegistry = activityResultRegistry
-      }
+        object : ActivityResultRegistryOwner {
+          override val activityResultRegistry = activityResultRegistry
+        }
     CompositionLocalProvider(
-      LocalActivityResultRegistryOwner provides activityResultRegistryOwner) {
-      content()
-    }
+        LocalActivityResultRegistryOwner provides activityResultRegistryOwner) {
+          content()
+        }
   }
 
   private lateinit var navigationActions: NavigationActions
@@ -157,16 +157,16 @@ class DocumentListTest {
   @Test
   fun assertMessageWhenNoFileSelectedImportDocument() {
     val testRegistry =
-      object : ActivityResultRegistry() {
-        override fun <I, O> onLaunch(
-          requestCode: Int,
-          contract: ActivityResultContract<I, O>,
-          input: I,
-          options: ActivityOptionsCompat?
-        ) {
-          dispatchResult(requestCode, null)
+        object : ActivityResultRegistry() {
+          override fun <I, O> onLaunch(
+              requestCode: Int,
+              contract: ActivityResultContract<I, O>,
+              input: I,
+              options: ActivityOptionsCompat?
+          ) {
+            dispatchResult(requestCode, null)
+          }
         }
-      }
 
     `when`(mockListTravelViewModel.selectedTravel).then {
       MutableStateFlow<TravelContainer?>(travelContainer)
@@ -191,16 +191,16 @@ class DocumentListTest {
   @Test
   fun assertUploadFileTriggersWhenUriNotNull() {
     val testRegistry =
-      object : ActivityResultRegistry() {
-        override fun <I, O> onLaunch(
-          requestCode: Int,
-          contract: ActivityResultContract<I, O>,
-          input: I,
-          options: ActivityOptionsCompat?
-        ) {
-          dispatchResult(requestCode, File.createTempFile("test", ".pdf").toUri())
+        object : ActivityResultRegistry() {
+          override fun <I, O> onLaunch(
+              requestCode: Int,
+              contract: ActivityResultContract<I, O>,
+              input: I,
+              options: ActivityOptionsCompat?
+          ) {
+            dispatchResult(requestCode, File.createTempFile("test", ".pdf").toUri())
+          }
         }
-      }
 
     `when`(mockListTravelViewModel.selectedTravel).then {
       MutableStateFlow<TravelContainer?>(travelContainer)

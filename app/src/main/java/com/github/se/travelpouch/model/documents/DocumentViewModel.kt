@@ -10,11 +10,11 @@ import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 
 /**
  * ViewModel for managing documents and related operations.
