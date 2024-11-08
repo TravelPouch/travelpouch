@@ -20,13 +20,12 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   private var collectionPath = "userslist"
   private var documentPath = ""
 
-  override suspend fun initAfterLogin() {
+  override suspend fun initAfterLogin(onSuccess: (Profile) -> Unit) {
     val user = Firebase.auth.currentUser
 
     if (user != null) {
       documentPath = user.uid
-      CurrentProfile.currentProfileUid = user.uid
-      gettingUserProfile(user)
+      gettingUserProfile(user, onSuccess)
     } else {
       Firebase.auth.signOut()
     }
@@ -39,15 +38,19 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param user (FirebaseUser) : the FirebaseUser that is connected on the application
    * @param document (DocumentSnapshot) : the document containing the profile of the connected user.
    */
-  private fun addingUserIfNotRegistered(user: FirebaseUser, document: DocumentSnapshot) {
+  private fun addingUserIfNotRegistered(
+      user: FirebaseUser,
+      document: DocumentSnapshot,
+      onSuccess: (Profile) -> Unit
+  ) {
     if (!document.exists()) {
       try {
-        addProfile(user.email!!, user.uid)
+        addProfile(user.email!!, user.uid, onSuccess)
       } catch (e: Exception) {
         Log.e("nullEmail", "Email of user was null, deleting user")
-        user.delete()
-        Firebase.auth.signOut()
       }
+    } else {
+      onSuccess(ProfileRepositoryConvert.documentToProfile(document))
     }
   }
 
@@ -58,10 +61,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param user (FirebaseUser) : the currently connected user on the application
    * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
    */
-  suspend fun gettingUserProfile(user: FirebaseUser) {
+  suspend fun gettingUserProfile(user: FirebaseUser, onSuccess: (Profile) -> Unit) {
     try {
       val document = db.collection(collectionPath).document(documentPath).get().await()
-      addingUserIfNotRegistered(user, document)
+      addingUserIfNotRegistered(user, document, onSuccess)
     } catch (e: Exception) {
       Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
     }
@@ -95,7 +98,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param email (String) : the email of the user
    * @param uid (String) : the unique identifier of the user
    */
-  private fun addProfile(email: String, uid: String) {
+  private fun addProfile(email: String, uid: String, onSuccess: (Profile) -> Unit) {
     val profile =
         Profile(
             fsUid = uid,
@@ -106,7 +109,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             emptyList())
     performFirestoreOperation(
         db.collection(collectionPath).document(uid).set(profile),
-        onSuccess = { Log.d("ProfileCreated", "profile created") },
+        onSuccess = {
+          Log.d("ProfileCreated", "profile created")
+          onSuccess(profile)
+        },
         onFailure = {
           Log.e("ErrorProfile", "Error while creating profile")
           // has to correct thing
