@@ -31,6 +31,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
@@ -51,7 +54,10 @@ fun NotificationsScreen(
     navigationActions: NavigationActions,
     notificationViewModel: NotificationViewModel,
     profileModelView: ProfileModelView,
-    listTravelViewModel: ListTravelViewModel
+    listTravelViewModel: ListTravelViewModel,
+    activityViewModel: ActivityViewModel,
+    documentViewModel: DocumentViewModel,
+    eventsViewModel: EventViewModel
 ) {
     profileModelView.getProfile()
 
@@ -125,7 +131,10 @@ fun NotificationsScreen(
                             notificationViewModel = notificationViewModel,
                             profileViewModel = profileModelView,
                             listTravelViewModel = listTravelViewModel,
-                            navigationActions = navigationActions
+                            navigationActions = navigationActions,
+                            activityViewModel = activityViewModel,
+                            documentViewModel = documentViewModel,
+                            eventsViewModel = eventsViewModel
                         ) {
                             // Handle notification click
                         }
@@ -153,6 +162,9 @@ fun NotificationItem(
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
     notification: Notification,
+    activityViewModel : ActivityViewModel,
+    documentViewModel: DocumentViewModel,
+    eventsViewModel: EventViewModel,
     onClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -166,8 +178,20 @@ fun NotificationItem(
         shape = RoundedCornerShape(13.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         onClick = {
-            navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-        } // TODO : Probably to change to a specific travel !!
+            // Get travel from notification
+            listTravelViewModel.getTravelById(notification.travelUid,
+                onSuccess = { travel ->
+                    listTravelViewModel.selectTravel(travel!!)
+                    activityViewModel.setIdTravel(travel.fsUid)
+                    documentViewModel.setIdTravel(travel.fsUid)
+                    eventsViewModel.setIdTravel(travel.fsUid)
+                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                },
+                onFailure = {
+                    Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
     ) {
         Column(
             modifier = Modifier
@@ -294,7 +318,6 @@ fun categorizeNotifications(notifications: List<Notification>): Map<String, List
 
     notifications.forEach { notification ->
         val notificationTime = notification.timestamp.toDate()
-        val diff = now.time.time - notificationTime.time
 
         when {
             isThisWeek(notificationTime, now) -> thisWeek.add(notification)

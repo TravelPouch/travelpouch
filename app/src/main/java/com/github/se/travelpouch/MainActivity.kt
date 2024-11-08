@@ -134,7 +134,7 @@ fun TravelPouchApp() {
 
     composable(Screen.NOTIFICATION) {
       NotificationsScreen(
-          navigationActions, notificationViewModel, profileModelView, listTravelViewModel)
+          navigationActions, notificationViewModel, profileModelView, listTravelViewModel, activityModelView, documentViewModel, eventsViewModel)
     }
   }
 }
