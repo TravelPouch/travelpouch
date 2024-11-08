@@ -112,7 +112,7 @@ fun DocumentListScreen(
         uri: Uri? ->
       if (uri != null)
           documentViewModel.uploadFile(context.contentResolver.openInputStream(uri), selectedTravel.value, context.contentResolver.getType(uri))
-      else Log.e("DocumentList", "Failed to access local storage")
+      else Log.d("DocumentList", "No file selected")
     }
 
   Scaffold(
