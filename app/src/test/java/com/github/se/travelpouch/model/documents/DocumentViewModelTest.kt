@@ -2,18 +2,29 @@ package com.github.se.travelpouch.model.documents
 
 import android.util.Log
 import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Participant
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainer
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.MockedStatic
 import org.mockito.Mockito.*
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.shadows.ShadowLog
 
+@RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class DocumentViewModelTest {
 
@@ -24,6 +35,7 @@ class DocumentViewModelTest {
   private lateinit var documentReference: DocumentReference
   private lateinit var fileDownloader: FileDownloader
   private lateinit var document: NewDocumentContainer
+  private lateinit var selectedTravel: TravelContainer
 
   @Before
   fun setUp() {
@@ -55,6 +67,18 @@ class DocumentViewModelTest {
             addedAt = Timestamp.now(),
             visibility = DocumentVisibility.ME // Remplacez par une instance de DocumentVisibility
             )
+    selectedTravel =
+        TravelContainer(
+            "test1234test1234test",
+            "Test Travel",
+            "Test Description",
+            Timestamp(0, 0),
+            Timestamp.now(),
+            Location(40.4114, 40.43321, Timestamp.now(), "Here"),
+            mapOf(),
+            mapOf(Participant("rythwEmprFhOOgsANXnv12345678") to Role.OWNER),
+            listOf())
+    ShadowLog.clear()
   }
 
   @Test
@@ -160,5 +184,56 @@ class DocumentViewModelTest {
       verify(documentRepository).deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("DocumentsViewModel", errorMessage, exception) }
     }
+  }
+
+  private fun testUploadFileLog(
+      documentViewModel: DocumentViewModel,
+      inputStream: InputStream?,
+      selectedTravel: TravelContainer?,
+      mimeType: String?,
+      expected: String
+  ): Boolean {
+    ShadowLog.clear()
+    documentViewModel.uploadFile(inputStream, selectedTravel, mimeType)
+    val logs = ShadowLog.getLogs()
+    return logs.find {
+      it.type == Log.ERROR && it.tag == "DocumentViewModel" && it.msg == expected
+    } != null
+  }
+
+  @Test
+  fun assertUploadFileAnyInvalid() {
+    val documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
+    val mockInputStream = mock(InputStream::class.java)
+
+    assert(
+        testUploadFileLog(documentViewModel, null, selectedTravel, "image/jpeg", "No input stream"))
+    assert(
+        testUploadFileLog(
+            documentViewModel, mockInputStream, null, "image/jpeg", "No travel selected"))
+    assert(
+        testUploadFileLog(
+            documentViewModel, mockInputStream, selectedTravel, null, "No or invalid mime type"))
+    assert(
+        testUploadFileLog(
+            documentViewModel,
+            mockInputStream,
+            selectedTravel,
+            "application/json",
+            "No or invalid mime type"))
+  }
+
+  @Test
+  fun assertUploadFileValid() {
+    val SIZE = 1024
+    val SEED = 123L
+    val spyDocumentViewModel = spy(documentViewModel)
+
+    val data = ByteArray(SIZE)
+    Random(SEED).nextBytes(data)
+    val inputStream: InputStream = ByteArrayInputStream(data)
+    spyDocumentViewModel.uploadFile(inputStream, selectedTravel, "image/jpeg")
+    verify(spyDocumentViewModel)
+        .uploadDocument(anyString(), org.mockito.kotlin.any(), org.mockito.kotlin.any())
   }
 }
