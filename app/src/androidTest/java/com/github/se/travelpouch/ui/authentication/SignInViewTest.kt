@@ -1,5 +1,7 @@
 package com.github.se.travelpouch.ui.authentication
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -57,5 +59,15 @@ class SignInViewTest {
       SignInScreen(navigationActions = mockNavigationActions, profileModelView, travelViewModel)
     }
     composeTestRule.onNodeWithTag("loginButtonRow").performClick()
+  }
+
+  @Test
+  fun signInScreenTestSpinner() {
+    val yesSpin: MutableState<Boolean> = mutableStateOf(true)
+    composeTestRule.setContent {
+      SignInScreen(
+          navigationActions = mockNavigationActions, profileModelView, travelViewModel, yesSpin)
+    }
+    composeTestRule.waitForIdle()
   }
 }

@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -54,10 +55,11 @@ import kotlinx.coroutines.launch
 fun SignInScreen(
     navigationActions: NavigationActions,
     profileModelView: ProfileModelView,
-    travelViewModel: ListTravelViewModel
+    travelViewModel: ListTravelViewModel,
+    isLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 ) {
   val context = LocalContext.current
-  val isLoading = rememberSaveable { mutableStateOf(false) }
+  val isLoading: MutableState<Boolean> = isLoading
 
   // launcher for Firebase authentication
   val launcher =
@@ -113,7 +115,7 @@ fun SignInScreen(
           Box(
               modifier =
                   Modifier.fillMaxWidth(0.8f) // Fixed width for both button and spinner
-                      .height(64.dp), // Fixed height for both button and spinner
+                      .height(56.dp), // Fixed height for both button and spinner
               contentAlignment = Alignment.Center) {
 
                 // Google Sign-In Button (before the loading state)
