@@ -12,6 +12,8 @@ import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.location.LocationRepository
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.TravelRepository
@@ -52,6 +54,9 @@ class AddTravelScreenTest {
   private lateinit var listTravelViewModel: ListTravelViewModel
   private lateinit var locationViewModel: LocationViewModel
 
+  private lateinit var profileRepository: ProfileRepository
+  private lateinit var profileModelView: ProfileModelView
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -63,6 +68,10 @@ class AddTravelScreenTest {
     // Mocking objects for ViewModel and NavigationActions
     travelRepository = mock(TravelRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
+
+    profileRepository = mock(ProfileRepository::class.java)
+    profileModelView = ProfileModelView((profileRepository))
+
     listTravelViewModel = ListTravelViewModel(travelRepository)
     // Use a real LocationViewModel with a fake repository
     locationViewModel = LocationViewModel(FakeLocationRepository())
@@ -74,7 +83,9 @@ class AddTravelScreenTest {
 
   @Test
   fun displayAllComponents() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
     composeTestRule.onNodeWithTag("addTravelScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
@@ -93,7 +104,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithInvalidStartDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -119,7 +134,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithEndInvalidDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -141,7 +160,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithInvalidStartAndEndDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -167,7 +190,11 @@ class AddTravelScreenTest {
   @Test
   fun doesNotSubmitWithNonNumericDate() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid title and description
@@ -195,7 +222,11 @@ class AddTravelScreenTest {
 
     // Set up the content for the test
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     composeTestRule.waitForIdle() // Ensures inputs are registered
@@ -222,7 +253,9 @@ class AddTravelScreenTest {
 
   @Test
   fun backButtonNavigatesCorrectly() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
     // Click the go back button
     composeTestRule.onNodeWithTag("goBackButton").performClick()
@@ -233,7 +266,9 @@ class AddTravelScreenTest {
 
   @Test
   fun saveButtonNotEnabled() {
-    composeTestRule.setContent { AddTravelScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+    }
 
     // Initially, the save button should be disabled
     composeTestRule.onNodeWithTag("travelSaveButton").assertIsNotEnabled()
@@ -248,7 +283,11 @@ class AddTravelScreenTest {
 
     // Set up the content for the test
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, locationViewModel)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
     }
 
     // Input valid travel details

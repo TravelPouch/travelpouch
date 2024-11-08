@@ -56,18 +56,6 @@ open class DocumentViewModel(
   }
 
   /**
-   * Adds a Document.
-   *
-   * @param document The Document to be added.
-   */
-  fun createDocument(document: NewDocumentContainer) {
-    repository.createDocument(
-        document,
-        onSuccess = { getDocuments() },
-        onFailure = { Log.e("DocumentsViewModel", "Failed to create Document", it) })
-  }
-
-  /**
    * Downloads a Document from Firebase store adn store it in the folder pointed by documentFile
    *
    * @param documentFile The folder in which to create the file

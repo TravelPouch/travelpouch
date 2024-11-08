@@ -18,12 +18,6 @@ interface DocumentRepository {
 
   fun getDocuments(onSuccess: (List<DocumentContainer>) -> Unit, onFailure: (Exception) -> Unit)
 
-  fun createDocument(
-      document: NewDocumentContainer,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  )
-
   fun deleteDocumentById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   fun getDownloadUrl(
@@ -80,31 +74,6 @@ class DocumentRepositoryFirestore(
       } else {
         task.exception?.let { e ->
           Log.e("DocumentRepositoryFirestore", "Error getting documents", e)
-          onFailure(e)
-        }
-      }
-    }
-  }
-
-  /**
-   * Adds a new document to the Firestore database using the simpler version of a DocumentContainer
-   * without the ref/uid.
-   *
-   * @param document The document to be added.
-   * @param onSuccess Callback function to be called when the document is added successfully.
-   * @param onFailure Callback function to be called when an error occurs.
-   */
-  override fun createDocument(
-      document: NewDocumentContainer,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection(collectionPath).add(toMap(document)).addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        onSuccess()
-      } else {
-        task.exception?.let { e ->
-          Log.e("DocumentRepositoryFirestore", "Error adding document", e)
           onFailure(e)
         }
       }
