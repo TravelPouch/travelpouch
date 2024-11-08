@@ -17,7 +17,6 @@
   "dependencies": {
     "firebase-admin": "^12.1.0",
     "firebase-functions": "^6.0.1",
-    "jimp": "^1.6.0",
     "mupdf": "^0.3.0",
     "wasm-vips": "^0.0.11"
   },
