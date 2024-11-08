@@ -3,10 +3,11 @@ package com.github.se.travelpouch.ui.dashboard
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -14,8 +15,10 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -117,43 +120,29 @@ fun AddActivityScreen(
               // Time Input Field (Optional)
               Box(
                   modifier =
-                      Modifier.testTag("timeField")
-                          .fillMaxWidth()
-                          .clickable(
-                              interactionSource = remember { MutableInteractionSource() },
-                              indication = null,
-                              onClick = {
-                                // Create and show the TimePickerDialog when clicked
-                                TimePickerDialog(
-                                        context,
-                                        { _, hourOfDay, minute ->
-                                          timeText =
-                                              String.format(
-                                                  Locale.getDefault(),
-                                                  "%02d:%02d",
-                                                  hourOfDay,
-                                                  minute)
-                                        },
-                                        gregorianCalendar.get(Calendar.HOUR_OF_DAY),
-                                        gregorianCalendar.get(Calendar.MINUTE),
-                                        true)
-                                    .show()
-                              })) {
-                    OutlinedTextField(
-                        value = timeText,
-                        onValueChange = {},
-                        label = {
-                          Text(
-                              "Time (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                      Modifier.fillMaxWidth()
+                          .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.extraSmall)
+                          .background(Color.Transparent, shape = MaterialTheme.shapes.extraSmall)
+                          .padding(16.dp)) {
+                    ClickableText(
+                        text = AnnotatedString(if (timeText.isBlank()) "Time" else timeText),
+                        onClick = {
+                          TimePickerDialog(
+                                  context,
+                                  { _, hourOfDay, minute ->
+                                    timeText =
+                                        String.format(
+                                            Locale.getDefault(), "%02d:%02d", hourOfDay, minute)
+                                  },
+                                  gregorianCalendar.get(Calendar.HOUR_OF_DAY),
+                                  gregorianCalendar.get(Calendar.MINUTE),
+                                  true)
+                              .show()
                         },
-                        placeholder = {
-                          Text(
-                              "HH:MM (Optional)",
-                              color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        readOnly = true,
-                        modifier = Modifier.fillMaxWidth())
+                        style =
+                            LocalTextStyle.current.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        modifier = Modifier.fillMaxWidth().testTag("timeField"))
                   }
 
               // Location Input with dropdown (Optional)

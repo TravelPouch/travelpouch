@@ -10,6 +10,8 @@ import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
@@ -39,6 +41,9 @@ class TravelListScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
+  private lateinit var profileRepository: ProfileRepository
+  private lateinit var profileModelView: ProfileModelView
+
   private lateinit var navigationActions: NavigationActions
   private lateinit var listTravelViewModel: ListTravelViewModel
   private lateinit var travelRepository: TravelRepository
@@ -58,6 +63,9 @@ class TravelListScreenTest {
     documentRepository = mock(DocumentRepository::class.java)
     eventRepository = mock(EventRepository::class.java)
     mockFileDownloader = mock()
+
+    profileRepository = mock(ProfileRepository::class.java)
+    profileModelView = ProfileModelView((profileRepository))
 
     listTravelViewModel = ListTravelViewModel(travelRepository)
     activityViewModel = ActivityViewModel(activityRepository)
@@ -107,7 +115,8 @@ class TravelListScreenTest {
           listTravelViewModel = listTravelViewModel,
           activityViewModel,
           eventViewModel,
-          documentViewModel)
+          documentViewModel,
+          profileModelView)
     }
     Thread.sleep(3000)
     // Assert
@@ -125,7 +134,8 @@ class TravelListScreenTest {
           listTravelViewModel = listTravelViewModel,
           activityViewModel,
           eventViewModel,
-          documentViewModel)
+          documentViewModel,
+          profileModelView)
     }
 
     // Assert
@@ -193,7 +203,8 @@ class TravelListScreenTest {
           listTravelViewModel = listTravelViewModel,
           activityViewModel,
           eventViewModel,
-          documentViewModel)
+          documentViewModel,
+          profileModelView)
     }
     composeTestRule.waitForIdle()
 
@@ -214,7 +225,8 @@ class TravelListScreenTest {
           listTravelViewModel = listTravelViewModel,
           activityViewModel,
           eventViewModel,
-          documentViewModel)
+          documentViewModel,
+          profileModelView)
     }
     composeTestRule.waitForIdle()
 
