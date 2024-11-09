@@ -53,6 +53,7 @@ class TravelListScreenTest {
   private lateinit var documentRepository: DocumentRepository
   private lateinit var eventViewModel: EventViewModel
   private lateinit var eventRepository: EventRepository
+
   @Mock private lateinit var mockFileDownloader: FileDownloader
 
   @Before
@@ -236,5 +237,33 @@ class TravelListScreenTest {
 
     // Verify that the navigation action was called for ADD_TRAVEL
     verify(navigationActions).navigateTo(Screen.ADD_TRAVEL)
+  }
+
+  @Test
+  fun displayEmptyTravelList() {
+    // Arrange
+    val emptyTravelList = emptyList<TravelContainer>()
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
+          onSuccess(emptyTravelList)
+          null
+        }
+        .whenever(travelRepository)
+        .getTravels(anyOrNull(), anyOrNull())
+
+    // Act
+    composeTestRule.setContent {
+      TravelListScreen(
+          navigationActions = navigationActions,
+          listTravelViewModel = listTravelViewModel,
+          activityViewModel,
+          eventViewModel,
+          documentViewModel,
+          profileModelView)
+    }
+    composeTestRule.waitForIdle()
+
+    // Assert
+    composeTestRule.onNodeWithTag("emptyTravelPrompt").assertIsDisplayed()
   }
 }
