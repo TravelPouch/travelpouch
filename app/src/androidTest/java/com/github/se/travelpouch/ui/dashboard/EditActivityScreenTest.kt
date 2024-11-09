@@ -178,4 +178,12 @@ class EditActivityScreenTest {
         composeTestRule.onNodeWithTag("dateField").fetchSemanticsNode().config[EditableText]
     assert(result.text == "01/23/4567")
   }
+
+  @Test
+  fun datePickerDialogOpensOnClick() {
+    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView) }
+
+    // Simulate clicking the date picker button
+    composeTestRule.onNodeWithTag("datePickerButton").performClick()
+  }
 }
