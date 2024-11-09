@@ -12,6 +12,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -236,18 +237,23 @@ class ProfileRepositoryTest {
     assertThat(result, `is`(ErrorProfile.errorProfile))
   }
 
-  //  @Test
-  //  fun gettingProfileUserCallsCreatingProfile(){
-  //
-  //    `when`(mockFirebaseUser.uid).thenReturn("uid")
-  //    `when`(mockFirebaseUser.email).thenReturn("email")
-  //
-  //    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
-  //    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
-  //    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
-  //
-  //    `when`(mockDocumentSnapshot.exists()).thenReturn(true)
-  //    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
-  //    verify(mockDocumentSnapshot).exists()
-  //  }
+  @Test
+  fun gettingProfileUserCallsCreatingProfile() = runTest {
+    val mockTask: Task<DocumentSnapshot> = mock()
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(true)
+    `when`(mockTask.result).thenReturn(mockDocumentSnapshot)
+
+    `when`(mockFirebaseUser.uid).thenReturn("uid")
+    `when`(mockFirebaseUser.email).thenReturn("email")
+
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(mockTask)
+    `when`(mockTask.await()).thenReturn(mockDocumentSnapshot)
+
+    `when`(mockDocumentSnapshot.exists()).thenReturn(true)
+    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
+    verify(mockDocumentSnapshot).exists()
+  }
 }
