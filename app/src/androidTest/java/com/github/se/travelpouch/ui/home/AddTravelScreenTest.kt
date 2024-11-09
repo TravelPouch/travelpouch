@@ -97,8 +97,11 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("inputTravelTitle").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelDescription").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("inputTravelStartDate").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelEndDate").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().assertIsDisplayed()
   }
 
   @Test
@@ -302,6 +305,30 @@ class AddTravelScreenTest {
 
     // Simulate clicking the save button
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
+  }
+
+  @Test
+  fun datePickerDialogOpensOnClick() {
+    composeTestRule.setContent {
+      // Set up the content for the test
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          locationViewModel,
+          profileModelView = profileModelView)
+    }
+
+    // The startDate picker button should be displayed
+    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
+
+    // Simulate clicking the date picker button
+    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().performClick()
+
+    // The endDate picker button should be displayed
+    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().assertIsDisplayed()
+
+    // Simulate clicking the date picker button
+    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().performClick()
   }
 
   // Helper function to input text into a text field
