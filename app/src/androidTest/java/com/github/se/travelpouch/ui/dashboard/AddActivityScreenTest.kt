@@ -79,6 +79,7 @@ class AddActivityScreenTest {
     composeTestRule.onNodeWithTag("titleField").isDisplayed()
     composeTestRule.onNodeWithTag("descriptionField").isDisplayed()
     composeTestRule.onNodeWithTag("dateField").isDisplayed()
+    composeTestRule.onNodeWithTag("titleField").isDisplayed()
     composeTestRule.onNodeWithTag("locationField").isDisplayed()
     composeTestRule.onNodeWithTag("saveButton").isDisplayed()
     composeTestRule.onNodeWithTag("saveButton").assertTextEquals("Save")
@@ -93,6 +94,9 @@ class AddActivityScreenTest {
 
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("01022024")
+
+    composeTestRule.onNodeWithTag("timeField").performTextClearance()
+    composeTestRule.onNodeWithTag("timeField").performTextInput("15:24")
   }
 
   @Test
@@ -219,8 +223,21 @@ class AddActivityScreenTest {
     }
 
     // The time field should be displayed
-    composeTestRule.onNodeWithTag("timeField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("timePickerButton").assertIsDisplayed()
     // Click on the time field
-    composeTestRule.onNodeWithTag("timeField").performClick()
+    composeTestRule.onNodeWithTag("timePickerButton").performClick()
+  }
+
+  @Test
+  fun datePickerDialogOpensOnClick() {
+
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+    }
+
+    // The time field should be displayed
+    composeTestRule.onNodeWithTag("datePickerButton").assertIsDisplayed()
+    // Click on the time field
+    composeTestRule.onNodeWithTag("datePickerButton").performClick()
   }
 }
