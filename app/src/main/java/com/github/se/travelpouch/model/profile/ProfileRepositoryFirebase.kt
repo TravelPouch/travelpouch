@@ -21,7 +21,9 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   private var documentPath = ""
 
   override suspend fun initAfterLogin(onSuccess: (Profile) -> Unit) {
-    val user = Firebase.auth.currentUser
+      Log.d("ENDTOENDTEST", "in the profile repository")
+
+      val user = Firebase.auth.currentUser
 
     if (user != null) {
       documentPath = user.uid
@@ -62,9 +64,16 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
    */
   suspend fun gettingUserProfile(user: FirebaseUser, onSuccess: (Profile) -> Unit) {
-    try {
-      val document = db.collection(collectionPath).document(documentPath).get().await()
-      addingUserIfNotRegistered(user, document, onSuccess)
+      Log.d("ENDTOENDTEST", "getting first the profile")
+
+      try {
+
+          Log.d("ENDTOENDTEST", "getting first the profile, in the try")
+
+          val document = db.collection(collectionPath).document(documentPath).get().await()
+          Log.d("ENDTOENDTEST", "finished waiting for the document")
+
+          addingUserIfNotRegistered(user, document, onSuccess)
     } catch (e: Exception) {
       Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
     }

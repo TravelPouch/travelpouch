@@ -1,16 +1,19 @@
 package com.github.se.travelpouch.ui.endToEnd
 
-import android.util.Log
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.MainActivity
-import com.github.se.travelpouch.TravelPouchApp
-import com.github.se.travelpouch.ui.theme.SampleAppTheme
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.time.delay
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,36 +24,31 @@ class EndToEndTest {
   @Test
   fun endToEndTest() {
 
-    Log.d("USER", "${Firebase.auth.currentUser!!.email}")
+      composeTestRule.onNodeWithText("Sign in with Email and Password").assertIsDisplayed()
+      composeTestRule.onNodeWithText("Sign in with Email and Password").performClick()
 
-    composeTestRule.setContent {
-      SampleAppTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
-        ) {
-          TravelPouchApp()
-        }
+      composeTestRule.onNodeWithTag("emailSignIn").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("emailSignIn").performClick()
+
+      composeTestRule.onNodeWithTag("emailSignIn").performTextInput("travelpouchswenttest2027@gmail.com")
+      composeTestRule.onNodeWithTag("passwordSignIn").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("passwordSignIn").performClick()
+
+      composeTestRule.onNodeWithTag("passwordSignIn").performTextInput("travelPouchSwentTest")
+
+      composeTestRule.onNodeWithText("Create account and Log in").assertIsDisplayed()
+      composeTestRule.onNodeWithText("Create account and Log in").performClick()
+
+      //composeTestRule.waitUntilAtLeastOneExists(hasTestTag("emptyTravelPrompt"), 5000)
+
+      composeTestRule.waitUntil {
+        composeTestRule.onNodeWithTag("emptyTravelPrompt").isDisplayed()
       }
-    }
+      composeTestRule.onNodeWithTag("emptyTravelPrompt").assertIsDisplayed()
 
-    //        composeTestRule.onNodeWithText("Sign in with Email and Password").assertIsDisplayed()
-    //        composeTestRule.onNodeWithText("Sign in with Email and Password").performClick()
-    //        Thread.sleep(10000)
-    //        composeTestRule.onNodeWithTag("emailSignIn").assertIsDisplayed()
-    //        composeTestRule.onNodeWithTag("emailSignIn").performClick()
+
     //
-    // composeTestRule.onNodeWithTag("emailSignIn").performTextInput("travelpouchswenttest@gmail.com")
-    //        composeTestRule.onNodeWithTag("passwordSignIn").assertIsDisplayed()
-    //        composeTestRule.onNodeWithTag("passwordSignIn").performClick()
-    //
-    // composeTestRule.onNodeWithTag("passwordSignIn").performTextInput("travelPouchSwentTest")
-    //
-    //        composeTestRule.onNodeWithText("Create account and Log in").assertIsDisplayed()
-    //        composeTestRule.onNodeWithText("Create account and Log in").performClick()
-    //        Thread.sleep(5000)
-    //
-    //        composeTestRule.onNodeWithText("You have no travels yet.").assertIsDisplayed()
+    //     composeTestRule.onNodeWithText("You have no travels yet.").assertIsDisplayed()
     //        composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
     //        composeTestRule.onNodeWithTag("createTravelFab").performClick()
     //        Thread.sleep(2000)

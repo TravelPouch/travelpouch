@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.travels
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.profile.Profile
@@ -24,10 +25,12 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    *
    * @param onSuccess The callback to call if the user is authenticated.
    */
+  @SuppressLint("SuspiciousIndentation")
   override fun initAfterLogin(onSuccess: () -> Unit) {
     val user = Firebase.auth.currentUser
     if (user != null) {
       currentUserUid = user.uid
+      Log.d("ENDTOEND", currentUserUid)
       onSuccess()
     }
   }
@@ -174,7 +177,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
       onFailure: (Exception) -> Unit
   ) {
 
-    Log.d("TravelRepositoryFirestore", "getTravels")
+      Log.d("TravelRepositoryFirestore", "getTravels")
     db.collection(collectionPath)
         .whereArrayContains("listParticipant", currentUserUid)
         .get()

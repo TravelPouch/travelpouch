@@ -74,9 +74,29 @@ fun SignInEmailPassword(
                       if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success")
-                        GlobalScope.launch { profileModelView.initAfterLogin() }
-                        travelViewModel.initAfterLogin()
-                        navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                          Log.d("ENDTOENDTEST", "before the job")
+
+                          val job =
+                            GlobalScope.launch {
+                                Log.d("ENDTOENDTEST", "in the coroutine")
+
+                                profileModelView.initAfterLogin {
+                                  //travelViewModel.initAfterLogin()
+                                  Log.d("ENDTOENDTEST", "before the toast")
+                                  Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
+                                  Log.d("ENDTOENDTEST", "before the navigate to")
+                                  navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                                  Log.d("ENDTOENDTEST", "after the navigate to")
+
+                              }
+                                Log.d("ENDTOENDTEST", "end of the coroutine")
+
+                            }
+
+                          Log.d("ENDTOENDTEST", "outside of coroutine")
+
+
+
                       } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "createUserWithEmail:failure", task.exception)

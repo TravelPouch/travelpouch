@@ -172,16 +172,6 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
-    //todo: wait for a listener to finish libraries
-    implementation(libs.guava)
-
-    // To use CallbackToFutureAdapter
-    implementation(libs.androidx.concurrent.futures)
-
-    // Kotlin
-    implementation(libs.kotlinx.coroutines.guava)
-
-
     // Google Service and Maps
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)

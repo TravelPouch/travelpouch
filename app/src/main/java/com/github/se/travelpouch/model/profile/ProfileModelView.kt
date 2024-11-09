@@ -37,10 +37,15 @@ class ProfileModelView(private val repository: ProfileRepository) : ViewModel() 
 
   /** The initialisation function of the profile model view. It fetches the profile of the user */
   suspend fun initAfterLogin(onSuccess: () -> Unit) {
-    repository.initAfterLogin {
+      Log.d("ENDTOENDTEST", "in profile MV")
+
+      repository.initAfterLogin {
       profile_.value = it
-      getProfile()
-      onSuccess()
+          Log.d("ENDTOENDTEST", "in the init")
+
+        onSuccess()
+        Log.d("ENDTOENDTEST", "after on success")
+
     }
   }
 

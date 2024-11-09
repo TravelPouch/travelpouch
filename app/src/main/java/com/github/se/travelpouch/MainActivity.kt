@@ -18,7 +18,6 @@ import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
-import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.authentication.SignInEmailPassword
@@ -73,8 +72,8 @@ fun TravelPouchApp() {
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
-  val notificationViewModel: NotificationViewModel =
-      viewModel(factory = NotificationViewModel.Factory)
+  //  val notificationViewModel: NotificationViewModel =
+  //      viewModel(factory = NotificationViewModel.Factory)
 
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(

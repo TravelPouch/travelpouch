@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,7 +47,7 @@ import java.util.Locale
  * @param navigationActions Actions for navigation.
  * @param listTravelViewModel List of travels as a viewmodel, to display.
  */
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun TravelListScreen(
     navigationActions: NavigationActions,
@@ -56,12 +57,11 @@ fun TravelListScreen(
     documentViewModel: DocumentViewModel,
     profileModelView: ProfileModelView
 ) {
-  // Fetch travels when the screen is launched
-  LaunchedEffect(Unit) {
-    listTravelViewModel.getTravels()
-    profileModelView.getProfile()
-    // sleep the thread for 1 second to allow the data to be fetched
-  }
+//   //Fetch travels when the screen is launched
+//    LaunchedEffect(Unit) {
+//      listTravelViewModel.getTravels()
+//      // sleep the thread for 1 second to allow the data to be fetched
+//    }
   val travelList = listTravelViewModel.travels.collectAsState()
   val currentProfile = profileModelView.profile.collectAsState()
 
@@ -96,11 +96,16 @@ fun TravelListScreen(
                   }
                 }
           } else {
-            MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), emptyList())
+              Log.d("ENDTOENDTEST", "on the next screen")
 
+              MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), emptyList())
+
+
+
+              Log.d("ENDTOENDTEST", "on the next screen after map")
             Text(
                 modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
-                text = "You have no travels yet.")
+                text = "${profileModelView.profile.value.name} You have no travels yet.")
           }
         }
       })
