@@ -124,7 +124,6 @@ open class DocumentViewModel(
         onFailure = { Log.e("DocumentsViewModel", "Failed to upload Document") })
   }
 
-
   /**
    * Uploads a file to the selected travel.
    *
