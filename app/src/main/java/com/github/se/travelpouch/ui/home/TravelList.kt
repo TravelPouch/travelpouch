@@ -97,11 +97,14 @@ fun TravelListScreen(
               if (travelList.value.isNotEmpty()) {
                 items(travelList.value.size) { index ->
                   TravelItem(travelContainer = travelList.value[index]) {
+                    val travelId = travelList.value[index].fsUid
                     listTravelViewModel.selectTravel(travelList.value[index])
                     navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    eventViewModel.setIdTravel(travelId)
+                    activityViewModel.setIdTravel(travelId)
+                    documentViewModel.setIdTravel(travelId)
                   }
                 }
-
               } else {
                 item {
                   Box(
@@ -112,9 +115,9 @@ fun TravelListScreen(
                             text = "You have no travels yet.")
                         if (isLoading.value) {
                           CircularProgressIndicator(
-                          modifier = Modifier.testTag("loadingSpinner"),
-                          color = MaterialTheme.colorScheme.primary,
-                          strokeWidth = 5.dp)
+                              modifier = Modifier.testTag("loadingSpinner"),
+                              color = MaterialTheme.colorScheme.primary,
+                              strokeWidth = 5.dp)
                         }
                       }
                 }
