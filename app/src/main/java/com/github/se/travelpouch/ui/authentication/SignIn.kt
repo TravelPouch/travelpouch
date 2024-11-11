@@ -142,7 +142,10 @@ fun SignInScreen(
                     enter = fadeIn(animationSpec = tween(300)),
                     exit = fadeOut(animationSpec = tween(300))) {
                       CircularProgressIndicator(
-                          modifier = Modifier.height(28.dp), // Same height as Google Sign-In button
+                          modifier =
+                              Modifier.height(28.dp)
+                                  .testTag(
+                                      "loadingSpinner"), // Same height as Google Sign-In button
                           color = MaterialTheme.colorScheme.primary,
                           strokeWidth = 5.dp)
                     }

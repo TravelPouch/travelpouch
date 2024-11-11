@@ -64,5 +64,6 @@ class SignInViewTest {
           navigationActions = mockNavigationActions, profileModelView, travelViewModel, yesSpin)
     }
     composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
   }
 }

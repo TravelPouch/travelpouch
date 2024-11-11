@@ -115,7 +115,8 @@ fun TravelListScreen(
                             text = "You have no travels yet.")
                         if (isLoading.value) {
                           CircularProgressIndicator(
-                              modifier = Modifier.testTag("loadingSpinner"),
+                              modifier =
+                                  Modifier.align(Alignment.TopStart).testTag("loadingSpinner"),
                               color = MaterialTheme.colorScheme.primary,
                               strokeWidth = 5.dp)
                         }

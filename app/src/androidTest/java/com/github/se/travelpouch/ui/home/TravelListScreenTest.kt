@@ -104,8 +104,7 @@ class TravelListScreenTest {
         .getTravels(anyOrNull(), anyOrNull())
 
     // Initialize the ViewModel's travels StateFlow
-    listTravelViewModel =
-        ListTravelViewModel(travelRepository).apply {} // travels.value = travelList }
+    listTravelViewModel = ListTravelViewModel(travelRepository).apply {}
   }
 
   @Test
@@ -120,7 +119,6 @@ class TravelListScreenTest {
           documentViewModel,
           profileModelView)
     }
-    // Thread.sleep(3000)
     // Assert
     composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
@@ -154,8 +152,7 @@ class TravelListScreenTest {
     travelsField.set(listTravelViewModel, MutableStateFlow(emptyList<TravelContainer>()))
 
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
-          // onSuccess(emptyList())
+          // don't return any travels so that it keeps spinning
           null
         }
         .whenever(travelRepository)
@@ -171,15 +168,9 @@ class TravelListScreenTest {
           profileModelView)
     }
 
-    val isLoadingField = ListTravelViewModel::class.java.getDeclaredField("_isLoading")
-    isLoadingField.isAccessible = true
-    isLoadingField.set(listTravelViewModel, MutableStateFlow(true))
     composeTestRule.waitForIdle()
-    // Assert
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
-    isLoadingField.set(listTravelViewModel, MutableStateFlow(false))
-    composeTestRule.waitForIdle()
   }
 
   @Test
@@ -225,7 +216,6 @@ class TravelListScreenTest {
     // Act
     composeTestRule.setContent { MapScreen(travelContainers = travelContainers) }
     composeTestRule.waitForIdle()
-    // Thread.sleep(3000)
 
     // Assert
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()

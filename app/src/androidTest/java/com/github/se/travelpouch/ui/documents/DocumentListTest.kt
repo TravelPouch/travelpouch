@@ -158,6 +158,7 @@ class DocumentListTest {
     val loadingFlow = isLoadingField.get(mockDocumentViewModel) as MutableStateFlow<Boolean>
     loadingFlow.value = true
     composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
   }
 
   @Test
