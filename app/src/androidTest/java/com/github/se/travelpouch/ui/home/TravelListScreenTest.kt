@@ -26,6 +26,8 @@ import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -118,7 +120,7 @@ class TravelListScreenTest {
           documentViewModel,
           profileModelView)
     }
-    Thread.sleep(3000)
+    //Thread.sleep(3000)
     // Assert
     composeTestRule.onNodeWithTag("TravelListScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
@@ -127,7 +129,6 @@ class TravelListScreenTest {
 
   @Test
   fun displayTravelListWhenNotEmpty() {
-    // Act
     composeTestRule.setContent {
       TravelListScreen(
           navigationActions = navigationActions,
@@ -144,6 +145,44 @@ class TravelListScreenTest {
     composeTestRule.onNodeWithText("Trip to Paris").assertIsDisplayed()
     composeTestRule.onNodeWithText("A wonderful trip to Paris").assertIsDisplayed()
   }
+
+    @Test
+    fun displayTravelListWhenEmpty() {
+        // Act
+        val travelsField = ListTravelViewModel::class.java.getDeclaredField("travels_")
+        travelsField.isAccessible = true
+        travelsField.set(listTravelViewModel, MutableStateFlow(emptyList<TravelContainer>()))
+
+        doAnswer { invocation ->
+            val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
+            //onSuccess(emptyList())
+            null
+        }
+            .whenever(travelRepository)
+            .getTravels(anyOrNull(), anyOrNull())
+
+        composeTestRule.setContent {
+            TravelListScreen(
+                navigationActions = navigationActions,
+                listTravelViewModel = listTravelViewModel,
+                activityViewModel,
+                eventViewModel,
+                documentViewModel,
+                profileModelView)
+        }
+
+        val isLoadingField = ListTravelViewModel::class.java.getDeclaredField("_isLoading")
+        isLoadingField.isAccessible = true
+        isLoadingField.set(listTravelViewModel, MutableStateFlow(true))
+        composeTestRule.waitForIdle()
+        // Assert
+        composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
+        isLoadingField.set(listTravelViewModel, MutableStateFlow(false))
+        composeTestRule.waitForIdle()
+
+    }
+
 
   @Test
   fun displayMapWithMarkers() {
@@ -188,7 +227,7 @@ class TravelListScreenTest {
     // Act
     composeTestRule.setContent { MapScreen(travelContainers = travelContainers) }
     composeTestRule.waitForIdle()
-    Thread.sleep(3000)
+    //Thread.sleep(3000)
 
     // Assert
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()

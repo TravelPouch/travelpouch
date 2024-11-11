@@ -60,16 +60,14 @@ fun TravelListScreen(
     profileModelView: ProfileModelView
 ) {
   // Fetch travels when the screen is launched
-  val isLoading = rememberSaveable { mutableStateOf(false) }
   LaunchedEffect(Unit) {
-    isLoading.value = true
     listTravelViewModel.getTravels()
     profileModelView.getProfile()
-    isLoading.value = false
   }
 
   val travelList = listTravelViewModel.travels.collectAsState()
   val currentProfile = profileModelView.profile.collectAsState()
+    val isLoading = listTravelViewModel.isLoading.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
@@ -83,7 +81,6 @@ fun TravelListScreen(
       content = { pd ->
         Column {
           if (travelList.value.isNotEmpty()) {
-            isLoading.value = false
             // Add the map to display the travels
 
             MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), travelList.value)
@@ -108,10 +105,12 @@ fun TravelListScreen(
             Text(
                 modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
                 text = "You have no travels yet.")
-            CircularProgressIndicator(
-                modifier = Modifier.testTag("loadingSpinner"),
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 5.dp)
+            if(isLoading.value) {
+                CircularProgressIndicator(
+                    modifier = Modifier.testTag("loadingSpinner"),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 5.dp)
+            }
           }
         }
       })
