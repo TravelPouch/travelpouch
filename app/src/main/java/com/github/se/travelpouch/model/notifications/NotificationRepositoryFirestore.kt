@@ -11,7 +11,8 @@ import com.google.firebase.firestore.Query
  *
  * @property firestore The Firestore instance used for database operations.
  */
-class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) : NotificationRepository {
+class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) :
+    NotificationRepository {
 
   // Reference to the "notifications" collection in Firestore
   private val notificationCollection = firestore.collection("notifications")

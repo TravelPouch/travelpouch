@@ -10,6 +10,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import java.lang.reflect.InvocationTargetException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
@@ -25,7 +26,6 @@ import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
-import java.lang.reflect.InvocationTargetException
 
 @RunWith(RobolectricTestRunner::class)
 class NotificationRepositoryFirestoreUnitTest {
@@ -37,10 +37,8 @@ class NotificationRepositoryFirestoreUnitTest {
   @Mock private lateinit var query: Query
 
   @Mock private lateinit var task: Task<QuerySnapshot>
-  @Mock
-  private val documents: QuerySnapshot = mock()
-  @Mock
-  private val document: DocumentSnapshot = mock()
+  @Mock private val documents: QuerySnapshot = mock()
+  @Mock private val document: DocumentSnapshot = mock()
 
   private lateinit var notificationRepositoryFirestore: NotificationRepositoryFirestore
 
@@ -155,18 +153,18 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
 
-    whenever(document["content"]).thenReturn(
-      mapOf(
-        "inviterName" to "John Doe",
-        "travelTitle" to "Trip to Paris",
-        "role" to "PARTICIPANT"
-      )
-    )
+    whenever(document["content"])
+        .thenReturn(
+            mapOf(
+                "inviterName" to "John Doe",
+                "travelTitle" to "Trip to Paris",
+                "role" to "PARTICIPANT"))
 
     // Reflection to access the private method
-    val method = NotificationRepositoryFirestore::class
-      .java
-      .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
     method.isAccessible = true
 
     try {
@@ -175,8 +173,8 @@ class NotificationRepositoryFirestoreUnitTest {
       assertEquals("ATPaDqjZyogRVtfszvv4d5mj1tp2", result.senderUid)
       assertEquals("IIrRuQpDpzOlRPN52J5QAEj2xOq1", result.receiverUid)
       assertEquals("6NU2zp2oGdA34s1Q1q5l", result.travelUid)
-        assertEquals(NotificationType.INVITATION, result.notificationType)
-        assertEquals(NotificationStatus.UNREAD, result.status)
+      assertEquals(NotificationType.INVITATION, result.notificationType)
+      assertEquals(NotificationStatus.UNREAD, result.status)
     } catch (e: InvocationTargetException) {
       e.printStackTrace()
       fail("Method invocation failed: ${e.cause?.message}")
@@ -199,17 +197,14 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
 
-    whenever(document["content"]).thenReturn(
-      mapOf(
-        "travelTitle" to "Trip to Paris",
-        "role" to "PARTICIPANT"
-      )
-    )
+    whenever(document["content"])
+        .thenReturn(mapOf("travelTitle" to "Trip to Paris", "role" to "PARTICIPANT"))
 
     // Reflection to access the private method
-    val method = NotificationRepositoryFirestore::class
-      .java
-      .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
     method.isAccessible = true
 
     try {
@@ -242,17 +237,14 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
 
-    whenever(document["content"]).thenReturn(
-      mapOf(
-        "userName" to "John Doe",
-        "travelTitle" to "Trip to Paris"
-      )
-    )
+    whenever(document["content"])
+        .thenReturn(mapOf("userName" to "John Doe", "travelTitle" to "Trip to Paris"))
 
     // Reflection to access the private method
-    val method = NotificationRepositoryFirestore::class
-      .java
-      .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
     method.isAccessible = true
 
     try {
@@ -285,17 +277,14 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
 
-    whenever(document["content"]).thenReturn(
-      mapOf(
-        "userName" to "John Doe",
-        "travelTitle" to "Trip to Paris"
-      )
-    )
+    whenever(document["content"])
+        .thenReturn(mapOf("userName" to "John Doe", "travelTitle" to "Trip to Paris"))
 
     // Reflection to access the private method
-    val method = NotificationRepositoryFirestore::class
-      .java
-      .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
     method.isAccessible = true
 
     try {
@@ -324,9 +313,10 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getString("senderUid")).thenReturn(null) // This will cause an exception
 
     // Reflection to access the private method
-    val method = NotificationRepositoryFirestore::class
-      .java
-      .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
     method.isAccessible = true
 
     try {
@@ -348,11 +338,12 @@ class NotificationRepositoryFirestoreUnitTest {
     val task = Tasks.forResult<Void>(null) // Create a Task<Void> instance
 
     `when`(notificationCollection.document(notificationUid)).thenReturn(documentReference)
-    `when`(documentReference.update("notificationType", NotificationType.INVITATION)).thenReturn(task)
+    `when`(documentReference.update("notificationType", NotificationType.INVITATION))
+        .thenReturn(task)
 
-    notificationRepositoryFirestore.changeNotificationType(notificationUid, NotificationType.INVITATION)
+    notificationRepositoryFirestore.changeNotificationType(
+        notificationUid, NotificationType.INVITATION)
 
     verify(documentReference).update("notificationType", NotificationType.INVITATION)
   }
-
 }

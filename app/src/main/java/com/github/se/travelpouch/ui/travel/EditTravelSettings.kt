@@ -46,7 +46,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationType
@@ -54,6 +53,7 @@ import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
@@ -327,12 +327,11 @@ fun EditTravelSettingsScreen(
                             val isUserAlreadyAdded =
                                 selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
                             if (fsUid == profileViewModel.profile.value.fsUid) {
-                                Toast.makeText(
-                                    context,
-                                    "Error: You can't invite yourself",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
+                              Toast.makeText(
+                                      context,
+                                      "Error: You can't invite yourself",
+                                      Toast.LENGTH_SHORT)
+                                  .show()
                             } else if (isUserAlreadyAdded) {
                               Toast.makeText(
                                       context, "Error: User already added", Toast.LENGTH_SHORT)

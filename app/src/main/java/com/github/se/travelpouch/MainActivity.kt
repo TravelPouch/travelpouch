@@ -74,7 +74,6 @@ fun TravelPouchApp() {
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
-
   NavHost(navController = navController, startDestination = Route.DEFAULT) {
     navigation(
         startDestination = Screen.AUTH,
@@ -134,7 +133,13 @@ fun TravelPouchApp() {
 
     composable(Screen.NOTIFICATION) {
       NotificationsScreen(
-          navigationActions, notificationViewModel, profileModelView, listTravelViewModel, activityModelView, documentViewModel, eventsViewModel)
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          listTravelViewModel,
+          activityModelView,
+          documentViewModel,
+          eventsViewModel)
     }
   }
 }

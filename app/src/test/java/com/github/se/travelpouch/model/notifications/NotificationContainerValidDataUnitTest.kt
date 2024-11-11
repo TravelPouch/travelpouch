@@ -117,27 +117,27 @@ class NotificationContainerLastCaseTest {
     val timestamp = Timestamp.now()
     val status = NotificationStatus.UNREAD
 
-    val notification = Notification(
-      notificationUid = notificationUid,
-      senderUid = senderUid,
-      receiverUid = receiverUid,
-      travelUid = travelUid,
-      content = content,
-      notificationType = notificationType,
-      timestamp = timestamp,
-      status = status
-    )
+    val notification =
+        Notification(
+            notificationUid = notificationUid,
+            senderUid = senderUid,
+            receiverUid = receiverUid,
+            travelUid = travelUid,
+            content = content,
+            notificationType = notificationType,
+            timestamp = timestamp,
+            status = status)
 
-    val expectedMap = mapOf(
-      "notificationUid" to notificationUid,
-      "senderUid" to senderUid,
-      "receiverUid" to receiverUid,
-      "travelUid" to travelUid,
-      "content" to content,
-      "notificationType" to notificationType,
-      "timestamp" to timestamp,
-      "status" to status
-    )
+    val expectedMap =
+        mapOf(
+            "notificationUid" to notificationUid,
+            "senderUid" to senderUid,
+            "receiverUid" to receiverUid,
+            "travelUid" to travelUid,
+            "content" to content,
+            "notificationType" to notificationType,
+            "timestamp" to timestamp,
+            "status" to status)
 
     assertEquals(expectedMap, notification.toMap())
   }

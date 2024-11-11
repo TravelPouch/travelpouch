@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.profile.Profile
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -245,9 +244,11 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
         onFailure = { onFailure() })
   }
 
-    fun getTravelById(id: String, onSuccess: (TravelContainer?) -> Unit, onFailure: (Exception) -> Unit) {
-        repository.getTravelById(id, onSuccess, onFailure)
-    }
-
-
+  fun getTravelById(
+      id: String,
+      onSuccess: (TravelContainer?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    repository.getTravelById(id, onSuccess, onFailure)
+  }
 }

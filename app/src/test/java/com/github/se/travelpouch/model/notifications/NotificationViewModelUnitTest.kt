@@ -42,71 +42,71 @@ class NotificationViewModelUnitTest {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
 
-      val context = ApplicationProvider.getApplicationContext<Context>()
-      FirebaseApp.initializeApp(context)
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    FirebaseApp.initializeApp(context)
 
     notificationViewModel = NotificationViewModel(notificationRepositoryFirestore)
-
   }
 
-    val senderUid = generateAutoUserId()
-    val receiverUid = generateAutoUserId()
-    val notificationUid = generateAutoObjectId()
-    val travel1Uid = generateAutoObjectId()
-    val content1 = NotificationContent.InvitationNotification(
-        "John Doe", "Trip to Paris", Role.PARTICIPANT)
-    val notificationType1 = NotificationType.INVITATION
+  val senderUid = generateAutoUserId()
+  val receiverUid = generateAutoUserId()
+  val notificationUid = generateAutoObjectId()
+  val travel1Uid = generateAutoObjectId()
+  val content1 =
+      NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
+  val notificationType1 = NotificationType.INVITATION
 
-    val notification1 = Notification(
-        notificationUid = notificationUid,
-        senderUid = senderUid,
-        receiverUid = receiverUid,
-        travelUid = travel1Uid,
-        content = content1,
-        notificationType = notificationType1)
+  val notification1 =
+      Notification(
+          notificationUid = notificationUid,
+          senderUid = senderUid,
+          receiverUid = receiverUid,
+          travelUid = travel1Uid,
+          content = content1,
+          notificationType = notificationType1)
 
-    val senderUid2 = generateAutoUserId()
-    val receiverUid2 = generateAutoUserId()
-    val notificationUid2 = generateAutoObjectId()
-    val travel2Uid = generateAutoObjectId()
-    val content2 = NotificationContent.InvitationNotification(
-        "Ludovic Beethoven", "Trip to Berlin", Role.PARTICIPANT)
-    val notificationType2 = NotificationType.INVITATION
+  val senderUid2 = generateAutoUserId()
+  val receiverUid2 = generateAutoUserId()
+  val notificationUid2 = generateAutoObjectId()
+  val travel2Uid = generateAutoObjectId()
+  val content2 =
+      NotificationContent.InvitationNotification(
+          "Ludovic Beethoven", "Trip to Berlin", Role.PARTICIPANT)
+  val notificationType2 = NotificationType.INVITATION
 
-    val notification2 = Notification(
-        notificationUid = notificationUid2,
-        senderUid = senderUid2,
-        receiverUid = receiverUid2,
-        travelUid = travel2Uid,
-        content = content2,
-        notificationType = notificationType2
-    )
+  val notification2 =
+      Notification(
+          notificationUid = notificationUid2,
+          senderUid = senderUid2,
+          receiverUid = receiverUid2,
+          travelUid = travel2Uid,
+          content = content2,
+          notificationType = notificationType2)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun loadNotificationsForUser_updatesNotifications() = runBlockingTest {
-        val notifications = listOf(notification1, notification2)
-        `when`(notificationRepositoryFirestore.fetchNotificationsForUser(any(), any())).then {
-            val callback = it.arguments[1] as (List<Notification>) -> Unit
-            callback(notifications)
-        }
-
-        notificationViewModel.loadNotificationsForUser(receiverUid)
-
-        assertEquals(notifications, notificationViewModel.notifications.value)
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Test
+  fun loadNotificationsForUser_updatesNotifications() = runBlockingTest {
+    val notifications = listOf(notification1, notification2)
+    `when`(notificationRepositoryFirestore.fetchNotificationsForUser(any(), any())).then {
+      val callback = it.arguments[1] as (List<Notification>) -> Unit
+      callback(notifications)
     }
 
-    @Test
-    fun loadNotificationsForUser_nullNotifications() = runBlockingTest {
-        val userId = "user123"
-        `when`(notificationRepositoryFirestore.fetchNotificationsForUser(eq(userId), any())).thenAnswer {
-            (it.arguments[1] as (List<Notification>) -> Unit).invoke(emptyList())
-        }
+    notificationViewModel.loadNotificationsForUser(receiverUid)
 
-        notificationViewModel.loadNotificationsForUser(userId)
+    assertEquals(notifications, notificationViewModel.notifications.value)
+  }
 
-        assertEquals(emptyList<Notification>(), notificationViewModel.notifications.value)
-    }
+  @Test
+  fun loadNotificationsForUser_nullNotifications() = runBlockingTest {
+    val userId = "user123"
+    `when`(notificationRepositoryFirestore.fetchNotificationsForUser(eq(userId), any()))
+        .thenAnswer { (it.arguments[1] as (List<Notification>) -> Unit).invoke(emptyList()) }
+
+    notificationViewModel.loadNotificationsForUser(userId)
+
+    assertEquals(emptyList<Notification>(), notificationViewModel.notifications.value)
+  }
 
   @Test
   fun markNotificationAsRead() {
@@ -150,32 +150,33 @@ class NotificationViewModelUnitTest {
     assertThat(viewModel, instanceOf(NotificationViewModel::class.java))
   }
 
-    @Test
-    fun deleteAllNotificationsForUser() {
-        val userUid = generateAutoUserId()
-        val onSuccess = mock(Runnable::class.java)
-        val onFailure = mock(Function1::class.java) as (Exception) -> Unit
+  @Test
+  fun deleteAllNotificationsForUser() {
+    val userUid = generateAutoUserId()
+    val onSuccess = mock(Runnable::class.java)
+    val onFailure = mock(Function1::class.java) as (Exception) -> Unit
 
-        notificationViewModel.deleteAllNotificationsForUser(userUid, onSuccess::run, onFailure)
+    notificationViewModel.deleteAllNotificationsForUser(userUid, onSuccess::run, onFailure)
 
-        verify(notificationRepositoryFirestore).deleteAllNotificationsForUser(eq(userUid), any(), any())
-    }
+    verify(notificationRepositoryFirestore).deleteAllNotificationsForUser(eq(userUid), any(), any())
+  }
 
-    @Test
-    fun changeNotificationType() {
-        val notificationUid = generateAutoObjectId()
-        val notificationType = NotificationType.INVITATION
+  @Test
+  fun changeNotificationType() {
+    val notificationUid = generateAutoObjectId()
+    val notificationType = NotificationType.INVITATION
 
-        notificationViewModel.changeNotificationType(notificationUid, notificationType)
+    notificationViewModel.changeNotificationType(notificationUid, notificationType)
 
-        verify(notificationRepositoryFirestore).changeNotificationType(eq(notificationUid), eq(notificationType))
-    }
+    verify(notificationRepositoryFirestore)
+        .changeNotificationType(eq(notificationUid), eq(notificationType))
+  }
 
-    @Test
-    fun `Factory creates NotificationViewModel instance 2`() {
-        val factory = NotificationViewModel.Factory
-        val viewModel = factory.create(NotificationViewModel::class.java)
+  @Test
+  fun `Factory creates NotificationViewModel instance 2`() {
+    val factory = NotificationViewModel.Factory
+    val viewModel = factory.create(NotificationViewModel::class.java)
 
-        assertThat(viewModel, instanceOf(NotificationViewModel::class.java))
-    }
+    assertThat(viewModel, instanceOf(NotificationViewModel::class.java))
+  }
 }

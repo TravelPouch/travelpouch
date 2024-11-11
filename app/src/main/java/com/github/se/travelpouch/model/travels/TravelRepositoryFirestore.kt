@@ -10,7 +10,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
 class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepository {
 
@@ -195,31 +194,29 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
         }
   }
 
-    override fun getTravelById(
-        id: String,
-        onSuccess: (TravelContainer?) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        db.collection(collectionPath).document(id).get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val document = task.result
-                if (document.exists()) {
-                    val travel = documentToTravel(document)
-                    if (travel != null) {
-                        onSuccess(travel)
-                    } else {
-                        onFailure(Exception("Travel not found"))
-                    }
-                } else {
-                    onFailure(Exception("Document does not exist"))
-                }
-            } else {
-                task.exception?.let { e ->
-                    onFailure(e)
-                }
-            }
+  override fun getTravelById(
+      id: String,
+      onSuccess: (TravelContainer?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(collectionPath).document(id).get().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val document = task.result
+        if (document.exists()) {
+          val travel = documentToTravel(document)
+          if (travel != null) {
+            onSuccess(travel)
+          } else {
+            onFailure(Exception("Travel not found"))
+          }
+        } else {
+          onFailure(Exception("Document does not exist"))
         }
+      } else {
+        task.exception?.let { e -> onFailure(e) }
+      }
     }
+  }
 
   /**
    * Performs a Firestore operation and calls the appropriate callback based on the result.

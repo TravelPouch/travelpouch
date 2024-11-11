@@ -117,5 +117,4 @@ class NotificationContentUnitTest {
       assert(true)
     }
   }
-
 }
