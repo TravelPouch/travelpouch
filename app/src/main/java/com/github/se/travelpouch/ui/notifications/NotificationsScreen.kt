@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,15 +70,17 @@ fun NotificationsScreen(
     val context = LocalContext.current
 
     Scaffold(
+        modifier = Modifier.testTag("ScalNotificationsScreen"),
         topBar = {
             TopAppBar(
+                modifier = Modifier.padding(8.dp).testTag("TopAppBarNotificationsScreen"),
                 title = {
                     Text(
                         text = "Notifications",
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().testTag("TitleNotificationsScreen")
                     )
                 },
                 actions = {
@@ -101,19 +104,21 @@ fun NotificationsScreen(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 })
-                        }) {
+                        },
+                        modifier = Modifier.testTag("DeleteAllNotificationsButton"),)
+                    {
+
                         Text("Delete All")
                     }
                 },
-                modifier = Modifier.padding(8.dp)
             )
         },
         content = { paddingValues ->
             LazyColumn(
-                modifier =
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues) // Padding to avoid overlap with top bar
+                    .padding(paddingValues)
+                    .testTag("LazyColumnNotificationsScreen")
             ) {
                 categorizedNotifications.forEach { (category, notifications) ->
                     item {
@@ -121,7 +126,7 @@ fun NotificationsScreen(
                             text = category,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier.padding(8.dp).testTag("CategoryTitle")
                         )
                     }
                     itemsIndexed(notifications) { _, notification ->
@@ -136,7 +141,6 @@ fun NotificationsScreen(
                             documentViewModel = documentViewModel,
                             eventsViewModel = eventsViewModel
                         ) {
-                            // Handle notification click
                         }
                     }
                 }
@@ -153,159 +157,6 @@ fun NotificationsScreen(
                 )
             )
         })
-}
-
-@Composable
-fun NotificationItem(
-    navigationActions: NavigationActions,
-    listTravelViewModel: ListTravelViewModel,
-    profileViewModel: ProfileModelView,
-    notificationViewModel: NotificationViewModel,
-    notification: Notification,
-    activityViewModel : ActivityViewModel,
-    documentViewModel: DocumentViewModel,
-    eventsViewModel: EventViewModel,
-    onClick: () -> Unit = {}
-) {
-    val context = LocalContext.current
-
-    Card(
-        modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 12.dp)
-            .clickable(onClick = onClick), // Handle item clicks
-        shape = RoundedCornerShape(13.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        onClick = {
-            // Get travel from notification
-            listTravelViewModel.getTravelById(notification.travelUid,
-                onSuccess = { travel ->
-                    listTravelViewModel.selectTravel(travel!!)
-                    activityViewModel.setIdTravel(travel.fsUid)
-                    documentViewModel.setIdTravel(travel.fsUid)
-                    eventsViewModel.setIdTravel(travel.fsUid)
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-                },
-                onFailure = {
-                    Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
-                }
-            )
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = notification.timestamp.toDate().toString(),
-                fontSize = 12.sp,
-                color = Color.Gray // Subtle color for the timestamp
-            )
-            Spacer(modifier = Modifier.height(4.dp)) // Space between message and timestamp
-
-            Text(
-                text = notification.content.toDisplayString(),
-                fontSize = 15.sp,
-                color = Color(0xFF669bbc) // A vibrant color for the title
-            )
-
-            // Button ACCEPT or DECLINE
-            if (notification.notificationType == NotificationType.INVITATION) {
-                Spacer(modifier = Modifier.height(4.dp)) // Space between message and timestamp
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {
-                            listTravelViewModel.getTravelById(notification.travelUid, { travel ->
-                                notificationViewModel.sendNotification(
-                                    Notification(
-                                        notification.notificationUid,
-                                        profileViewModel.profile.value.fsUid,
-                                        notification.senderUid,
-                                        notification.travelUid,
-                                        NotificationContent.InvitationResponseNotification(
-                                            profileViewModel.profile.value.name,
-                                            travel!!.title,
-                                            true
-                                        ),
-                                        NotificationType.ACCEPTED
-                                    )
-                                )
-
-                                listTravelViewModel.addUserToTravel(
-                                    profileViewModel.profile.value.email,
-                                    travel,
-                                    { updatedContainer ->
-                                        listTravelViewModel.selectTravel(updatedContainer)
-                                        Toast.makeText(
-                                            context, "User added successfully!", Toast.LENGTH_SHORT
-                                        ).show()
-                                    },
-                                    {
-                                        Toast.makeText(
-                                            context,
-                                            "Failed to add user",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                    })
-
-                                Toast.makeText(context, "ACCEPTED", Toast.LENGTH_SHORT).show()
-                            }, onFailure = {
-                                Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT)
-                                    .show()
-                            })
-
-                        },
-                        modifier = Modifier.padding(end = 8.dp), // Space between buttons
-                        colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = Color(0xFF12c15d)
-                        )
-                    ) {
-                        Text(text = "ACCEPT")
-                    }
-                    Button(
-                        onClick = {
-                            listTravelViewModel.getTravelById(notification.travelUid, { travel ->
-                                notificationViewModel.sendNotification(
-                                    Notification(
-                                        notification.notificationUid,
-                                        profileViewModel.profile.value.fsUid,
-                                        notification.senderUid,
-                                        notification.travelUid,
-                                        NotificationContent.InvitationResponseNotification(
-                                            profileViewModel.profile.value.name,
-                                            travel!!.title,
-                                            false
-                                        ),
-                                        NotificationType.DECLINED
-                                    )
-                                )
-
-                                Toast.makeText(context, "DECLINED", Toast.LENGTH_SHORT).show()
-                            }, onFailure = {
-                                Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT)
-                                    .show()
-                            })
-                        },
-                        colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent, contentColor = Color.Red
-                        )
-                    ) {
-                        Text(text = "DECLINE")
-                    }
-                }
-            }
-        }
-    }
 }
 
 fun categorizeNotifications(notifications: List<Notification>): Map<String, List<Notification>> {
