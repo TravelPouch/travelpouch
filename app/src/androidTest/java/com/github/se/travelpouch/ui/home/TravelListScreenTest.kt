@@ -54,6 +54,7 @@ class TravelListScreenTest {
   private lateinit var documentRepository: DocumentRepository
   private lateinit var eventViewModel: EventViewModel
   private lateinit var eventRepository: EventRepository
+
   @Mock private lateinit var mockFileDownloader: FileDownloader
 
   @Before
@@ -230,33 +231,6 @@ class TravelListScreenTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 
-  //  @Test
-  //  fun testNavigationBottomBar() {
-  //    // Act
-  //      composeTestRule.setContent {
-  //          TravelListScreen(
-  //              navigationActions = navigationActions,
-  //              listTravelViewModel = listTravelViewModel,
-  //              activityViewModel, eventViewModel, documentViewModel
-  //          )
-  //      }
-  //    composeTestRule.waitForIdle()
-  //
-  //    // Click on the "Activities" navigation item
-  //    composeTestRule.onNodeWithTag("Travels").performClick()
-  //    composeTestRule.waitForIdle()
-  //
-  //    // Verify that the navigation action was called for "Activities"
-  //    verify(navigationActions).navigateTo(Screen.TRAVEL_LIST)
-  //
-  //    // Click on the "Calendar" navigation item
-  //    composeTestRule.onNodeWithTag("Calendar").performClick()
-  //    composeTestRule.waitForIdle()
-  //
-  //    // Verify that the navigation action was called for "Calendar"
-  //    verify(navigationActions).navigateTo(Screen.CALENDAR)
-  //  }
-
   @Test
   fun testTravelItemClickNavigatesToTravelActivities() {
     // Act
@@ -299,5 +273,33 @@ class TravelListScreenTest {
 
     // Verify that the navigation action was called for ADD_TRAVEL
     verify(navigationActions).navigateTo(Screen.ADD_TRAVEL)
+  }
+
+  @Test
+  fun displayEmptyTravelList() {
+    // Arrange
+    val emptyTravelList = emptyList<TravelContainer>()
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
+          onSuccess(emptyTravelList)
+          null
+        }
+        .whenever(travelRepository)
+        .getTravels(anyOrNull(), anyOrNull())
+
+    // Act
+    composeTestRule.setContent {
+      TravelListScreen(
+          navigationActions = navigationActions,
+          listTravelViewModel = listTravelViewModel,
+          activityViewModel,
+          eventViewModel,
+          documentViewModel,
+          profileModelView)
+    }
+    composeTestRule.waitForIdle()
+
+    // Assert
+    composeTestRule.onNodeWithTag("emptyTravelPrompt").assertIsDisplayed()
   }
 }

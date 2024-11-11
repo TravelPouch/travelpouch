@@ -97,16 +97,16 @@ fun SignInScreen(
           Image(
               painter = painterResource(id = R.drawable.travelpouch_logo),
               contentDescription = "App Logo",
-              modifier = Modifier.size(250.dp).testTag("appLogo"))
+              modifier = Modifier.fillMaxWidth().height(150.dp).testTag("appLogo"))
 
           Spacer(modifier = Modifier.height(16.dp))
 
           // Welcome Text
           Text(
-              modifier = Modifier.testTag("welcomText"),
+              modifier = Modifier.testTag("welcomText").padding(horizontal = 16.dp),
               text = "Welcome",
               style =
-                  MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
+                  MaterialTheme.typography.headlineLarge.copy(fontSize = 36.sp, lineHeight = 44.sp),
               fontWeight = FontWeight.Bold,
               textAlign = TextAlign.Center)
 
