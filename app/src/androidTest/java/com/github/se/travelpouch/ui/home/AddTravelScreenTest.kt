@@ -321,13 +321,13 @@ class AddTravelScreenTest {
     // The startDate picker button should be displayed
     composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
 
-    // Simulate clicking the date picker button
+    // Simulate clicking the startDate picker button
     composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().performClick()
 
     // The endDate picker button should be displayed
     composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().assertIsDisplayed()
 
-    // Simulate clicking the date picker button
+    // Simulate clicking the endDate picker button
     composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().performClick()
   }
 

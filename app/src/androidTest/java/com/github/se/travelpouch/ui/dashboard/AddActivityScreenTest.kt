@@ -235,9 +235,9 @@ class AddActivityScreenTest {
       AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
     }
 
-    // The time field should be displayed
+    // The date field should be displayed
     composeTestRule.onNodeWithTag("datePickerButton").assertIsDisplayed()
-    // Click on the time field
+    // Click on the date field
     composeTestRule.onNodeWithTag("datePickerButton").performClick()
   }
 }
