@@ -183,6 +183,9 @@ class EditActivityScreenTest {
   fun datePickerDialogOpensOnClick() {
     composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView) }
 
+    // The date field should be displayed
+    composeTestRule.onNodeWithTag("datePickerButton").assertIsDisplayed()
+
     // Simulate clicking the date picker button
     composeTestRule.onNodeWithTag("datePickerButton").performClick()
   }
