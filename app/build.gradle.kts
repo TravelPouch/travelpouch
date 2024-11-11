@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.sonar)
     id("jacoco")
     alias(libs.plugins.gms)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -85,12 +87,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     packaging {
@@ -172,14 +174,11 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
-    //todo: wait for a listener to finish libraries
-    implementation(libs.guava)
-
-    // To use CallbackToFutureAdapter
-    implementation(libs.androidx.concurrent.futures)
-
-    // Kotlin
-    implementation(libs.kotlinx.coroutines.guava)
+    //Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
 
     // Google Service and Maps
@@ -260,6 +259,11 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
 
 tasks.withType<Test> {

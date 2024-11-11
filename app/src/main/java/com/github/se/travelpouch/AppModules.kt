@@ -1,0 +1,36 @@
+package com.github.se.travelpouch
+
+import com.github.se.travelpouch.model.profile.ProfileRepository
+import com.github.se.travelpouch.model.profile.ProfileRepositoryFirebase
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@InstallIn(SingletonComponent::class)
+@Module
+object AppModule {
+
+  @Provides
+  @Singleton
+  fun provideFirebaseAuth(): AuthenticationService {
+    return FirebaseAuthenticationService(Firebase.auth)
+  }
+
+  @Provides
+  @Singleton
+  fun provideFirebaseFirestore(): FirebaseFirestore {
+    return Firebase.firestore
+  }
+
+  @Provides
+  @Singleton
+  fun providesProfileRepository(db: FirebaseFirestore): ProfileRepository {
+    return ProfileRepositoryFirebase(db)
+  }
+}
