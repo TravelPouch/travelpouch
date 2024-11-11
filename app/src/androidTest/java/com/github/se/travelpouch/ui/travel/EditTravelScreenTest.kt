@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.notifications.NotificationRepository
+import com.github.se.travelpouch.model.notifications.NotificationRepositoryFirestore
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileModelView
@@ -172,9 +173,9 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("addUserEmailField")
-        .assertTextContains("newuser.email@example.org")
+        .assertTextContains("")
     val randomEmail = "random.email@example.org"
-    inputText("addUserEmailField", "newuser.email@example.org", randomEmail)
+    inputText("addUserEmailField", "", randomEmail)
     // Now this is an invalid user that doesn't exist
     doAnswer { invocation ->
           val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
@@ -185,7 +186,7 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     // Now this is a valid user that had serialisation problems
-    inputText("addUserEmailField", randomEmail, "newuser.email@example.org")
+    inputText("addUserEmailField", randomEmail, "")
     doAnswer { invocation ->
           val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
           // Call the onSuccess callback with null

@@ -2,7 +2,6 @@ package com.github.se.travelpouch.model.notifications
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ApplicationProvider
@@ -28,13 +27,12 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class NotificationViewModelUnitTest {
 
-  @Mock private lateinit var notificationRepository: NotificationRepository
+  @Mock private lateinit var notificationRepositoryFirestore: NotificationRepositoryFirestore
   @Mock private lateinit var notificationViewModel: NotificationViewModel
   @Mock private lateinit var mockFirestore: FirebaseFirestore
 
@@ -47,7 +45,7 @@ class NotificationViewModelUnitTest {
       val context = ApplicationProvider.getApplicationContext<Context>()
       FirebaseApp.initializeApp(context)
 
-    notificationViewModel = NotificationViewModel(notificationRepository)
+    notificationViewModel = NotificationViewModel(notificationRepositoryFirestore)
 
   }
 
@@ -88,7 +86,7 @@ class NotificationViewModelUnitTest {
     @Test
     fun loadNotificationsForUser_updatesNotifications() = runBlockingTest {
         val notifications = listOf(notification1, notification2)
-        `when`(notificationRepository.fetchNotificationsForUser(any(), any())).then {
+        `when`(notificationRepositoryFirestore.fetchNotificationsForUser(any(), any())).then {
             val callback = it.arguments[1] as (List<Notification>) -> Unit
             callback(notifications)
         }
@@ -101,7 +99,7 @@ class NotificationViewModelUnitTest {
     @Test
     fun loadNotificationsForUser_nullNotifications() = runBlockingTest {
         val userId = "user123"
-        `when`(notificationRepository.fetchNotificationsForUser(eq(userId), any())).thenAnswer {
+        `when`(notificationRepositoryFirestore.fetchNotificationsForUser(eq(userId), any())).thenAnswer {
             (it.arguments[1] as (List<Notification>) -> Unit).invoke(emptyList())
         }
 
@@ -114,7 +112,7 @@ class NotificationViewModelUnitTest {
   fun markNotificationAsRead() {
     val notificationUid = generateAutoObjectId()
     notificationViewModel.markNotificationAsRead(notificationUid)
-    verify(notificationRepository, times(1)).markNotificationAsRead(eq(notificationUid))
+    verify(notificationRepositoryFirestore, times(1)).markNotificationAsRead(eq(notificationUid))
   }
 
   @Test
@@ -130,20 +128,20 @@ class NotificationViewModelUnitTest {
                     "John Doe", "Trip to Paris", Role.PARTICIPANT),
             notificationType = NotificationType.INVITATION)
     notificationViewModel.sendNotification(notification)
-    verify(notificationRepository, times(1)).addNotification(eq(notification))
+    verify(notificationRepositoryFirestore, times(1)).addNotification(eq(notification))
   }
 
   @Test
   fun `Factory creates NotificationViewModel instance`() {
     // Directly mock NotificationRepository for simplicity
-    notificationRepository = mock(NotificationRepository::class.java)
+    notificationRepositoryFirestore = mock(NotificationRepositoryFirestore::class.java)
 
     // Create the ViewModel using the Factory
     val factory =
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return NotificationViewModel(notificationRepository) as T
+            return NotificationViewModel(notificationRepositoryFirestore) as T
           }
         }
 
@@ -160,7 +158,7 @@ class NotificationViewModelUnitTest {
 
         notificationViewModel.deleteAllNotificationsForUser(userUid, onSuccess::run, onFailure)
 
-        verify(notificationRepository).deleteAllNotificationsForUser(eq(userUid), any(), any())
+        verify(notificationRepositoryFirestore).deleteAllNotificationsForUser(eq(userUid), any(), any())
     }
 
     @Test
@@ -170,7 +168,7 @@ class NotificationViewModelUnitTest {
 
         notificationViewModel.changeNotificationType(notificationUid, notificationType)
 
-        verify(notificationRepository).changeNotificationType(eq(notificationUid), eq(notificationType))
+        verify(notificationRepositoryFirestore).changeNotificationType(eq(notificationUid), eq(notificationType))
     }
 
     @Test
