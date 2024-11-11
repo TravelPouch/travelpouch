@@ -140,8 +140,7 @@ fun NotificationsScreen(
                             activityViewModel = activityViewModel,
                             documentViewModel = documentViewModel,
                             eventsViewModel = eventsViewModel
-                        ) {
-                        }
+                        )
                     }
                 }
             }

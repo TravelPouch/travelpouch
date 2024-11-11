@@ -2,13 +2,7 @@ package com.github.se.travelpouch.ui.notifications
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.travelpouch.model.activity.ActivityViewModel
@@ -40,7 +35,7 @@ fun NotificationItem(
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
     notification: Notification,
-    activityViewModel : ActivityViewModel,
+    activityViewModel: ActivityViewModel,
     documentViewModel: DocumentViewModel,
     eventsViewModel: EventViewModel,
     onClick: () -> Unit = {}
@@ -48,140 +43,171 @@ fun NotificationItem(
     val context = LocalContext.current
 
     Card(
-        modifier =
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 12.dp)
-            .clickable(onClick = onClick), // Handle item clicks
+            .clickable { onCardClick(notification, listTravelViewModel, activityViewModel, documentViewModel, eventsViewModel, navigationActions, context) }
+            .testTag("notification_item"),
         shape = RoundedCornerShape(13.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        onClick = {
-            // Get travel from notification
-            listTravelViewModel.getTravelById(notification.travelUid,
-                onSuccess = { travel ->
-                    listTravelViewModel.selectTravel(travel!!)
-                    activityViewModel.setIdTravel(travel.fsUid)
-                    documentViewModel.setIdTravel(travel.fsUid)
-                    eventsViewModel.setIdTravel(travel.fsUid)
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-                },
-                onFailure = {
-                    Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
-                }
-            )
-        }
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag("notification_item_content"),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = notification.timestamp.toDate().toString(),
-                fontSize = 12.sp,
-                color = Color.Gray // Subtle color for the timestamp
-            )
-            Spacer(modifier = Modifier.height(4.dp)) // Space between message and timestamp
+            NotificationTimestamp(notification)
+            Spacer(modifier = Modifier.height(4.dp).testTag("notification_item_space"))
+            NotificationMessage(notification)
 
-            Text(
-                text = notification.content.toDisplayString(),
-                fontSize = 15.sp,
-                color = Color(0xFF669bbc) // A vibrant color for the title
-            )
-
-            // Button ACCEPT or DECLINE
             if (notification.notificationType == NotificationType.INVITATION) {
-                Spacer(modifier = Modifier.height(4.dp)) // Space between message and timestamp
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {
-                            listTravelViewModel.getTravelById(notification.travelUid, { travel ->
-                                notificationViewModel.sendNotification(
-                                    Notification(
-                                        notification.notificationUid,
-                                        profileViewModel.profile.value.fsUid,
-                                        notification.senderUid,
-                                        notification.travelUid,
-                                        NotificationContent.InvitationResponseNotification(
-                                            profileViewModel.profile.value.name,
-                                            travel!!.title,
-                                            true
-                                        ),
-                                        NotificationType.ACCEPTED
-                                    )
-                                )
-
-                                listTravelViewModel.addUserToTravel(
-                                    profileViewModel.profile.value.email,
-                                    travel,
-                                    { updatedContainer ->
-                                        listTravelViewModel.selectTravel(updatedContainer)
-                                        Toast.makeText(
-                                            context, "User added successfully!", Toast.LENGTH_SHORT
-                                        ).show()
-                                    },
-                                    {
-                                        Toast.makeText(
-                                            context,
-                                            "Failed to add user",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                    })
-
-                                Toast.makeText(context, "ACCEPTED", Toast.LENGTH_SHORT).show()
-                            }, onFailure = {
-                                Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT)
-                                    .show()
-                            })
-
-                        },
-                        modifier = Modifier.padding(end = 8.dp), // Space between buttons
-                        colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = Color(0xFF12c15d)
-                        )
-                    ) {
-                        Text(text = "ACCEPT")
-                    }
-                    Button(
-                        onClick = {
-                            listTravelViewModel.getTravelById(notification.travelUid, { travel ->
-                                notificationViewModel.sendNotification(
-                                    Notification(
-                                        notification.notificationUid,
-                                        profileViewModel.profile.value.fsUid,
-                                        notification.senderUid,
-                                        notification.travelUid,
-                                        NotificationContent.InvitationResponseNotification(
-                                            profileViewModel.profile.value.name,
-                                            travel!!.title,
-                                            false
-                                        ),
-                                        NotificationType.DECLINED
-                                    )
-                                )
-
-                                Toast.makeText(context, "DECLINED", Toast.LENGTH_SHORT).show()
-                            }, onFailure = {
-                                Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT)
-                                    .show()
-                            })
-                        },
-                        colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent, contentColor = Color.Red
-                        )
-                    ) {
-                        Text(text = "DECLINE")
-                    }
-                }
+                InvitationButtons(notification, listTravelViewModel, profileViewModel, notificationViewModel, context)
             }
         }
     }
+}
+
+@Composable
+fun NotificationTimestamp(notification: Notification) {
+    Text(
+        text = notification.timestamp.toDate().toString(),
+        fontSize = 12.sp,
+        color = Color.Gray,
+        modifier = Modifier.testTag("notification_item_timestamp")
+    )
+}
+
+@Composable
+fun NotificationMessage(notification: Notification) {
+    Text(
+        text = notification.content.toDisplayString(),
+        fontSize = 15.sp,
+        color = Color(0xFF669bbc),
+        modifier = Modifier.testTag("notification_item_message")
+    )
+}
+
+@Composable
+fun InvitationButtons(
+    notification: Notification,
+    listTravelViewModel: ListTravelViewModel,
+    profileViewModel: ProfileModelView,
+    notificationViewModel: NotificationViewModel,
+    context: android.content.Context
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("notification_item_buttons"),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        AcceptButton(notification, listTravelViewModel, profileViewModel, notificationViewModel, context)
+        DeclineButton(notification, listTravelViewModel, profileViewModel, notificationViewModel, context)
+    }
+}
+
+@Composable
+fun AcceptButton(
+    notification: Notification,
+    listTravelViewModel: ListTravelViewModel,
+    profileViewModel: ProfileModelView,
+    notificationViewModel: NotificationViewModel,
+    context: android.content.Context
+) {
+    Button(
+        onClick = {
+            handleInvitationResponse(notification, listTravelViewModel, profileViewModel, notificationViewModel, context, isAccepted = true)
+        },
+        modifier = Modifier.padding(end = 8.dp).testTag("notification_item_accept_button"),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color(0xFF12c15d))
+    ) {
+        Text(text = "ACCEPT")
+    }
+}
+
+@Composable
+fun DeclineButton(
+    notification: Notification,
+    listTravelViewModel: ListTravelViewModel,
+    profileViewModel: ProfileModelView,
+    notificationViewModel: NotificationViewModel,
+    context: android.content.Context
+) {
+    Button(
+        onClick = {
+            handleInvitationResponse(notification, listTravelViewModel, profileViewModel, notificationViewModel, context, isAccepted = false)
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Red),
+        modifier = Modifier.testTag("notification_item_decline_button")
+    ) {
+        Text(text = "DECLINE")
+    }
+}
+
+fun handleInvitationResponse(
+    notification: Notification,
+    listTravelViewModel: ListTravelViewModel,
+    profileViewModel: ProfileModelView,
+    notificationViewModel: NotificationViewModel,
+    context: android.content.Context,
+    isAccepted: Boolean
+) {
+    listTravelViewModel.getTravelById(notification.travelUid, { travel ->
+        val responseType = if (isAccepted) NotificationType.ACCEPTED else NotificationType.DECLINED
+        val responseMessage = if (isAccepted) "ACCEPTED" else "DECLINED"
+
+        val invitationResponse = Notification(
+            notification.notificationUid,
+            profileViewModel.profile.value.fsUid,
+            notification.senderUid,
+            notification.travelUid,
+            NotificationContent.InvitationResponseNotification(
+                profileViewModel.profile.value.name,
+                travel!!.title,
+                isAccepted
+            ),
+            responseType
+        )
+
+        notificationViewModel.sendNotification(invitationResponse)
+        if (isAccepted) {
+            listTravelViewModel.addUserToTravel(
+                profileViewModel.profile.value.email,
+                travel,
+                { updatedContainer ->
+                    listTravelViewModel.selectTravel(updatedContainer)
+                    Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
+                },
+                {
+                    Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+        Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
+    }, onFailure = {
+        Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
+    })
+}
+
+fun onCardClick(
+    notification: Notification,
+    listTravelViewModel: ListTravelViewModel,
+    activityViewModel: ActivityViewModel,
+    documentViewModel: DocumentViewModel,
+    eventsViewModel: EventViewModel,
+    navigationActions: NavigationActions,
+    context: android.content.Context
+) {
+    listTravelViewModel.getTravelById(notification.travelUid,
+        onSuccess = { travel ->
+            listTravelViewModel.selectTravel(travel!!)
+            activityViewModel.setIdTravel(travel.fsUid)
+            documentViewModel.setIdTravel(travel.fsUid)
+            eventsViewModel.setIdTravel(travel.fsUid)
+            navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+        },
+        onFailure = {
+            Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
+        }
+    )
 }
