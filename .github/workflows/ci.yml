@@ -112,6 +112,18 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: echo "Generated AVD snapshot for caching."
+          
+      - name: Cache firebase emulators
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-firebase-emulators-
+
+      - name : Install Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
 
       - name: Set execute permissions for gradlew
         run: chmod +x ./gradlew
@@ -132,7 +144,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --parallel --build-cache
+          script: firebase emulators:exec "./gradlew connectedCheck --parallel --build-cache"
 
       - name: Save UI Test Results
         if: success()  # Only save if the tests were successful
