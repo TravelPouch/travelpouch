@@ -25,8 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,7 +65,7 @@ fun TravelListScreen(
 
   val travelList = listTravelViewModel.travels.collectAsState()
   val currentProfile = profileModelView.profile.collectAsState()
-    val isLoading = listTravelViewModel.isLoading.collectAsState()
+  val isLoading = listTravelViewModel.isLoading.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
@@ -105,11 +103,11 @@ fun TravelListScreen(
             Text(
                 modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
                 text = "You have no travels yet.")
-            if(isLoading.value) {
-                CircularProgressIndicator(
-                    modifier = Modifier.testTag("loadingSpinner"),
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 5.dp)
+            if (isLoading.value) {
+              CircularProgressIndicator(
+                  modifier = Modifier.testTag("loadingSpinner"),
+                  color = MaterialTheme.colorScheme.primary,
+                  strokeWidth = 5.dp)
             }
           }
         }
