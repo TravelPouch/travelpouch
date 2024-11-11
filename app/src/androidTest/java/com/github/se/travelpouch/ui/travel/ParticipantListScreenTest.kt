@@ -10,7 +10,11 @@ import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import com.github.se.travelpouch.model.notifications.NotificationRepository
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
@@ -79,6 +83,10 @@ class ParticipantListScreenTest {
   private lateinit var travelRepository: TravelRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listTravelViewModel: ListTravelViewModel
+  private lateinit var notificationViewModel: NotificationViewModel
+  private lateinit var notificationRepository: NotificationRepository
+  private lateinit var profileModelView: ProfileModelView
+  private lateinit var profileRepository: ProfileRepository
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -87,11 +95,16 @@ class ParticipantListScreenTest {
     travelRepository = mock(TravelRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listTravelViewModel = ListTravelViewModel(travelRepository)
+    notificationRepository = mock(NotificationRepository::class.java)
+    notificationViewModel = NotificationViewModel(notificationRepository)
+    profileRepository = mock(ProfileRepository::class.java)
+    profileModelView = ProfileModelView(profileRepository)
+
+      composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions, notificationViewModel, profileModelView) }
   }
 
   @Test
   fun testemptyView() {
-    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
 
     // Check if all elements are displayed
     composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
@@ -120,8 +133,6 @@ class ParticipantListScreenTest {
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
-    // Set the content of the screen
-    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
     // listTravelViewModel.addParticipant(participant1)
     // listTravelViewModel.addParticipant(participant2)
 
@@ -176,8 +187,6 @@ class ParticipantListScreenTest {
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
-    // Set the content of the screen
-    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
     // listTravelViewModel.addParticipant(participant1)
     // listTravelViewModel.addParticipant(participant2)
 
@@ -233,8 +242,6 @@ class ParticipantListScreenTest {
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
-    // Set the content of the screen
-    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
     // listTravelViewModel.addParticipant(participant1)
     // listTravelViewModel.addParticipant(participant2)
 
@@ -284,8 +291,6 @@ class ParticipantListScreenTest {
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
 
-    // Set the content of the screen
-    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
     // listTravelViewModel.addParticipant(participant1)
     // listTravelViewModel.addParticipant(participant2)
 
@@ -319,9 +324,6 @@ class ParticipantListScreenTest {
         participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, Profile>>
     participantFlow.value =
         mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
-
-    // Set the content of the screen
-    composeTestRule.setContent { ParticipantListScreen(listTravelViewModel, navigationActions) }
 
     // Check if all elements are displayed
     composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
