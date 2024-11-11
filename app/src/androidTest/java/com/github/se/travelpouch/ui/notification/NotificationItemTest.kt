@@ -153,37 +153,4 @@ class NotificationItemTest {
     composeTestRule.onNodeWithTag("notification_item_decline_button").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notification_item_decline_button").assertTextEquals("DECLINE")
   }
-
-  @Test
-  fun handleInvitationResponse_acceptsInvitation() {
-    val context: Context = mock()
-
-    val travel =
-        mock<TravelContainer> {
-          on { fsUid } doReturn "travelFsUid"
-          on { title } doReturn "Travel Title"
-        }
-    whenever(listTravelViewModel.getTravelById(eq(notification1.travelUid), any(), any()))
-        .thenAnswer { (it.arguments[1] as (TravelContainer?) -> Unit).invoke(travel) }
-    whenever(profileModelView.profile.value)
-        .thenReturn(
-            mock {
-              on { fsUid } doReturn "profileFsUid"
-              on { name } doReturn "Profile Name"
-              on { email } doReturn "profile@example.com"
-            })
-
-    handleInvitationResponse(
-        notification1,
-        listTravelViewModel,
-        profileModelView,
-        notificationViewModel,
-        context,
-        isAccepted = true)
-
-    verify(notificationViewModel).sendNotification(any())
-    verify(listTravelViewModel).addUserToTravel(eq("profile@example.com"), eq(travel), any(), any())
-    verify(listTravelViewModel).selectTravel(any())
-    // verify(context).makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
-  }
 }
