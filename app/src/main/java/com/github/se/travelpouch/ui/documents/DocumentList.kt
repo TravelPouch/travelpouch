@@ -3,6 +3,7 @@ package com.github.se.travelpouch.ui.documents
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.net.Uri
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -107,6 +108,18 @@ fun DocumentListScreen(
             }
           }
 
+  // Create a launcher of the file picker to select a file
+  val filePickerLauncher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+          uri: Uri? ->
+        if (uri != null)
+            documentViewModel.uploadFile(
+                context.contentResolver.openInputStream(uri),
+                selectedTravel.value,
+                context.contentResolver.getType(uri))
+        else Log.d("DocumentList", "No file selected")
+      }
+
   Scaffold(
       modifier = Modifier.testTag("documentListScreen"),
       topBar = {
@@ -140,7 +153,7 @@ fun DocumentListScreen(
                         modifier = Modifier.testTag("importLocalFileButtonText"))
                   },
                   icon = { Icon(Icons.Default.UploadFile, contentDescription = "Add Document") },
-                  onClick = {},
+                  onClick = { filePickerLauncher.launch(DocumentFileFormat.ACCEPTED_MIME_TYPE) },
                   modifier = Modifier.testTag("importLocalFileButton"))
 
               Spacer(modifier = Modifier.height(8.dp))
