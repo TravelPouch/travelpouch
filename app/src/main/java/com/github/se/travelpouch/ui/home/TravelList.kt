@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -64,10 +65,11 @@ fun TravelListScreen(
   LaunchedEffect(Unit) {
     listTravelViewModel.getTravels()
     profileModelView.getProfile()
-    // sleep the thread for 1 second to allow the data to be fetched
   }
+
   val travelList = listTravelViewModel.travels.collectAsState()
   val currentProfile = profileModelView.profile.collectAsState()
+  val isLoading = listTravelViewModel.isLoading.collectAsState()
 
   // Used for the screen orientation redraw
   val configuration = LocalConfiguration.current
@@ -95,8 +97,12 @@ fun TravelListScreen(
               if (travelList.value.isNotEmpty()) {
                 items(travelList.value.size) { index ->
                   TravelItem(travelContainer = travelList.value[index]) {
+                    val travelId = travelList.value[index].fsUid
                     listTravelViewModel.selectTravel(travelList.value[index])
                     navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    eventViewModel.setIdTravel(travelId)
+                    activityViewModel.setIdTravel(travelId)
+                    documentViewModel.setIdTravel(travelId)
                   }
                 }
               } else {
@@ -107,6 +113,13 @@ fun TravelListScreen(
                         Text(
                             modifier = Modifier.testTag("emptyTravelPrompt"),
                             text = "You have no travels yet.")
+                        if (isLoading.value) {
+                          CircularProgressIndicator(
+                              modifier =
+                                  Modifier.align(Alignment.TopStart).testTag("loadingSpinner"),
+                              color = MaterialTheme.colorScheme.primary,
+                              strokeWidth = 5.dp)
+                        }
                       }
                 }
               }
