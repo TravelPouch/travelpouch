@@ -1,5 +1,8 @@
 package com.github.se.travelpouch.ui.authentication
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +24,9 @@ import com.github.se.travelpouch.AuthenticationService
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInWithPassword(
@@ -51,7 +57,28 @@ fun SignInWithPassword(
       Button(
           onClick = {
             authService.createUser(
-                email, password, context, profileModelView, travelViewModel, navigationActions)
+                email,
+                password,
+                onSuccess = { user ->
+                  Log.d("SignInScreen", "User signed in: ${user?.displayName}")
+
+                  val job =
+                      GlobalScope.launch {
+                        profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                      }
+
+                  Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
+                  navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                },
+                onFailure = { task ->
+                  Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                  Toast.makeText(
+                          context,
+                          "Authentication failed.",
+                          Toast.LENGTH_SHORT,
+                      )
+                      .show()
+                })
           }) {
             Text("Sign in")
           }
