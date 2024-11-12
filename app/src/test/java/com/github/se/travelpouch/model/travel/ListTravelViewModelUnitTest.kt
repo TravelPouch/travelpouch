@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockedStatic
@@ -316,4 +317,40 @@ class ListTravelViewModelTest {
       logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
   }
+
+    @Test
+    fun getTravelById_mockCall() {
+        val travelId = "6NU2zp2oGdA34s1Q1q5h"
+        val travel = TravelContainer(
+            travelId,
+            "Test Title",
+            "Test Description",
+            Timestamp.now(),
+            Timestamp(Timestamp.now().seconds + 1000, 0),
+            Location(
+                0.0,
+                0.0,
+                Timestamp.now(),
+                "Test Location",
+            ),
+            mapOf("Test Key item" to "Test Value item"),
+            mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER),
+            emptyList()
+        )
+
+        doAnswer { invocation ->
+            val onSuccess = invocation.getArgument(1) as (TravelContainer) -> Unit
+            onSuccess(travel)
+            null
+        }
+            .whenever(travelRepository)
+            .getTravelById(anyString(), anyOrNull(), anyOrNull())
+
+        listTravelViewModel.getTravelById(travelId, { receivedTravel ->
+            assertNotNull(receivedTravel)
+            assertThat(receivedTravel, `is`(travel))
+        }, {})
+
+        verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
+    }
 }
