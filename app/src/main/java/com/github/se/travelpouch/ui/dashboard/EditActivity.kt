@@ -1,15 +1,18 @@
 package com.github.se.travelpouch.ui.dashboard
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,9 +37,9 @@ import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.utils.DateTimeUtils
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.GregorianCalendar
 import java.util.Locale
 
 /**
@@ -50,12 +53,6 @@ import java.util.Locale
 @Composable
 fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel) {
 
-  val dateFormat =
-      SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-        isLenient = false // strict date format
-      }
-
-  val gregorianCalendar = GregorianCalendar()
   val context = LocalContext.current
 
   val selectedActivity = activityViewModel.selectedActivity.collectAsState()
@@ -66,6 +63,8 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
   var date by remember {
     mutableStateOf(convertDateToString(selectedActivity.value!!.date.toDate()))
   }
+
+  val dateTimeUtils = DateTimeUtils("dd/MM/yyyy")
 
   Scaffold(
       modifier = Modifier.testTag("EditActivityScreen"),
@@ -110,6 +109,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   label = { Text("Location") },
                   modifier = Modifier.testTag("locationField"))
 
+              // Date Input
               OutlinedTextField(
                   value = date,
                   onValueChange = {
@@ -119,9 +119,25 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   },
                   enabled = true,
                   label = { Text("Date") },
+                  placeholder = { Text("DD/MM/YYYY") },
                   visualTransformation = DateVisualTransformation(),
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                  modifier = Modifier.testTag("dateField"))
+                  modifier = Modifier.fillMaxWidth().testTag("dateField"),
+                  trailingIcon = {
+                    IconButton(
+                        onClick = {
+                          dateTimeUtils.showDatePicker(context) { selectedDate ->
+                            date =
+                                selectedDate.replace(
+                                    "/", "") // Use the DatePickerDialog to select a date
+                          }
+                        },
+                        modifier = Modifier.testTag("datePickerButton")) {
+                          Icon(
+                              imageVector = Icons.Default.DateRange,
+                              contentDescription = "Select Date")
+                        }
+                  })
 
               Button(
                   enabled =
@@ -130,27 +146,50 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                           description.isNotBlank() &&
                           date.isNotBlank(),
                   onClick = {
-                    try {
-                      val finalDate = convertStringToDate(date, dateFormat, gregorianCalendar)
 
-                      val activity =
-                          Activity(
-                              selectedActivity.value!!.uid,
-                              title,
-                              description,
-                              selectedActivity.value!!.location,
-                              finalDate,
-                              mapOf())
+                    // Correctly format dateText from ddMMyyyy to dd/MM/yyyy
+                    val formattedDateText =
+                        if (date.length == 8) {
+                          "${date.substring(0, 2)}/${date.substring(2, 4)}/${date.substring(4, 8)}"
+                        } else {
+                          date // If the length is incorrect, use it as is (to handle any edge
+                          // cases)
+                        }
 
-                      activityViewModel.updateActivity(activity, context)
-                    } catch (e: java.text.ParseException) {
+                    val finalDate = dateTimeUtils.convertStringToTimestamp(formattedDateText)
+
+                    if (finalDate == null) {
+                      Log.e("EditActivityScreen", "Invalid date or format")
                       Toast.makeText(
                               context,
-                              "Invalid format, date must be DD/MM/YYYY.",
+                              "Invalid date or time format. Please use DD/MM/YYYY or HH:mm.",
                               Toast.LENGTH_SHORT)
                           .show()
+                    } else {
+                      try {
+                        Log.d(
+                            "EditActivityScreen",
+                            "All inputs are valid, proceeding to add Activity")
+
+                        val activity =
+                            Activity(
+                                selectedActivity.value!!.uid,
+                                title,
+                                description,
+                                selectedActivity.value!!.location,
+                                finalDate,
+                                mapOf())
+
+                        activityViewModel.updateActivity(activity, context)
+                        navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      } catch (e: java.text.ParseException) {
+                        Toast.makeText(
+                                context,
+                                "Error editing Activity. Please try again.",
+                                Toast.LENGTH_SHORT)
+                            .show()
+                      }
                     }
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                   },
                   modifier = Modifier.testTag("saveButton")) {
                     Text("Save")
