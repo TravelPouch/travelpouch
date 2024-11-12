@@ -37,7 +37,7 @@ class EndToEndTest {
   }
 
   @Test
-  fun testAfterHilt() =
+  fun verifyUserFlowForTravelCreation() =
       runTest(timeout = Duration.INFINITE) {
 
         // assert that login screen is displayed

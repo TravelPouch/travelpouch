@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -113,51 +112,51 @@ fun SignInScreen(
 
           Spacer(modifier = Modifier.height(48.dp))
 
+          Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier =
+                    Modifier.fillMaxWidth(0.8f) // Fixed width for both button and spinner
+                        .height(56.dp), // Fixed height for both button and spinner
+                contentAlignment = Alignment.Center) {
 
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth(0.8f) // Fixed width for both button and spinner
-                      .height(56.dp), // Fixed height for both button and spinner
-              contentAlignment = Alignment.Center) {
+                  // Google Sign-In Button (before the loading state)
+                  this@Column.AnimatedVisibility(
+                      visible = !isLoading.value,
+                      enter = fadeIn(animationSpec = tween(150)),
+                      exit = fadeOut(animationSpec = tween(300))) {
+                        // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
+                        GoogleSignInButton(
+                            onSignInClick = {
+                              val gso =
+                                  GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                      .requestIdToken(token)
+                                      .requestEmail()
+                                      .build()
+                              val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                              launcher.launch(googleSignInClient.signInIntent)
+                              isLoading.value = true
+                            })
+                      }
 
-                // Google Sign-In Button (before the loading state)
-                this@Column.AnimatedVisibility(
-                    visible = !isLoading.value,
-                    enter = fadeIn(animationSpec = tween(150)),
-                    exit = fadeOut(animationSpec = tween(300))) {
-                      // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
-                      GoogleSignInButton(
-                          onSignInClick = {
-                            val gso =
-                                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                    .requestIdToken(token)
-                                    .requestEmail()
-                                    .build()
-                            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                            launcher.launch(googleSignInClient.signInIntent)
-                            isLoading.value = true
-                          })
-                      
-                      Button(onClick = { navigationActions.navigateTo(Screen.SIGN_IN_PASSWORD) }) {
-            Text("Sign in with email and password")
+                  // CircularProgressIndicator (when loading)
+                  this@Column.AnimatedVisibility(
+                      visible = isLoading.value,
+                      enter = fadeIn(animationSpec = tween(300)),
+                      exit = fadeOut(animationSpec = tween(300))) {
+                        CircularProgressIndicator(
+                            modifier =
+                                Modifier.height(28.dp)
+                                    .testTag(
+                                        "loadingSpinner"), // Same height as Google Sign-In button
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 5.dp)
+                      }
+                }
+
+            Button(onClick = { navigationActions.navigateTo(Screen.SIGN_IN_PASSWORD) }) {
+              Text("Sign in with email and password")
+            }
           }
-                    }
-
-                // CircularProgressIndicator (when loading)
-                this@Column.AnimatedVisibility(
-                    visible = isLoading.value,
-                    enter = fadeIn(animationSpec = tween(300)),
-                    exit = fadeOut(animationSpec = tween(300))) {
-                      CircularProgressIndicator(
-                          modifier =
-                              Modifier.height(28.dp)
-                                  .testTag(
-                                      "loadingSpinner"), // Same height as Google Sign-In button
-                          color = MaterialTheme.colorScheme.primary,
-                          strokeWidth = 5.dp)
-                    }
-              }
-
         }
       })
 }
