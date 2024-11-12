@@ -63,5 +63,6 @@ class TravelRepositoryMock : TravelRepository {
 
   override fun deleteTravelById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     travelCollection.remove(id)
+    onSuccess()
   }
 }
