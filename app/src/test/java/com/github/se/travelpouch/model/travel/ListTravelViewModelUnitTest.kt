@@ -318,10 +318,11 @@ class ListTravelViewModelTest {
     }
   }
 
-    @Test
-    fun getTravelById_mockCall() {
-        val travelId = "6NU2zp2oGdA34s1Q1q5h"
-        val travel = TravelContainer(
+  @Test
+  fun getTravelById_mockCall() {
+    val travelId = "6NU2zp2oGdA34s1Q1q5h"
+    val travel =
+        TravelContainer(
             travelId,
             "Test Title",
             "Test Description",
@@ -335,22 +336,24 @@ class ListTravelViewModelTest {
             ),
             mapOf("Test Key item" to "Test Value item"),
             mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER),
-            emptyList()
-        )
+            emptyList())
 
-        doAnswer { invocation ->
-            val onSuccess = invocation.getArgument(1) as (TravelContainer) -> Unit
-            onSuccess(travel)
-            null
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument(1) as (TravelContainer) -> Unit
+          onSuccess(travel)
+          null
         }
-            .whenever(travelRepository)
-            .getTravelById(anyString(), anyOrNull(), anyOrNull())
+        .whenever(travelRepository)
+        .getTravelById(anyString(), anyOrNull(), anyOrNull())
 
-        listTravelViewModel.getTravelById(travelId, { receivedTravel ->
-            assertNotNull(receivedTravel)
-            assertThat(receivedTravel, `is`(travel))
-        }, {})
+    listTravelViewModel.getTravelById(
+        travelId,
+        { receivedTravel ->
+          assertNotNull(receivedTravel)
+          assertThat(receivedTravel, `is`(travel))
+        },
+        {})
 
-        verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
-    }
+    verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
+  }
 }

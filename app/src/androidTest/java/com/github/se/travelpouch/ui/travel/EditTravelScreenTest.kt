@@ -308,7 +308,10 @@ class EditTravelSettingsScreenTest {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
 
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     // The startDate picker button should be displayed
     composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
