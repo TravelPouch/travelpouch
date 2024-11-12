@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.notification
 
-import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -21,7 +20,6 @@ import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Role
-import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import com.github.se.travelpouch.model.travels.TravelRepository
@@ -31,13 +29,11 @@ import com.github.se.travelpouch.ui.notifications.DeclineButton
 import com.github.se.travelpouch.ui.notifications.InvitationButtons
 import com.github.se.travelpouch.ui.notifications.NotificationMessage
 import com.github.se.travelpouch.ui.notifications.NotificationTimestamp
-import com.github.se.travelpouch.ui.notifications.handleInvitationResponse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.*
 
 class NotificationItemTest {
 

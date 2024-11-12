@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.notification
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -16,18 +17,24 @@ import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.notifications.Notification
+import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationRepository
+import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
+import com.github.se.travelpouch.model.travels.Role
+import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import com.github.se.travelpouch.ui.notifications.NotificationsScreen
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -64,6 +71,23 @@ class NotificationScreenTest {
           friends = emptyMap(),
           userTravelList = emptyList())
 
+  val senderUid = generateAutoUserId()
+  val receiverUid = generateAutoUserId()
+  val notificationUid = generateAutoObjectId()
+  val travel1Uid = generateAutoObjectId()
+  val content1 =
+      NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
+  val notificationType1 = NotificationType.INVITATION
+
+  val notification1 =
+      Notification(
+          notificationUid = notificationUid,
+          senderUid = senderUid,
+          receiverUid = receiverUid,
+          travelUid = travel1Uid,
+          content = content1,
+          notificationType = notificationType1)
+
   @Before
   fun setUp() {
     travelRepository = mock(TravelRepository::class.java)
@@ -97,6 +121,15 @@ class NotificationScreenTest {
   @SuppressLint("CheckResult")
   @Test
   fun bottomNavigationMenu_displayAndClickActions() {
+    val _notificationsField =
+        NotificationViewModel::class.java.getDeclaredField("_notifications").apply {
+          isAccessible = true
+        }
+    val notificationFlow =
+        _notificationsField.get(notificationViewModel) as MutableStateFlow<List<Notification>>
+    notificationFlow.value = listOf(notification1)
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).assertExists()
     composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).performClick()
     verify(navigationActions, times(1)).navigateTo(Screen.NOTIFICATION)
@@ -108,6 +141,18 @@ class NotificationScreenTest {
     composeTestRule.onNodeWithTag(TopLevelDestinations.CALENDAR.textId).assertExists()
     composeTestRule.onNodeWithTag(TopLevelDestinations.CALENDAR.textId).performClick()
     verify(navigationActions, times(1)).navigateTo(Screen.CALENDAR)
+
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("notification_item").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithTag("notification_item_accept_button")
+        .assertIsDisplayed()
+        .performClick()
+    composeTestRule
+        .onNodeWithTag("notification_item_decline_button")
+        .assertIsDisplayed()
+        .performClick()
+    composeTestRule.onNodeWithTag("DeleteAllNotificationsButton").assertIsDisplayed().performClick()
   }
 
   @Test
