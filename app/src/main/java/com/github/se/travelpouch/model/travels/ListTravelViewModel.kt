@@ -31,6 +31,9 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
   private var lastFetchedTravel: TravelContainer? = null
   private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
 
+  private val _isLoading = MutableStateFlow(false)
+  val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
   fun initAfterLogin() {
     repository.initAfterLogin { getTravels() }
   }
@@ -115,10 +118,16 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
 
   /** Gets all Travel documents. */
   fun getTravels() {
-
+    _isLoading.value = true
     repository.getTravels(
-        onSuccess = { travels_.value = it },
-        onFailure = { Log.e("ListTravelViewModel", "Failed to get travels", it) })
+        onSuccess = {
+          travels_.value = it
+          _isLoading.value = false
+        },
+        onFailure = {
+          _isLoading.value = false
+          Log.e("ListTravelViewModel", "Failed to get travels", it)
+        })
   }
 
   /**
