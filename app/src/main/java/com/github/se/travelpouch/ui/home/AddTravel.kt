@@ -63,7 +63,7 @@ import com.google.firebase.Timestamp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTravelScreen(
-    listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
+    listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory),
     profileModelView: ProfileModelView

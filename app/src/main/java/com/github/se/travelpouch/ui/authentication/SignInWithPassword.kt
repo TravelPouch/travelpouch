@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import com.github.se.travelpouch.AuthenticationService
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
@@ -39,9 +40,13 @@ fun SignInWithPassword(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-      OutlinedTextField(value = email, onValueChange = { email = it })
+      OutlinedTextField(
+          value = email, onValueChange = { email = it }, modifier = Modifier.testTag("emailField"))
 
-      OutlinedTextField(value = password, onValueChange = { password = it })
+      OutlinedTextField(
+          value = password,
+          onValueChange = { password = it },
+          modifier = Modifier.testTag("passwordField"))
 
       Button(
           onClick = {

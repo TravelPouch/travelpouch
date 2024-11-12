@@ -71,6 +71,12 @@ class MockFirebaseAuthenticationService : AuthenticationService {
       navigationActions: NavigationActions
   ) {
 
-    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+    Log.d("ENDTOEND-FINAL", "in the mock sign in")
+
+    val job =
+        GlobalScope.launch { profileModelView.initAfterLogin { travelViewModel.initAfterLogin() } }
+
+    Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
+    navigationActions.navigateTo(Screen.TRAVEL_LIST)
   }
 }

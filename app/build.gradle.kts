@@ -39,7 +39,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.github.se.travelpouch.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -179,6 +179,11 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    testImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
 
 
     // Google Service and Maps

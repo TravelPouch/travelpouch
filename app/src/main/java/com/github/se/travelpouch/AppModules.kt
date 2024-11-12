@@ -2,6 +2,8 @@ package com.github.se.travelpouch
 
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.profile.ProfileRepositoryFirebase
+import com.github.se.travelpouch.model.travels.TravelRepository
+import com.github.se.travelpouch.model.travels.TravelRepositoryFirestore
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,5 +34,11 @@ object AppModule {
   @Singleton
   fun providesProfileRepository(db: FirebaseFirestore): ProfileRepository {
     return ProfileRepositoryFirebase(db)
+  }
+
+  @Provides
+  @Singleton
+  fun providesTravelRepository(db: FirebaseFirestore): TravelRepository {
+    return TravelRepositoryFirestore(db)
   }
 }
