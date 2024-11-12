@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
@@ -57,6 +59,7 @@ import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
+import com.github.se.travelpouch.utils.DateTimeUtils
 import com.google.firebase.Timestamp
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -85,6 +88,8 @@ fun EditTravelSettingsScreen(
   val context = LocalContext.current
   val clipboardManager = LocalClipboardManager.current
   val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
+
+  val dateTimeUtils = DateTimeUtils("dd/MM/yyyy")
 
   Scaffold(
       modifier = Modifier.testTag("editScreen"),
@@ -209,16 +214,44 @@ fun EditTravelSettingsScreen(
                 modifier = Modifier.testTag("inputTravelLongitude"))
             OutlinedTextField(
                 value = startTime.value,
-                onValueChange = { keystroke -> startTime.value = keystroke },
-                modifier = Modifier.testTag("inputTravelStartTime"),
-                label = { Text("StartTime") },
-                placeholder = { Text("StartTime") })
+                onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
+                label = { Text("Start Date") },
+                placeholder = { Text("DD/MM/YYYY") },
+                modifier = Modifier.fillMaxWidth().testTag("inputTravelStartTime"),
+                trailingIcon = {
+                  IconButton(
+                      onClick = {
+                        dateTimeUtils.showDatePicker(context) { selectedDate ->
+                          startTime.value = selectedDate
+                        }
+                      },
+                      modifier = Modifier.testTag("startDatePickerButton")) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select Start Date")
+                      }
+                })
             OutlinedTextField(
                 value = endTimeText.value,
-                onValueChange = { keystroke -> endTimeText.value = keystroke },
-                modifier = Modifier.testTag("inputTravelEndTime"),
-                label = { Text("EndTime") },
-                placeholder = { Text("--/--/--") })
+                onValueChange = { keystroke ->
+                  endTimeText.value = keystroke
+                }, // Allow manual input
+                label = { Text("End Date") },
+                placeholder = { Text("DD/MM/YYYY") },
+                modifier = Modifier.fillMaxWidth().testTag("inputTravelEndTime"),
+                trailingIcon = {
+                  IconButton(
+                      onClick = {
+                        dateTimeUtils.showDatePicker(context) { selectedDate ->
+                          endTimeText.value = selectedDate
+                        }
+                      },
+                      modifier = Modifier.testTag("endDatePickerButton")) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select End Date")
+                      }
+                })
 
             Button(
                 onClick = {

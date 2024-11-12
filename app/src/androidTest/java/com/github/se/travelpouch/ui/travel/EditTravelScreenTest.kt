@@ -301,4 +301,25 @@ class EditTravelSettingsScreenTest {
 
     composeTestRule.onNodeWithTag("travelSaveButton").isDisplayed()
   }
+
+  @Test
+  fun datePickerDialogOpensOnClick() {
+
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+
+    // The startDate picker button should be displayed
+    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
+
+    // Simulate clicking the date picker button
+    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().performClick()
+
+    // The endDate picker button should be displayed
+    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().assertIsDisplayed()
+
+    // Simulate clicking the date picker button
+    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().performClick()
+  }
 }
