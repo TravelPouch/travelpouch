@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.notification
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -34,6 +35,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.*
 
 class NotificationItemTest {
 
