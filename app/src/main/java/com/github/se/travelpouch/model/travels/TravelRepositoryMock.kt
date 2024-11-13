@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.model.travels
 
-import android.util.Log
 import com.github.se.travelpouch.di.travelCollection
 import com.github.se.travelpouch.model.profile.Profile
 
@@ -29,7 +28,6 @@ class TravelRepositoryMock : TravelRepository {
   }
 
   override fun initAfterLogin(onSuccess: () -> Unit) {
-    Log.d("ENDTOEND-FINAL", "in the mock travel repo")
     currentUserUid = "qwertzuiopasdfghjklyxcvbnm12"
     onSuccess()
   }
@@ -38,7 +36,7 @@ class TravelRepositoryMock : TravelRepository {
       onSuccess: (List<TravelContainer>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    val allTravels = com.github.se.travelpouch.di.travelCollection.values.toList()
+    val allTravels = travelCollection.values.toList()
     val travelsOfUsers = allTravels.filter { it.listParticipant.contains(currentUserUid) }
     onSuccess(travelsOfUsers)
   }
@@ -48,7 +46,7 @@ class TravelRepositoryMock : TravelRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    com.github.se.travelpouch.di.travelCollection[travel.fsUid] = travel
+    travelCollection[travel.fsUid] = travel
     onSuccess()
   }
 
@@ -57,7 +55,7 @@ class TravelRepositoryMock : TravelRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    com.github.se.travelpouch.di.travelCollection[travel.fsUid] = travel
+    travelCollection[travel.fsUid] = travel
     onSuccess()
   }
 
