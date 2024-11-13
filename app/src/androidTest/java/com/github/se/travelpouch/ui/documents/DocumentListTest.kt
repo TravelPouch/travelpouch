@@ -152,6 +152,13 @@ class DocumentListTest {
         .assertTextEquals("Scan with camera")
 
     composeTestRule.onNodeWithTag("dropDownButton").assertIsDisplayed()
+    // make spinner appear
+    val isLoadingField = DocumentViewModel::class.java.getDeclaredField("_isLoading")
+    isLoadingField.isAccessible = true
+    val loadingFlow = isLoadingField.get(mockDocumentViewModel) as MutableStateFlow<Boolean>
+    loadingFlow.value = true
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
   }
 
   @Test

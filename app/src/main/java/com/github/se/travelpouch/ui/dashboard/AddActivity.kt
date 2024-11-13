@@ -1,24 +1,21 @@
 package com.github.se.travelpouch.ui.dashboard
 
 import android.annotation.SuppressLint
-import android.app.TimePickerDialog
+import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -30,8 +27,7 @@ import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.google.firebase.Timestamp
-import java.text.SimpleDateFormat
+import com.github.se.travelpouch.utils.DateTimeUtils
 import java.util.*
 
 /**
@@ -47,12 +43,6 @@ fun AddActivityScreen(
     activityModelView: ActivityViewModel,
     locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
 ) {
-  val dateFormat =
-      SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).apply {
-        isLenient = false // strict date format
-      }
-
-  val gregorianCalendar = GregorianCalendar()
 
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
@@ -66,6 +56,8 @@ fun AddActivityScreen(
   var selectedLocation by remember { mutableStateOf<Location?>(null) }
 
   val context = LocalContext.current
+
+  val dateTimeUtils = DateTimeUtils("dd/MM/yyyy HH:mm")
 
   Scaffold(
       modifier = Modifier.testTag("AddActivityScreen"),
@@ -104,6 +96,7 @@ fun AddActivityScreen(
                   placeholder = { Text("Description") },
                   modifier = Modifier.testTag("descriptionField").fillMaxWidth())
 
+              // Date Input with Visual Transformation
               OutlinedTextField(
                   value = dateText,
                   onValueChange = {
@@ -112,38 +105,46 @@ fun AddActivityScreen(
                     }
                   },
                   label = { Text("Date") },
-                  placeholder = { Text("01/01/2024") },
-                  visualTransformation = DateVisualTransformation(),
+                  placeholder = { Text("DD/MM/YYYY") },
+                  visualTransformation = DateVisualTransformation(), // Apply visual transformation
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                  modifier = Modifier.testTag("dateField").fillMaxWidth())
-
-              // Time Input Field (Optional)
-              Box(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.extraSmall)
-                          .background(Color.Transparent, shape = MaterialTheme.shapes.extraSmall)
-                          .padding(16.dp)) {
-                    ClickableText(
-                        text = AnnotatedString(if (timeText.isBlank()) "Time" else timeText),
+                  modifier = Modifier.testTag("dateField").fillMaxWidth(),
+                  trailingIcon = {
+                    IconButton(
                         onClick = {
-                          TimePickerDialog(
-                                  context,
-                                  { _, hourOfDay, minute ->
-                                    timeText =
-                                        String.format(
-                                            Locale.getDefault(), "%02d:%02d", hourOfDay, minute)
-                                  },
-                                  gregorianCalendar.get(Calendar.HOUR_OF_DAY),
-                                  gregorianCalendar.get(Calendar.MINUTE),
-                                  true)
-                              .show()
+                          dateTimeUtils.showDatePicker(context) { selectedDate ->
+                            dateText =
+                                selectedDate.replace(
+                                    "/", "") // Use the DatePickerDialog to select a date
+                          }
                         },
-                        style =
-                            LocalTextStyle.current.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant),
-                        modifier = Modifier.fillMaxWidth().testTag("timeField"))
-                  }
+                        modifier = Modifier.testTag("datePickerButton")) {
+                          Icon(
+                              imageVector = Icons.Default.DateRange,
+                              contentDescription = "Select Date")
+                        }
+                  })
+
+              // Time Input
+              OutlinedTextField(
+                  value = timeText,
+                  onValueChange = { timeText = it }, // Allow manual input
+                  label = { Text("Time") },
+                  placeholder = { Text("HH:mm") },
+                  modifier = Modifier.fillMaxWidth().testTag("timeField"),
+                  trailingIcon = {
+                    IconButton(
+                        onClick = {
+                          dateTimeUtils.showTimePicker(context) { selectedDate ->
+                            timeText = selectedDate
+                          }
+                        },
+                        modifier = Modifier.testTag("timePickerButton")) {
+                          Icon(
+                              imageVector = Icons.Filled.AccessTime,
+                              contentDescription = "Select Time")
+                        }
+                  })
 
               // Location Input with dropdown (Optional)
               Box(modifier = Modifier.fillMaxWidth()) {
@@ -202,64 +203,56 @@ fun AddActivityScreen(
               Button(
                   enabled = title.isNotBlank() && description.isNotBlank() && dateText.isNotBlank(),
                   onClick = {
-                    try {
-                      val finalDate =
-                          convertStringToDate(dateText + timeText, dateFormat, gregorianCalendar)
 
-                      val activity =
-                          Activity(
-                              activityModelView.getNewUid(),
-                              title,
-                              description,
-                              selectedLocation ?: Location(0.0, 0.0, finalDate, "Unknown"),
-                              finalDate,
-                              mapOf())
+                    // Correctly format dateText from ddMMyyyy to dd/MM/yyyy
+                    val formattedDateText =
+                        if (dateText.length == 8) {
+                          "${dateText.substring(0, 2)}/${dateText.substring(2, 4)}/${dateText.substring(4, 8)}"
+                        } else {
+                          dateText // If the length is incorrect, use it as is (to handle any edge
+                          // cases)
+                        }
 
-                      activityModelView.addActivity(activity, context)
-                    } catch (e: java.text.ParseException) {
+                    val t = formattedDateText + timeText
+                    Log.d(
+                        "AddActivityScreen", "ATT : $title, $description, $dateText, $timeText, $t")
+                    val finalDate =
+                        dateTimeUtils.convertStringToTimestamp("$formattedDateText $timeText")
+                    // Check if date parsing was successful
+                    if (finalDate == null) {
+                      Log.e("AddActivityScreen", "Invalid date or time format")
                       Toast.makeText(
                               context,
-                              "Invalid format, date must be DD/MM/YYYY and time must be HH:MM.",
+                              "Invalid date or time format. Please use DD/MM/YYYY or HH:mm.",
                               Toast.LENGTH_SHORT)
                           .show()
+                    } else {
+                      Log.d("AddActivityScreen", "All inputs are valid, proceeding to add Activity")
+                      try {
+                        val activity =
+                            Activity(
+                                activityModelView.getNewUid(),
+                                title,
+                                description,
+                                selectedLocation ?: Location(0.0, 0.0, finalDate, "Unknown"),
+                                finalDate,
+                                mapOf())
+
+                        activityModelView.addActivity(activity, context)
+
+                        navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      } catch (e: java.text.ParseException) {
+                        Toast.makeText(
+                                context,
+                                "Error adding Activity. Please try again.",
+                                Toast.LENGTH_SHORT)
+                            .show()
+                      }
                     }
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
                   },
                   modifier = Modifier.testTag("saveButton")) {
                     Text("Save")
                   }
             }
       })
-}
-
-/**
- * This function converts a String date to a Timestamp using the dd/MM/yyyy HH:mm format.
- *
- * @param stringDate (String) : the string to convert to a date
- * @param dateFormat (SimpleDateFormat) : the format to use to convert the string to a timestamp
- * @param gregorianCalendar (GregorianCalendar) : the calendar to use to set the date
- * @return (Timestamp) : the timestamp got from the string
- * @throws (Exception) : If the formatting fails an exception is thrown
- */
-fun convertStringToDate(
-    stringDate: String,
-    dateFormat: SimpleDateFormat,
-    gregorianCalendar: GregorianCalendar
-): Timestamp {
-  val day = stringDate.substring(0, 2)
-  val month = stringDate.substring(2, 4)
-  val year = stringDate.substring(4, 8)
-  val hour = if (stringDate.length > 8) stringDate.substring(8, 10) else "00"
-  val minute = if (stringDate.length > 10) stringDate.substring(11, 13) else "00"
-
-  val finalDateString = "$day/$month/$year $hour:$minute"
-
-  val date = dateFormat.parse(finalDateString)
-  val calendar =
-      gregorianCalendar.apply {
-        time = date!!
-        set(Calendar.SECOND, 0)
-      }
-
-  return Timestamp(calendar.time)
 }
