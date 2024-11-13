@@ -26,6 +26,8 @@ open class DocumentViewModel(
     private val repository: DocumentRepository,
     private val fileDownloader: FileDownloader
 ) : ViewModel() {
+  private val _isLoading = MutableStateFlow(false)
+  val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
   private val _documents = MutableStateFlow<List<DocumentContainer>>(emptyList())
   val documents: StateFlow<List<DocumentContainer>> = _documents.asStateFlow()
   private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
@@ -116,14 +118,20 @@ open class DocumentViewModel(
   }
 
   fun uploadDocument(travelId: String, bytes: ByteArray, format: DocumentFileFormat) {
+    _isLoading.value = true // set as loading for spinner
     repository.uploadDocument(
         travelId,
         bytes,
         format,
-        onSuccess = { getDocuments() },
-        onFailure = { Log.e("DocumentsViewModel", "Failed to upload Document") })
+        onSuccess = {
+          getDocuments()
+          _isLoading.value = false // set as not loading
+        },
+        onFailure = {
+          _isLoading.value = false // set as not loading
+          Log.e("DocumentsViewModel", "Failed to upload Document")
+        })
   }
-
 
   /**
    * Uploads a file to the selected travel.

@@ -34,14 +34,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
-import org.mockito.kotlin.validateMockitoUsage
-import org.mockito.kotlin.verify
 
 class DocumentListTest {
   @Composable
@@ -155,6 +152,13 @@ class DocumentListTest {
         .assertTextEquals("Scan with camera")
 
     composeTestRule.onNodeWithTag("dropDownButton").assertIsDisplayed()
+    // make spinner appear
+    val isLoadingField = DocumentViewModel::class.java.getDeclaredField("_isLoading")
+    isLoadingField.isAccessible = true
+    val loadingFlow = isLoadingField.get(mockDocumentViewModel) as MutableStateFlow<Boolean>
+    loadingFlow.value = true
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
   }
 
   @Test
@@ -205,9 +209,7 @@ class DocumentListTest {
           }
         }
 
-    `when`(mockListTravelViewModel.selectedTravel).then {
-      MutableStateFlow<TravelContainer?>(null)
-    }
+    `when`(mockListTravelViewModel.selectedTravel).then { MutableStateFlow<TravelContainer?>(null) }
 
     composeTestRule.setContent {
       withActivityResultRegistry(testRegistry) {
