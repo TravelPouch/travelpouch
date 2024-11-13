@@ -21,6 +21,7 @@ import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelRepository
+import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -188,10 +189,10 @@ class EditTravelSettingsScreenTest {
     // Now this is an invalid user that doesn't exist
     doAnswer { invocation ->
           val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
-          onFailure(Exception("User not found"))
+          onFailure(Exception("Unknown API Error"))
         }
-        .`when`(travelRepository)
-        .checkParticipantExists(any(), any(), any())
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     // Now this is a valid user that had serialisation problems
@@ -201,16 +202,57 @@ class EditTravelSettingsScreenTest {
           // Call the onSuccess callback with null
           onSuccess(null)
         }
-        .`when`(travelRepository)
-        .checkParticipantExists(any(), any(), any())
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
     // Mock the repository.updateTravel method to do nothing
     doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
+    inputText("addUserEmailField", "", randomEmail)
 
     // Now this is a valid user that does exist
     doAnswer { invocation ->
           val email = invocation.getArgument<String>(0)
-          val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = profileModelView.profile.value.fsUid,
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = null)
+          // Call the onSuccess callback with the custom UserInfo
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+    // Mock the repository.updateTravel method to do nothing
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doAnswer { "sigmasigmasigmasigm2" }.`when`(travelRepository).getNewUid()
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = "sigmasigmasigmasigma12345678",
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = null)
+          // Call the onSuccess callback with the custom UserInfo
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+    doAnswer { "sigmasigmasigmasigma" }.`when`(travelRepository).getNewUid()
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
           val customUserInfo =
               Profile(
                   fsUid = "abcdefghijklmnopqrstuvwxyz12",
@@ -220,13 +262,31 @@ class EditTravelSettingsScreenTest {
                   username = "username",
                   friends = null)
           // Call the onSuccess callback with the custom UserInfo
-          onSuccess(customUserInfo)
+          onSuccess(customUserInfo.fsUid)
         }
-        .`when`(travelRepository)
-        .checkParticipantExists(any(), any(), any())
-    // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+    doAnswer { "sigmasigmasigmasigma" }.`when`(travelRepository).getNewUid()
     composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+    //    doAnswer { invocation ->
+    //      val email = invocation.getArgument<String>(0)
+    //      val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+    //      val customUserInfo =
+    //        Profile(
+    //          fsUid = "sigmasigmasigmasigma12345678",
+    //          name = "Custom User",
+    //          userTravelList = listOf("00000000000000000000"),
+    //          email = email,
+    //          username = "username",
+    //          friends = null)
+    //      // Call the onSuccess callback with the custom UserInfo
+    //      onSuccess(customUserInfo.fsUid)
+    //    }
+    //      .`when`(profileRepository)
+    //      .getFsUidByEmail(any(), any(), any())
+    //    doAnswer {"sigmasigmasigmasigma"}.`when`(travelRepository).getNewUid()
+    //    composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     // perform deletion of travel
     composeTestRule.onNodeWithTag("travelDeleteButton").performClick()
