@@ -180,10 +180,10 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    testImplementation("com.google.dagger:hilt-android-testing:2.51.1")
-    kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.android.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
 
 
     // Google Service and Maps

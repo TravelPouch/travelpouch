@@ -1,4 +1,4 @@
-package com.github.se.travelpouch
+package com.github.se.travelpouch.di
 
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.travels.TravelContainer

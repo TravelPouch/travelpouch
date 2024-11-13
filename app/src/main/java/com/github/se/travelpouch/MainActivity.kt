@@ -1,7 +1,6 @@
 package com.github.se.travelpouch
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -83,8 +83,6 @@ class MainActivity : ComponentActivity() {
 
     val notificationViewModel: NotificationViewModel =
         viewModel(factory = NotificationViewModel.Factory)
-
-    Log.d("ENDTOEND-FINAL", "after all viewmodels")
 
     NavHost(navController = navController, startDestination = Route.DEFAULT) {
       navigation(

@@ -1,5 +1,7 @@
-package com.github.se.travelpouch
+package com.github.se.travelpouch.di
 
+import com.github.se.travelpouch.model.authentication.AuthenticationService
+import com.github.se.travelpouch.model.authentication.MockFirebaseAuthenticationService
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.profile.ProfileRepositoryMock
 import com.github.se.travelpouch.model.travels.TravelRepository

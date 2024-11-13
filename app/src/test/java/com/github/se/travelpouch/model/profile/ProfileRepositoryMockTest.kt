@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.profile
 
-import com.github.se.travelpouch.profileCollection
+import com.github.se.travelpouch.di.profileCollection
+import junit.framework.TestCase.assertFalse
 import org.junit.Before
 import org.junit.Test
 
@@ -36,22 +37,22 @@ class ProfileRepositoryMockTest {
     var succeeded = false
     var failed = false
 
-    val noProfile = profileCollection[profile.fsUid]
+    val noProfile = com.github.se.travelpouch.di.profileCollection[profile.fsUid]
     assert(noProfile == null)
     profileMockRepository.getProfileElements({ succeeded = true }, { failed = true })
-    assert(!succeeded)
+    assertFalse(succeeded)
     assert(failed)
 
     succeeded = false
     failed = false
 
-    profileCollection[profile.fsUid] = profile
+    com.github.se.travelpouch.di.profileCollection[profile.fsUid] = profile
     profileMockRepository.getProfileElements({ succeeded = true }, { failed = true })
 
     assert(succeeded)
-    assert(!failed)
+    assertFalse(failed)
 
-    profileCollection.clear()
+    com.github.se.travelpouch.di.profileCollection.clear()
   }
 
   @Test
@@ -59,13 +60,13 @@ class ProfileRepositoryMockTest {
     var succeeded = false
     var failed = false
 
-    profileCollection[profile.fsUid] = profile
+    com.github.se.travelpouch.di.profileCollection[profile.fsUid] = profile
     profileMockRepository.updateProfile(newProfile, { succeeded = true }, { failed = true })
 
     assert(succeeded)
-    assert(!failed)
-    assert(profileCollection[profile.fsUid] == newProfile)
+    assertFalse(failed)
+    assert(com.github.se.travelpouch.di.profileCollection[profile.fsUid] == newProfile)
 
-    profileCollection.clear()
+    com.github.se.travelpouch.di.profileCollection.clear()
   }
 }

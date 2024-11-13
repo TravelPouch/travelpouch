@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import com.github.se.travelpouch.MockFirebaseAuthenticationService
+import com.github.se.travelpouch.model.authentication.MockFirebaseAuthenticationService
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel

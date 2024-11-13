@@ -1,7 +1,7 @@
 package com.github.se.travelpouch.model.profile
 
 import android.util.Log
-import com.github.se.travelpouch.profileCollection
+import com.github.se.travelpouch.di.profileCollection
 
 class ProfileRepositoryMock : ProfileRepository {
 
@@ -21,7 +21,7 @@ class ProfileRepositoryMock : ProfileRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    profileCollection[profilePath] = newProfile
+    com.github.se.travelpouch.di.profileCollection[profilePath] = newProfile
     onSuccess()
   }
 
@@ -29,14 +29,14 @@ class ProfileRepositoryMock : ProfileRepository {
     Log.d("ENDTOEND-FINAL", "in the mock profile repo")
 
     profilePath = "qwertzuiopasdfghjklyxcvbnm12"
-    val profileFetched: Profile? = profileCollection[profilePath]
+    val profileFetched: Profile? = com.github.se.travelpouch.di.profileCollection[profilePath]
 
     if (profileFetched != null) {
       onSuccess(profileFetched)
     } else {
       val profile =
           Profile(profilePath, "username", "emailtest1@gmail.com", null, "name", emptyList())
-      profileCollection[profilePath] = profile
+      com.github.se.travelpouch.di.profileCollection[profilePath] = profile
       onSuccess(profile)
     }
   }

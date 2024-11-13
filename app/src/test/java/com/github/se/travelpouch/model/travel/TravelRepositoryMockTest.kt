@@ -1,13 +1,14 @@
 package com.github.se.travelpouch.model.travel
 
+import com.github.se.travelpouch.di.travelCollection
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelContainerMock
 import com.github.se.travelpouch.model.travels.TravelRepositoryMock
-import com.github.se.travelpouch.travelCollection
 import com.google.firebase.Timestamp
+import junit.framework.TestCase.assertFalse
 import org.junit.Test
 
 class TravelRepositoryMockTest {
@@ -43,16 +44,16 @@ class TravelRepositoryMockTest {
     var succeeded = false
     var failed = false
 
-    val noTravel = travelCollection[travel.fsUid]
+    val noTravel = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(noTravel == null)
     travelMockRepository.addTravel(travel, { succeeded = true }, { failed = true })
     assert(succeeded)
-    assert(!failed)
+    assertFalse(failed)
 
-    val newTravel = travelCollection[travel.fsUid]
+    val newTravel = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(newTravel == travel)
 
-    travelCollection.clear()
+    com.github.se.travelpouch.di.travelCollection.clear()
   }
 
   @Test
@@ -60,19 +61,19 @@ class TravelRepositoryMockTest {
     var succeeded = false
     var failed = false
 
-    val noTravel = travelCollection[travel.fsUid]
+    val noTravel = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(noTravel == null)
     travelMockRepository.addTravel(travel, {}, {})
-    val travelAdded = travelCollection[travel.fsUid]
+    val travelAdded = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(travelAdded == travel)
     travelMockRepository.updateTravel(travelUpdated, { succeeded = true }, { failed = true })
     assert(succeeded)
-    assert(!failed)
+    assertFalse(failed)
 
-    val newTravel = travelCollection[travel.fsUid]
+    val newTravel = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(newTravel == travelUpdated)
 
-    travelCollection.clear()
+    com.github.se.travelpouch.di.travelCollection.clear()
   }
 
   @Test
@@ -80,18 +81,18 @@ class TravelRepositoryMockTest {
     var succeeded = false
     var failed = false
 
-    val noTravel = travelCollection[travel.fsUid]
+    val noTravel = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(noTravel == null)
     travelMockRepository.addTravel(travel, {}, {})
-    val travelAdded = travelCollection[travel.fsUid]
+    val travelAdded = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(travelAdded == travel)
     travelMockRepository.deleteTravelById(travel.fsUid, { succeeded = true }, { failed = true })
     assert(succeeded)
-    assert(!failed)
+    assertFalse(failed)
 
-    val newTravel = travelCollection[travel.fsUid]
+    val newTravel = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(newTravel == null)
 
-    travelCollection.clear()
+    com.github.se.travelpouch.di.travelCollection.clear()
   }
 }

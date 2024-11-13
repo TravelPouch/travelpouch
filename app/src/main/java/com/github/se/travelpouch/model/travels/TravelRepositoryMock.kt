@@ -1,8 +1,8 @@
 package com.github.se.travelpouch.model.travels
 
 import android.util.Log
+import com.github.se.travelpouch.di.travelCollection
 import com.github.se.travelpouch.model.profile.Profile
-import com.github.se.travelpouch.travelCollection
 
 class TravelRepositoryMock : TravelRepository {
 
@@ -38,7 +38,7 @@ class TravelRepositoryMock : TravelRepository {
       onSuccess: (List<TravelContainer>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    val allTravels = travelCollection.values.toList()
+    val allTravels = com.github.se.travelpouch.di.travelCollection.values.toList()
     val travelsOfUsers = allTravels.filter { it.listParticipant.contains(currentUserUid) }
     onSuccess(travelsOfUsers)
   }
@@ -48,7 +48,7 @@ class TravelRepositoryMock : TravelRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    travelCollection[travel.fsUid] = travel
+    com.github.se.travelpouch.di.travelCollection[travel.fsUid] = travel
     onSuccess()
   }
 
@@ -57,12 +57,12 @@ class TravelRepositoryMock : TravelRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    travelCollection[travel.fsUid] = travel
+    com.github.se.travelpouch.di.travelCollection[travel.fsUid] = travel
     onSuccess()
   }
 
   override fun deleteTravelById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    travelCollection.remove(id)
+    com.github.se.travelpouch.di.travelCollection.remove(id)
     onSuccess()
   }
 }

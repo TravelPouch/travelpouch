@@ -10,12 +10,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import com.github.se.travelpouch.AppModule
 import com.github.se.travelpouch.MainActivity
+import com.github.se.travelpouch.di.AppModule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -38,7 +38,7 @@ class EndToEndTest {
 
   @Test
   fun verifyUserFlowForTravelCreation() =
-      runTest(timeout = Duration.INFINITE) {
+      runTest(timeout = 30.seconds) {
 
         // assert that login screen is displayed
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
