@@ -18,6 +18,7 @@ import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
@@ -68,6 +69,7 @@ fun TravelPouchApp() {
   val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
   val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
   val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
+    val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
 
   val calendarViewModel: CalendarViewModel =
       viewModel(factory = CalendarViewModel.Factory(activityModelView))
@@ -102,7 +104,7 @@ fun TravelPouchApp() {
         AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
       }
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
-        EditTravelSettingsScreen(listTravelViewModel, navigationActions)
+        EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel )
       }
 
       composable(Screen.ACTIVITIES_MAP) {

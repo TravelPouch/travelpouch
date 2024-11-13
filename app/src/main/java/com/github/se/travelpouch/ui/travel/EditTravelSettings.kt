@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,10 +30,13 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +63,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.PopupProperties
 import com.github.se.travelpouch.R
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.TravelContainer
@@ -87,6 +93,7 @@ import java.util.Locale
 fun EditTravelSettingsScreen(
     listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
+    locationViewModel: LocationViewModel
 ) {
     val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
     val context = LocalContext.current
@@ -131,7 +138,7 @@ fun EditTravelSettingsScreen(
                     }
                 )
             }
-        }.
+        },
         floatingActionButton = {
             var toggled by remember { mutableStateOf(false) }
 
@@ -161,54 +168,9 @@ fun EditTravelSettingsScreen(
                             },
                             modifier = Modifier.testTag("importEmailButton")
                         )
+
                         Spacer(modifier = Modifier.height(8.dp))
-            // Longitude Input
-            OutlinedTextField(
-                value = longitude.value,
-                onValueChange = { longitude.value = it },
-                label = { Text("Longitude") },
-                placeholder = { Text("Enter longitude (e.g. 2.3522)") },
-                modifier = Modifier.testTag("inputTravelLongitude"))
-            OutlinedTextField(
-                value = startTime.value,
-                onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
-                label = { Text("Start Date") },
-                placeholder = { Text("DD/MM/YYYY") },
-                modifier = Modifier.fillMaxWidth().testTag("inputTravelStartTime"),
-                trailingIcon = {
-                  IconButton(
-                      onClick = {
-                        dateTimeUtils.showDatePicker(context) { selectedDate ->
-                          startTime.value = selectedDate
-                        }
-                      },
-                      modifier = Modifier.testTag("startDatePickerButton")) {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Select Start Date")
-                      }
-                })
-            OutlinedTextField(
-                value = endTimeText.value,
-                onValueChange = { keystroke ->
-                  endTimeText.value = keystroke
-                }, // Allow manual input
-                label = { Text("End Date") },
-                placeholder = { Text("DD/MM/YYYY") },
-                modifier = Modifier.fillMaxWidth().testTag("inputTravelEndTime"),
-                trailingIcon = {
-                  IconButton(
-                      onClick = {
-                        dateTimeUtils.showDatePicker(context) { selectedDate ->
-                          endTimeText.value = selectedDate
-                        }
-                      },
-                      modifier = Modifier.testTag("endDatePickerButton")) {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Select End Date")
-                      }
-                })
+
                         FloatingActionButton(
                             onClick = { toggled = !toggled },
                             modifier = Modifier.testTag("dropDownButton")
@@ -233,9 +195,11 @@ fun EditTravelSettingsScreen(
             val titleText = remember { mutableStateOf(selectedTravel!!.title) }
             val descriptionText = remember { mutableStateOf(selectedTravel!!.description) }
             val startTime = remember { mutableStateOf(formatter.format(selectedTravel!!.startTime.toDate())) }
-            val locationName = remember { mutableStateOf(selectedTravel!!.location.name) }
-            val latitude = remember { mutableStateOf(selectedTravel!!.location.latitude.toString()) }
-            val longitude = remember { mutableStateOf(selectedTravel!!.location.longitude.toString()) }
+            var selectedLocation by remember { mutableStateOf(selectedTravel!!.location) }
+            val locationQuery by locationViewModel.query.collectAsState()
+            var showDropdown by remember { mutableStateOf(false) }
+            val locationSuggestions by
+            locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
             val endTimeText = remember { mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate())) }
 
             Column(
@@ -288,30 +252,60 @@ fun EditTravelSettingsScreen(
                     placeholder = { Text("Describe the Travel") },
                     maxLines = 1
                 )
-                OutlinedTextField(
-                    value = locationName.value,
-                    onValueChange = { locationName.value = it },
-                    label = { Text("Location Name") },
-                    placeholder = { Text("Enter location name") },
-                    modifier = textFieldModifier.testTag("inputTravelLocationName"),
-                    maxLines = 1
-                )
-                OutlinedTextField(
-                    value = latitude.value,
-                    onValueChange = { latitude.value = it },
-                    label = { Text("Latitude") },
-                    placeholder = { Text("Enter latitude (e.g. 48.8566)") },
-                    modifier = textFieldModifier.testTag("inputTravelLatitude"),
-                    maxLines = 1
-                )
-                OutlinedTextField(
-                    value = longitude.value,
-                    onValueChange = { longitude.value = it },
-                    label = { Text("Longitude") },
-                    placeholder = { Text("Enter longitude (e.g. 2.3522)") },
-                    modifier = textFieldModifier.testTag("inputTravelLongitude"),
-                    maxLines = 1
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = locationQuery,
+                        onValueChange = {
+                            locationViewModel.setQuery(it)
+                            showDropdown = true // Show dropdown when user starts typing
+                        },
+                        label = { Text("Location") },
+                        placeholder = { Text("Enter an Address or Location") },
+                        modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
+
+                    // Dropdown to show location suggestions
+                    DropdownMenu(
+                        expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                        onDismissRequest = { showDropdown = false },
+                        properties = PopupProperties(focusable = false),
+                        modifier =
+                        Modifier.fillMaxWidth()
+                            .heightIn(
+                                max = 200.dp) // Set max height to make it scrollable if more than 3
+
+                        // items
+                    ) {
+                        locationSuggestions.filterNotNull().take(3).forEach { location ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text =
+                                        location.name.take(30) +
+                                                if (location.name.length > 30) "..."
+                                                else "", // Limit name length and add ellipsis
+                                        maxLines = 1 // Ensure name doesn't overflow
+                                    )
+                                },
+                                onClick = {
+                                    locationViewModel.setQuery(location.name)
+                                    selectedLocation = location // Store the selected location object
+                                    showDropdown = false // Close dropdown on selection
+                                },
+                                modifier =
+                                Modifier.padding(8.dp)
+                                    .testTag("suggestion_${location.name}") // Tag each suggestion
+                            )
+                            HorizontalDivider() // Separate items with a divider
+                        }
+
+                        if (locationSuggestions.size > 3) {
+                            DropdownMenuItem(
+                                text = { Text("More...") },
+                                onClick = { /* Optionally show more results */},
+                                modifier = Modifier.padding(8.dp).testTag("moreSuggestions"))
+                        }
+                    }
+                }
                 OutlinedTextField(
                     value = startTime.value,
                     onValueChange = { keystroke -> startTime.value = keystroke },
@@ -336,10 +330,10 @@ fun EditTravelSettingsScreen(
                             val newLocation: Location
                             try {
                                 newLocation = Location(
-                                    latitude = latitude.value.toDouble(),
-                                    longitude = longitude.value.toDouble(),
-                                    name = locationName.value,
-                                    insertTime = Timestamp.now()
+                                    latitude = selectedLocation.latitude,
+                                    longitude = selectedLocation.longitude,
+                                    name = selectedLocation.name,
+                                    insertTime = selectedLocation.insertTime
                                 )
                             } catch (e: NumberFormatException) {
                                 Toast.makeText(
