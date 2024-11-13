@@ -2,6 +2,8 @@ package com.github.se.travelpouch.model.profile
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -11,6 +13,9 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -257,5 +262,112 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
     verify(mockDocumentSnapshot).exists()
+  }
+
+  @Test
+  fun getFsUidByEmailTestSucceedsWithEmptyList() {
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(true)
+    `when`(mockTask.result).thenReturn(mockQuerySnapshot)
+    `when`(mockQuerySnapshot.documents).thenReturn(emptyList())
+
+    `when`(mockFirestore.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    `when`(mockQuery.get()).thenReturn(mockTask)
+    `when`(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask) // Allow chaining
+
+    var successCalled = false
+    var failed = false
+    var idGot: String? = null
+
+    profileRepositoryFirestore.getFsUidByEmail(
+      "email",
+      {
+        successCalled = true
+        idGot = it
+      },
+      { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(mockTask).addOnSuccessListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onSuccess(mockQuerySnapshot)
+
+    assert(successCalled)
+    assertFalse(failed)
+    assert(idGot == null)
+  }
+
+  @Test
+  fun getFsUidByEmailTestSucceedsWithNonEmptyList() {
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(true)
+    `when`(mockTask.result).thenReturn(mockQuerySnapshot)
+    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
+
+    `when`(mockFirestore.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    `when`(mockQuery.get()).thenReturn(mockTask)
+    `when`(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask) // Allow chaining
+
+    var idGot: String? = null
+    var successCalled = false
+    var failed = false
+    profileRepositoryFirestore.getFsUidByEmail(
+      "email",
+      {
+        successCalled = true
+        idGot = it
+      },
+      { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(mockTask).addOnSuccessListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onSuccess(mockQuerySnapshot)
+
+    assert(successCalled)
+    assertFalse(failed)
+    assert(idGot == profile.fsUid)
+  }
+
+  @Test
+  fun getFsUidByEmailTestFails() {
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(false)
+
+    `when`(mockFirestore.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    `when`(mockQuery.get()).thenReturn(mockTask)
+    `when`(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask) // Allow chaining
+
+    var idGot: String? = null
+    var successCalled = false
+    var failed = false
+    profileRepositoryFirestore.getFsUidByEmail(
+      "email",
+      {
+        successCalled = true
+        idGot = profile.fsUid
+      },
+      { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnFailureListener>()
+    verify(mockTask).addOnFailureListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onFailure(Exception("message"))
+
+    assert(failed)
+    assertFalse(successCalled)
+    assert(idGot == null)
   }
 }
