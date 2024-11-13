@@ -104,7 +104,7 @@ class TestSignInEmailPasswordUI {
         composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
         composeTestRule.onNodeWithText("Log in").performClick()
 
-        verify(profileModelView).initAfterLogin(anyOrNull())
+        verify(profileRepository).initAfterLogin(anyOrNull())
         verify(mockNavigationActions).navigateTo(anyOrNull())
       }
 }
