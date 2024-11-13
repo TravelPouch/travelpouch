@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ fun SignInWithPassword(
 
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
+  val methodChosen = rememberSaveable { mutableStateOf(false) }
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
@@ -94,8 +96,13 @@ fun SignInWithPassword(
           Spacer(Modifier.padding(10.dp))
 
           Button(
-              enabled = email.isNotBlank() && password.isNotBlank() && isValidEmail(email),
+              enabled =
+                  email.isNotBlank() &&
+                      password.isNotBlank() &&
+                      isValidEmail(email) &&
+                      !methodChosen.value,
               onClick = {
+                methodChosen.value = true
                 authService.createUser(
                     email,
                     password,
@@ -108,8 +115,10 @@ fun SignInWithPassword(
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
                       navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                      methodChosen.value = false
                     },
                     onFailure = { task ->
+                      methodChosen.value = false
                       Log.w(TAG, "createUserWithEmail:failure", task.exception)
                       Toast.makeText(
                               context,
@@ -125,8 +134,13 @@ fun SignInWithPassword(
           Spacer(Modifier.padding(5.dp))
 
           Button(
-              enabled = email.isNotBlank() && password.isNotBlank() && isValidEmail(email),
+              enabled =
+                  email.isNotBlank() &&
+                      password.isNotBlank() &&
+                      isValidEmail(email) &&
+                      !methodChosen.value,
               onClick = {
+                methodChosen.value = true
                 authService.login(
                     email,
                     password,
@@ -139,6 +153,7 @@ fun SignInWithPassword(
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
                       navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                      methodChosen.value = false
                     },
                     onFailure = { task ->
                       Log.w(TAG, "LoginWithEmailAndPassword:failure", task.exception)
@@ -148,6 +163,7 @@ fun SignInWithPassword(
                               Toast.LENGTH_SHORT,
                           )
                           .show()
+                      methodChosen.value = false
                     })
               }) {
                 Text("Log in")

@@ -22,8 +22,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -60,11 +62,13 @@ fun SignInScreen(
 ) {
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
+  val methodChosen = rememberSaveable { mutableStateOf(false) }
 
   // launcher for Firebase authentication
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
+            methodChosen.value = false
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
             val job =
@@ -77,6 +81,7 @@ fun SignInScreen(
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
+            methodChosen.value = false
             isLoading.value = false
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
@@ -127,6 +132,7 @@ fun SignInScreen(
                         // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
                         GoogleSignInButton(
                             onSignInClick = {
+                              methodChosen.value = true
                               val gso =
                                   GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                                       .requestIdToken(token)
@@ -153,9 +159,11 @@ fun SignInScreen(
                       }
                 }
 
-            Button(onClick = { navigationActions.navigateTo(Screen.SIGN_IN_PASSWORD) }) {
-              Text("Sign in with email and password")
-            }
+            Button(
+                onClick = { navigationActions.navigateTo(Screen.SIGN_IN_PASSWORD) },
+                enabled = !methodChosen.value) {
+                  Text("Sign in with email and password")
+                }
           }
         }
       })
