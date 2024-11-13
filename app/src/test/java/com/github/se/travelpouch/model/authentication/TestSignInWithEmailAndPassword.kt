@@ -73,4 +73,54 @@ class TestSignInWithEmailAndPassword {
         assertFalse(onSuccessCalled)
         assert(onFailureCalled)
       }
+
+  @Test
+  fun testLogInWithEmailAndPasswordWorksCorrectly() =
+      runTest(timeout = 30.seconds) {
+        val firebaseAuthService = FirebaseAuthenticationService(mockFirebaseAuth)
+        val task: Task<AuthResult> = mock()
+        val mockUser: FirebaseUser = mock()
+
+        whenever(task.isSuccessful).thenReturn(true)
+        whenever(mockFirebaseAuth.signInWithEmailAndPassword(anyOrNull(), anyOrNull()))
+            .thenReturn(task)
+        whenever(mockFirebaseAuth.currentUser).thenReturn(mockUser)
+
+        var onSuccessCalled = false
+        var onFailureCalled = false
+
+        firebaseAuthService.login(
+            "email", "password", { onSuccessCalled = true }, { onFailureCalled = true })
+
+        val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<AuthResult>>()
+        verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
+        onCompleteListenerCaptor.firstValue.onComplete(task)
+
+        assert(onSuccessCalled)
+        assertFalse(onFailureCalled)
+      }
+
+  @Test
+  fun testLogInWithEmailAndPasswordIfTaskFails() =
+      runTest(timeout = 30.seconds) {
+        val firebaseAuthService = FirebaseAuthenticationService(mockFirebaseAuth)
+        val task: Task<AuthResult> = mock()
+
+        var onSuccessCalled = false
+        var onFailureCalled = false
+
+        whenever(task.isSuccessful).thenReturn(false)
+        whenever(mockFirebaseAuth.signInWithEmailAndPassword(anyOrNull(), anyOrNull()))
+            .thenReturn(task)
+
+        firebaseAuthService.login(
+            "email", "password", { onSuccessCalled = true }, { onFailureCalled = true })
+
+        val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<AuthResult>>()
+        verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
+        onCompleteListenerCaptor.firstValue.onComplete(task)
+
+        assertFalse(onSuccessCalled)
+        assert(onFailureCalled)
+      }
 }
