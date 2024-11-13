@@ -288,7 +288,7 @@ class ProfileRepositoryTest {
         "email",
         {
           successCalled = true
-          idGot = profile.fsUid
+          idGot = it
         },
         { failed = true })
 
@@ -324,7 +324,7 @@ class ProfileRepositoryTest {
         "email",
         {
           successCalled = true
-          idGot = profile.fsUid
+          idGot = it
         },
         { failed = true })
 
