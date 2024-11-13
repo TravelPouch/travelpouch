@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.authentication.AuthenticationService
+import com.github.se.travelpouch.model.authentication.MockFirebaseAuthenticationService
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
@@ -30,6 +31,7 @@ class TestSignInEmailPasswordUI {
   val profileModelView = ProfileModelView(profileRepository)
 
   val authenticationService: AuthenticationService = mock()
+  val authenticationServiceMock = MockFirebaseAuthenticationService()
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -49,7 +51,7 @@ class TestSignInEmailPasswordUI {
   }
 
   @Test
-  fun signingInWithPasswordWorks() =
+  fun signingInWithPasswordCallsCreateUser() =
       runTest(timeout = 20.seconds) {
         composeTestRule.setContent {
           SignInWithPassword(
@@ -68,7 +70,7 @@ class TestSignInEmailPasswordUI {
       }
 
   @Test
-  fun logInWithPasswordWorks() =
+  fun logInWithPasswordCallsLogin() =
       runTest(timeout = 20.seconds) {
         composeTestRule.setContent {
           SignInWithPassword(
@@ -84,5 +86,25 @@ class TestSignInEmailPasswordUI {
         composeTestRule.onNodeWithText("Log in").performClick()
 
         verify(authenticationService).login(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+      }
+
+  @Test
+  fun logInWithPasswordCallsProfileVM() =
+      runTest(timeout = 20.seconds) {
+        composeTestRule.setContent {
+          SignInWithPassword(
+              mockNavigationActions, profileModelView, travelViewModel, authenticationServiceMock)
+        }
+
+        composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest1@gmail.com")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
+        composeTestRule.onNodeWithText("Log in").performClick()
+
+        verify(profileModelView).initAfterLogin(anyOrNull())
+        verify(mockNavigationActions).navigateTo(anyOrNull())
       }
 }
