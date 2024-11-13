@@ -269,25 +269,6 @@ class EditTravelSettingsScreenTest {
     doAnswer { "sigmasigmasigmasigma" }.`when`(travelRepository).getNewUid()
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    //    doAnswer { invocation ->
-    //      val email = invocation.getArgument<String>(0)
-    //      val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
-    //      val customUserInfo =
-    //        Profile(
-    //          fsUid = "sigmasigmasigmasigma12345678",
-    //          name = "Custom User",
-    //          userTravelList = listOf("00000000000000000000"),
-    //          email = email,
-    //          username = "username",
-    //          friends = null)
-    //      // Call the onSuccess callback with the custom UserInfo
-    //      onSuccess(customUserInfo.fsUid)
-    //    }
-    //      .`when`(profileRepository)
-    //      .getFsUidByEmail(any(), any(), any())
-    //    doAnswer {"sigmasigmasigmasigma"}.`when`(travelRepository).getNewUid()
-    //    composeTestRule.onNodeWithTag("addUserButton").performClick()
-
     // perform deletion of travel
     composeTestRule.onNodeWithTag("travelDeleteButton").performClick()
     doNothing().`when`(navigationActions).goBack()
