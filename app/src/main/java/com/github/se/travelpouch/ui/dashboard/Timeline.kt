@@ -121,7 +121,7 @@ fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventVi
     } else {
       Box(modifier = Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
         Text(
-            text = "Loading...",
+            text = "Not yet implemented",
             textAlign = TextAlign.Center,
             modifier = Modifier.testTag("loadingText"))
       }

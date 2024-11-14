@@ -36,8 +36,10 @@ import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.util.Locale
 
 /**
@@ -67,6 +69,7 @@ fun TravelListScreen(
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
+      bottomBar = { BottomNavigationMenu(listOf(TopLevelDestinations.PROFILE), navigationActions) },
       floatingActionButton = {
         FloatingActionButton(
             onClick = { navigationActions.navigateTo(Screen.ADD_TRAVEL) },

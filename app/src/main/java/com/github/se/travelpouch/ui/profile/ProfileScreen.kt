@@ -46,7 +46,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
             title = { Text("Profile", Modifier.testTag("ProfileBar")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES) },
+                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -82,6 +82,13 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
               enabled = false,
               label = { Text("Username") },
               modifier = Modifier.testTag("usernameField"))
+
+          OutlinedTextField(
+              value = profile.value.name,
+              onValueChange = {},
+              enabled = false,
+              label = { Text("Name") },
+              modifier = Modifier.testTag("nameField"))
 
           OutlinedTextField(
               value = "No Friend, sadge :(",

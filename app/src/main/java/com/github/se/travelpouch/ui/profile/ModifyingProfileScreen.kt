@@ -48,6 +48,7 @@ fun ModifyingProfileScreen(
 
   var email by remember { mutableStateOf(profile.value.email) }
   var username by remember { mutableStateOf(profile.value.username) }
+  var name by remember { mutableStateOf(profile.value.name) }
 
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
@@ -86,6 +87,13 @@ fun ModifyingProfileScreen(
               enabled = true,
               label = { Text("Username") },
               modifier = Modifier.testTag("usernameField"))
+
+          OutlinedTextField(
+              value = name,
+              onValueChange = { name = it },
+              enabled = true,
+              label = { Text("Name") },
+              modifier = Modifier.testTag("nameField"))
 
           OutlinedTextField(
               value = "No Friend, sadge :(",

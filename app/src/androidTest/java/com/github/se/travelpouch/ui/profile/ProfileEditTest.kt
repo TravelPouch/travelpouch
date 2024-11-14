@@ -39,7 +39,7 @@ class ProfileEditTest {
           email = "newtest@test.ch",
           username = "newUsername",
           friends = null,
-          name = "name",
+          name = "newName",
           userTravelList = emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -67,6 +67,8 @@ class ProfileEditTest {
     composeTestRule.onNodeWithTag("emailField").assertTextContains(profile.email)
     composeTestRule.onNodeWithTag("usernameField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(profile.username)
+    composeTestRule.onNodeWithTag("nameField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("nameField").assertTextContains(profile.name)
     composeTestRule.onNodeWithTag("friendsField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("friendsField").assertTextContains("No Friend, sadge :(")
 
@@ -74,10 +76,13 @@ class ProfileEditTest {
     composeTestRule.onNodeWithTag("emailField").performTextInput(newProfile.email)
     composeTestRule.onNodeWithTag("usernameField").performTextClearance()
     composeTestRule.onNodeWithTag("usernameField").performTextInput(newProfile.username)
+    composeTestRule.onNodeWithTag("nameField").performTextClearance()
+    composeTestRule.onNodeWithTag("nameField").performTextInput(newProfile.name)
     composeTestRule.onNodeWithTag("friendsField").assertTextContains("No Friend, sadge :(")
 
     composeTestRule.onNodeWithTag("emailField").assertTextContains(newProfile.email)
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(newProfile.username)
+    composeTestRule.onNodeWithTag("nameField").assertTextContains(newProfile.name)
 
     composeTestRule.onNodeWithTag("saveButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("saveButton").performClick()
