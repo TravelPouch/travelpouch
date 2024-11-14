@@ -3,17 +3,25 @@ package com.github.se.travelpouch.ui.documents
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.net.Uri
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
@@ -22,11 +30,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -65,10 +75,11 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 @Composable
 fun DocumentListScreen(
     documentViewModel: DocumentViewModel = viewModel(),
-    listTravelViewModel: ListTravelViewModel = viewModel(factory = ListTravelViewModel.Factory),
+    listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
     onNavigateToDocumentPreview: () -> Unit
 ) {
+  val isLoading = documentViewModel.isLoading.collectAsState()
   val documents = documentViewModel.documents.collectAsState()
   documentViewModel.getDocuments()
   val selectedTravel = listTravelViewModel.selectedTravel.collectAsState()
@@ -107,6 +118,18 @@ fun DocumentListScreen(
             }
           }
 
+  // Create a launcher of the file picker to select a file
+  val filePickerLauncher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+          uri: Uri? ->
+        if (uri != null)
+            documentViewModel.uploadFile(
+                context.contentResolver.openInputStream(uri),
+                selectedTravel.value,
+                context.contentResolver.getType(uri))
+        else Log.d("DocumentList", "No file selected")
+      }
+
   Scaffold(
       modifier = Modifier.testTag("documentListScreen"),
       topBar = {
@@ -140,7 +163,7 @@ fun DocumentListScreen(
                         modifier = Modifier.testTag("importLocalFileButtonText"))
                   },
                   icon = { Icon(Icons.Default.UploadFile, contentDescription = "Add Document") },
-                  onClick = {},
+                  onClick = { filePickerLauncher.launch(DocumentFileFormat.ACCEPTED_MIME_TYPE) },
                   modifier = Modifier.testTag("importLocalFileButton"))
 
               Spacer(modifier = Modifier.height(8.dp))
@@ -175,30 +198,47 @@ fun DocumentListScreen(
           }
         }
       }) { paddingValue ->
-        Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
-          var isRefreshing by remember { mutableStateOf(false) }
-          val pullToRefreshState = rememberPullToRefreshState()
-          LazyVerticalGrid(
-              columns = GridCells.Adaptive(minSize = 150.dp),
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .pullToRefresh(
-                          isRefreshing = isRefreshing,
-                          state = pullToRefreshState,
-                          onRefresh = {
-                            isRefreshing = true
-                            documentViewModel.getDocuments()
-                            isRefreshing = false
-                          })) {
-                items(documents.value.size) { index ->
-                  DocumentListItem(
-                      documents.value[index],
-                      documentViewModel,
-                      onClick = {
-                        documentViewModel.selectDocument(documents.value[index])
-                        onNavigateToDocumentPreview()
-                      })
+        Box(modifier = Modifier.fillMaxSize()) {
+          Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
+            var isRefreshing by remember { mutableStateOf(false) }
+            val pullToRefreshState = rememberPullToRefreshState()
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 150.dp),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .pullToRefresh(
+                            isRefreshing = isRefreshing,
+                            state = pullToRefreshState,
+                            onRefresh = {
+                              isRefreshing = true
+                              documentViewModel.getDocuments()
+                              isRefreshing = false
+                            })) {
+                  items(documents.value.size) { index ->
+                    DocumentListItem(
+                        documents.value[index],
+                        documentViewModel,
+                        onClick = {
+                          documentViewModel.selectDocument(documents.value[index])
+                          onNavigateToDocumentPreview()
+                        })
+                  }
                 }
+          }
+
+          // Update the CircularProgressIndicator appearance
+          AnimatedVisibility(
+              modifier = Modifier.align(Alignment.Center).fillMaxSize(0.2f),
+              visible = isLoading.value,
+              enter = fadeIn(animationSpec = tween(50)),
+              exit = fadeOut(animationSpec = tween(500))) {
+                CircularProgressIndicator(
+                    modifier =
+                        Modifier // Adjust spinner size fifth of screen height
+                            .align(Alignment.Center) // Center the spinner
+                            .testTag("loadingSpinner"),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 10.dp)
               }
         }
       }

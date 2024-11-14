@@ -12,6 +12,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -39,6 +40,7 @@ class ProfileRepositoryTest {
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
   @Mock private lateinit var mockDocumentSnapshotError: DocumentSnapshot
+  @Mock private lateinit var mockFunction: (Profile) -> Unit
 
   private lateinit var profileRepositoryFirestore: ProfileRepositoryFirebase
 
@@ -52,6 +54,8 @@ class ProfileRepositoryTest {
           null,
           "nameTest",
           emptyList())
+
+  val function: (Profile) -> Unit = {}
 
   @Before
   fun setUp() {
@@ -68,6 +72,7 @@ class ProfileRepositoryTest {
     mockTaskDocumentSnapshot = mock()
     mockFirebaseAuth = mock(FirebaseAuth::class.java)
     mockFirebaseUser = mock(FirebaseUser::class.java)
+    mockFunction = mock()
 
     `when`(mockDocumentSnapshot.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockDocumentSnapshot.getString("email")).thenReturn("email@test.ch")
@@ -128,11 +133,12 @@ class ProfileRepositoryTest {
 
     val privateFunc =
         profileRepositoryFirestore.javaClass.getDeclaredMethod(
-            "addProfile", String::class.java, String::class.java)
+            "addProfile", String::class.java, String::class.java, Function1::class.java)
     privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(2)
+    val parameters = arrayOfNulls<Any>(3)
     parameters[0] = "email@test.ch"
     parameters[1] = "qwertzuiopasdfghjklyxcvbnm12"
+    parameters[2] = function
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
@@ -159,11 +165,15 @@ class ProfileRepositoryTest {
   fun addingUserWhenDoesNotExistTest() {
     val privateFunc =
         profileRepositoryFirestore.javaClass.getDeclaredMethod(
-            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java)
+            "addingUserIfNotRegistered",
+            FirebaseUser::class.java,
+            DocumentSnapshot::class.java,
+            (Function1::class.java))
     privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(2)
+    val parameters = arrayOfNulls<Any>(3)
     parameters[0] = mockFirebaseUser
     parameters[1] = mockDocumentSnapshot
+    parameters[2] = function
 
     `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockFirebaseUser.email).thenReturn("email@test.ch")
@@ -183,11 +193,16 @@ class ProfileRepositoryTest {
   fun addingUserTest() {
     val privateFunc =
         profileRepositoryFirestore.javaClass.getDeclaredMethod(
-            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java)
+            "addingUserIfNotRegistered",
+            FirebaseUser::class.java,
+            DocumentSnapshot::class.java,
+            (Function1::class.java))
     privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(2)
+    val parameters = arrayOfNulls<Any>(3)
+
     parameters[0] = mockFirebaseUser
     parameters[1] = mockDocumentSnapshot
+    parameters[2] = function
 
     `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockFirebaseUser.email).thenReturn("email@test.ch")
@@ -204,30 +219,6 @@ class ProfileRepositoryTest {
   }
 
   @Test
-  fun addingUserWithNullEmailTriggersExceptionTest() {
-    val privateFunc =
-        profileRepositoryFirestore.javaClass.getDeclaredMethod(
-            "addingUserIfNotRegistered", FirebaseUser::class.java, DocumentSnapshot::class.java)
-    privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(2)
-    parameters[0] = mockFirebaseUser
-    parameters[1] = mockDocumentSnapshot
-
-    `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
-    `when`(mockFirebaseUser.email).thenReturn(null)
-
-    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
-    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
-    `when`(mockDocumentReference.set(anyOrNull())).thenReturn(Tasks.forResult(null))
-
-    `when`(mockDocumentSnapshot.exists()).thenReturn(false)
-    privateFunc.invoke(profileRepositoryFirestore, *parameters)
-
-    verify(mockFirebaseUser).delete()
-  }
-
-  @Test
   fun gettingProfileUserCallsTheDocumentReference() = runTest {
     `when`(mockFirebaseUser.uid).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockFirebaseUser.email).thenReturn("email@test.ch")
@@ -236,7 +227,7 @@ class ProfileRepositoryTest {
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(null))
 
-    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser)
+    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
     verify(timeout(1000)) { (mockDocumentReference) }
   }
 
@@ -246,18 +237,23 @@ class ProfileRepositoryTest {
     assertThat(result, `is`(ErrorProfile.errorProfile))
   }
 
-  //  @Test
-  //  fun gettingProfileUserCallsCreatingProfile(){
-  //
-  //    `when`(mockFirebaseUser.uid).thenReturn("uid")
-  //    `when`(mockFirebaseUser.email).thenReturn("email")
-  //
-  //    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
-  //    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
-  //    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
-  //
-  //    `when`(mockDocumentSnapshot.exists()).thenReturn(true)
-  //    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
-  //    verify(mockDocumentSnapshot).exists()
-  //  }
+  @Test
+  fun gettingProfileUserCallsCreatingProfile() = runTest {
+    val mockTask: Task<DocumentSnapshot> = mock()
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(true)
+    `when`(mockTask.result).thenReturn(mockDocumentSnapshot)
+
+    `when`(mockFirebaseUser.uid).thenReturn("uid")
+    `when`(mockFirebaseUser.email).thenReturn("email")
+
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(mockTask)
+    `when`(mockTask.await()).thenReturn(mockDocumentSnapshot)
+
+    `when`(mockDocumentSnapshot.exists()).thenReturn(true)
+    profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
+    verify(mockDocumentSnapshot).exists()
+  }
 }

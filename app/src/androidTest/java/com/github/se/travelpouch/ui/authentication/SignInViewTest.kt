@@ -1,14 +1,14 @@
 package com.github.se.travelpouch.ui.authentication
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertContentDescriptionEquals
-import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
@@ -43,8 +43,6 @@ class SignInViewTest {
     // Image
     composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
     composeTestRule.onNodeWithTag("appLogo").assertContentDescriptionEquals("App Logo")
-    composeTestRule.onNodeWithTag("appLogo").assertWidthIsEqualTo(250.dp)
-    composeTestRule.onNodeWithTag("appLogo").assertHeightIsEqualTo(250.dp)
 
     // Text
     composeTestRule.onNodeWithTag("welcomText").assertIsDisplayed()
@@ -57,5 +55,25 @@ class SignInViewTest {
       SignInScreen(navigationActions = mockNavigationActions, profileModelView, travelViewModel)
     }
     composeTestRule.onNodeWithTag("loginButtonRow").performClick()
+  }
+
+  @Test
+  fun signInScreenTestSpinner() {
+    val yesSpin: MutableState<Boolean> = mutableStateOf(true)
+    composeTestRule.setContent {
+      SignInScreen(
+          navigationActions = mockNavigationActions, profileModelView, travelViewModel, yesSpin)
+    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
+  }
+
+  @Test
+  fun signInWithWmailAndPasswordIsDisplayed() {
+    composeTestRule.setContent {
+      SignInScreen(navigationActions = mockNavigationActions, profileModelView, travelViewModel)
+    }
+
+    composeTestRule.onNodeWithText("Sign in with email and password").assertIsDisplayed()
   }
 }

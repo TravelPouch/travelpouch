@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.ui.semantics.SemanticsProperties.EditableText
-import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
@@ -80,6 +79,7 @@ class AddActivityScreenTest {
     composeTestRule.onNodeWithTag("titleField").isDisplayed()
     composeTestRule.onNodeWithTag("descriptionField").isDisplayed()
     composeTestRule.onNodeWithTag("dateField").isDisplayed()
+    composeTestRule.onNodeWithTag("titleField").isDisplayed()
     composeTestRule.onNodeWithTag("locationField").isDisplayed()
     composeTestRule.onNodeWithTag("saveButton").isDisplayed()
     composeTestRule.onNodeWithTag("saveButton").assertTextEquals("Save")
@@ -94,6 +94,9 @@ class AddActivityScreenTest {
 
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("01022024")
+
+    composeTestRule.onNodeWithTag("timeField").performTextClearance()
+    composeTestRule.onNodeWithTag("timeField").performTextInput("15:24")
   }
 
   @Test
@@ -204,14 +207,9 @@ class AddActivityScreenTest {
 
   @Test
   fun timePickerDialogOpensOnClick() {
-    composeTestRule.setContent {
-      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
-    }
 
-    // Click on the time field
-    composeTestRule.onNodeWithTag("timeField").performClick()
-    // TODO: Add a test for the time picker dialog
     // Since TimePickerDialog is a platform dialog, we cannot directly test its display.
+
     // However, we can test that the timeText state variable updates after interaction.
 
     // For this test, assume that the TimePickerDialog sets the time to "12:34"
@@ -220,6 +218,26 @@ class AddActivityScreenTest {
     // Unfortunately, Compose UI testing cannot interact with platform dialogs like
     // TimePickerDialog.
 
-    composeTestRule.onNodeWithTag("timeField").assertHasClickAction()
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+    }
+
+    // The time field should be displayed
+    composeTestRule.onNodeWithTag("timePickerButton").assertIsDisplayed()
+    // Click on the time field
+    composeTestRule.onNodeWithTag("timePickerButton").performClick()
+  }
+
+  @Test
+  fun datePickerDialogOpensOnClick() {
+
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+    }
+
+    // The date field should be displayed
+    composeTestRule.onNodeWithTag("datePickerButton").assertIsDisplayed()
+    // Click on the date field
+    composeTestRule.onNodeWithTag("datePickerButton").performClick()
   }
 }

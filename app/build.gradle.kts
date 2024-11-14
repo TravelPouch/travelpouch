@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.sonar)
     id("jacoco")
     alias(libs.plugins.gms)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -27,6 +29,7 @@ android {
     val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS")
     val keyPassword = System.getenv("KEY_PASSWORD") ?: localProperties.getProperty("KEY_PASSWORD")
     val mapsApiKey: String = System.getenv("MAPS_API_KEY") ?: (localProperties.getProperty("MAPS_API_KEY") ?: "")
+    var chosenConfig: Boolean = false // this is to avoid issues with the signing config when building apk
 
     defaultConfig {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
@@ -37,7 +40,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.github.se.travelpouch.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -45,15 +48,16 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            //isMinifyEnabled = true
+            //isShrinkResources = true
+            //proguardFiles(
+            //    getDefaultProguardFile("proguard-android-optimize.txt"),
+            //    "proguard-rules.pro"
+            //)
             // Only assign signing config if it exists
             if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
                 println("creating a release config")
+                chosenConfig = true // prevent debug signingConfig from getting created
                 signingConfig = signingConfigs.create("release") {
                     storeFile(file(keystoreFile))
                     storePassword(keystorePassword)
@@ -67,13 +71,25 @@ android {
         }
 
         debug {
+            if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null && !chosenConfig) {
+                println("creating a debug config")
+                signingConfig = signingConfigs.create("debug") {
+                    storeFile(file(keystoreFile))
+                    storePassword(keystorePassword)
+                    keyAlias(keyAlias)
+                    keyPassword(keyPassword)
+                }
+            }
+            else {
+                println("No debug signing config set.")
+            }
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
     }
 
     testCoverage {
-        jacocoVersion = "0.8.8"
+        jacocoVersion = "0.8.12"
     }
 
     buildFeatures {
@@ -85,12 +101,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     packaging {
@@ -172,14 +188,16 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
-    //todo: wait for a listener to finish libraries
-    implementation(libs.guava)
+    //Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-    // To use CallbackToFutureAdapter
-    implementation(libs.androidx.concurrent.futures)
-
-    // Kotlin
-    implementation(libs.kotlinx.coroutines.guava)
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.android.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
 
 
     // Google Service and Maps
@@ -262,6 +280,11 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
 }
 
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
+}
+
 tasks.withType<Test> {
     // Configure Jacoco for each tests
     configure<JacocoTaskExtension> {
@@ -298,6 +321,15 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
+    // strange workaround to fix the 65535 issue
+    // https://github.com/EPFLSWENT2024G1/partagix/pull/78 taken from this PR of a previous year
+    doLast {
+        val reportFile = reports.xml.outputLocation.asFile.get()
+        val newContent = reportFile.readText().replace("<line[^>]+nr=\"65535\"[^>]*>".toRegex(), "")
+        reportFile.writeText(newContent)
+
+        logger.quiet("Wrote summarized jacoco test coverage report xml to $reportFile.absolutePath}")
+    }
 }
 
 tasks.register("beforeCommitCheck") {

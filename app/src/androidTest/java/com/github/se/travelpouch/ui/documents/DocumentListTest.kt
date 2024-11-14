@@ -1,10 +1,20 @@
 package com.github.se.travelpouch.ui.documents
 
+import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.net.toUri
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
@@ -19,6 +29,7 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import java.io.File
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -26,8 +37,24 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
 
 class DocumentListTest {
+  @Composable
+  fun withActivityResultRegistry(
+      activityResultRegistry: ActivityResultRegistry,
+      content: @Composable () -> Unit
+  ) {
+    val activityResultRegistryOwner =
+        object : ActivityResultRegistryOwner {
+          override val activityResultRegistry = activityResultRegistry
+        }
+    CompositionLocalProvider(
+        LocalActivityResultRegistryOwner provides activityResultRegistryOwner) {
+          content()
+        }
+  }
 
   private lateinit var navigationActions: NavigationActions
   private lateinit var mockDocumentRepository: DocumentRepository
@@ -85,7 +112,8 @@ class DocumentListTest {
     mockFileDownloader = mock(FileDownloader::class.java)
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
-    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
+    val documentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
+    mockDocumentViewModel = spy(documentViewModel)
   }
 
   @Test
@@ -124,5 +152,78 @@ class DocumentListTest {
         .assertTextEquals("Scan with camera")
 
     composeTestRule.onNodeWithTag("dropDownButton").assertIsDisplayed()
+    // make spinner appear
+    val isLoadingField = DocumentViewModel::class.java.getDeclaredField("_isLoading")
+    isLoadingField.isAccessible = true
+    val loadingFlow = isLoadingField.get(mockDocumentViewModel) as MutableStateFlow<Boolean>
+    loadingFlow.value = true
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
+  }
+
+  @Test
+  fun assertMessageWhenNoFileSelectedImportDocument() {
+    val testRegistry =
+        object : ActivityResultRegistry() {
+          override fun <I, O> onLaunch(
+              requestCode: Int,
+              contract: ActivityResultContract<I, O>,
+              input: I,
+              options: ActivityOptionsCompat?
+          ) {
+            dispatchResult(requestCode, null)
+          }
+        }
+
+    `when`(mockListTravelViewModel.selectedTravel).then {
+      MutableStateFlow<TravelContainer?>(travelContainer)
+    }
+
+    composeTestRule.setContent {
+      withActivityResultRegistry(testRegistry) {
+        DocumentListScreen(mockDocumentViewModel, mockListTravelViewModel, navigationActions, {})
+      }
+    }
+
+    val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    device.executeShellCommand("logcat -c")
+
+    composeTestRule.onNodeWithTag("plusButton").performClick()
+    composeTestRule.onNodeWithTag("importLocalFileButton").performClick()
+
+    val logs = device.executeShellCommand("logcat -d travelpouch:D")
+    assert(logs.contains("No file selected"))
+  }
+
+  @Test
+  fun assertUploadFileTriggersWhenUriNotNull() {
+    val testRegistry =
+        object : ActivityResultRegistry() {
+          override fun <I, O> onLaunch(
+              requestCode: Int,
+              contract: ActivityResultContract<I, O>,
+              input: I,
+              options: ActivityOptionsCompat?
+          ) {
+            dispatchResult(requestCode, File.createTempFile("test", ".pdf").toUri())
+          }
+        }
+
+    `when`(mockListTravelViewModel.selectedTravel).then { MutableStateFlow<TravelContainer?>(null) }
+
+    composeTestRule.setContent {
+      withActivityResultRegistry(testRegistry) {
+        DocumentListScreen(mockDocumentViewModel, mockListTravelViewModel, navigationActions, {})
+      }
+    }
+
+    val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    device.executeShellCommand("logcat -c")
+
+    composeTestRule.onNodeWithTag("plusButton").performClick()
+    composeTestRule.onNodeWithTag("importLocalFileButton").performClick()
+
+    val logs = device.executeShellCommand("logcat -d travelpouch:D")
+    assert(logs.contains("No travel selected"))
   }
 }

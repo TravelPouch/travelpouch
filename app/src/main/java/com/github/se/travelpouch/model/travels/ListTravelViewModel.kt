@@ -2,11 +2,10 @@ package com.github.se.travelpouch.model.travels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.github.se.travelpouch.model.profile.Profile
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +16,9 @@ import kotlinx.coroutines.launch
  *
  * @property repository The repository used for accessing travel data.
  */
-open class ListTravelViewModel(private val repository: TravelRepository) : ViewModel() {
+@HiltViewModel
+open class ListTravelViewModel @Inject constructor(private val repository: TravelRepository) :
+    ViewModel() {
   private val travels_ = MutableStateFlow<List<TravelContainer>>(emptyList())
   val travels: StateFlow<List<TravelContainer>> = travels_.asStateFlow()
 
@@ -30,20 +31,23 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
   private var lastFetchedTravel: TravelContainer? = null
   private var lastFetchedParticipants: Map<fsUid, Role> = emptyMap()
 
+  private val _isLoading = MutableStateFlow(false)
+  val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
   fun initAfterLogin() {
     repository.initAfterLogin { getTravels() }
   }
 
-  // create factory
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ListTravelViewModel(TravelRepositoryFirestore(Firebase.firestore)) as T
-          }
-        }
-  }
+  //  // create factory
+  //  companion object {
+  //    val Factory: ViewModelProvider.Factory =
+  //        object : ViewModelProvider.Factory {
+  //          @Suppress("UNCHECKED_CAST")
+  //          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+  //            return ListTravelViewModel(TravelRepositoryFirestore(Firebase.firestore)) as T
+  //          }
+  //        }
+  //  }
 
   /**
    * Generates a new unique ID.
@@ -114,10 +118,16 @@ open class ListTravelViewModel(private val repository: TravelRepository) : ViewM
 
   /** Gets all Travel documents. */
   fun getTravels() {
-
+    _isLoading.value = true
     repository.getTravels(
-        onSuccess = { travels_.value = it },
-        onFailure = { Log.e("ListTravelViewModel", "Failed to get travels", it) })
+        onSuccess = {
+          travels_.value = it
+          _isLoading.value = false
+        },
+        onFailure = {
+          _isLoading.value = false
+          Log.e("ListTravelViewModel", "Failed to get travels", it)
+        })
   }
 
   /**

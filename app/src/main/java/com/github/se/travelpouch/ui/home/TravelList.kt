@@ -1,13 +1,16 @@
 package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,12 +31,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -53,13 +59,22 @@ fun TravelListScreen(
     activityViewModel: ActivityViewModel,
     eventViewModel: EventViewModel,
     documentViewModel: DocumentViewModel,
+    profileModelView: ProfileModelView
 ) {
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
     listTravelViewModel.getTravels()
-    // sleep the thread for 1 second to allow the data to be fetched
+    profileModelView.getProfile()
   }
+
   val travelList = listTravelViewModel.travels.collectAsState()
+  val currentProfile = profileModelView.profile.collectAsState()
+  val isLoading = listTravelViewModel.isLoading.collectAsState()
+
+  // Used for the screen orientation redraw
+  val configuration = LocalConfiguration.current
+  val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+  val mapHeight = if (isPortrait) 300.dp else 200.dp
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
@@ -71,15 +86,17 @@ fun TravelListScreen(
             }
       },
       content = { pd ->
-        Column {
-          if (travelList.value.isNotEmpty()) {
-            // Add the map to display the travels
+        Column(modifier = Modifier.fillMaxSize().padding(pd)) {
+          // Map placed outside the LazyColumn to prevent it from being part of the scrollable
+          // content
+          MapContent(
+              modifier = Modifier.fillMaxWidth().height(mapHeight),
+              travelContainers = travelList.value)
 
-            MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), travelList.value)
-
-            LazyColumn(
-                contentPadding = PaddingValues(vertical = 8.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
+          LazyColumn(
+              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).padding(pd),
+              contentPadding = PaddingValues(bottom = 80.dp)) {
+                if (travelList.value.isNotEmpty()) {
                   items(travelList.value.size) { index ->
                     TravelItem(travelContainer = travelList.value[index]) {
                       val travelId = travelList.value[index].fsUid
@@ -90,14 +107,25 @@ fun TravelListScreen(
                       documentViewModel.setIdTravel(travelId)
                     }
                   }
+                } else {
+                  item {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        contentAlignment = Alignment.Center) {
+                          Text(
+                              modifier = Modifier.testTag("emptyTravelPrompt"),
+                              text = "You have no travels yet.")
+                          if (isLoading.value) {
+                            CircularProgressIndicator(
+                                modifier =
+                                    Modifier.align(Alignment.TopStart).testTag("loadingSpinner"),
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 5.dp)
+                          }
+                        }
+                  }
                 }
-          } else {
-            MapContent(modifier = Modifier.fillMaxWidth().height(300.dp), emptyList())
-
-            Text(
-                modifier = Modifier.padding(pd).testTag("emptyTravelPrompt"),
-                text = "You have no travels yet.")
-          }
+              }
         }
       })
 }
@@ -114,7 +142,7 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
       modifier =
           Modifier.testTag("travelListItem")
               .fillMaxWidth()
-              .padding(vertical = 4.dp)
+              .padding(vertical = 6.dp)
               .clickable(onClick = onClick),
   ) {
     Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
