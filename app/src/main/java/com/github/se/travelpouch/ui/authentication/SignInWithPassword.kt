@@ -115,7 +115,6 @@ fun SignInWithPassword(
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
                       navigationActions.navigateTo(Screen.TRAVEL_LIST)
-                      methodChosen.value = false
                     },
                     onFailure = { task ->
                       methodChosen.value = false
@@ -153,7 +152,6 @@ fun SignInWithPassword(
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
                       navigationActions.navigateTo(Screen.TRAVEL_LIST)
-                      methodChosen.value = false
                     },
                     onFailure = { task ->
                       Log.w(TAG, "LoginWithEmailAndPassword:failure", task.exception)
