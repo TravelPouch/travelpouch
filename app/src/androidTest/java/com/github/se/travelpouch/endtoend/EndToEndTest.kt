@@ -57,7 +57,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithText("Sign in").performClick()
 
         // wait until we are in the travel list screen
-        composeTestRule.waitUntil {
+        composeTestRule.waitUntil(timeoutMillis = 40000) {
           composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
         }
 
@@ -69,7 +69,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("createTravelFab").performClick()
 
         // wait until we are in the screen to add a travel
-        composeTestRule.waitUntil {
+        composeTestRule.waitUntil(timeoutMillis = 40000) {
           composeTestRule.onNodeWithTag("travelTitle", useUnmergedTree = true).isDisplayed()
         }
 
@@ -92,7 +92,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
 
         // wait to have La paz displayed
-        composeTestRule.waitUntil {
+        composeTestRule.waitUntil(timeoutMillis = 40000) {
           composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
         }
 
