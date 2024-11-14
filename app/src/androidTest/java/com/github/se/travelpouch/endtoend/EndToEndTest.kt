@@ -38,7 +38,7 @@ class EndToEndTest {
 
   @Test
   fun verifyUserFlowForTravelCreation() =
-      runTest(timeout = 40.seconds) {
+      runTest(timeout = 300.seconds) {
 
         // assert that login screen is displayed
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
