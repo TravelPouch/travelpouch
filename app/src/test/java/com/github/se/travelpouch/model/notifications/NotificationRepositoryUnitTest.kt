@@ -149,7 +149,7 @@ class NotificationRepositoryUnitTest {
             "6NU2zp2oGdA34s1Q1q5h12345678",
             "6NU2zp2oGdA34s1Q122212345678",
             "6NU2zp2oGdA34s1Q1q5h",
-            mock(NotificationContent::class.java),
+            mock(NotificationContent.InvitationNotification::class.java),
             NotificationType.INVITATION)
     whenever(querySnapshot.documents).thenReturn(listOf(queryDocumentSnapshot))
     whenever(queryDocumentSnapshot.toObject(Notification::class.java)).thenReturn(mockNotification)
