@@ -78,8 +78,13 @@ jobs:
           echo "KEYSTORE_FILE=$(readlink -f ~/.keystore/test-release.keystore)" >> $GITHUB_ENV
 
       - name: Build APK Release with Custom Key
+        env:
+          KEYSTORE_PASSWORD: testpass
+          KEY_ALIAS: testalias
+          KEY_PASSWORD: testpass
         run: |
           echo "Keystore_file is: $KEYSTORE_FILE" && \
+          echo $(readlink -f ~/.keystore/test-release.keystore) &&
           ./gradlew clean assembleRelease --info
 
       - name: Extract SHA-1 Fingerprint from Release Keystore
