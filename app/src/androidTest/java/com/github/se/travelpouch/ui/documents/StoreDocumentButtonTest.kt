@@ -129,4 +129,45 @@ class StoreDocumentButtonTest {
     // Verify that the mock callback was called once with null
     verify(mockOnDirectoryPicked, never()).invoke(any())
   }
+
+  @Test
+  fun assertNoAskIfPermissionExists() {
+    // Create a mock callback
+    val mockOnDirectoryPicked: (Uri?) -> Unit = mock()
+
+    // Create a test ActivityResultRegistry
+    val testRegistry =
+        object : ActivityResultRegistry() {
+          override fun <I, O> onLaunch(
+              requestCode: Int,
+              contract: ActivityResultContract<I, O>,
+              input: I,
+              options: ActivityOptionsCompat?
+          ) {
+            dispatchResult(requestCode, Uri.EMPTY)
+            assert(false)
+          }
+        }
+
+    documentViewModel.setSaveDocumentFolder(
+        Uri.parse("content://com.android.externalstorage.documents/exists"))
+
+    // Set the content for the test
+    composeTestRule.setContent {
+      withActivityResultRegistry(testRegistry) {
+        StoreDocumentButton(
+            documentViewModel,
+            modifier = Modifier.testTag("clickMe"),
+            onDirectoryPicked = mockOnDirectoryPicked // Pass the mock directly
+            )
+      }
+    }
+
+    // Perform the click on the button
+    composeTestRule.onNodeWithTag("clickMe").performClick()
+
+    // Verify that the mock callback was called once with null
+    verify(mockOnDirectoryPicked, times(1))
+        .invoke(Uri.parse("content://com.android.externalstorage.documents/exists"))
+  }
 }
