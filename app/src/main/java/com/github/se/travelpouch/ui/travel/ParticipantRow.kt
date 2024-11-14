@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.travel
 
+import TruncatedText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -38,14 +39,16 @@ fun ParticipantRow(
         Text(
             text = participant.value.name,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp).testTag("participantName"))
-        Text(
+            modifier = Modifier.padding(10.dp).testTag("participantName").weight(0.5f))
+        TruncatedText(
             text = participant.value.email,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp).testTag("participantEmail"))
-        Text(
+            maxLength = 30,
+            modifier = Modifier.padding(10.dp).testTag("participantEmail").weight(0.8f))
+        TruncatedText(
             text = selectedTravel.allParticipants[Participant(participant.key)]!!.name,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp).testTag("participantRole"))
+            maxLength = 20,
+            modifier = Modifier.padding(10.dp).testTag("participantRole").weight(1f))
       }
 }
