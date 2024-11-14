@@ -7,7 +7,7 @@ import {
   processNewMessagesId, updateVars,
 } from "./gmail.js";
 import {storeFile} from "./storage.js";
-import {convertPdf} from "./thumbnailing.js";
+import {generateThumbnailForDocument} from "./thumbnailing.js";
 
 initializeApp();
 
@@ -46,22 +46,25 @@ export const storeDocument = onCall(
         body.title, body.travelId, body.fileSize);
     } catch (e) {
       logger.error("some error occured", e);
-      return {message: "Ohhhhhh nooo", code: 500};
+      return {success: false, code: 500};
     }
 
-    return {message: "Oooooookayyy", code: 200};
+    return {success: true, code: 200};
   }
 );
 
-export const test = onRequest(
-  {region: "europe-west9"},
+export const generateThumbnail = onRequest(
+  {region: "europe-west9", memory: "1GiB"},
   async (req, res) => {
-    logger.debug(req.headers);
-
-    convertPdf("chartes.pdf").then(() => {
-      res.json({result: "Ok"});
-    }).catch((err: string) => {
-      res.json({result: err});
+    logger.debug(req.headers, req.body);
+    if (!req.body.travelId || !req.body.documentId || !req.body.width) {
+      res.json({success: false, message: "Missing parameters"});
+      return;
+    }
+    generateThumbnailForDocument(req.body.travelId, req.body.documentId, req.body.width).then(() => {
+      res.json({success: true});
+    }).catch((err) => {
+      res.json({success: false, message: err});
     });
   });
 

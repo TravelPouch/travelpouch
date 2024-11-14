@@ -6,10 +6,11 @@ import {logger} from "firebase-functions";
 
 /**
  * Parse a TravelPouch Document from firestore DocumentData
- * @param {DocumentData} data The data to parse
+ * @param {DocumentData} doc The data to parse
  * @return {Document} The document
  */
-export function parseDocumentFromFirestore(data: DocumentData): Document {
+export function parseDocumentFromFirestore(doc: DocumentData): Document {
+  const data = doc.data();
   return {
     addedAt: data.addedAt,
     fileFormat: data.fileFormat,
