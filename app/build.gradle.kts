@@ -29,6 +29,7 @@ android {
     val keyAlias = System.getenv("KEY_ALIAS") ?: localProperties.getProperty("KEY_ALIAS")
     val keyPassword = System.getenv("KEY_PASSWORD") ?: localProperties.getProperty("KEY_PASSWORD")
     val mapsApiKey: String = System.getenv("MAPS_API_KEY") ?: (localProperties.getProperty("MAPS_API_KEY") ?: "")
+    var chosenConfig: Boolean = false // this is to avoid issues with the signing config when building apk
 
     defaultConfig {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
@@ -47,15 +48,16 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            //isMinifyEnabled = true
+            //isShrinkResources = true
+            //proguardFiles(
+            //    getDefaultProguardFile("proguard-android-optimize.txt"),
+            //    "proguard-rules.pro"
+            //)
             // Only assign signing config if it exists
             if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
                 println("creating a release config")
+                chosenConfig = true // prevent debug signingConfig from getting created
                 signingConfig = signingConfigs.create("release") {
                     storeFile(file(keystoreFile))
                     storePassword(keystorePassword)
@@ -69,6 +71,18 @@ android {
         }
 
         debug {
+            if (keystoreFile != null && keystorePassword != null && keyAlias != null && keyPassword != null && !chosenConfig) {
+                println("creating a debug config")
+                signingConfig = signingConfigs.create("debug") {
+                    storeFile(file(keystoreFile))
+                    storePassword(keystorePassword)
+                    keyAlias(keyAlias)
+                    keyPassword(keyPassword)
+                }
+            }
+            else {
+                println("No debug signing config set.")
+            }
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
