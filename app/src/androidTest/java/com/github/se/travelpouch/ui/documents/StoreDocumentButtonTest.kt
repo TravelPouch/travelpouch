@@ -11,17 +11,23 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.app.ActivityOptionsCompat
+import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.model.documents.DocumentRepository
+import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.documents.StoreDocumentButton
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 class StoreDocumentButtonTest {
+  private lateinit var documentViewModel: DocumentViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -40,8 +46,16 @@ class StoreDocumentButtonTest {
         }
   }
 
+  @Before
+  fun setup() {
+    val repository = mock(DocumentRepository::class.java)
+    val fileDownloader = mock(FileDownloader::class.java)
+    documentViewModel = spy(DocumentViewModel(repository, fileDownloader))
+  }
+
   @Test
   fun assertCallbackOnSuccess() {
+
     // Create a mock callback
     val mockOnDirectoryPicked: (Uri?) -> Unit = mock()
 
@@ -58,10 +72,13 @@ class StoreDocumentButtonTest {
           }
         }
 
+    documentViewModel.setSaveDocumentFolder(Uri.EMPTY)
+
     // Set the content for the test
     composeTestRule.setContent {
       withActivityResultRegistry(testRegistry) {
         StoreDocumentButton(
+            documentViewModel,
             modifier = Modifier.testTag("clickMe"),
             onDirectoryPicked = mockOnDirectoryPicked // Pass the mock directly
             )
@@ -93,10 +110,13 @@ class StoreDocumentButtonTest {
           }
         }
 
+    documentViewModel.setSaveDocumentFolder(Uri.EMPTY)
+
     // Set the content for the test
     composeTestRule.setContent {
       withActivityResultRegistry(testRegistry) {
         StoreDocumentButton(
+            documentViewModel,
             modifier = Modifier.testTag("clickMe"),
             onDirectoryPicked = mockOnDirectoryPicked // Pass the mock directly
             )
