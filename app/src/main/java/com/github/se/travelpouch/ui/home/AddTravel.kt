@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.home
 
-import android.icu.util.GregorianCalendar
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,6 +49,7 @@ import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.utils.DateTimeUtils
 import com.google.firebase.Timestamp
 
 /**
@@ -79,9 +80,12 @@ fun AddTravelScreen(
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
+  val currentProfile = profileModelView.profile.collectAsState()
+
   val context = LocalContext.current
 
-  val currentProfile = profileModelView.profile.collectAsState()
+  // Create an instance of DateUtils
+  val dateTimeUtils = DateTimeUtils("dd/MM/yyyy")
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("addTravelScreen"), // Tag for entire screen
@@ -189,26 +193,52 @@ fun AddTravelScreen(
               // Start Date Input
               OutlinedTextField(
                   value = startDate,
-                  onValueChange = { startDate = it },
+                  onValueChange = { startDate = it }, // Allow manual input
                   label = { Text("Start Date") },
                   placeholder = { Text("DD/MM/YYYY") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputTravelStartDate"))
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelStartDate"),
+                  trailingIcon = {
+                    IconButton(
+                        onClick = {
+                          dateTimeUtils.showDatePicker(context) { selectedDate ->
+                            startDate = selectedDate
+                          }
+                        },
+                        modifier = Modifier.testTag("startDatePickerButton")) {
+                          Icon(
+                              imageVector = Icons.Default.DateRange,
+                              contentDescription = "Select Start Date")
+                        }
+                  })
 
               // End Date Input
               OutlinedTextField(
                   value = endDate,
-                  onValueChange = { endDate = it },
+                  onValueChange = { endDate = it }, // Allow manual input
                   label = { Text("End Date") },
                   placeholder = { Text("DD/MM/YYYY") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputTravelEndDate"))
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelEndDate"),
+                  trailingIcon = {
+                    IconButton(
+                        onClick = {
+                          dateTimeUtils.showDatePicker(context) { selectedDate ->
+                            endDate = selectedDate
+                          }
+                        },
+                        modifier = Modifier.testTag("endDatePickerButton")) {
+                          Icon(
+                              imageVector = Icons.Default.DateRange,
+                              contentDescription = "Select End Date")
+                        }
+                  })
 
               Spacer(modifier = Modifier.height(16.dp))
 
               // Save Button
               Button(
                   onClick = {
-                    val startCalendar = parseDate(startDate)
-                    val endCalendar = parseDate(endDate)
+                    val startCalendar = dateTimeUtils.convertStringToTimestamp(startDate)
+                    val endCalendar = dateTimeUtils.convertStringToTimestamp(endDate)
 
                     Log.d("AddTravelScreen", "Start date: $startDate, End date: $endDate")
                     Log.d(
@@ -234,8 +264,8 @@ fun AddTravelScreen(
                                 fsUid = listTravelViewModel.getNewUid(),
                                 title = title,
                                 description = description,
-                                startTime = Timestamp(startCalendar.time),
-                                endTime = Timestamp(endCalendar.time),
+                                startTime = startCalendar,
+                                endTime = endCalendar,
                                 location =
                                     selectedLocation ?: Location(0.0, 0.0, Timestamp.now(), " "),
                                 allAttachments = emptyMap(),
@@ -288,20 +318,4 @@ fun AddTravelScreen(
                   }
             }
       })
-}
-
-// Function to parse a date in DD/MM/YYYY format
-fun parseDate(dateString: String): GregorianCalendar? {
-  val parts = dateString.split("/")
-  return if (parts.size == 3) {
-    try {
-      val calendar = GregorianCalendar()
-      calendar.set(parts[2].toInt(), parts[1].toInt() - 1, parts[0].toInt(), 0, 0, 0)
-      calendar
-    } catch (e: Exception) {
-      null // Return null if there's a parsing issue
-    }
-  } else {
-    null // Return null if the date format is incorrect
-  }
 }
