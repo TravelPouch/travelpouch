@@ -10,6 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import com.github.se.travelpouch.model.location.LocationRepository
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
@@ -66,6 +68,8 @@ class EditTravelSettingsScreenTest {
   private lateinit var travelRepository: TravelRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listTravelViewModel: ListTravelViewModel
+  private lateinit var locationRepository: LocationRepository
+  private lateinit var locationViewModel: LocationViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -74,11 +78,13 @@ class EditTravelSettingsScreenTest {
     travelRepository = mock(TravelRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listTravelViewModel = ListTravelViewModel(travelRepository)
+    locationRepository = mock(LocationRepository::class.java)
+    locationViewModel = LocationViewModel(locationRepository)
   }
 
   @Test
   fun checkNoSelectedTravel() {
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editTravelText").assertIsDisplayed()
@@ -98,7 +104,7 @@ class EditTravelSettingsScreenTest {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(
         travelContainer) // this causes strange overwrite, shouldn't happen IRL
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editTravelText").assertIsDisplayed()
@@ -125,7 +131,7 @@ class EditTravelSettingsScreenTest {
   fun testChangeInput() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
 
     inputText("inputTravelTitle", travelContainer.title, "Test Title")
     inputText("inputTravelDescription", travelContainer.description, "Test Description")
@@ -146,7 +152,7 @@ class EditTravelSettingsScreenTest {
   fun pressALotOfButtons() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
 
@@ -219,7 +225,7 @@ class EditTravelSettingsScreenTest {
   fun testInput() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
 
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
     inputText("inputTravelEndTime", "16/02/2009", "15/02/2009")
@@ -235,7 +241,7 @@ class EditTravelSettingsScreenTest {
   fun testbadInputs() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
     // check bad dates
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
     inputText("inputTravelEndTime", "16/02/2009", "gyat")
@@ -254,7 +260,7 @@ class EditTravelSettingsScreenTest {
 
   @Test
   fun backButtonNavigatesCorrectly() {
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
 
     composeTestRule.onNodeWithTag("goBackButton").performClick()
 
@@ -263,7 +269,7 @@ class EditTravelSettingsScreenTest {
 
   @Test
   fun saveButtonPressed() {
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
 
     composeTestRule.onNodeWithTag("travelSaveButton").isDisplayed()
   }
@@ -274,7 +280,7 @@ class EditTravelSettingsScreenTest {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
 
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
 
     // The startDate picker button should be displayed
     composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()

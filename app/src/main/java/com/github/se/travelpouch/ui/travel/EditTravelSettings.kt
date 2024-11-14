@@ -104,41 +104,6 @@ fun EditTravelSettingsScreen(
 
     Scaffold(
         modifier = Modifier.testTag("editScreen"),
-        topBar = {
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.travel_settings_background),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(110.dp),
-                    contentScale = ContentScale.FillWidth, // Display the image from the bottom
-                    alignment = Alignment.BottomCenter // Align the image to the bottom
-                )
-                MediumTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        titleContentColor = Color.White,
-                    ),
-                    title = {
-                        Text(
-                            "Edit Travel",
-                            modifier = Modifier.testTag("editTravelText"),
-                            fontWeight = FontWeight.Bold // Set the title to bold
-                        )
-                    },
-                    navigationIcon = {
-                        Button(
-                            onClick = { navigationActions.goBack() },
-                            modifier = Modifier.testTag("goBackButton")
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    }
-                )
-            }
-        },
         floatingActionButton = {
             var toggled by remember { mutableStateOf(false) }
 
@@ -146,11 +111,11 @@ fun EditTravelSettingsScreen(
                 if (toggled) {
                     Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
                         ExtendedFloatingActionButton(
-                            text = { Text("Add User", modifier = Modifier.testTag("addUserButtonText")) },
+                            text = { Text("List of participants", modifier = Modifier.testTag("addUserButtonText")) },
                             icon = { Icon(Icons.Default.Person, contentDescription = "Add User") },
                             onClick = {
-                                setExpandedAddUserDialog(true)
-                                Log.d("EditTravelSettingsScreen", "Add User clicked")
+                                listTravelViewModel.fetchAllParticipantsInfo()
+                                navigationActions.navigateTo(PARTICIPANT_LIST)
                             },
                             modifier = Modifier.testTag("addUserButton")
                         )
@@ -196,11 +161,12 @@ fun EditTravelSettingsScreen(
             val descriptionText = remember { mutableStateOf(selectedTravel!!.description) }
             val startTime = remember { mutableStateOf(formatter.format(selectedTravel!!.startTime.toDate())) }
             var selectedLocation by remember { mutableStateOf(selectedTravel!!.location) }
-            val locationQuery by locationViewModel.query.collectAsState()
+            val locationQuery = remember { mutableStateOf(selectedTravel!!.location.name) } // Use mutable state for location query            locationViewModel.setQuery(selectedTravel!!.location.name)
             var showDropdown by remember { mutableStateOf(false) }
             val locationSuggestions by
             locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
             val endTimeText = remember { mutableStateOf(formatter.format(selectedTravel!!.endTime.toDate())) }
+
 
             Column(
                 modifier = Modifier.padding(padding)
@@ -209,6 +175,40 @@ fun EditTravelSettingsScreen(
                 Arrangement.Top,
                 Alignment.CenterHorizontally
             ) {
+                Box {
+                    Image(
+                        painter = painterResource(id = R.drawable.travel_settings_background),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth().height(110.dp),
+                        contentScale = ContentScale.FillWidth, // Display the image from the bottom
+                        alignment = Alignment.BottomCenter // Align the image to the bottom
+                    )
+                    MediumTopAppBar(
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                            titleContentColor = Color.White,
+                        ),
+                        title = {
+                            Text(
+                                "Edit Travel",
+                                modifier = Modifier.testTag("editTravelText"),
+                                fontWeight = FontWeight.Bold // Set the title to bold
+                            )
+                        },
+                        navigationIcon = {
+                            Button(
+                                onClick = { navigationActions.goBack() },
+                                modifier = Modifier.testTag("goBackButton")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Localized description"
+                                )
+                            }
+                        }
+                    )
+                }
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
@@ -220,10 +220,6 @@ fun EditTravelSettingsScreen(
                         modifier = Modifier.padding(start = 50.dp, end = 8.dp)
                             .size(50.dp)
                             .testTag("editTravelParticipantIcon")
-                            .clickable {
-                                listTravelViewModel.fetchAllParticipantsInfo()
-                                navigationActions.navigateTo(PARTICIPANT_LIST)
-                            }
                     )
                     Text(
                         "${selectedTravel!!.allParticipants.size} participants",
@@ -252,47 +248,42 @@ fun EditTravelSettingsScreen(
                     placeholder = { Text("Describe the Travel") },
                     maxLines = 1
                 )
-                Box(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.width(300.dp).padding(vertical = 4.dp))  {
                     OutlinedTextField(
-                        value = locationQuery,
+                        value = locationQuery.value,  // Use mutable state for locationQuery
                         onValueChange = {
+                            locationQuery.value = it  // Update the query as the user types
                             locationViewModel.setQuery(it)
                             showDropdown = true // Show dropdown when user starts typing
                         },
                         label = { Text("Location") },
                         placeholder = { Text("Enter an Address or Location") },
-                        modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
+                        modifier = textFieldModifier
+                    )
 
-                    // Dropdown to show location suggestions
+                    // Dropdown for location suggestions
                     DropdownMenu(
                         expanded = showDropdown && locationSuggestions.isNotEmpty(),
                         onDismissRequest = { showDropdown = false },
                         properties = PopupProperties(focusable = false),
-                        modifier =
-                        Modifier.fillMaxWidth()
-                            .heightIn(
-                                max = 200.dp) // Set max height to make it scrollable if more than 3
-
-                        // items
+                        modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp) // Set max height to make it scrollable if more than 3
                     ) {
                         locationSuggestions.filterNotNull().take(3).forEach { location ->
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        text =
-                                        location.name.take(30) +
-                                                if (location.name.length > 30) "..."
-                                                else "", // Limit name length and add ellipsis
+                                        text = location.name.take(30) + if (location.name.length > 30) "..." else "", // Limit name length and add ellipsis
                                         maxLines = 1 // Ensure name doesn't overflow
                                     )
                                 },
                                 onClick = {
                                     locationViewModel.setQuery(location.name)
                                     selectedLocation = location // Store the selected location object
+                                    locationQuery.value = location.name  // Update location query with the selected location name
                                     showDropdown = false // Close dropdown on selection
                                 },
-                                modifier =
-                                Modifier.padding(8.dp)
+                                modifier = Modifier
+                                    .padding(8.dp)
                                     .testTag("suggestion_${location.name}") // Tag each suggestion
                             )
                             HorizontalDivider() // Separate items with a divider
@@ -302,7 +293,8 @@ fun EditTravelSettingsScreen(
                             DropdownMenuItem(
                                 text = { Text("More...") },
                                 onClick = { /* Optionally show more results */},
-                                modifier = Modifier.padding(8.dp).testTag("moreSuggestions"))
+                                modifier = Modifier.padding(8.dp).testTag("moreSuggestions")
+                            )
                         }
                     }
                 }

@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.travel
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,25 +28,51 @@ fun ParticipantRow(
     onClick: () -> Unit
 ) {
 
-  Row(
-      modifier = Modifier.fillMaxWidth().testTag("participantRow").clickable { onClick() },
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("participantColumn")
+            .clickable { onClick() }
+            .padding(10.dp)  // Apply padding for the entire column
+    ) {
+        // Icon on top
         Icon(
             imageVector = Icons.Default.Person,
             contentDescription = "Localized description",
-            modifier = Modifier.padding(10.dp).testTag("participantIcon"))
+            modifier = Modifier
+                .padding(bottom = 8.dp)  // Add space below the icon
+                .testTag("participantIcon")
+        )
+
+        // Username
         Text(
             text = participant.value.name,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp).testTag("participantName"))
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp)  // Add space between text elements
+                .testTag("participantName")
+        )
+
+        // Email
         Text(
             text = participant.value.email,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp).testTag("participantEmail"))
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp)  // Add space between text elements
+                .testTag("participantEmail")
+        )
+
+        // Role
         Text(
             text = selectedTravel.allParticipants[Participant(participant.key)]!!.name,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp).testTag("participantRole"))
-      }
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp)  // Add space between text elements
+                .testTag("participantRole")
+        )
+    }
+
 }

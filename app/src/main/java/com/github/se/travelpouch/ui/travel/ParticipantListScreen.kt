@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.travel
 
 import TruncatedText
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,15 +14,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -35,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -60,6 +68,7 @@ fun ParticipantListScreen(
   val (expandedRoleDialog, setExpandedRoleDialog) = remember { mutableStateOf(false) }
   val (selectedParticipant, setSelectedParticipant) =
       remember { mutableStateOf<Map.Entry<fsUid, Profile>?>(null) }
+    val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
 
   Scaffold(
       modifier = Modifier.testTag("participantListScreen"),
@@ -85,6 +94,17 @@ fun ParticipantListScreen(
                   }
             })
       },
+      floatingActionButton = {
+          ExtendedFloatingActionButton(
+              text = { Text("Add user", modifier = Modifier.testTag("AddUserButton")) },
+              icon = { Icon(Icons.Default.PersonAdd, contentDescription = "Add user") },
+              onClick = {
+                    listTravelViewModel.fetchAllParticipantsInfo()
+                    setExpandedAddUserDialog(true)
+              },
+              modifier = Modifier.testTag("importEmailButton")
+          )
+      }
   ) { paddingValues ->
     if (selectedTravel != null) {
       LazyColumn(
@@ -212,5 +232,54 @@ fun ParticipantListScreen(
         }
       }
     }
+
+      if (expandedAddUserDialog) {
+          val addUserEmail = remember { mutableStateOf("") }
+          Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
+              Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("addUserDialogBox")) {
+                  Column(
+                      modifier = Modifier.fillMaxSize()
+                          .padding(16.dp)
+                          .verticalScroll(rememberScrollState())
+                          .testTag("roleDialogColumn"),
+                      horizontalAlignment = Alignment.CenterHorizontally,
+                      verticalArrangement = Arrangement.Center
+                  ) {
+                      Text(
+                          "Add User by Email",
+                          fontWeight = FontWeight.Bold,
+                          modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle")
+                      )
+                      OutlinedTextField(
+                          value = addUserEmail.value,
+                          onValueChange = { addUserEmail.value = it },
+                          label = { Text("Enter User's Email") },
+                          placeholder = { Text("Enter User's Email") },
+                          modifier = Modifier.testTag("addUserEmailField"),
+                          maxLines = 1
+                      )
+                      Button(
+                          onClick = {
+                              listTravelViewModel.addUserToTravel(
+                                  addUserEmail.value,
+                                  selectedTravel!!,
+                                  { updatedContainer ->
+                                      listTravelViewModel.selectTravel(updatedContainer)
+                                      Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
+                                      setExpandedAddUserDialog(false)
+                                  },
+                                  {
+                                      Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
+                                  }
+                              )
+                          },
+                          modifier = Modifier.testTag("addUserButton")
+                      ) {
+                          Text("Add User")
+                      }
+                  }
+              }
+          }
+      }
   }
 }
