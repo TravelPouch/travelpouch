@@ -9,22 +9,37 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.github.se.travelpouch.model.documents.DocumentViewModel
 
 @Composable
-fun StoreDocumentButton(modifier: Modifier = Modifier, onDirectoryPicked: (Uri) -> Unit) {
+fun StoreDocumentButton(
+    documentViewModel: DocumentViewModel,
+    modifier: Modifier = Modifier,
+    onDirectoryPicked: (Uri) -> Unit
+) {
   val openDirectoryLauncher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) {
           uri: Uri? ->
-        if (uri != null) onDirectoryPicked(uri)
-        else Log.e("OpenDocumentButton", "Failed to access local storage")
+        if (uri != null) {
+          documentViewModel.setSaveDocumentFolder(uri)
+          onDirectoryPicked(uri)
+        } else Log.i("OpenDocumentButton", "Access to directory denied")
       }
 
-  IconButton(onClick = { openDirectoryLauncher.launch(null) }, modifier = modifier) {
-    Icon(
-        imageVector = Icons.Default.FileDownload,
-        contentDescription = "Download Document",
-        modifier = Modifier.testTag("storeDocumentButtonIcon"))
-  }
+  IconButton(
+      onClick = {
+        if (documentViewModel.saveDocumentFolder.value == Uri.EMPTY)
+            openDirectoryLauncher.launch(null)
+        else onDirectoryPicked(documentViewModel.saveDocumentFolder.value)
+      },
+      modifier = modifier) {
+        Icon(
+            imageVector = Icons.Default.FileDownload,
+            contentDescription = "Download Document",
+            modifier = Modifier.testTag("storeDocumentButtonIcon"))
+      }
 }
