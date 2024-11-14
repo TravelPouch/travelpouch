@@ -66,6 +66,7 @@ jobs:
           # Convert the PKCS12 keystore to JKS format (which Android uses)
           keytool -importkeystore \
             -srckeystore ~/.keystore/test-release.p12 \
+            -srcstorepass testpass \
             -srcstoretype PKCS12 \
             -destkeystore ~/.keystore/test-release.keystore \
             -deststoretype JKS \
