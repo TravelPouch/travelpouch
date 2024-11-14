@@ -52,6 +52,7 @@ import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,6 +102,7 @@ fun ParticipantListScreen(
               onClick = {
                     listTravelViewModel.fetchAllParticipantsInfo()
                     setExpandedAddUserDialog(true)
+                  navigationActions.navigateTo(Screen.PARTICIPANT_LIST)
               },
               modifier = Modifier.testTag("importEmailButton")
           )
