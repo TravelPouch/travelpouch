@@ -172,13 +172,17 @@ fun EditTravelSettingsScreen(
             OutlinedTextField(
                 value = titleText.value,
                 onValueChange = { keystroke -> titleText.value = keystroke },
-                modifier = Modifier.testTag("inputTravelTitle"),
+                modifier =
+                    Modifier.testTag("inputTravelTitle").fillMaxWidth().padding(horizontal = 10.dp),
                 label = { Text("Title") },
                 placeholder = { Text("Name the Travel") })
             OutlinedTextField(
                 value = descriptionText.value,
                 onValueChange = { keystroke -> descriptionText.value = keystroke },
-                modifier = Modifier.testTag("inputTravelDescription"),
+                modifier =
+                    Modifier.testTag("inputTravelDescription")
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
                 label = { Text("Description") },
                 placeholder = { Text("Describe the Travel") })
 
@@ -187,7 +191,10 @@ fun EditTravelSettingsScreen(
                 onValueChange = { locationName.value = it },
                 label = { Text("Location Name") },
                 placeholder = { Text("Enter location name") },
-                modifier = Modifier.testTag("inputTravelLocationName"))
+                modifier =
+                    Modifier.testTag("inputTravelLocationName")
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp))
 
             // Latitude Input
             OutlinedTextField(
@@ -195,7 +202,10 @@ fun EditTravelSettingsScreen(
                 onValueChange = { latitude.value = it },
                 label = { Text("Latitude") },
                 placeholder = { Text("Enter latitude (e.g. 48.8566)") },
-                modifier = Modifier.testTag("inputTravelLatitude"))
+                modifier =
+                    Modifier.testTag("inputTravelLatitude")
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp))
 
             // Longitude Input
             OutlinedTextField(
@@ -203,13 +213,19 @@ fun EditTravelSettingsScreen(
                 onValueChange = { longitude.value = it },
                 label = { Text("Longitude") },
                 placeholder = { Text("Enter longitude (e.g. 2.3522)") },
-                modifier = Modifier.testTag("inputTravelLongitude"))
+                modifier =
+                    Modifier.testTag("inputTravelLongitude")
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp))
             OutlinedTextField(
                 value = startTime.value,
                 onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
                 label = { Text("Start Date") },
                 placeholder = { Text("DD/MM/YYYY") },
-                modifier = Modifier.fillMaxWidth().testTag("inputTravelStartTime"),
+                modifier =
+                    Modifier.testTag("inputTravelStartTime")
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
                 trailingIcon = {
                   IconButton(
                       onClick = {
@@ -230,7 +246,10 @@ fun EditTravelSettingsScreen(
                 }, // Allow manual input
                 label = { Text("End Date") },
                 placeholder = { Text("DD/MM/YYYY") },
-                modifier = Modifier.fillMaxWidth().testTag("inputTravelEndTime"),
+                modifier =
+                    Modifier.testTag("inputTravelEndTime")
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
                 trailingIcon = {
                   IconButton(
                       onClick = {
