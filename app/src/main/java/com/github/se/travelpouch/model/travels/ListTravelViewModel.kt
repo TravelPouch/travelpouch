@@ -238,7 +238,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
           newParticipantMap[newParticipant] = Role.PARTICIPANT
 
           val newParticipantList = selectedTravel.listParticipant.toMutableList()
-          newParticipantList.plus(user.fsUid)
+          newParticipantList.add(user.fsUid)
 
           val newTravel =
               selectedTravel.copy(
