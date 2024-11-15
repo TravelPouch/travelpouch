@@ -4,7 +4,8 @@ import * as vips from "wasm-vips";
 import {getDocumentFromId} from "./storage.js";
 import {logger} from "firebase-functions";
 
-const PDF_CONVERSION_DPI = 250;
+const PDF_DEFAULT_DPI = 72;
+const PDF_OUTPUT_DPI = 250;
 const RATIO_WIDTH_HEIGHT = 210 / 297;
 
 /**
@@ -28,7 +29,7 @@ async function getDocumentBuffer(documentId: string): Promise<ArrayBuffer> {
 function convertPdfToImage(buffer: ArrayBuffer): ArrayBuffer {
   const originalDocument = mupdf.Document.openDocument(buffer, "application/pdf");
   const page = originalDocument.loadPage(0);
-  const matrix = mupdf.Matrix.scale(PDF_CONVERSION_DPI / 72, PDF_CONVERSION_DPI / 72);
+  const matrix = mupdf.Matrix.scale(PDF_OUTPUT_DPI / PDF_DEFAULT_DPI, PDF_OUTPUT_DPI / PDF_DEFAULT_DPI);
   const pixmap = page.toPixmap(matrix, mupdf.ColorSpace.DeviceRGB, false, true);
   return pixmap.asPNG().buffer;
 }
