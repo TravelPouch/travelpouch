@@ -175,22 +175,20 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   ) {
 
     Log.d("TravelRepositoryFirestore", "getTravels")
-    db.collection(collectionPath)
-        .whereArrayContains("listParticipant", currentUserUid)
-        .get()
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            val travels =
-                task.result?.documents?.mapNotNull { document -> documentToTravel(document) }
-                    ?: emptyList()
-            onSuccess(travels)
-          } else {
-            task.exception?.let { e ->
-              Log.e("TravelRepositoryFirestore", "Error getting documents", e)
-              onFailure(e)
-            }
-          }
+    db.collection(collectionPath).get().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val travels =
+            task.result?.documents?.mapNotNull { document -> documentToTravel(document) }
+                ?: emptyList()
+        val participant = Participant(currentUserUid)
+        onSuccess(travels.filter { it.allParticipants.containsKey(participant) })
+      } else {
+        task.exception?.let { e ->
+          Log.e("TravelRepositoryFirestore", "Error getting documents", e)
+          onFailure(e)
         }
+      }
+    }
   }
 
   /**

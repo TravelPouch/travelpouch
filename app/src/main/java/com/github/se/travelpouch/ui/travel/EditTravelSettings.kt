@@ -342,7 +342,7 @@ fun EditTravelSettingsScreen(
           modifier = Modifier.padding(padding).testTag("noTravelSelectedText"))
     }
     if (expandedAddUserDialog) {
-      val addUserEmail = remember { mutableStateOf("newuser.email@example.org") }
+      val addUserEmail = remember { mutableStateOf("") }
       Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
         Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("addUserDialogBox")) {
           Column(
