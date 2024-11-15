@@ -1,4 +1,4 @@
-import {onCall, onRequest} from "firebase-functions/v2/https";
+import {HttpsError, onCall, onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
 
@@ -57,12 +57,12 @@ export const generateThumbnailCall = onCall(
   {region: "europe-west9", memory: "1GiB"},
   async (req) => {
     if (!req.data.travelId || !req.data.documentId || !req.data.width) {
-      return {success: false, message: "Missing parameters"};
+      throw new HttpsError("invalid-argument", "Missing parameters");
     }
     try {
       await generateThumbnailForDocument(req.data.travelId, req.data.documentId, req.data.width);
     } catch (err) {
-      return {success: false, message: err};
+      throw new HttpsError("internal", "Internal error while generating thumbnail");
     }
     return {success: true};
   });
@@ -71,13 +71,13 @@ export const generateThumbnailHttp = onRequest(
   {region: "europe-west9", memory: "1GiB"},
   async (req, res) => {
     if (!req.body.travelId || !req.body.documentId || !req.body.width) {
-      res.json({success: false, message: "Missing parameters"});
+      res.status(400).json({success: false, message: "Missing parameters"});
       return;
     }
     try {
       await generateThumbnailForDocument(req.body.travelId, req.body.documentId, req.body.width);
     } catch (err) {
-      res.json({success: false, message: err});
+      res.status(500).json({success: false, message: err});
       return;
     }
     res.json({success: true});

@@ -45,8 +45,7 @@ async function resizeImage(buffer: ArrayBuffer, width: number): Promise<Uint8Arr
   logger.debug(`vips loaded size=${image.width}`);
   const resizedImage = image.thumbnailImage(width, {
     height: Math.round(width / RATIO_WIDTH_HEIGHT),
-    size: "both",
-    crop: "center",
+    crop: "entropy",
   });
   return resizedImage.writeToBuffer(".png");
 }
