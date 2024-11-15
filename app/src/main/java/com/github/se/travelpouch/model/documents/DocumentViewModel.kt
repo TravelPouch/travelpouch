@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.documents
 
 import android.content.ContentResolver
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.documentfile.provider.DocumentFile
@@ -12,6 +13,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +34,8 @@ open class DocumentViewModel(
   val documents: StateFlow<List<DocumentContainer>> = _documents.asStateFlow()
   private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
   var selectedDocument: StateFlow<DocumentContainer?> = _selectedDocument.asStateFlow()
+  private val _saveDocumentFolder = MutableStateFlow<Uri>(Uri.EMPTY)
+  val saveDocumentFolder: StateFlow<Uri> = _saveDocumentFolder.asStateFlow()
   private val _downloadUrls = mutableStateMapOf<String, String>()
   val downloadUrls: Map<String, String>
     get() = _downloadUrls
@@ -68,17 +72,19 @@ open class DocumentViewModel(
    *
    * @param documentFile The folder in which to create the file
    */
-  fun storeSelectedDocument(documentFile: DocumentFile) {
+  fun storeSelectedDocument(documentFile: DocumentFile): Job {
     val mimeType = selectedDocument.value?.fileFormat?.mimeType
     val title = selectedDocument.value?.title
     val ref = selectedDocument.value?.ref?.id
 
     if (mimeType == null || title == null || ref == null) {
-      Log.i("DocumentViewModel", "Some required fields are empty. Abort download")
-      return
+      return Job().apply {
+        completeExceptionally(
+            IllegalArgumentException("Some required fields are empty. Abort download"))
+      }
     }
 
-    fileDownloader.downloadFile(mimeType, title, ref, documentFile)
+    return fileDownloader.downloadFile(mimeType, title, ref, documentFile)
   }
 
   /**
@@ -96,6 +102,10 @@ open class DocumentViewModel(
   /** Defines selected document for the preview */
   fun selectDocument(document: DocumentContainer) {
     _selectedDocument.value = document
+  }
+
+  fun setSaveDocumentFolder(uri: Uri) {
+    _saveDocumentFolder.value = uri
   }
 
   fun getDownloadUrl(document: DocumentContainer) {

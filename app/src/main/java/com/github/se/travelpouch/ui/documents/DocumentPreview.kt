@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.documents
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,9 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.rizzi.bouquet.ResourceType
 import com.rizzi.bouquet.VerticalPDFReader
 import com.rizzi.bouquet.rememberVerticalPdfReaderState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Composable function for previewing a document.
@@ -76,11 +80,20 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   }
             },
             actions = {
-              StoreDocumentButton(modifier = Modifier.testTag("downloadButton")) {
-                DocumentFile.fromTreeUri(context, it)?.let {
-                  documentViewModel.storeSelectedDocument(it)
-                }
-              }
+              StoreDocumentButton(
+                  documentViewModel, modifier = Modifier.testTag("downloadButton")) {
+                    DocumentFile.fromTreeUri(context, it)?.let {
+                      documentViewModel.storeSelectedDocument(it).invokeOnCompletion {
+                        CoroutineScope(Dispatchers.Main).launch {
+                          Toast.makeText(
+                                  context,
+                                  "Document downloaded in ${documentViewModel.saveDocumentFolder.value.lastPathSegment}",
+                                  Toast.LENGTH_SHORT)
+                              .show()
+                        }
+                      }
+                    }
+                  }
               IconButton(
                   onClick = {
                     documentViewModel.deleteDocumentById(documentContainer.ref.id)
