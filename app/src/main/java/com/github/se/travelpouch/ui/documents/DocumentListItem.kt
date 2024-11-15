@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,8 @@ import com.rizzi.bouquet.rememberVerticalPdfReaderState
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+const val THUMBNAIL_WIDTH = 150
+
 /**
  * Composable function for displaying a document item.
  *
@@ -48,9 +51,9 @@ fun DocumentListItem(
     documentViewModel: DocumentViewModel,
     onClick: () -> Unit
 ) {
-  var previewUri by remember { mutableStateOf("") }
-  LaunchedEffect(documentContainer) { documentViewModel.getDownloadUrl(documentContainer) }
-  previewUri = documentViewModel.downloadUrls[documentContainer.ref.id] ?: ""
+  var thumbnailUri by remember { mutableStateOf("") }
+  LaunchedEffect(documentContainer) { documentViewModel.getDocumentThumbnail(documentContainer, THUMBNAIL_WIDTH) }
+  thumbnailUri = documentViewModel.thumbnailUrls["${documentContainer.ref.id}-thumb-$THUMBNAIL_WIDTH"] ?: ""
 
   Card(
       modifier =
@@ -81,10 +84,19 @@ fun DocumentListItem(
               }
 
           Box(modifier = Modifier.height(200.dp).width(150.dp)) {
-            if (previewUri.isNotEmpty()) {
-              DocumentPreviewBox(previewUri, documentContainer.fileFormat)
+            if (thumbnailUri.isNotEmpty()) {
+              AsyncImage(
+                model = thumbnailUri,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(),
+              )
             } else {
-              // Display a placeholder
+              CircularProgressIndicator(
+                modifier =
+                Modifier.align(Alignment.Center).testTag("loadingSpinner"),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 5.dp)
             }
           }
 
@@ -93,23 +105,5 @@ fun DocumentListItem(
               style = MaterialTheme.typography.bodyMedium,
               modifier = Modifier.testTag("DocumentTitle"))
         }
-  }
-}
-
-@Composable
-fun DocumentPreviewBox(previewUri: String, fileFormat: DocumentFileFormat) {
-  if (fileFormat == DocumentFileFormat.PDF) {
-    val pdfState =
-        rememberVerticalPdfReaderState(
-            resource = ResourceType.Remote(previewUri), isZoomEnable = false)
-    VerticalPDFReader(
-        state = pdfState, modifier = Modifier.fillMaxSize().background(color = Color.Gray))
-  } else {
-    AsyncImage(
-        model = previewUri,
-        contentDescription = null,
-        contentScale = ContentScale.Fit,
-        modifier = Modifier.fillMaxSize(),
-    )
   }
 }

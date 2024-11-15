@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 
 /** Interface for the DocumentRepository. */
 interface DocumentRepository {
@@ -24,6 +25,14 @@ interface DocumentRepository {
       document: DocumentContainer,
       onSuccess: (String) -> Unit,
       onFailure: (Exception) -> Unit
+  )
+
+  fun getThumbnailUrl(
+    document: DocumentContainer,
+    width: Int,
+    onSuccess: (String) -> Unit,
+    onFailure: (Exception) -> Unit,
+    canFail: Boolean = true
   )
 
   fun uploadDocument(
@@ -121,6 +130,61 @@ class DocumentRepositoryFirestore(
         .downloadUrl
         .addOnSuccessListener { uri -> onSuccess(uri.toString()) }
         .addOnFailureListener(onFailure)
+  }
+
+  private fun generateThumbnail(
+    document: DocumentContainer,
+    width: Int,
+    onSuccess: () -> Unit,
+    onFailure: (Exception) -> Unit
+  ) {
+    functions
+      .getHttpsCallable("generateThumbnailCall")
+      .call(
+        mapOf(
+          "travelId" to document.travelRef.id,
+          "documentId" to document.ref.id,
+          "width" to width))
+      .continueWith { task ->
+        if (task.isSuccessful) {
+          onSuccess()
+        } else {
+          Log.e("DocumentRepositoryFirestore", "Error generating thumbnail for document id=${document.ref.id},width=$width", task.exception)
+          onFailure(task.exception!!)
+        }
+      }
+  }
+
+  /**
+   * Try to get the thumbnailUrl a document from the Firestore database.
+   *
+   * @param document The document to fetch the download URL for.
+   * @param width The width of the thumbnail.
+   * @param onSuccess Callback function to be called when the download URL is fetched successfully.
+   * @param onFailure Callback function to be called when an error occurs.
+   */
+  override fun getThumbnailUrl(
+    document: DocumentContainer,
+    width: Int,
+    onSuccess: (String) -> Unit,
+    onFailure: (Exception) -> Unit,
+    canFail: Boolean
+    ) {
+    storage
+      .getReference("${document.ref.id}-thumb-$width")
+      .downloadUrl
+      .addOnSuccessListener { uri -> onSuccess(uri.toString()) }
+      .addOnFailureListener { err ->
+        if (canFail && err is StorageException && err.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
+          Log.d("DocumentRepositoryFirestore", "Thumbnail for document id=${document.ref.id},width=$width not found, generating one...", err)
+          generateThumbnail(document, width, {
+            getThumbnailUrl(document, width, onSuccess, onFailure, false)
+          }, onFailure)
+        } else {
+          Log.e("DocumentRepositoryFirestore", "Error getting thumbnail for document id=${document.ref.id},width=$width", err)
+          onFailure(err)
+        }
+      }
   }
 
   override fun uploadDocument(
