@@ -53,19 +53,32 @@ export const storeDocument = onCall(
   }
 );
 
-export const generateThumbnail = onRequest(
+export const generateThumbnailCall = onCall(
+  {region: "europe-west9", memory: "1GiB"},
+  async (req) => {
+    if (!req.data.travelId || !req.data.documentId || !req.data.width) {
+      return {success: false, message: "Missing parameters"};
+    }
+    try {
+      await generateThumbnailForDocument(req.data.travelId, req.data.documentId, req.data.width);
+    } catch (err) {
+      return {success: false, message: err};
+    }
+    return {success: true};
+  });
+
+export const generateThumbnailHttp = onRequest(
   {region: "europe-west9", memory: "1GiB"},
   async (req, res) => {
-    logger.debug(req.headers, req.body);
     if (!req.body.travelId || !req.body.documentId || !req.body.width) {
       res.json({success: false, message: "Missing parameters"});
       return;
     }
-    generateThumbnailForDocument(req.body.travelId, req.body.documentId, req.body.width).then(() => {
-      res.json({success: true});
-    }).catch((err) => {
+    try {
+      await generateThumbnailForDocument(req.body.travelId, req.body.documentId, req.body.width);
+    } catch (err) {
       res.json({success: false, message: err});
-    });
+      return;
+    }
+    res.json({success: true});
   });
-
-
