@@ -191,7 +191,9 @@ fun SignInScreen(
                 isLoading.value = false
               } catch (refreshError: Exception) {
 
-                Log.e("SignInScreen", "Failed to reauthenticate from session: ${refreshError.localizedMessage}")
+                Log.e(
+                    "SignInScreen",
+                    "Failed to reauthenticate from session: ${refreshError.localizedMessage}")
                 Toast.makeText(
                         context, "Failed to refresh token, please sign in again", Toast.LENGTH_LONG)
                     .show()
