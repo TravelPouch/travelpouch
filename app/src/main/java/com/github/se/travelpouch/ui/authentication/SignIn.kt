@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,9 +44,11 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 /**
  * A composable function that displays the sign-in screen.
@@ -63,6 +66,8 @@ fun SignInScreen(
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
   val methodChosen = rememberSaveable { mutableStateOf(false) }
+
+  val currentUser = FirebaseAuth.getInstance().currentUser
 
   // launcher for Firebase authentication
   val launcher =
@@ -127,8 +132,8 @@ fun SignInScreen(
                   // Google Sign-In Button (before the loading state)
                   this@Column.AnimatedVisibility(
                       visible = !isLoading.value,
-                      enter = fadeIn(animationSpec = tween(150)),
-                      exit = fadeOut(animationSpec = tween(300))) {
+                      enter = fadeIn(animationSpec = tween(0)),
+                      exit = fadeOut(animationSpec = tween(150))) {
                         // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
                         GoogleSignInButton(
                             onSignInClick = {
@@ -147,8 +152,8 @@ fun SignInScreen(
                   // CircularProgressIndicator (when loading)
                   this@Column.AnimatedVisibility(
                       visible = isLoading.value,
-                      enter = fadeIn(animationSpec = tween(300)),
-                      exit = fadeOut(animationSpec = tween(300))) {
+                      enter = fadeIn(animationSpec = tween(150)),
+                      exit = fadeOut(animationSpec = tween(150))) {
                         CircularProgressIndicator(
                             modifier =
                                 Modifier.height(28.dp)
@@ -164,6 +169,36 @@ fun SignInScreen(
                 enabled = !methodChosen.value) {
                   Text("Sign in with email and password")
                 }
+          }
+          if (currentUser != null) {
+            LaunchedEffect(Unit) {
+              try {
+                isLoading.value = true
+                methodChosen.value = true
+
+                currentUser.getIdToken(true).await() // to get the result asynchronously
+
+                Log.d(
+                    "SignInScreen",
+                    "User already signed in: ${currentUser.displayName}, Token: $token")
+
+                // Continue with post-login setup
+                val job =
+                    GlobalScope.launch {
+                      profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                    }
+                navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                isLoading.value = false
+              } catch (refreshError: Exception) {
+
+                Log.e("SignInScreen", "Failed to reauthenticate from session: ${refreshError.localizedMessage}")
+                Toast.makeText(
+                        context, "Failed to refresh token, please sign in again", Toast.LENGTH_LONG)
+                    .show()
+                isLoading.value = false
+                methodChosen.value = false
+              }
+            }
           }
         }
       })
