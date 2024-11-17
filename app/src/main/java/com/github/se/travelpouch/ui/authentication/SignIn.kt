@@ -44,7 +44,9 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -61,13 +63,14 @@ fun SignInScreen(
     navigationActions: NavigationActions,
     profileModelView: ProfileModelView,
     travelViewModel: ListTravelViewModel,
-    isLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+    isLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+    auth: FirebaseAuth = Firebase.auth
 ) {
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
   val methodChosen = rememberSaveable { mutableStateOf(false) }
 
-  val currentUser = FirebaseAuth.getInstance().currentUser
+  val currentUser = auth.currentUser
 
   // launcher for Firebase authentication
   val launcher =
@@ -171,12 +174,14 @@ fun SignInScreen(
                 }
           }
           if (currentUser != null) {
+            Log.d("SignInScreen", "we're here")
             LaunchedEffect(Unit) {
               try {
                 isLoading.value = true
                 methodChosen.value = true
 
-                currentUser.getIdToken(true).await() // to get the result asynchronously
+                val gaming =
+                    currentUser.getIdToken(true).await() // to get the result asynchronously
 
                 Log.d(
                     "SignInScreen",
