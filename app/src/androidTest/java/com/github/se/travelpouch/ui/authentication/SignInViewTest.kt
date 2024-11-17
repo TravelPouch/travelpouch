@@ -67,10 +67,13 @@ class SignInViewTest {
   @Test
   fun signInScreen_googleSignInButtonClick_triggersSignIn() {
     composeTestRule.setContent {
-      SignInScreen(navigationActions = mockNavigationActions, profileModelView, travelViewModel)
+      SignInScreen(
+          navigationActions = mockNavigationActions,
+          profileModelView,
+          travelViewModel,
+          auth = mockFirebaseAuth)
     }
     composeTestRule.onNodeWithTag("loginButtonRow").performClick()
-    composeTestRule.waitForIdle()
   }
 
   @Test
