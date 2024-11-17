@@ -70,6 +70,7 @@ class SignInViewTest {
       SignInScreen(navigationActions = mockNavigationActions, profileModelView, travelViewModel)
     }
     composeTestRule.onNodeWithTag("loginButtonRow").performClick()
+    composeTestRule.waitForIdle()
   }
 
   @Test
