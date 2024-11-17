@@ -1,6 +1,8 @@
 package com.github.se.travelpouch.model.documents
 
+import android.net.Uri
 import android.util.Log
+import androidx.documentfile.provider.DocumentFile
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
@@ -18,7 +20,14 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockedStatic
-import org.mockito.Mockito.*
+import org.mockito.Mockito.any
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.spy
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -235,5 +244,29 @@ class DocumentViewModelTest {
     spyDocumentViewModel.uploadFile(inputStream, selectedTravel, "image/jpeg")
     verify(spyDocumentViewModel)
         .uploadDocument(anyString(), org.mockito.kotlin.any(), org.mockito.kotlin.any())
+  }
+
+  @Test
+  fun assertStoreSelectedDocumentNoSelectedDocument() {
+    val documentFile: DocumentFile = mock(DocumentFile::class.java)
+    `when`(documentFile.uri)
+        .thenReturn(
+            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload"))
+    documentViewModel.storeSelectedDocument(documentFile).invokeOnCompletion {
+      assert(it is IllegalArgumentException)
+      assert(it?.message == "Some required fields are empty. Abort download")
+    }
+  }
+
+  @Test
+  fun assertStoreSelectedDocumentSuccess() {
+    val documentFile: DocumentFile = mock(DocumentFile::class.java)
+    `when`(documentFile.uri)
+        .thenReturn(
+            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload"))
+    `when`(documentReference.id).thenReturn("1")
+    documentViewModel.selectDocument(documentContainer)
+    documentViewModel.storeSelectedDocument(documentFile)
+    verify(fileDownloader).downloadFile(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }
