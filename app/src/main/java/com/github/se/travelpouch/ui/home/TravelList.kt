@@ -111,18 +111,19 @@ fun TravelListScreen(
                   }
                 } else {
                   item {
-                      Row(
-                          modifier = Modifier.fillParentMaxSize().padding(top = 32.dp, start = 16.dp, end = 0.dp),
-                          horizontalArrangement = Arrangement.Center,
-                          verticalAlignment = Alignment.Top
-                      ) {
+                    Row(
+                        modifier =
+                            Modifier.fillParentMaxSize()
+                                .padding(top = 32.dp, start = 16.dp, end = 0.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.Top) {
                           AnimatedVisibility(visible = isLoading.value) {
-                              CircularProgressIndicator(
-                                  modifier = Modifier.testTag("loadingSpinner").size(100.dp),
-                                  color = MaterialTheme.colorScheme.primary,
-                                  strokeWidth = 5.dp,
-                                  strokeCap = StrokeCap.Round,
-                              )
+                            CircularProgressIndicator(
+                                modifier = Modifier.testTag("loadingSpinner").size(100.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 5.dp,
+                                strokeCap = StrokeCap.Round,
+                            )
                           }
 
                           Spacer(modifier = Modifier.fillMaxWidth(0.1f))
@@ -130,9 +131,11 @@ fun TravelListScreen(
                           Text(
                               modifier = Modifier.testTag("emptyTravelPrompt"),
                               text = "You have no travels yet.",
-                              style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                              style =
+                                  MaterialTheme.typography.bodyLarge.copy(
+                                      fontWeight = FontWeight.Bold),
                               color = MaterialTheme.colorScheme.onBackground)
-                      }
+                        }
                   }
                 }
               }
@@ -154,43 +157,45 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
               .fillMaxWidth()
               .padding(vertical = 6.dp)
               .clickable(onClick = onClick),
-          colors = CardColors(
+      colors =
+          CardColors(
               containerColor = MaterialTheme.colorScheme.surface,
               disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
               contentColor = MaterialTheme.colorScheme.onSurface,
               disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-          )
-  ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-      // Date and Title Row
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(
-            text =
-                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    .format(travelContainer.startTime.toDate()),
-            style = MaterialTheme.typography.bodySmall)
+          )) {
+        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+          // Date and Title Row
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text =
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            .format(travelContainer.startTime.toDate()),
+                    style = MaterialTheme.typography.bodySmall)
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Text(
+                      text = travelContainer.title,
+                      style = MaterialTheme.typography.bodySmall,
+                      fontWeight = FontWeight.Bold)
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                      contentDescription = null)
+                }
+              }
+
+          Spacer(modifier = Modifier.height(4.dp))
+
+          // Description
+          Text(text = travelContainer.description, style = MaterialTheme.typography.bodyMedium)
+
+          // Location Name
           Text(
-              text = travelContainer.title,
+              text = travelContainer.location.name,
               style = MaterialTheme.typography.bodySmall,
-              fontWeight = FontWeight.Bold
-          )
-          Icon(
-              imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+              fontWeight = FontWeight.Light)
         }
       }
-
-      Spacer(modifier = Modifier.height(4.dp))
-
-      // Description
-      Text(text = travelContainer.description, style = MaterialTheme.typography.bodyMedium)
-
-      // Location Name
-      Text(
-          text = travelContainer.location.name,
-          style = MaterialTheme.typography.bodySmall,
-          fontWeight = FontWeight.Light)
-    }
-  }
 }

@@ -32,8 +32,7 @@ private val LightColorScheme =
         onTertiary = Color.White,
         onBackground = Color(0xFF1C1B1F),
         onSurface = Color(0xFF1C1B1F),
-        inverseOnSurface = Color(0xFF1C1B1F)
-    )
+        inverseOnSurface = Color(0xFF1C1B1F))
 
 @Composable
 fun SampleAppTheme(

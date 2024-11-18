@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard
 
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -153,7 +152,9 @@ fun TravelActivitiesScreen(
                       item {
                         Text(
                             text = "No activities planned for this trip",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.testTag("emptyTravel"))
                       }
@@ -202,49 +203,74 @@ fun ActivityItem(
       modifier = Modifier.testTag("activityItem").fillMaxSize(),
       onClick = onClick,
       elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-      colors = CardColors(
-          containerColor = MaterialTheme.colorScheme.surface,
-          disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
-          contentColor = MaterialTheme.colorScheme.onSurface,
-          disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-      ),
-      //border = BorderStroke(1.dp, Color.DarkGray)
+      colors =
+          CardColors(
+              containerColor = MaterialTheme.colorScheme.surface,
+              disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+              contentColor = MaterialTheme.colorScheme.onSurface,
+              disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+          ),
+      // border = BorderStroke(1.dp, Color.DarkGray)
   ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-          Text(activity.title, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge)
-          Text(activity.location.name, style = MaterialTheme.typography.bodyMedium)
-          Text(
-              "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}",
-              style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Light
-              )
+    Column(modifier = Modifier.padding(8.dp)) {
+      Text(
+          activity.title,
+          fontWeight = FontWeight.SemiBold,
+          style = MaterialTheme.typography.bodyLarge)
+      Text(activity.location.name, style = MaterialTheme.typography.bodyMedium)
+      Text(
+          "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}",
+          style = MaterialTheme.typography.bodyMedium,
+          fontWeight = FontWeight.Light)
 
-          // Handling image display logic
-          if (images.isEmpty()) {
-            // No images to show, do nothing
-          } else if (images.size == 1) {
-            // Single image
-            Box(
-                modifier =
-                    Modifier.fillMaxWidth() // Fill the width of the parent
-                        .aspectRatio(
-                            A4_ASPECT_RATIO) // Maintain A4 aspect ratio (width / height ~ 1:1.414)
-                        .background(Color.Transparent)) {
-                  AdvancedImageDisplayWithEffects(
-                      imageUrl = images[0],
-                      loadingContent = { DefaultLoadingUI() },
-                      errorContent = { DefaultErrorUI() })
-                }
-          } else if (images.size == 2) {
-            // Two images - display side by side with space in between
+      // Handling image display logic
+      if (images.isEmpty()) {
+        // No images to show, do nothing
+      } else if (images.size == 1) {
+        // Single image
+        Box(
+            modifier =
+                Modifier.fillMaxWidth() // Fill the width of the parent
+                    .aspectRatio(
+                        A4_ASPECT_RATIO) // Maintain A4 aspect ratio (width / height ~ 1:1.414)
+                    .background(Color.Transparent)) {
+              AdvancedImageDisplayWithEffects(
+                  imageUrl = images[0],
+                  loadingContent = { DefaultLoadingUI() },
+                  errorContent = { DefaultErrorUI() })
+            }
+      } else if (images.size == 2) {
+        // Two images - display side by side with space in between
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+              images.take(2).forEach { imageUrl ->
+                Box(
+                    modifier =
+                        Modifier.weight(1f)
+                            .aspectRatio(
+                                A4_ASPECT_RATIO) // Use the same A4 aspect ratio for both images
+                            .background(Color.Transparent)) {
+                      AdvancedImageDisplayWithEffects(
+                          imageUrl = imageUrl,
+                          loadingContent = { DefaultLoadingUI() },
+                          errorContent = { DefaultErrorUI() })
+                    }
+              }
+            }
+      } else if (images.size >= 3) {
+        // Three or more images - show the first two with a button above them
+        Column(modifier = Modifier.fillMaxWidth()) {
+          Box { // Box to layer
+            // Display the first two images inside a Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                   images.take(2).forEach { imageUrl ->
                     Box(
                         modifier =
-                            Modifier.weight(1f)
-                                .aspectRatio(
-                                    A4_ASPECT_RATIO) // Use the same A4 aspect ratio for both images
+                            Modifier.weight(1f) // Ensure the images take equal space
+                                .aspectRatio(A4_ASPECT_RATIO) // Maintain A4 aspect ratio
                                 .background(Color.Transparent)) {
                           AdvancedImageDisplayWithEffects(
                               imageUrl = imageUrl,
@@ -253,57 +279,33 @@ fun ActivityItem(
                         }
                   }
                 }
-          } else if (images.size >= 3) {
-            // Three or more images - show the first two with a button above them
-            Column(modifier = Modifier.fillMaxWidth()) {
-              Box { // Box to layer
-                // Display the first two images inside a Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                      images.take(2).forEach { imageUrl ->
-                        Box(
-                            modifier =
-                                Modifier.weight(1f) // Ensure the images take equal space
-                                    .aspectRatio(A4_ASPECT_RATIO) // Maintain A4 aspect ratio
-                                    .background(Color.Transparent)) {
-                              AdvancedImageDisplayWithEffects(
-                                  imageUrl = imageUrl,
-                                  loadingContent = { DefaultLoadingUI() },
-                                  errorContent = { DefaultErrorUI() })
-                            }
-                      }
-                    }
 
-                // More options button on top of the second image
-                IconButton(
-                    onClick = {
-                      Toast.makeText(
-                              context,
-                              "Placeholder for document view of activity",
-                              Toast.LENGTH_LONG)
-                          .show()
-                    },
-                    modifier =
-                        Modifier.align(
-                                Alignment.BottomEnd) // Position the button on the bottom right
-                            .background(
-                                Color.Gray,
-                                shape =
-                                    androidx.compose.foundation.shape.RoundedCornerShape(
-                                        10)) // Rounded background
-                            .testTag("extraDocumentButton") // Add padding to the button
-                    ) {
-                      Icon(
-                          imageVector = Icons.Default.MoreVert,
-                          contentDescription = "More options",
-                          tint = Color.White)
-                    }
-              }
-            }
+            // More options button on top of the second image
+            IconButton(
+                onClick = {
+                  Toast.makeText(
+                          context, "Placeholder for document view of activity", Toast.LENGTH_LONG)
+                      .show()
+                },
+                modifier =
+                    Modifier.align(Alignment.BottomEnd) // Position the button on the bottom right
+                        .background(
+                            Color.Gray,
+                            shape =
+                                androidx.compose.foundation.shape.RoundedCornerShape(
+                                    10)) // Rounded background
+                        .testTag("extraDocumentButton") // Add padding to the button
+                ) {
+                  Icon(
+                      imageVector = Icons.Default.MoreVert,
+                      contentDescription = "More options",
+                      tint = Color.White)
+                }
           }
         }
       }
+    }
+  }
 }
 
 // 98% of the following code down here was taken without shame from

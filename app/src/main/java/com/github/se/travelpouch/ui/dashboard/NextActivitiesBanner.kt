@@ -61,8 +61,8 @@ fun NextActivitiesBanner(
   val darkTheme = isSystemInDarkTheme()
   val entryColor = if (darkTheme) Color.White else Color.Black
   val titleColor = if (darkTheme) Color.Black else Color.White
-  val overlayColor = if (darkTheme) Color.White.copy(alpha = 0.85f) else Color.Gray.copy(alpha = 0.85f)
-
+  val overlayColor =
+      if (darkTheme) Color.White.copy(alpha = 0.85f) else Color.Gray.copy(alpha = 0.85f)
 
   // Filter activities due within the next 24 hours
   val upcomingActivities =
@@ -93,12 +93,14 @@ fun NextActivitiesBanner(
               modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Upcoming Activities in the next 24 hours",
-                    color = if (darkTheme) Color.LightGray else Color.DarkGray ,
+                    color = if (darkTheme) Color.LightGray else Color.DarkGray,
                     style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                     modifier =
                         Modifier.padding(bottom = 8.dp, start = 2.dp, end = 2.dp)
                             .testTag("reminderTitle")
-                            .background( if(darkTheme)  Color.DarkGray else Color.LightGray, RoundedCornerShape(4.dp)))
+                            .background(
+                                if (darkTheme) Color.DarkGray else Color.LightGray,
+                                RoundedCornerShape(4.dp)))
 
                 // Scrollable list of upcoming activities
                 LazyColumn(
