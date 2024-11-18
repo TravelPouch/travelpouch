@@ -32,6 +32,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -52,6 +53,7 @@ import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.github.se.travelpouch.utils.DateTimeUtils
 import com.google.firebase.Timestamp
@@ -86,16 +88,11 @@ fun EditTravelSettingsScreen(
   Scaffold(
       modifier = Modifier.testTag("editScreen"),
       topBar = {
-        MediumTopAppBar(
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
+          TopAppBar(
             title = { Text("Edit Travel", modifier = Modifier.testTag("editTravelText")) },
             navigationIcon = {
-              Button(
-                  onClick = { navigationActions.goBack() },
+                IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,

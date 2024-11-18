@@ -22,12 +22,14 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,6 +44,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
@@ -150,6 +153,8 @@ fun TravelActivitiesScreen(
                       item {
                         Text(
                             text = "No activities planned for this trip",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.testTag("emptyTravel"))
                       }
                     } else {
@@ -197,12 +202,21 @@ fun ActivityItem(
       modifier = Modifier.testTag("activityItem").fillMaxSize(),
       onClick = onClick,
       elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-      border = BorderStroke(1.dp, Color.DarkGray)) {
+      colors = CardColors(
+          containerColor = MaterialTheme.colorScheme.surface,
+          disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+          contentColor = MaterialTheme.colorScheme.onSurface,
+          disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+      ),
+      //border = BorderStroke(1.dp, Color.DarkGray)
+  ) {
         Column(modifier = Modifier.padding(8.dp)) {
-          Text(activity.title)
-          Text(activity.location.name)
+          Text(activity.title, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge)
+          Text(activity.location.name, style = MaterialTheme.typography.bodyMedium)
           Text(
-              "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}")
+              "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}",
+              style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Light
+              )
 
           // Handling image display logic
           if (images.isEmpty()) {

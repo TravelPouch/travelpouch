@@ -20,10 +20,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,6 +46,7 @@ import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,20 +67,15 @@ fun ParticipantListScreen(
   Scaffold(
       modifier = Modifier.testTag("participantListScreen"),
       topBar = {
-        MediumTopAppBar(
+        TopAppBar(
             modifier = Modifier.testTag("participantListSettingTopBar"),
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
             title = {
               Text(
                   "Participant Settings", modifier = Modifier.testTag("participantListSettingText"))
             },
             navigationIcon = {
-              Button(
-                  onClick = { navigationActions.goBack() },
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
