@@ -125,8 +125,7 @@ fun NotificationsScreen(
             tabList =
                 listOf(
                     TopLevelDestinations.NOTIFICATION,
-                    TopLevelDestinations.TRAVELS,
-                    TopLevelDestinations.CALENDAR))
+                    TopLevelDestinations.TRAVELS))
       })
 }
 

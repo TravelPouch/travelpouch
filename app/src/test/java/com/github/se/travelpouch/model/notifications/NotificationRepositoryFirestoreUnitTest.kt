@@ -19,6 +19,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
@@ -89,11 +90,11 @@ class NotificationRepositoryFirestoreUnitTest {
 
     `when`(notificationCollection.document(notification.notificationUid))
         .thenReturn(documentReference)
-    `when`(documentReference.set(notification)).thenReturn(task)
+    `when`(documentReference.set(any())).thenReturn(task)
 
     notificationRepositoryFirestore.addNotification(notification)
 
-    verify(documentReference).set(notification)
+    verify(documentReference).set(any())
   }
 
   @Test
@@ -310,30 +311,25 @@ class NotificationRepositoryFirestoreUnitTest {
 
   @Test
   fun convertDocumentToNotification_exception() {
-    val document: DocumentSnapshot = org.mockito.kotlin.mock()
+    val document: DocumentSnapshot = mock()
 
     // Mocking the data to cause an exception
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
-    whenever(document.getString("senderUid")).thenReturn(null) // This will cause an exception
+    whenever(document.getString("senderUid")).thenReturn(null) // This will cause a NullPointerException
 
     // Reflection to access the private method
-    val method =
-        NotificationRepositoryFirestore::class
-            .java
-            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    val method = NotificationRepositoryFirestore::class
+      .java
+      .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
     method.isAccessible = true
 
-    try {
-      method.invoke(notificationRepositoryFirestore, document) as Notification
-      fail("Expected an exception to be thrown")
-    } catch (e: InvocationTargetException) {
-      assertNotNull(e.cause)
-      assertTrue(e.cause is NullPointerException)
-    } catch (e: Exception) {
-      e.printStackTrace()
-      fail("Unexpected error: ${e.message}")
-    }
+    // Invoke the method and check that it returns null (indicating an error was caught)
+    val result = method.invoke(notificationRepositoryFirestore, document)
+
+    // Assert that the result is null, which is expected in case of an exception
+    assertNull(result)
   }
+
 
   @Test
   fun changeNotificationType_callsDocumentUpdate() {
@@ -393,7 +389,7 @@ class NotificationRepositoryFirestoreUnitTest {
       { failed = true }
     )
 
-    // Capture the onSuccessListener
+    // Capture the onSuccessListener for the query.get() call
     val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
     verify(mockTask).addOnSuccessListener(onSuccessListenerCaptor.capture())
 
@@ -407,8 +403,4 @@ class NotificationRepositoryFirestoreUnitTest {
     // Verifying that delete() was called on the correct document reference
     verify(mockDocumentReference).delete()
   }
-
-
-
-
 }

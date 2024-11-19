@@ -83,7 +83,9 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
         .get()
         .addOnSuccessListener { documents ->
           for (document in documents) {
-            notificationCollection.document(document.id).delete()
+            notificationCollection.document(document.id).delete().addOnFailureListener { exception ->
+              onFailure(exception)
+            }
           }
           onSuccess()
         }

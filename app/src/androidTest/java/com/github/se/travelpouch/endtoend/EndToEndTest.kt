@@ -38,86 +38,86 @@ class EndToEndTest {
 
   @Test
   fun verifyUserFlowForTravelCreation() =
-      runTest(timeout = 300.seconds) {
+    runTest(timeout = 300.seconds) {
 
-        // assert that login screen is displayed
-        composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("welcomText").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign in with email and password").assertIsDisplayed()
+      // assert that login screen is displayed
+      composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("welcomText").assertIsDisplayed()
+      composeTestRule.onNodeWithText("Sign in with email and password").assertIsDisplayed()
 
-        // go to sign in screen with email and password and log in
-        composeTestRule.onNodeWithText("Sign in with email and password").performClick()
+      // go to sign in screen with email and password and log in
+      composeTestRule.onNodeWithText("Sign in with email and password").performClick()
 
-        composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign in").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
+      composeTestRule.onNodeWithText("Sign in").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest1@gmail.com")
-        composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
-        composeTestRule.onNodeWithText("Sign in").performClick()
+      composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest1@gmail.com")
+      composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
+      composeTestRule.onNodeWithText("Sign in").performClick()
 
-        // wait until we are in the travel list screen
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
-          composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
-        }
-
-        // test that no travels are displayed because we have a new account
-        composeTestRule
-            .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("createTravelFab").performClick()
-
-        // wait until we are in the screen to add a travel
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
-          composeTestRule.onNodeWithTag("travelTitle", useUnmergedTree = true).isDisplayed()
-        }
-
-        // test that everything is displayed
-        composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("travelTitle").assertTextEquals("Create a new travel")
-        composeTestRule.onNodeWithTag("inputTravelTitle").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("inputTravelDescription").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("inputTravelLocation").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("inputTravelStartDate").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("inputTravelEndDate").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("travelSaveButton").assertTextEquals("Save")
-
-        // input fields to create a travel
-        composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("e2e travel 1")
-        composeTestRule
-            .onNodeWithTag("inputTravelDescription")
-            .performTextInput("test travel description")
-        composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
-
-        // wait to have La paz displayed
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
-          composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
-        }
-
-        composeTestRule.onNodeWithText("La Paz, Bolivia").performClick()
-        composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("10/11/2024")
-        composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("20/11/2024")
-
-        // save the travel and go back to the list of travels
-        composeTestRule.onNodeWithTag("travelSaveButton").performClick()
-
-        // verify that the previous buttons are still here
-        composeTestRule
-            .onNodeWithTag("TravelListScreen", useUnmergedTree = true)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
-
-        // verify that the empty travel prompt does not exist since we saved a travel
-        composeTestRule
-            .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
-            .assertDoesNotExist()
-
-        composeTestRule.onNodeWithText("e2e travel 1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("e2e travel 1"))
-        composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("test travel description"))
-        composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("La Paz, Bolivia"))
-        composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("10/11/2024"))
+      // wait until we are in the travel list screen
+      composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
       }
+
+      // test that no travels are displayed because we have a new account
+      composeTestRule
+        .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
+        .assertIsDisplayed()
+      composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("createTravelFab").performClick()
+
+      // wait until we are in the screen to add a travel
+      composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.onNodeWithTag("travelTitle", useUnmergedTree = true).isDisplayed()
+      }
+
+      // test that everything is displayed
+      composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("travelTitle").assertTextEquals("Create a new travel")
+      composeTestRule.onNodeWithTag("inputTravelTitle").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("inputTravelDescription").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("inputTravelLocation").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("inputTravelStartDate").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("inputTravelEndDate").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("travelSaveButton").assertTextEquals("Save")
+
+      // input fields to create a travel
+      composeTestRule.onNodeWithTag("inputTravelTitle").performTextInput("e2e travel 1")
+      composeTestRule
+        .onNodeWithTag("inputTravelDescription")
+        .performTextInput("test travel description")
+      composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
+
+      // wait to have La paz displayed
+      composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
+      }
+
+      composeTestRule.onNodeWithText("La Paz, Bolivia").performClick()
+      composeTestRule.onNodeWithTag("inputTravelStartDate").performTextInput("10/11/2024")
+      composeTestRule.onNodeWithTag("inputTravelEndDate").performTextInput("20/11/2024")
+
+      // save the travel and go back to the list of travels
+      composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+
+      // verify that the previous buttons are still here
+      composeTestRule
+        .onNodeWithTag("TravelListScreen", useUnmergedTree = true)
+        .assertIsDisplayed()
+      composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
+
+      // verify that the empty travel prompt does not exist since we saved a travel
+      composeTestRule
+        .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
+        .assertDoesNotExist()
+
+      composeTestRule.onNodeWithText("e2e travel 1").assertIsDisplayed()
+      composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("e2e travel 1"))
+      composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("test travel description"))
+      composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("La Paz, Bolivia"))
+      composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("10/11/2024"))
+    }
 }

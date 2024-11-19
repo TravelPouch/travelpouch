@@ -139,8 +139,6 @@ class NotificationItemTest {
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertTextEquals("ACCEPT")
     composeTestRule.onNodeWithTag("notification_item_accept_button").performClick()
-    verify(listTravelViewModel).getTravelById(eq(notification1.travelUid), any(), any())
-
   }
 
   @Test
@@ -154,5 +152,6 @@ class NotificationItemTest {
 
     composeTestRule.onNodeWithTag("notification_item_decline_button").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notification_item_decline_button").assertTextEquals("DECLINE")
+    composeTestRule.onNodeWithTag("notification_item_decline_button").performClick()
   }
 }

@@ -53,6 +53,7 @@ fun NotificationItem(
                     documentViewModel,
                     eventsViewModel,
                     navigationActions,
+                    profileViewModel,
                     context)
               }
               .testTag("notification_item"),
@@ -211,16 +212,29 @@ fun onCardClick(
     documentViewModel: DocumentViewModel,
     eventsViewModel: EventViewModel,
     navigationActions: NavigationActions,
+    profileViewModel: ProfileModelView,
     context: android.content.Context
 ) {
-  listTravelViewModel.getTravelById(
-      notification.travelUid,
-      onSuccess = { travel ->
-        listTravelViewModel.selectTravel(travel!!)
-        activityViewModel.setIdTravel(travel.fsUid)
-        documentViewModel.setIdTravel(travel.fsUid)
-        eventsViewModel.setIdTravel(travel.fsUid)
-        navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-      },
-      onFailure = { Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show() })
+    listTravelViewModel.getTravelById(
+        notification.travelUid,
+        onSuccess = { travel ->
+            if (travel != null) {
+                if (travel.listParticipant.contains(profileViewModel.profile.value.fsUid)) {
+                    listTravelViewModel.selectTravel(travel)
+                    activityViewModel.setIdTravel(travel.fsUid)
+                    documentViewModel.setIdTravel(travel.fsUid)
+                    eventsViewModel.setIdTravel(travel.fsUid)
+                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                } else {
+                    Toast.makeText(context, "You are not a member of this travel", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(context, "Travel not found", Toast.LENGTH_SHORT).show()
+            }
+        },
+        onFailure = {
+            Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
+        }
+    )
 }
+
