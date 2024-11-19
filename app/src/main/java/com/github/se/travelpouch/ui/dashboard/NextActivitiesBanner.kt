@@ -99,8 +99,7 @@ fun NextActivitiesBanner(
                         Modifier.padding(bottom = 8.dp, start = 2.dp, end = 2.dp)
                             .testTag("reminderTitle")
                             .background(
-                                MaterialTheme.colorScheme.surface,
-                                RoundedCornerShape(4.dp)))
+                                MaterialTheme.colorScheme.surface, RoundedCornerShape(4.dp)))
 
                 // Scrollable list of upcoming activities
                 LazyColumn(

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -109,7 +108,8 @@ fun ParticipantListScreen(
       if (expanded) {
         Dialog(onDismissRequest = { setExpanded(false) }) {
           Box(
-              Modifier.fillMaxWidth(1f).height(250.dp)
+              Modifier.fillMaxWidth(1f)
+                  .height(250.dp)
                   .background(MaterialTheme.colorScheme.surface)
                   .testTag("participantDialogBox")) {
                 Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
@@ -127,11 +127,11 @@ fun ParticipantListScreen(
                             maxLength = 25,
                             modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
                       }
-                    TruncatedText(
-                        text = participant.value.email,
-                        maxLength = 30,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
+                  TruncatedText(
+                      text = participant.value.email,
+                      maxLength = 30,
+                      fontWeight = FontWeight.Bold,
+                      modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
 
                   RoleEntryDialog(
                       selectedTravel = selectedTravel,
@@ -168,43 +168,48 @@ fun ParticipantListScreen(
 
       if (expandedRoleDialog) {
         Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
-          Box(Modifier.fillMaxWidth(1f).height(250.dp).background(MaterialTheme.colorScheme.surface).testTag("roleDialogBox")) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
-                  ChangeRoleDialog(selectedTravel, participant) { newRole ->
-                    val oldRole = selectedTravel!!.allParticipants[Participant(participant.key)]
-                    if (oldRole == newRole) {
-                      setExpandedRoleDialog(false)
-                      setExpanded(false)
-                      return@ChangeRoleDialog
+          Box(
+              Modifier.fillMaxWidth(1f)
+                  .height(250.dp)
+                  .background(MaterialTheme.colorScheme.surface)
+                  .testTag("roleDialogBox")) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                      ChangeRoleDialog(selectedTravel, participant) { newRole ->
+                        val oldRole = selectedTravel!!.allParticipants[Participant(participant.key)]
+                        if (oldRole == newRole) {
+                          setExpandedRoleDialog(false)
+                          setExpanded(false)
+                          return@ChangeRoleDialog
+                        }
+                        // we have an actual role change
+                        if (oldRole == Role.OWNER &&
+                            selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
+                                1) {
+                          Toast.makeText(
+                                  context,
+                                  "You're trying to change the role of the only owner of the travel. Please name another owner before changing the role.",
+                                  Toast.LENGTH_LONG)
+                              .show()
+                          setExpandedRoleDialog(false)
+                          setExpanded(false)
+                          return@ChangeRoleDialog
+                        }
+                        // we have a legal role change
+                        val participantMap = selectedTravel!!.allParticipants.toMutableMap()
+                        participantMap[Participant(participant.key)] = newRole
+                        val updatedContainer =
+                            selectedTravel!!.copy(allParticipants = participantMap.toMap())
+                        listTravelViewModel.updateTravel(updatedContainer)
+                        listTravelViewModel.selectTravel(updatedContainer)
+                        setExpandedRoleDialog(false)
+                        setExpanded(false)
+                        listTravelViewModel.fetchAllParticipantsInfo()
+                      }
                     }
-                    // we have an actual role change
-                    if (oldRole == Role.OWNER &&
-                        selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) == 1) {
-                      Toast.makeText(
-                              context,
-                              "You're trying to change the role of the only owner of the travel. Please name another owner before changing the role.",
-                              Toast.LENGTH_LONG)
-                          .show()
-                      setExpandedRoleDialog(false)
-                      setExpanded(false)
-                      return@ChangeRoleDialog
-                    }
-                    // we have a legal role change
-                    val participantMap = selectedTravel!!.allParticipants.toMutableMap()
-                    participantMap[Participant(participant.key)] = newRole
-                    val updatedContainer =
-                        selectedTravel!!.copy(allParticipants = participantMap.toMap())
-                    listTravelViewModel.updateTravel(updatedContainer)
-                    listTravelViewModel.selectTravel(updatedContainer)
-                    setExpandedRoleDialog(false)
-                    setExpanded(false)
-                    listTravelViewModel.fetchAllParticipantsInfo()
-                  }
-                }
-          }
+              }
         }
       }
     }

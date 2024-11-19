@@ -32,11 +32,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -123,22 +120,25 @@ fun EditTravelSettingsScreen(
                     Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
                   },
                   modifier = Modifier.testTag("importEmailFab")) {
-                  Row(
-                      verticalAlignment = Alignment.CenterVertically,
-                      modifier = Modifier.padding(horizontal = 12.dp) // Adjust padding for better alignment
-                  ) {
-                      Icon(
-                          imageVector = Icons.Default.MailOutline, // Replace with your mail icon resource
-                          contentDescription = "Mail Icon",
-                          modifier = Modifier.size(24.dp) // Adjust size as needed
-                      )
-                      Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
-                      Text(
-                          text = "Import Email",
-                          style = MaterialTheme.typography.bodyLarge // Or customize further
-                      )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 12.dp) // Adjust padding for better alignment
+                        ) {
+                          Icon(
+                              imageVector =
+                                  Icons.Default.MailOutline, // Replace with your mail icon resource
+                              contentDescription = "Mail Icon",
+                              modifier = Modifier.size(24.dp) // Adjust size as needed
+                              )
+                          Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                          Text(
+                              text = "Import Email",
+                              style = MaterialTheme.typography.bodyLarge // Or customize further
+                              )
+                        }
                   }
-              }
             }
       },
       floatingActionButtonPosition = FabPosition.End,
@@ -167,7 +167,9 @@ fun EditTravelSettingsScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).testTag("editTravelRow")) {
+                modifier =
+                    Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
+                        .testTag("editTravelRow")) {
                   Icon(
                       imageVector = Icons.Default.Person,
                       contentDescription = "Participants",
@@ -192,8 +194,8 @@ fun EditTravelSettingsScreen(
                 label = { Text("Title") },
                 placeholder = { Text("Name the Travel") },
                 shape = RoundedCornerShape(6.dp),
-                )
-          OutlinedTextField(
+            )
+            OutlinedTextField(
                 value = descriptionText.value,
                 onValueChange = { keystroke -> descriptionText.value = keystroke },
                 modifier =
@@ -204,7 +206,7 @@ fun EditTravelSettingsScreen(
                 placeholder = { Text("Describe the Travel") },
                 shape = RoundedCornerShape(6.dp))
 
-          OutlinedTextField(
+            OutlinedTextField(
                 value = locationName.value,
                 onValueChange = { locationName.value = it },
                 label = { Text("Location Name") },
@@ -216,7 +218,7 @@ fun EditTravelSettingsScreen(
                 shape = RoundedCornerShape(6.dp))
 
             // Latitude Input
-          OutlinedTextField(
+            OutlinedTextField(
                 value = latitude.value,
                 onValueChange = { latitude.value = it },
                 label = { Text("Latitude") },
@@ -228,7 +230,7 @@ fun EditTravelSettingsScreen(
                 shape = RoundedCornerShape(6.dp))
 
             // Longitude Input
-          OutlinedTextField(
+            OutlinedTextField(
                 value = longitude.value,
                 onValueChange = { longitude.value = it },
                 label = { Text("Longitude") },
@@ -238,7 +240,7 @@ fun EditTravelSettingsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
                 shape = RoundedCornerShape(6.dp))
-          OutlinedTextField(
+            OutlinedTextField(
                 value = startTime.value,
                 onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
                 label = { Text("Start Date") },
@@ -261,7 +263,7 @@ fun EditTravelSettingsScreen(
                             contentDescription = "Select Start Date")
                       }
                 })
-          OutlinedTextField(
+            OutlinedTextField(
                 value = endTimeText.value,
                 onValueChange = { keystroke ->
                   endTimeText.value = keystroke

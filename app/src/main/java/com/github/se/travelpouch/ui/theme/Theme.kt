@@ -22,8 +22,11 @@ private val DarkColorScheme =
         secondary = PurpleGrey80,
         tertiary = Pink40,
         background = Color(0xFF1C1B1F), // Dark background to contrast with lighter text
-        surface = Color(0xFF2D2C31), // Dark surface color (slightly lighter than background to create separation)
-        inverseSurface = Color(0xFFFEFBFF), // Light color for surfaces that are in the inverse state
+        surface =
+            Color(0xFF2D2C31), // Dark surface color (slightly lighter than background to create
+        // separation)
+        inverseSurface =
+            Color(0xFFFEFBFF), // Light color for surfaces that are in the inverse state
         onPrimary = Color.White, // Text on primary color needs to be white for contrast
         onSecondary = Color.White, // White text for secondary color
         onTertiary = Color.White, // White text for tertiary color
