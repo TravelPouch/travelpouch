@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
@@ -96,7 +97,7 @@ class NotificationItemTest {
   fun notificationTimestampTest() {
     composeTestRule.setContent { NotificationTimestamp(notification1) }
 
-    composeTestRule.onNodeWithTag("notification_item_timestamp").assertExists()
+    composeTestRule.onNodeWithTag("notification_item_timestamp").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("notification_item_timestamp")
         .assertTextEquals(notification1.timestamp.toDate().toString())
@@ -106,7 +107,7 @@ class NotificationItemTest {
   fun notificationMessageTest() {
     composeTestRule.setContent { NotificationMessage(notification1) }
 
-    composeTestRule.onNodeWithTag("notification_item_message").assertExists()
+    composeTestRule.onNodeWithTag("notification_item_message").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("notification_item_message")
         .assertTextEquals(notification1.content.toDisplayString())
@@ -137,6 +138,9 @@ class NotificationItemTest {
 
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertTextEquals("ACCEPT")
+    composeTestRule.onNodeWithTag("notification_item_accept_button").performClick()
+    verify(listTravelViewModel).getTravelById(eq(notification1.travelUid), any(), any())
+
   }
 
   @Test

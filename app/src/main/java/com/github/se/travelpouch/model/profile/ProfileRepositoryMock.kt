@@ -15,6 +15,14 @@ class ProfileRepositoryMock : ProfileRepository {
     }
   }
 
+  override fun getFsUidByEmail(
+    email: String,
+    onSuccess: (String?) -> Unit,
+    onFailure: (Exception) -> Unit
+  ) {
+    TODO("Not yet implemented")
+  }
+
   override fun updateProfile(
     newProfile: Profile,
     onSuccess: () -> Unit,

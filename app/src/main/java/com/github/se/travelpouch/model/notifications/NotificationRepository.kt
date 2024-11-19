@@ -6,7 +6,7 @@ interface NotificationRepository {
 
   fun addNotification(notification: Notification)
 
-  fun fetchNotificationsForUser(userId: String, onNotificationFetched: (List<Notification>) -> Unit)
+  fun fetchNotificationsForUser(userId: String, onNotificationFetched: (List<Notification?>) -> Unit)
 
   fun markNotificationAsRead(notificationUid: String)
 

@@ -207,7 +207,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
           if (travel != null) {
             onSuccess(travel)
           } else {
-            onFailure(Exception("Travel not found"))
+            onFailure(Exception("Travel corrupted"))
           }
         } else {
           onFailure(Exception("Document does not exist"))

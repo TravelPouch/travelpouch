@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
+import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.travels.Role
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,8 +15,7 @@ import com.google.firebase.firestore.Query
 class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) :
     NotificationRepository {
 
-  // Reference to the "notifications" collection in Firestore
-  private val notificationCollection = firestore.collection("notifications")
+  private val notificationCollection = firestore.collection(FirebasePaths.notifications)
 
   override fun getNewUid(): String {
     return notificationCollection.document().id
@@ -45,7 +45,7 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    */
   override fun fetchNotificationsForUser(
       userId: String,
-      onNotificationFetched: (List<Notification>) -> Unit
+      onNotificationFetched: (List<Notification?>) -> Unit
   ) {
     notificationCollection
         .whereEqualTo("receiverUid", userId)
@@ -100,8 +100,8 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
     notificationCollection.document(notificationUid).update("notificationType", notificationType)
   }
 
-  private fun documentToNotification(document: DocumentSnapshot): Notification {
-    try {
+  private fun documentToNotification(document: DocumentSnapshot): Notification? {
+    return try {
       val notificationUid = document.id
       val senderUid = document.getString("senderUid")!!
       val receiverUid = document.getString("receiverUid")!!
@@ -110,33 +110,37 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       val notificationType = NotificationType.valueOf(document.getString("notificationType")!!)
       val content =
           when (notificationType) {
-            NotificationType.INVITATION -> {
-              val inviterName = contentData["inviterName"] as String
-              val travelTitle = contentData["travelTitle"] as String
-              val role = contentData["role"] as String
-              NotificationContent.InvitationNotification(
-                  inviterName, travelTitle, Role.valueOf(role))
-            }
-            NotificationType.ROLE_UPDATE -> {
-              val travelTitle = contentData["travelTitle"] as String
-              val role = Role.valueOf(contentData["role"] as String)
-              NotificationContent.RoleChangeNotification(travelTitle, role)
-            }
-            NotificationType.ACCEPTED -> {
-              val userName = contentData["userName"] as String
-              val travelTitle = contentData["travelTitle"] as String
-              NotificationContent.InvitationResponseNotification(userName, travelTitle, true)
-            }
-            NotificationType.DECLINED -> {
-              val userName = contentData["userName"] as String
-              val travelTitle = contentData["travelTitle"] as String
-              NotificationContent.InvitationResponseNotification(userName, travelTitle, false)
-            }
+              NotificationType.INVITATION -> {
+                  val inviterName = contentData["inviterName"] as? String ?: "Unknown Inviter"
+                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+                  val role = contentData["role"] as? String ?: "PARTICIPANT"
+                  NotificationContent.InvitationNotification(
+                      inviterName, travelTitle, Role.valueOf(role)
+                  )
+              }
+              NotificationType.ROLE_UPDATE -> {
+                  val travelTitle = contentData["travelTitle"] as? String ?: "No Title"
+                  val role = contentData["role"] as? String ?: "PARTICIPANT"
+                  NotificationContent.RoleChangeNotification(
+                      travelTitle, Role.valueOf(role)
+                  )
+              }
+              NotificationType.ACCEPTED -> {
+                  val userName = contentData["userName"] as? String ?: "Unknown User"
+                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+                  NotificationContent.InvitationResponseNotification(userName, travelTitle, true)
+              }
+              NotificationType.DECLINED -> {
+                  val userName = contentData["userName"] as? String ?: "Unknown User"
+                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+                  NotificationContent.InvitationResponseNotification(userName, travelTitle, false)
+              }
+
           }
       val timestamp = document.getTimestamp("timestamp")!!
       val status = NotificationStatus.valueOf(document.getString("status")!!)
 
-      return Notification(
+      Notification(
           notificationUid,
           senderUid,
           receiverUid,
@@ -146,8 +150,8 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
           timestamp,
           status)
     } catch (e: Exception) {
-      Log.e("NotificationRepository", "Error converting document to Notification", e)
-      throw e
+        Log.e("NotificationRepository", "Error converting document to Notification", e)
+        null
     }
   }
 }

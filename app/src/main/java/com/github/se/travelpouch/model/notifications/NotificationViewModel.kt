@@ -41,8 +41,8 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    * @param userId The UID of the user whose notifications are to be loaded.
    */
   fun loadNotificationsForUser(userId: String) {
-    notificationRepository.fetchNotificationsForUser(userId) { notifications ->
-      _notifications.value = notifications
+    notificationRepository.fetchNotificationsForUser(userId) {
+      _notifications.value = it.filterNotNull()
     }
   }
 

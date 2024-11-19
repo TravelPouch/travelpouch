@@ -17,6 +17,17 @@ interface ProfileRepository {
   fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit)
 
   /**
+   * This function retrieves the Firestore UID associated with the given email.
+   *
+   * @param email (String) : the email address to search for
+   * @param onSuccess ((String?) -> Unit) : the function to apply with the UID when the
+   *   information is fetched correctly. The UID can be null if no user is found.
+   * @param onFailure ((Exception) -> Unit) : the function to apply when an error occurs while
+   *   fetching the UID
+   */
+  fun getFsUidByEmail(email: String, onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit)
+
+  /**
    * This function updates the information of the user profile.
    *
    * @param newProfile (Profile) : the new profile to be saved
