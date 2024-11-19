@@ -147,7 +147,7 @@ class NotificationRepositoryFirestoreUnitTest {
 
   @Test
   fun convertDocumentToNotification() {
-    val document: DocumentSnapshot = org.mockito.kotlin.mock()
+    val document: DocumentSnapshot = mock()
 
     // Mocking the data
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
@@ -191,7 +191,7 @@ class NotificationRepositoryFirestoreUnitTest {
 
   @Test
   fun convertDocumentToNotification_roleUpdate() {
-    val document: DocumentSnapshot = org.mockito.kotlin.mock()
+    val document: DocumentSnapshot = mock()
 
     // Mocking the data
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
@@ -231,7 +231,7 @@ class NotificationRepositoryFirestoreUnitTest {
 
   @Test
   fun convertDocumentToNotification_accepted() {
-    val document: DocumentSnapshot = org.mockito.kotlin.mock()
+    val document: DocumentSnapshot = mock()
 
     // Mocking the data
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
@@ -271,7 +271,7 @@ class NotificationRepositoryFirestoreUnitTest {
 
   @Test
   fun convertDocumentToNotification_declined() {
-    val document: DocumentSnapshot = org.mockito.kotlin.mock()
+    val document: DocumentSnapshot = mock()
 
     // Mocking the data
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
@@ -350,18 +350,18 @@ class NotificationRepositoryFirestoreUnitTest {
   @Test
   fun deleteAllNotificationsForUser_callsDelete() {
     // Mocking the Task object
-    val mockTask: Task<QuerySnapshot> = org.mockito.kotlin.mock()
-    val mockQuerySnapshot: QuerySnapshot = org.mockito.kotlin.mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
 
     // Creating a list of mock QueryDocumentSnapshots
-    val mockQueryDocumentSnapshot: QueryDocumentSnapshot = org.mockito.kotlin.mock()
+    val mockQueryDocumentSnapshot: QueryDocumentSnapshot = mock()
     val mockDocuments = listOf(mockQueryDocumentSnapshot)
 
     // Mocking the DocumentReference and delete method
-    val mockDocumentReference: DocumentReference = org.mockito.kotlin.mock()
+    val mockDocumentReference: DocumentReference = mock()
     whenever(mockQueryDocumentSnapshot.id).thenReturn("documentId") // Mock document ID
     whenever(notificationCollection.document("documentId")).thenReturn(mockDocumentReference)
-    whenever(mockDocumentReference.delete()).thenReturn(org.mockito.kotlin.mock()) // Mock delete() method
+    whenever(mockDocumentReference.delete()).thenReturn(mock()) // Mock delete() method
 
     // Mocking methods for the Task object
     whenever(mockTask.isSuccessful).thenReturn(true)

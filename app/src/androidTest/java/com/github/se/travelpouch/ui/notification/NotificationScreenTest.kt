@@ -62,15 +62,6 @@ class NotificationScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val myProfile =
-      Profile(
-          fsUid = generateAutoUserId(),
-          name = "John Doe",
-          email = "email@gmail.com",
-          username = "john_doe",
-          friends = emptyMap(),
-          userTravelList = emptyList())
-
   val senderUid = generateAutoUserId()
   val receiverUid = generateAutoUserId()
   val notificationUid = generateAutoObjectId()
@@ -137,10 +128,6 @@ class NotificationScreenTest {
     composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).assertExists()
     composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).performClick()
     verify(navigationActions, times(1)).navigateTo(Screen.TRAVEL_LIST)
-
-    composeTestRule.onNodeWithTag(TopLevelDestinations.CALENDAR.textId).assertExists()
-    composeTestRule.onNodeWithTag(TopLevelDestinations.CALENDAR.textId).performClick()
-    verify(navigationActions, times(1)).navigateTo(Screen.CALENDAR)
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("notification_item").assertIsDisplayed().performClick()

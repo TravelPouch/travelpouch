@@ -15,10 +15,10 @@ import com.google.firebase.firestore.Query
 class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) :
     NotificationRepository {
 
-  private val notificationCollection = firestore.collection(FirebasePaths.notifications)
+  private val notificationCollection = FirebasePaths.notifications
 
   override fun getNewUid(): String {
-    return notificationCollection.document().id
+    return firestore.collection(FirebasePaths.notifications).document().id
   }
 
   /**
@@ -27,7 +27,7 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    * @param notification The notification to be added.
    */
   override fun addNotification(notification: Notification) {
-    notificationCollection
+      firestore.collection(FirebasePaths.notifications)
         .document(notification.notificationUid)
         .set(notification)
         .addOnSuccessListener { Log.d("NotificationRepository", "Notification added successfully") }
@@ -47,7 +47,7 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       userId: String,
       onNotificationFetched: (List<Notification?>) -> Unit
   ) {
-    notificationCollection
+      firestore.collection(FirebasePaths.notifications)
         .whereEqualTo("receiverUid", userId)
         .orderBy("timestamp", Query.Direction.DESCENDING)
         .get()
@@ -70,7 +70,7 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    * @param notificationUid The UID of the notification to be marked as read.
    */
   override fun markNotificationAsRead(notificationUid: String) {
-    notificationCollection.document(notificationUid).update("status", NotificationStatus.READ)
+      firestore.collection(FirebasePaths.notifications).document(notificationUid).update("status", NotificationStatus.READ)
   }
 
   override fun deleteAllNotificationsForUser(
@@ -78,12 +78,12 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    notificationCollection
+      firestore.collection(FirebasePaths.notifications)
         .whereEqualTo("receiverUid", userUid)
         .get()
         .addOnSuccessListener { documents ->
           for (document in documents) {
-            notificationCollection.document(document.id).delete().addOnFailureListener { exception ->
+              firestore.collection(FirebasePaths.notifications).document(document.id).delete().addOnFailureListener { exception ->
               onFailure(exception)
             }
           }
@@ -99,7 +99,7 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    * @param notificationType The new type of the notification.
    */
   override fun changeNotificationType(notificationUid: String, notificationType: NotificationType) {
-    notificationCollection.document(notificationUid).update("notificationType", notificationType)
+      firestore.collection(FirebasePaths.notifications).document(notificationUid).update("notificationType", notificationType)
   }
 
   private fun documentToNotification(document: DocumentSnapshot): Notification? {

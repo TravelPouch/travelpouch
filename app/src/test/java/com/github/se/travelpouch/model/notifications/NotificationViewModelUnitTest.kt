@@ -34,7 +34,6 @@ class NotificationViewModelUnitTest {
 
   @Mock private lateinit var notificationRepositoryFirestore: NotificationRepositoryFirestore
   @Mock private lateinit var notificationViewModel: NotificationViewModel
-  @Mock private lateinit var mockFirestore: FirebaseFirestore
 
   @get:Rule val rule = InstantTaskExecutorRule()
 
@@ -153,10 +152,10 @@ class NotificationViewModelUnitTest {
   @Test
   fun deleteAllNotificationsForUser() {
     val userUid = generateAutoUserId()
-    val onSuccess = mock(Runnable::class.java)
+    val onSuccess = {}
     val onFailure = mock(Function1::class.java) as (Exception) -> Unit
 
-    notificationViewModel.deleteAllNotificationsForUser(userUid, onSuccess::run, onFailure)
+    notificationViewModel.deleteAllNotificationsForUser(userUid, onSuccess, onFailure)
 
     verify(notificationRepositoryFirestore).deleteAllNotificationsForUser(eq(userUid), any(), any())
   }

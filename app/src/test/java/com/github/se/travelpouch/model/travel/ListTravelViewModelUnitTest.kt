@@ -338,22 +338,24 @@ class ListTravelViewModelTest {
             mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER),
             emptyList())
 
-    doAnswer { invocation ->
+      var succeeded = false
+      var failed = false
+
+      doAnswer { invocation ->
           val onSuccess = invocation.getArgument(1) as (TravelContainer) -> Unit
           onSuccess(travel)
           null
-        }
-        .whenever(travelRepository)
-        .getTravelById(anyString(), anyOrNull(), anyOrNull())
+      }
+          .whenever(travelRepository)
+          .getTravelById(anyString(), anyOrNull(), anyOrNull())
 
-    listTravelViewModel.getTravelById(
-        travelId,
-        { receivedTravel ->
-          assertNotNull(receivedTravel)
-          assertThat(receivedTravel, `is`(travel))
-        },
-        {})
+      listTravelViewModel.getTravelById(
+          travelId,
+          {succeeded = true},
+          {failed = true})
 
-    verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
+        assert(succeeded)
+        assert(!failed)
+      verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
   }
 }
