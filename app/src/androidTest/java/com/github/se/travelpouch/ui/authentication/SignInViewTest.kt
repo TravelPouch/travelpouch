@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
@@ -65,5 +66,14 @@ class SignInViewTest {
     }
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
+  }
+
+  @Test
+  fun signInWithWmailAndPasswordIsDisplayed() {
+    composeTestRule.setContent {
+      SignInScreen(navigationActions = mockNavigationActions, profileModelView, travelViewModel)
+    }
+
+    composeTestRule.onNodeWithText("Sign in with email and password").assertIsDisplayed()
   }
 }

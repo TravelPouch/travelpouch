@@ -3,6 +3,11 @@ agp = "8.3.2"
 concurrentFutures = "1.2.0"
 coreTesting = "2.2.0"
 guava = "33.0.0-android"
+hiltAndroidCompiler = "2.51.1"
+hiltCompiler = "1.2.0"
+hiltLifecycleViewmodel = "1.0.0-alpha03"
+hiltNavigationCompose = "1.0.0"
+hiltNavigationComposeVersion = "1.2.0"
 kotlin = "1.8.10"
 coreKtx = "1.13.1"
 kotlinxCoroutinesGuava = "1.6.0"
@@ -69,8 +74,15 @@ bouquet = "1.1.2"
 androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-hilt-lifecycle-viewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hiltLifecycleViewmodel" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationComposeVersion" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidCompiler" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidCompiler" }
+hilt-navigation-compose = { module = "androix.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

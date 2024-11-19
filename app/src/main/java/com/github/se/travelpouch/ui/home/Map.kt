@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -49,6 +50,15 @@ fun MapContent(modifier: Modifier = Modifier, travelContainers: List<TravelConta
               LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
     } else {
       position = CameraPosition.fromLatLngZoom(LatLng(46.520564452328664, 6.567825512303322), 15f)
+    }
+  }
+
+  LaunchedEffect(travelContainers) {
+    if (travelContainers.isNotEmpty()) {
+      val firstLocation = travelContainers.first().location
+      cameraPositionState.position =
+          CameraPosition.fromLatLngZoom(
+              LatLng(firstLocation.latitude, firstLocation.longitude), 10f)
     }
   }
 

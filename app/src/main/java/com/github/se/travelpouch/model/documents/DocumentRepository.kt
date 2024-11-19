@@ -153,35 +153,6 @@ class DocumentRepositoryFirestore(
   }
 
   /**
-   * Extracts the DocumentVisibility from a DocumentSnapshot representing a TravelPouch Document.
-   *
-   * @param snapshot The firebase DocumentSnapshot to be added.
-   * @throws IllegalArgumentException if the document is not formatted properly.
-   */
-  private fun visibilityFromSnapshot(snapshot: DocumentSnapshot): DocumentVisibility? {
-    return when (snapshot.getString("visibility")) {
-      "ME" -> DocumentVisibility.ME
-      "ORGANIZERS" -> DocumentVisibility.ORGANIZERS
-      "PARTICIPANTS" -> DocumentVisibility.PARTICIPANTS
-      else -> null
-    }
-  }
-
-  /**
-   * Converts a DocumentVisibility to a String for database storage.
-   *
-   * @param visibility The firebase document to be added.
-   * @throws IllegalArgumentException if the document is not formatted properly.
-   */
-  private fun visibilityToString(visibility: DocumentVisibility): String {
-    return when (visibility) {
-      DocumentVisibility.ME -> "ME"
-      DocumentVisibility.ORGANIZERS -> "ORGANIZERS"
-      DocumentVisibility.PARTICIPANTS -> "PARTICIPANTS"
-    }
-  }
-
-  /**
    * Converts a DocumentSnapshot representing a TravelPouch Document to a DocumentContainer.
    *
    * @param document The firebase document to be added.
@@ -202,24 +173,9 @@ class DocumentRepositoryFirestore(
           addedByEmail = document.getString("addedByEmail"),
           addedByUser = document.getDocumentReference("addedByUser"),
           addedAt = requireNotNull(document.getTimestamp("addedAt")),
-          visibility = requireNotNull(visibilityFromSnapshot(document)))
+          visibility = enumValueOf(requireNotNull(document.getString("visibility"))))
     } catch (e: Exception) {
       throw IllegalArgumentException("Invalid document format", e)
     }
-  }
-
-  /**
-   * Converts a NewDocumentContainer to a Map for database storage.
-   *
-   * @param document The firebase document to be added.
-   */
-  private fun toMap(document: NewDocumentContainer): Map<String, Any?> {
-    return mapOf(
-        "title" to document.title,
-        "travelRef" to document.travelRef,
-        "fileFormat" to document.fileFormat.mimeType,
-        "fileSize" to document.fileSize,
-        "addedAt" to document.addedAt,
-        "visibility" to visibilityToString(document.visibility))
   }
 }

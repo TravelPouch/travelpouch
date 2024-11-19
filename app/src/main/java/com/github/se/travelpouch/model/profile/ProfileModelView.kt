@@ -4,9 +4,8 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,19 +17,21 @@ import kotlinx.coroutines.flow.asStateFlow
  * @param repository (ProfileRepository) : the repository that is used as a logic between Firebase
  *   and profiles
  */
-class ProfileModelView(private val repository: ProfileRepository) : ViewModel() {
+@HiltViewModel
+class ProfileModelView @Inject constructor(private val repository: ProfileRepository) :
+    ViewModel() {
 
   private val onFailureTag = "ProfileViewModel"
 
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ProfileModelView(ProfileRepositoryFirebase(Firebase.firestore)) as T
-          }
-        }
-  }
+  //  companion object {
+  //    val Factory: ViewModelProvider.Factory =
+  //        object : ViewModelProvider.Factory {
+  //          @Suppress("UNCHECKED_CAST")
+  //          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+  //            return ProfileModelView(ProfileRepositoryFirebase(Firebase.firestore)) as T
+  //          }
+  //        }
+  //  }
 
   private val profile_ = MutableStateFlow<Profile>(ErrorProfile.errorProfile)
   val profile: StateFlow<Profile> = profile_.asStateFlow()
