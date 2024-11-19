@@ -1,0 +1,19 @@
+{
+  "name": "myDocument",
+  "bucket": "travelpouch-7d692.appspot.com",
+  "metageneration": 1,
+  "generation": 1731615192984,
+  "contentType": "application/octet-stream",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "124a142a-87e7-4afb-85c3-b0fe1dfa0376"
+  ],
+  "etag": "y/HHzPLoQo6OST9rLZt7R7VSqpM",
+  "customMetadata": {},
+  "timeCreated": "2024-11-14T20:13:12.984Z",
+  "updated": "2024-11-14T20:13:12.984Z",
+  "size": 19018,
+  "md5Hash": "huIb+LGBLEsaUrshxkwHhw==",
+  "crc32c": "2874968683"
+}

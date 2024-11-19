@@ -15,14 +15,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,11 +62,13 @@ fun SignInScreen(
 ) {
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
+  val methodChosen = rememberSaveable { mutableStateOf(false) }
 
   // launcher for Firebase authentication
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
+            methodChosen.value = false
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
             val job =
@@ -76,6 +81,7 @@ fun SignInScreen(
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
+            methodChosen.value = false
             isLoading.value = false
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
@@ -111,45 +117,54 @@ fun SignInScreen(
 
           Spacer(modifier = Modifier.height(48.dp))
 
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth(0.8f) // Fixed width for both button and spinner
-                      .height(56.dp), // Fixed height for both button and spinner
-              contentAlignment = Alignment.Center) {
+          Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier =
+                    Modifier.fillMaxWidth(0.8f) // Fixed width for both button and spinner
+                        .height(56.dp), // Fixed height for both button and spinner
+                contentAlignment = Alignment.Center) {
 
-                // Google Sign-In Button (before the loading state)
-                this@Column.AnimatedVisibility(
-                    visible = !isLoading.value,
-                    enter = fadeIn(animationSpec = tween(150)),
-                    exit = fadeOut(animationSpec = tween(300))) {
-                      // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
-                      GoogleSignInButton(
-                          onSignInClick = {
-                            val gso =
-                                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                    .requestIdToken(token)
-                                    .requestEmail()
-                                    .build()
-                            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                            launcher.launch(googleSignInClient.signInIntent)
-                            isLoading.value = true
-                          })
-                    }
+                  // Google Sign-In Button (before the loading state)
+                  this@Column.AnimatedVisibility(
+                      visible = !isLoading.value,
+                      enter = fadeIn(animationSpec = tween(150)),
+                      exit = fadeOut(animationSpec = tween(300))) {
+                        // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
+                        GoogleSignInButton(
+                            onSignInClick = {
+                              methodChosen.value = true
+                              val gso =
+                                  GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                      .requestIdToken(token)
+                                      .requestEmail()
+                                      .build()
+                              val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                              launcher.launch(googleSignInClient.signInIntent)
+                              isLoading.value = true
+                            })
+                      }
 
-                // CircularProgressIndicator (when loading)
-                this@Column.AnimatedVisibility(
-                    visible = isLoading.value,
-                    enter = fadeIn(animationSpec = tween(300)),
-                    exit = fadeOut(animationSpec = tween(300))) {
-                      CircularProgressIndicator(
-                          modifier =
-                              Modifier.height(28.dp)
-                                  .testTag(
-                                      "loadingSpinner"), // Same height as Google Sign-In button
-                          color = MaterialTheme.colorScheme.primary,
-                          strokeWidth = 5.dp)
-                    }
-              }
+                  // CircularProgressIndicator (when loading)
+                  this@Column.AnimatedVisibility(
+                      visible = isLoading.value,
+                      enter = fadeIn(animationSpec = tween(300)),
+                      exit = fadeOut(animationSpec = tween(300))) {
+                        CircularProgressIndicator(
+                            modifier =
+                                Modifier.height(28.dp)
+                                    .testTag(
+                                        "loadingSpinner"), // Same height as Google Sign-In button
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 5.dp)
+                      }
+                }
+
+            Button(
+                onClick = { navigationActions.navigateTo(Screen.SIGN_IN_PASSWORD) },
+                enabled = !methodChosen.value) {
+                  Text("Sign in with email and password")
+                }
+          }
         }
       })
 }

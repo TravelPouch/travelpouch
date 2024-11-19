@@ -30,6 +30,7 @@ object Screen {
   const val ACTIVITIES_MAP = "MapActivities Screen"
 
   const val CALENDAR = "Calendar Screen"
+  const val SIGN_IN_PASSWORD = "Sign in with password Screen"
 }
 
 data class TopLevelDestination(val screen: String, val icon: ImageVector, val textId: String)

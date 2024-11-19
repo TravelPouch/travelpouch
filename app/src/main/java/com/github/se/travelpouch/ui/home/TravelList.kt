@@ -86,44 +86,47 @@ fun TravelListScreen(
             }
       },
       content = { pd ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(pd),
-            contentPadding = PaddingValues(bottom = 80.dp)) {
-              item {
-                MapContent(
-                    modifier = Modifier.fillMaxWidth().height(mapHeight),
-                    travelContainers = travelList.value)
-              }
-              if (travelList.value.isNotEmpty()) {
-                items(travelList.value.size) { index ->
-                  TravelItem(travelContainer = travelList.value[index]) {
-                    val travelId = travelList.value[index].fsUid
-                    listTravelViewModel.selectTravel(travelList.value[index])
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-                    eventViewModel.setIdTravel(travelId)
-                    activityViewModel.setIdTravel(travelId)
-                    documentViewModel.setIdTravel(travelId)
+        Column(modifier = Modifier.fillMaxSize().padding(pd)) {
+          // Map placed outside the LazyColumn to prevent it from being part of the scrollable
+          // content
+          MapContent(
+              modifier = Modifier.fillMaxWidth().height(mapHeight),
+              travelContainers = travelList.value)
+
+          LazyColumn(
+              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).padding(pd),
+              contentPadding = PaddingValues(bottom = 80.dp)) {
+                if (travelList.value.isNotEmpty()) {
+                  items(travelList.value.size) { index ->
+                    TravelItem(travelContainer = travelList.value[index]) {
+                      val travelId = travelList.value[index].fsUid
+                      listTravelViewModel.selectTravel(travelList.value[index])
+                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      eventViewModel.setIdTravel(travelId)
+                      activityViewModel.setIdTravel(travelId)
+                      documentViewModel.setIdTravel(travelId)
+                    }
+                  }
+                } else {
+                  item {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        contentAlignment = Alignment.Center) {
+                          Text(
+                              modifier = Modifier.testTag("emptyTravelPrompt"),
+                              text = "You have no travels yet.")
+                          if (isLoading.value) {
+                            CircularProgressIndicator(
+                                modifier =
+                                    Modifier.align(Alignment.TopStart).testTag("loadingSpinner"),
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 5.dp)
+                          }
+                        }
                   }
                 }
-              } else {
-                item {
-                  Box(
-                      modifier = Modifier.fillMaxSize().padding(16.dp),
-                      contentAlignment = Alignment.Center) {
-                        Text(
-                            modifier = Modifier.testTag("emptyTravelPrompt"),
-                            text = "You have no travels yet.")
-                        if (isLoading.value) {
-                          CircularProgressIndicator(
-                              modifier =
-                                  Modifier.align(Alignment.TopStart).testTag("loadingSpinner"),
-                              color = MaterialTheme.colorScheme.primary,
-                              strokeWidth = 5.dp)
-                        }
-                      }
-                }
               }
-            }
+        }
       })
 }
 
@@ -139,7 +142,7 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
       modifier =
           Modifier.testTag("travelListItem")
               .fillMaxWidth()
-              .padding(vertical = 4.dp)
+              .padding(vertical = 6.dp)
               .clickable(onClick = onClick),
   ) {
     Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {

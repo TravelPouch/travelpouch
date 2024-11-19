@@ -61,12 +61,8 @@ enum class DocumentFileFormat(val mimeType: String) {
   PDF("application/pdf");
 
   companion object {
-    fun fromMimeType(mimeType: String?): DocumentFileFormat? {
-      for (value in values()) {
-        if (value.mimeType == mimeType) return value
-      }
-      return null
-    }
+    fun fromMimeType(mimeType: String?): DocumentFileFormat? =
+        values().find { it.mimeType == mimeType }
 
     val ACCEPTED_MIME_TYPE = values().map { it.mimeType }.toTypedArray()
   }
