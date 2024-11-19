@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -107,8 +109,8 @@ fun ParticipantListScreen(
       if (expanded) {
         Dialog(onDismissRequest = { setExpanded(false) }) {
           Box(
-              Modifier.size(2000.dp, 200.dp)
-                  .background(Color.White)
+              Modifier.fillMaxWidth(1f).height(250.dp)
+                  .background(MaterialTheme.colorScheme.surface)
                   .testTag("participantDialogBox")) {
                 Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
                   Row(
@@ -122,14 +124,14 @@ fun ParticipantListScreen(
                         TruncatedText(
                             text = participant.value.name,
                             fontWeight = FontWeight.Bold,
-                            maxLength = 20,
+                            maxLength = 25,
                             modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
-                        TruncatedText(
-                            text = participant.value.email,
-                            maxLength = 20,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
                       }
+                    TruncatedText(
+                        text = participant.value.email,
+                        maxLength = 30,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
 
                   RoleEntryDialog(
                       selectedTravel = selectedTravel,
@@ -166,7 +168,7 @@ fun ParticipantListScreen(
 
       if (expandedRoleDialog) {
         Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
-          Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("roleDialogBox")) {
+          Box(Modifier.fillMaxWidth(1f).height(250.dp).background(MaterialTheme.colorScheme.surface).testTag("roleDialogBox")) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
                 horizontalAlignment = Alignment.CenterHorizontally,

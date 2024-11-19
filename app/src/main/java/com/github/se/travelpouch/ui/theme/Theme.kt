@@ -17,13 +17,25 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme =
-    darkColorScheme(primary = Purple80, secondary = PurpleGrey80, tertiary = Pink80)
+    darkColorScheme(
+        primary = Purple40,
+        secondary = PurpleGrey80,
+        tertiary = Pink40,
+        background = Color(0xFF1C1B1F), // Dark background to contrast with lighter text
+        surface = Color(0xFF2D2C31), // Dark surface color (slightly lighter than background to create separation)
+        inverseSurface = Color(0xFFFEFBFF), // Light color for surfaces that are in the inverse state
+        onPrimary = Color.White, // Text on primary color needs to be white for contrast
+        onSecondary = Color.White, // White text for secondary color
+        onTertiary = Color.White, // White text for tertiary color
+        onBackground = Color.White, // White text on dark background
+        onSurface = Color.White, // White text on dark surface
+        inverseOnSurface = Color(0xFF1C1B1F)) // Inverse text color for the dark mode surfaces
 
 private val LightColorScheme =
     lightColorScheme(
         primary = Purple40,
         secondary = PurpleGrey40,
-        tertiary = Pink40,
+        tertiary = Pink80,
         background = Color(0xFFFeF7FF),
         surface = Color(0xFFF0ECEF),
         inverseSurface = Color(0xFFFFFBFE),

@@ -1,6 +1,8 @@
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 
@@ -18,7 +20,8 @@ fun TruncatedText(
     text: String,
     maxLength: Int,
     fontWeight: FontWeight? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    style: TextStyle = LocalTextStyle.current
 ) {
   // Determine the text to display, truncating if it exceeds maxLength
   val displayText =

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,17 +39,20 @@ fun ParticipantRow(
             modifier = Modifier.padding(10.dp).testTag("participantIcon"))
         Text(
             text = participant.value.name,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp).testTag("participantName").weight(0.5f))
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier.padding(10.dp).testTag("participantName").weight(0.8f))
         TruncatedText(
             text = participant.value.email,
-            fontWeight = FontWeight.Bold,
-            maxLength = 30,
+            fontWeight = FontWeight.Light,
+            style = MaterialTheme.typography.labelSmall,
+            maxLength = 25,
             modifier = Modifier.padding(10.dp).testTag("participantEmail").weight(0.8f))
         TruncatedText(
             text = selectedTravel.allParticipants[Participant(participant.key)]!!.name,
             fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.labelMedium,
             maxLength = 20,
-            modifier = Modifier.padding(10.dp).testTag("participantRole").weight(1f))
+            modifier = Modifier.padding(10.dp).testTag("participantRole").weight(0.8f))
       }
 }

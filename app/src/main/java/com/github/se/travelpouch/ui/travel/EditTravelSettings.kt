@@ -9,16 +9,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,9 +30,13 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -99,14 +106,14 @@ fun EditTravelSettingsScreen(
       },
       floatingActionButton = {
         Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(150.dp)) {
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(50.dp)) {
               FloatingActionButton(
                   onClick = {
                     setExpandedAddUserDialog(true)
                     Log.d("EditTravelSettingsScreen", "Add User clicked")
                   },
-                  modifier = Modifier.testTag("addUserFab").padding(end = 16.dp)) {
+                  modifier = Modifier.testTag("addUserFab").padding(start = 16.dp)) {
                     Text("Add User")
                   }
               FloatingActionButton(
@@ -116,8 +123,22 @@ fun EditTravelSettingsScreen(
                     Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
                   },
                   modifier = Modifier.testTag("importEmailFab")) {
-                    Text("Import Email to Clipboard")
+                  Row(
+                      verticalAlignment = Alignment.CenterVertically,
+                      modifier = Modifier.padding(horizontal = 12.dp) // Adjust padding for better alignment
+                  ) {
+                      Icon(
+                          imageVector = Icons.Default.MailOutline, // Replace with your mail icon resource
+                          contentDescription = "Mail Icon",
+                          modifier = Modifier.size(24.dp) // Adjust size as needed
+                      )
+                      Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                      Text(
+                          text = "Import Email",
+                          style = MaterialTheme.typography.bodyLarge // Or customize further
+                      )
                   }
+              }
             }
       },
       floatingActionButtonPosition = FabPosition.End,
@@ -141,12 +162,12 @@ fun EditTravelSettingsScreen(
               Modifier.padding(padding)
                   .testTag("editTravelColumn")
                   .verticalScroll(rememberScrollState()),
-          Arrangement.Top,
+          Arrangement.spacedBy(8.dp),
           Alignment.CenterHorizontally) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(8.dp).testTag("editTravelRow")) {
+                modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).testTag("editTravelRow")) {
                   Icon(
                       imageVector = Icons.Default.Person,
                       contentDescription = "Participants",
@@ -169,8 +190,10 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelTitle").fillMaxWidth().padding(horizontal = 10.dp),
                 label = { Text("Title") },
-                placeholder = { Text("Name the Travel") })
-            OutlinedTextField(
+                placeholder = { Text("Name the Travel") },
+                shape = RoundedCornerShape(6.dp),
+                )
+          OutlinedTextField(
                 value = descriptionText.value,
                 onValueChange = { keystroke -> descriptionText.value = keystroke },
                 modifier =
@@ -178,9 +201,10 @@ fun EditTravelSettingsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
                 label = { Text("Description") },
-                placeholder = { Text("Describe the Travel") })
+                placeholder = { Text("Describe the Travel") },
+                shape = RoundedCornerShape(6.dp))
 
-            OutlinedTextField(
+          OutlinedTextField(
                 value = locationName.value,
                 onValueChange = { locationName.value = it },
                 label = { Text("Location Name") },
@@ -188,10 +212,11 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelLocationName")
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp))
+                        .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp))
 
             // Latitude Input
-            OutlinedTextField(
+          OutlinedTextField(
                 value = latitude.value,
                 onValueChange = { latitude.value = it },
                 label = { Text("Latitude") },
@@ -199,10 +224,11 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelLatitude")
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp))
+                        .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp))
 
             // Longitude Input
-            OutlinedTextField(
+          OutlinedTextField(
                 value = longitude.value,
                 onValueChange = { longitude.value = it },
                 label = { Text("Longitude") },
@@ -210,8 +236,9 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelLongitude")
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp))
-            OutlinedTextField(
+                        .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp))
+          OutlinedTextField(
                 value = startTime.value,
                 onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
                 label = { Text("Start Date") },
@@ -220,6 +247,7 @@ fun EditTravelSettingsScreen(
                     Modifier.testTag("inputTravelStartTime")
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
                       onClick = {
@@ -233,7 +261,7 @@ fun EditTravelSettingsScreen(
                             contentDescription = "Select Start Date")
                       }
                 })
-            OutlinedTextField(
+          OutlinedTextField(
                 value = endTimeText.value,
                 onValueChange = { keystroke ->
                   endTimeText.value = keystroke
@@ -244,6 +272,7 @@ fun EditTravelSettingsScreen(
                     Modifier.testTag("inputTravelEndTime")
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
                       onClick = {
