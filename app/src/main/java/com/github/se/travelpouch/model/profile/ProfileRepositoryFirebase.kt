@@ -84,7 +84,8 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             email = email,
             friends = null,
             name = email.substringBefore("@"),
-            emptyList())
+            emptyList(),
+            needsOnboarding = true)
     performFirestoreOperation(
         db.collection(collectionPath).document(uid).set(profile),
         onSuccess = {
@@ -166,6 +167,7 @@ class ProfileRepositoryConvert {
         val friends = friendsData?.map { (key, value) -> key as Int to value as String }?.toMap()
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
+        val needsOnboarding = document.getBoolean("needsOnboarding") ?: true
 
         Profile(
             fsUid = uid,
@@ -173,7 +175,8 @@ class ProfileRepositoryConvert {
             email = email!!,
             friends = friends,
             name = name!!,
-            userTravelList = userTravelList ?: emptyList())
+            userTravelList = userTravelList ?: emptyList(),
+            needsOnboarding = needsOnboarding)
       } catch (e: Exception) {
         Log.e("ProfileRepository", "Error converting document to Profile", e)
         ErrorProfile.errorProfile
