@@ -20,7 +20,8 @@ data class Profile(
     val email: String,
     val friends: Map<Int, String>?,
     val name: String,
-    var userTravelList: List<String>
+    var userTravelList: List<String>,
+    var needsOnboarding: Boolean = true
 ) {
   init {
     require(fsUid.isNotBlank() && isValidUserUid(fsUid)) { "Invalid fsUid" }
