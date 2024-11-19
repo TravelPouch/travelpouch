@@ -99,15 +99,14 @@ class ParticipantListScreenTest {
     notificationViewModel = NotificationViewModel(notificationRepository)
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView(profileRepository)
-
-    composeTestRule.setContent {
-      ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
-    }
   }
 
   @Test
   fun testemptyView() {
+      composeTestRule.setContent {
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+      }
 
     // Check if all elements are displayed
     composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
@@ -180,6 +179,11 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewChangeRoleFailed() {
+      composeTestRule.setContent {
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+      }
+
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
@@ -235,6 +239,11 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewChangeRoleToSameRole() {
+      composeTestRule.setContent {
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+      }
+
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
@@ -284,6 +293,11 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewRemoveParticipant() {
+      composeTestRule.setContent {
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+      }
+
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot
@@ -318,6 +332,11 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewRemoveParticipantFail() {
+      composeTestRule.setContent {
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+      }
+
     listTravelViewModel.selectTravel(container)
 
     // this hack was generated using Github Copilot

@@ -283,7 +283,7 @@ fun handleRoleChange(
         // Actual role change logic
         notificationViewModel.sendNotification(
             Notification(
-                listTravelViewModel.getNewUid(),
+                notificationViewModel.getNewUid(),
                 profileViewModel.profile.value.fsUid,
                 participant.key,
                 selectedTravel.fsUid,

@@ -35,6 +35,10 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
         }
   }
 
+  fun getNewUid(): String {
+    return notificationRepository.getNewUid()
+  }
+
   /**
    * Loads notifications for a specific user.
    *

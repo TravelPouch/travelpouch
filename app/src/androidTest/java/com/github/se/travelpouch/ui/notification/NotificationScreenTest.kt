@@ -42,6 +42,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.anyOrNull
 
 class NotificationScreenTest {
 
@@ -96,55 +98,72 @@ class NotificationScreenTest {
     activityViewModel = ActivityViewModel(activityRepository)
     documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
     eventViewModel = EventViewModel(eventRepository)
-
-    composeTestRule.setContent {
-      NotificationsScreen(
-          navigationActions = navigationActions,
-          notificationViewModel = notificationViewModel,
-          profileModelView = profileModelView,
-          listTravelViewModel = listTravelViewModel,
-          activityViewModel = activityViewModel,
-          documentViewModel = documentViewModel,
-          eventsViewModel = eventViewModel)
-    }
   }
 
-  @SuppressLint("CheckResult")
-  @Test
-  fun bottomNavigationMenu_displayAndClickActions() {
-    val _notificationsField =
-        NotificationViewModel::class.java.getDeclaredField("_notifications").apply {
-          isAccessible = true
+    @SuppressLint("CheckResult")
+    @Test
+    fun bottomNavigationMenu_displayAndClickActions() {
+        composeTestRule.setContent {
+            NotificationsScreen(
+                navigationActions = navigationActions,
+                notificationViewModel = notificationViewModel,
+                profileModelView = profileModelView,
+                listTravelViewModel = listTravelViewModel,
+                activityViewModel = activityViewModel,
+                documentViewModel = documentViewModel,
+                eventsViewModel = eventViewModel)
         }
-    val notificationFlow =
-        _notificationsField.get(notificationViewModel) as MutableStateFlow<List<Notification>>
-    notificationFlow.value = listOf(notification1)
-    composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).assertExists()
-    composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).performClick()
-    verify(navigationActions, times(1)).navigateTo(Screen.NOTIFICATION)
+        // Mock the repository call to return the desired notifications
+        `when`(notificationRepository.fetchNotificationsForUser(anyOrNull(), anyOrNull())).then {
+            it.getArgument<(List<Notification>) -> Unit>(1)(listOf(notification1))
+        }
 
-    composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).assertExists()
-    composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).performClick()
-    verify(navigationActions, times(1)).navigateTo(Screen.TRAVEL_LIST)
+        // Load the notifications for the user (this will update the StateFlow)
+        notificationViewModel.loadNotificationsForUser("uid")
 
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("notification_item").assertIsDisplayed().performClick()
-    composeTestRule
-        .onNodeWithTag("notification_item_accept_button")
-        .assertIsDisplayed()
-        .performClick()
-    composeTestRule
-        .onNodeWithTag("notification_item_decline_button")
-        .assertIsDisplayed()
-        .performClick()
-    composeTestRule.onNodeWithTag("DeleteAllNotificationsButton").assertIsDisplayed().performClick()
-  }
+        // Perform assertions and interactions
+        composeTestRule.waitForIdle()
 
-  @Test
+        // Check if the notification item is displayed and clickable
+        composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).performClick()
+        verify(navigationActions, times(1)).navigateTo(Screen.NOTIFICATION)
+
+        composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).performClick()
+        verify(navigationActions, times(1)).navigateTo(Screen.TRAVEL_LIST)
+
+        composeTestRule.waitForIdle()
+
+        // Interactions with the notification item
+        composeTestRule.onNodeWithTag("notification_item").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithTag("notification_item_accept_button")
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("notification_item_decline_button")
+            .assertIsDisplayed()
+
+        // Interact with the "Delete All Notifications" button
+        composeTestRule.onNodeWithTag("DeleteAllNotificationsButton").assertIsDisplayed()
+    }
+
+
+    @Test
   fun contentScaffold_display() {
-    composeTestRule.onNodeWithTag("LazyColumnNotificationsScreen").assertExists()
+        composeTestRule.setContent {
+            NotificationsScreen(
+                navigationActions = navigationActions,
+                notificationViewModel = notificationViewModel,
+                profileModelView = profileModelView,
+                listTravelViewModel = listTravelViewModel,
+                activityViewModel = activityViewModel,
+                documentViewModel = documentViewModel,
+                eventsViewModel = eventViewModel)
+        }
+
+    composeTestRule.onNodeWithTag("LazyColumnNotificationsScreen").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("LazyColumnNotificationsScreen").onChildren()[0].assertExists()
     composeTestRule.onNodeWithTag("LazyColumnNotificationsScreen").onChildren()[0].isDisplayed()
@@ -174,6 +193,16 @@ class NotificationScreenTest {
 
   @Test
   fun topBar_display() {
+      composeTestRule.setContent {
+          NotificationsScreen(
+              navigationActions = navigationActions,
+              notificationViewModel = notificationViewModel,
+              profileModelView = profileModelView,
+              listTravelViewModel = listTravelViewModel,
+              activityViewModel = activityViewModel,
+              documentViewModel = documentViewModel,
+              eventsViewModel = eventViewModel)
+      }
     composeTestRule.onNodeWithTag("TopAppBarNotificationsScreen").assertExists()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").assertExists()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").isDisplayed()

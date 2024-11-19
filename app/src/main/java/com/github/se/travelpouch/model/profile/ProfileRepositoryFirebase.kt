@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.profile
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
@@ -70,6 +71,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     }
   }
 
+  @SuppressLint("SuspiciousIndentation")
   override fun getFsUidByEmail(
       email: String,
       onSuccess: (String?) -> Unit,
@@ -81,8 +83,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .addOnSuccessListener { result ->
           if (result.documents.isNotEmpty()) {
             val fsUid = result.documents[0].id
+              Log.d("ProfileRepository", "fsUid: $fsUid")
             onSuccess(fsUid)
           } else {
+              Log.d("ProfileRepository", "fsUid: null")
             onSuccess(null)
           }
         }

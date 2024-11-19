@@ -389,18 +389,24 @@ fun EditTravelSettingsScreen(
                                       context, "Error: User already added", Toast.LENGTH_SHORT)
                                   .show()
                             } else if (fsUid != null) {
-                              notificationViewModel.sendNotification(
-                                  Notification(
-                                      listTravelViewModel.getNewUid(),
-                                      profileViewModel.profile.value.fsUid,
-                                      fsUid,
-                                      selectedTravel!!.fsUid,
-                                      NotificationContent.InvitationNotification(
-                                          profileViewModel.profile.value.name,
-                                          selectedTravel!!.title,
-                                          Role.PARTICIPANT),
-                                      NotificationType.INVITATION))
-                              // Go back
+                                try {
+                                    notificationViewModel.sendNotification(
+                                        Notification(
+                                            notificationViewModel.getNewUid(),
+                                            profileViewModel.profile.value.fsUid,
+                                            fsUid,
+                                            selectedTravel!!.fsUid,
+                                            NotificationContent.InvitationNotification(
+                                                profileViewModel.profile.value.name,
+                                                selectedTravel!!.title,
+                                                Role.PARTICIPANT),
+                                            NotificationType.INVITATION)
+                                    )
+                                } catch (e: Exception) {
+                                    Log.e("NotificationError", "Failed to send notification: ${e.message}")
+                                    // Handle any additional actions here if needed, e.g., show a Toast or alert
+                                }
+                                // Go back
                               setExpandedAddUserDialog(false)
                             } else {
                               Toast.makeText(
