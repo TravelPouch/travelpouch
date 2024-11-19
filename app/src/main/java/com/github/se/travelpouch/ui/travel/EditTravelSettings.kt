@@ -104,8 +104,8 @@ fun EditTravelSettingsScreen(
       },
       floatingActionButton = {
         Row(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(50.dp)) {
+            modifier = Modifier.padding(start = 16.dp, end = 0.dp),
+            horizontalArrangement = Arrangement.spacedBy(95.dp)) {
               FloatingActionButton(
                   onClick = {
                     setExpandedAddUserDialog(true)
@@ -118,7 +118,7 @@ fun EditTravelSettingsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier =
                             Modifier.padding(
-                                horizontal = 12.dp) // Adjust padding for better alignment
+                                horizontal = 10.dp) // Adjust padding for better alignment
                         ) {
                           Icon(
                               imageVector =
