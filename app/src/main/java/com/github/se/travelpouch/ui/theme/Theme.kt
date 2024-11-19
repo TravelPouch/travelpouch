@@ -29,6 +29,7 @@ private val DarkColorScheme =
             Color(0xFFFEFBFF), // Light color for surfaces that are in the inverse state
         onPrimary = Color.White, // Text on primary color needs to be white for contrast
         onSecondary = Color.White, // White text for secondary color
+        secondaryContainer = Color(0xFFE7DDF6), // Lighter text for secondary color
         onTertiary = Color.White, // White text for tertiary color
         onBackground = Color.White, // White text on dark background
         onSurface = Color.White, // White text on dark surface

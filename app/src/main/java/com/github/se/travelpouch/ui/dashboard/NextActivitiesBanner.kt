@@ -59,8 +59,6 @@ fun NextActivitiesBanner(
   val reminderRange = 86400L // 24 hours in milliseconds
   val nowTime = Timestamp.now().seconds
   val darkTheme = isSystemInDarkTheme()
-  val entryColor = if (darkTheme) Color.White else Color.Black
-  val titleColor = if (darkTheme) Color.Black else Color.White
   val overlayColor =
       if (darkTheme) Color.DarkGray.copy(alpha = 0.85f) else Color.Gray.copy(alpha = 0.85f)
 
@@ -130,7 +128,7 @@ fun NextActivitiesBanner(
                         Modifier.size(dismissButtonSize)
                             .border(
                                 width = if (showOutline.value) 2.dp else 0.dp,
-                                color = if (showOutline.value) entryColor else Color.Transparent,
+                                color = if (showOutline.value) Color.White else Color.Transparent,
                                 shape = CircleShape)
                             .testTag("NextActivitiesBannerDismissButton")
                             .padding(
@@ -140,7 +138,7 @@ fun NextActivitiesBanner(
                       Icon(
                           imageVector = Icons.Default.Close,
                           contentDescription = "Dismiss",
-                          tint = titleColor)
+                          tint = Color.White)
                     }
               }
         }

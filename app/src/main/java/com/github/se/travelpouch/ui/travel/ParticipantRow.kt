@@ -53,6 +53,6 @@ fun ParticipantRow(
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.labelMedium,
             maxLength = 20,
-            modifier = Modifier.padding(10.dp).testTag("participantRole").weight(0.8f))
+            modifier = Modifier.padding(10.dp).testTag("participantRole").weight(0.9f))
       }
 }
