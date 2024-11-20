@@ -87,9 +87,7 @@ fun NotificationsScreen(
                         profile.value.fsUid,
                         onSuccess = {
                           Toast.makeText(context, "All notifications deleted", Toast.LENGTH_SHORT)
-                              .show()
-                          notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
-                        },
+                              .show() },
                         onFailure = { e ->
                           Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                         })
