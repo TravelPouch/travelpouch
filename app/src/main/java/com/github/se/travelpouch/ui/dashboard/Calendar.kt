@@ -7,14 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,9 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
-import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -44,32 +36,33 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
 
   // Application
   Scaffold(
-      topBar = {
-        // TopAppBar with title and icon to indicate the calendar feature
-        TopAppBar(
-            title = { Text("Calendar") },
-            navigationIcon = {
-              IconButton(
-                  modifier = Modifier.testTag("goBackIcon"),
-                  onClick = { navigationActions.goBack() }) {
-                    // Back icon for navigation
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
-                    )
-                  }
-            },
-            modifier = Modifier.testTag("calendarTopAppBar"))
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            tabList =
-                listOf(
-                    TopLevelDestinations.ACTIVITIES,
-                    TopLevelDestinations.CALENDAR,
-                    TopLevelDestinations.MAP),
-            navigationActions = navigationActions)
-      }) { innerPadding ->
+      //      topBar = {
+      //        // TopAppBar with title and icon to indicate the calendar feature
+      //        TopAppBar(
+      //            title = { Text("Calendar") },
+      //            navigationIcon = {
+      //              IconButton(
+      //                  modifier = Modifier.testTag("goBackIcon"),
+      //                  onClick = { navigationActions.goBack() }) {
+      //                    // Back icon for navigation
+      //                    Icon(
+      //                        Icons.AutoMirrored.Filled.ArrowBack,
+      //                        contentDescription = null,
+      //                    )
+      //                  }
+      //            },
+      //            modifier = Modifier.testTag("calendarTopAppBar"))
+      //      },
+      //      bottomBar = {
+      //        BottomNavigationMenu(
+      //            tabList =
+      //                listOf(
+      //                    TopLevelDestinations.ACTIVITIES,
+      //                    TopLevelDestinations.CALENDAR,
+      //                    TopLevelDestinations.MAP),
+      //            navigationActions = navigationActions)
+      //      }
+      ) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("calendarScreenColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,

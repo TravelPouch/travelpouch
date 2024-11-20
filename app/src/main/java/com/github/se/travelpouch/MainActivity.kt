@@ -26,10 +26,8 @@ import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.authentication.SignInWithPassword
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
-import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.EditActivity
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
-import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
@@ -106,9 +104,9 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               profileModelView)
         }
-        composable(Screen.TRAVEL_ACTIVITIES) {
-          TravelActivitiesScreen(navigationActions, activityModelView)
-        }
+        //        composable(Screen.TRAVEL_ACTIVITIES) {
+        //          TravelActivitiesScreen(navigationActions, activityModelView)
+        //        }
         composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
         composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
         composable(Screen.ADD_TRAVEL) {
@@ -147,7 +145,7 @@ class MainActivity : ComponentActivity() {
           ModifyingProfileScreen(navigationActions, profileModelView)
         }
 
-        composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
+        // composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
 
         composable(Screen.SIGN_IN_PASSWORD) {
           SignInWithPassword(navigationActions, profileModelView, listTravelViewModel, auth)
