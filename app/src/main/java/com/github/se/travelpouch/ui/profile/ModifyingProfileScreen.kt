@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -68,9 +69,10 @@ fun ModifyingProfileScreen(
   ) { pd ->
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .padding(pd)
                 .testTag("ProfileColumn")) {
           OutlinedTextField(
@@ -78,21 +80,21 @@ fun ModifyingProfileScreen(
               onValueChange = { email = it },
               enabled = true,
               label = { Text("Email") },
-              modifier = Modifier.testTag("emailField"))
+              modifier = Modifier.fillMaxWidth().testTag("emailField"))
 
           OutlinedTextField(
               value = username,
               onValueChange = { username = it },
               enabled = true,
               label = { Text("Username") },
-              modifier = Modifier.testTag("usernameField"))
+              modifier = Modifier.fillMaxWidth().testTag("usernameField"))
 
           OutlinedTextField(
               value = "No Friend, sadge :(",
               onValueChange = {},
               enabled = false,
               label = { Text("Friends") },
-              modifier = Modifier.testTag("friendsField"))
+              modifier = Modifier.fillMaxWidth().testTag("friendsField"))
 
           Button(
               onClick = {
