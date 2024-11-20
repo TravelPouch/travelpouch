@@ -61,15 +61,14 @@ fun ParticipantListScreen(
     notificationViewModel: NotificationViewModel,
     profileViewModel: ProfileModelView
 ) {
-    val context = LocalContext.current
-    val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
-    val participants by listTravelViewModel.participants.collectAsState()
+  val context = LocalContext.current
+  val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
+  val participants by listTravelViewModel.participants.collectAsState()
 
-    val (expanded, setExpanded) = remember { mutableStateOf(false) }
-    val (expandedRoleDialog, setExpandedRoleDialog) = remember { mutableStateOf(false) }
-    val (selectedParticipant, setSelectedParticipant) =
-        remember { mutableStateOf<Map.Entry<fsUid, Profile>?>(null) }
-
+  val (expanded, setExpanded) = remember { mutableStateOf(false) }
+  val (expandedRoleDialog, setExpandedRoleDialog) = remember { mutableStateOf(false) }
+  val (selectedParticipant, setSelectedParticipant) =
+      remember { mutableStateOf<Map.Entry<fsUid, Profile>?>(null) }
 
   Scaffold(
       modifier = Modifier.testTag("participantListScreen"),
@@ -107,15 +106,12 @@ fun ParticipantListScreen(
                 HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
               }
             }
-        } else {
-            Text(
-                "No Travel is selected or the selected travel no longer exists.",
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .testTag("noTravelSelected")
-            )
-        }
-
+          }
+    } else {
+      Text(
+          "No Travel is selected or the selected travel no longer exists.",
+          modifier = Modifier.padding(paddingValues).testTag("noTravelSelected"))
+    }
 
     selectedParticipant?.let { participant ->
       if (expanded) {
@@ -146,47 +142,38 @@ fun ParticipantListScreen(
                       fontWeight = FontWeight.Bold,
                       modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
 
-                            RoleEntryDialog(
-                                selectedTravel = selectedTravel,
-                                participant = participant,
-                                changeRoleAction = setExpandedRoleDialog,
-                                removeParticipantAction = {
-                                    if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
-                                        Role.OWNER
-                                    ) {
-                                        if (selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
-                                            1
-                                        ) {
-                                            Toast.makeText(
-                                                context,
-                                                "You're trying to remove the owner of the travel. Please name another owner before removing.",
-                                                Toast.LENGTH_LONG
-                                            )
-                                                .show()
-                                            setExpanded(false)
-                                            return@RoleEntryDialog
-                                        }
-                                    }
-                                    val participantMap =
-                                        selectedTravel!!.allParticipants.toMutableMap()
-                                    participantMap.remove(Participant(participant.key))
-                                    val updatedContainer =
-                                        selectedTravel!!.copy(allParticipants = participantMap.toMap())
-                                    listTravelViewModel.updateTravel(updatedContainer)
-                                    listTravelViewModel.selectTravel(updatedContainer)
-                                    listTravelViewModel.fetchAllParticipantsInfo()
-                                    setExpanded(false)
-                                    Toast.makeText(
-                                        context,
-                                        "Participant removed",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                })
+                  RoleEntryDialog(
+                      selectedTravel = selectedTravel,
+                      participant = participant,
+                      changeRoleAction = setExpandedRoleDialog,
+                      removeParticipantAction = {
+                        if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
+                            Role.OWNER) {
+                          if (selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
+                              1) {
+                            Toast.makeText(
+                                    context,
+                                    "You're trying to remove the owner of the travel. Please name another owner before removing.",
+                                    Toast.LENGTH_LONG)
+                                .show()
+                            setExpanded(false)
+                            return@RoleEntryDialog
+                          }
                         }
-                    }
+                        val participantMap = selectedTravel!!.allParticipants.toMutableMap()
+                        participantMap.remove(Participant(participant.key))
+                        val updatedContainer =
+                            selectedTravel!!.copy(allParticipants = participantMap.toMap())
+                        listTravelViewModel.updateTravel(updatedContainer)
+                        listTravelViewModel.selectTravel(updatedContainer)
+                        listTravelViewModel.fetchAllParticipantsInfo()
+                        setExpanded(false)
+                        Toast.makeText(context, "Participant removed", Toast.LENGTH_LONG).show()
+                      })
                 }
-            }
-
+              }
+        }
+      }
 
       if (expandedRoleDialog) {
         Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
@@ -200,22 +187,23 @@ fun ParticipantListScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center) {
                       ChangeRoleDialog(selectedTravel, participant) { newRole ->
-                                handleRoleChange(
-                                    context,
-                                    selectedTravel,
-                                    participant,
-                                    newRole,
-                                    listTravelViewModel,
-                                    notificationViewModel,
-                                    profileViewModel,
-                                    setExpandedRoleDialog,
-                                    setExpanded
-                                )
-                            }
+                        handleRoleChange(
+                            context,
+                            selectedTravel,
+                            participant,
+                            newRole,
+                            listTravelViewModel,
+                            notificationViewModel,
+                            profileViewModel,
+                            setExpandedRoleDialog,
+                            setExpanded)
+                      }
                     }
               }
         }
+      }
     }
+  }
 }
 
 fun handleRoleChange(
@@ -229,42 +217,39 @@ fun handleRoleChange(
     setExpandedRoleDialog: (Boolean) -> Unit,
     setExpanded: (Boolean) -> Unit
 ) {
-    val oldRole = selectedTravel!!.allParticipants[Participant(participant.key)]
-    if (oldRole == newRole) {
-        // Role is already set to the new one
-        Toast.makeText(context, "The role is already set to $newRole", Toast.LENGTH_LONG).show()
-        setExpandedRoleDialog(false)
-        setExpanded(false)
-    } else if (oldRole == Role.OWNER &&
-        selectedTravel.allParticipants.values.count { it == Role.OWNER } == 1
-    ) {
-        // Trying to change the role of the only owner
-        Toast.makeText(
+  val oldRole = selectedTravel!!.allParticipants[Participant(participant.key)]
+  if (oldRole == newRole) {
+    // Role is already set to the new one
+    Toast.makeText(context, "The role is already set to $newRole", Toast.LENGTH_LONG).show()
+    setExpandedRoleDialog(false)
+    setExpanded(false)
+  } else if (oldRole == Role.OWNER &&
+      selectedTravel.allParticipants.values.count { it == Role.OWNER } == 1) {
+    // Trying to change the role of the only owner
+    Toast.makeText(
             context,
             "You're trying to change the role of the only owner of the travel. Please name another owner before changing the role.",
-            Toast.LENGTH_LONG
-        ).show()
-        setExpandedRoleDialog(false)
-        setExpanded(false)
-    } else {
-        // Actual role change logic
-        notificationViewModel.sendNotification(
-            Notification(
-                notificationViewModel.getNewUid(),
-                profileViewModel.profile.value.fsUid,
-                participant.key,
-                selectedTravel.fsUid,
-                NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
-                NotificationType.ROLE_UPDATE
-            )
-        )
-        val participantMap = selectedTravel.allParticipants.toMutableMap()
-        participantMap[Participant(participant.key)] = newRole
-        val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
-        listTravelViewModel.updateTravel(updatedContainer)
-        listTravelViewModel.selectTravel(updatedContainer)
-        setExpandedRoleDialog(false)
-        setExpanded(false)
-        listTravelViewModel.fetchAllParticipantsInfo()
-    }
+            Toast.LENGTH_LONG)
+        .show()
+    setExpandedRoleDialog(false)
+    setExpanded(false)
+  } else {
+    // Actual role change logic
+    notificationViewModel.sendNotification(
+        Notification(
+            notificationViewModel.getNewUid(),
+            profileViewModel.profile.value.fsUid,
+            participant.key,
+            selectedTravel.fsUid,
+            NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
+            NotificationType.ROLE_UPDATE))
+    val participantMap = selectedTravel.allParticipants.toMutableMap()
+    participantMap[Participant(participant.key)] = newRole
+    val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
+    listTravelViewModel.updateTravel(updatedContainer)
+    listTravelViewModel.selectTravel(updatedContainer)
+    setExpandedRoleDialog(false)
+    setExpanded(false)
+    listTravelViewModel.fetchAllParticipantsInfo()
+  }
 }

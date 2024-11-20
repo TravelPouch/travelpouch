@@ -9,7 +9,6 @@ import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import com.google.firebase.FirebaseApp
-import com.google.firebase.firestore.FirebaseFirestore
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -111,7 +110,8 @@ class NotificationViewModelUnitTest {
   fun markNotificationAsRead() {
     val notificationUid = generateAutoObjectId()
     notificationViewModel.markNotificationAsRead(notificationUid)
-    verify(notificationRepositoryFirestore, times(1)).markNotificationAsRead(eq(notificationUid), any(), any())
+    verify(notificationRepositoryFirestore, times(1))
+        .markNotificationAsRead(eq(notificationUid), any(), any())
   }
 
   @Test

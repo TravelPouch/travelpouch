@@ -106,60 +106,58 @@ class NotificationCategorizationTests {
     assertEquals(0, result["Last year"]?.size)
   }
 
-    @Test
-    fun isThisWeek_test() {
-        val now = Calendar.getInstance()
-        var date = now.time
-        assertTrue(isThisWeek(date, now))
+  @Test
+  fun isThisWeek_test() {
+    val now = Calendar.getInstance()
+    var date = now.time
+    assertTrue(isThisWeek(date, now))
 
-        // Subtract one week from now
-        now.add(Calendar.WEEK_OF_YEAR, -1)
-        date = now.time
-        assertFalse(isThisWeek(date, Calendar.getInstance()))
+    // Subtract one week from now
+    now.add(Calendar.WEEK_OF_YEAR, -1)
+    date = now.time
+    assertFalse(isThisWeek(date, Calendar.getInstance()))
 
-        // Subtract one more week (now two weeks ago)
-        now.add(Calendar.WEEK_OF_YEAR, -1)
-        date = now.time
-        assertFalse(isThisWeek(date, Calendar.getInstance()))
-    }
+    // Subtract one more week (now two weeks ago)
+    now.add(Calendar.WEEK_OF_YEAR, -1)
+    date = now.time
+    assertFalse(isThisWeek(date, Calendar.getInstance()))
+  }
 
+  @Test
+  fun isLastWeek_test() {
+    val now = Calendar.getInstance()
+    var date = now.time
+    assertFalse(isLastWeek(date, now)) // Test for current week
 
-    @Test
-    fun isLastWeek_test() {
-        val now = Calendar.getInstance()
-        var date = now.time
-        assertFalse(isLastWeek(date, now))  // Test for current week
+    // Subtract one week from now
+    now.add(Calendar.WEEK_OF_YEAR, -1)
+    date = now.time
+    assertTrue(isLastWeek(date, Calendar.getInstance())) // Test for last week
 
-        // Subtract one week from now
-        now.add(Calendar.WEEK_OF_YEAR, -1)
-        date = now.time
-        assertTrue(isLastWeek(date, Calendar.getInstance()))  // Test for last week
+    // Subtract one more week (now two weeks ago)
+    now.add(Calendar.WEEK_OF_YEAR, -1)
+    date = now.time
+    assertFalse(isLastWeek(date, Calendar.getInstance())) // Test for two weeks ago
+  }
 
-        // Subtract one more week (now two weeks ago)
-        now.add(Calendar.WEEK_OF_YEAR, -1)
-        date = now.time
-        assertFalse(isLastWeek(date, Calendar.getInstance()))  // Test for two weeks ago
-    }
+  @Test
+  fun isLastMonth_test() {
+    val now = Calendar.getInstance()
+    var date = now.time
+    assertFalse(isLastMonth(date, now)) // Test for current month
 
-    @Test
-    fun isLastMonth_test() {
-        val now = Calendar.getInstance()
-        var date = now.time
-        assertFalse(isLastMonth(date, now))  // Test for current month
+    // Subtract one month from now
+    now.add(Calendar.MONTH, -1)
+    date = now.time
+    assertTrue(isLastMonth(date, Calendar.getInstance())) // Test for last month
 
-        // Subtract one month from now
-        now.add(Calendar.MONTH, -1)
-        date = now.time
-        assertTrue(isLastMonth(date, Calendar.getInstance()))  // Test for last month
+    // Subtract one more month (now two months ago)
+    now.add(Calendar.MONTH, -1)
+    date = now.time
+    assertFalse(isLastMonth(date, Calendar.getInstance())) // Test for two months ago
+  }
 
-        // Subtract one more month (now two months ago)
-        now.add(Calendar.MONTH, -1)
-        date = now.time
-        assertFalse(isLastMonth(date, Calendar.getInstance()))  // Test for two months ago
-    }
-
-
-    @Test
+  @Test
   fun isLastYear_test() {
     val now = Calendar.getInstance()
     var date = now.time

@@ -316,12 +316,14 @@ class NotificationRepositoryFirestoreUnitTest {
 
     // Mocking the data to cause an exception
     whenever(document.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
-    whenever(document.getString("senderUid")).thenReturn(null) // This will cause a NullPointerException
+    whenever(document.getString("senderUid"))
+        .thenReturn(null) // This will cause a NullPointerException
 
     // Reflection to access the private method
-    val method = NotificationRepositoryFirestore::class
-      .java
-      .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
     method.isAccessible = true
 
     // Invoke the method and check that it returns null (indicating an error was caught)
@@ -330,7 +332,6 @@ class NotificationRepositoryFirestoreUnitTest {
     // Assert that the result is null, which is expected in case of an exception
     assertNull(result)
   }
-
 
   @Test
   fun changeNotificationType_callsDocumentUpdate() {
@@ -362,7 +363,8 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(mockDocumentReference.delete()).thenReturn(mockDeleteTask)
     whenever(mockTask.isSuccessful).thenReturn(true)
     whenever(mockTask.result).thenReturn(mockQuerySnapshot)
-    whenever(mockQuerySnapshot.iterator()).thenReturn(mockDocuments.iterator() as MutableIterator<QueryDocumentSnapshot>?)
+    whenever(mockQuerySnapshot.iterator())
+        .thenReturn(mockDocuments.iterator() as MutableIterator<QueryDocumentSnapshot>?)
     whenever(firestore.collection("notifications")).thenReturn(notificationCollection)
     whenever(notificationCollection.whereEqualTo("receiverUid", "userUid")).thenReturn(query)
     whenever(query.get()).thenReturn(mockTask)
@@ -377,16 +379,15 @@ class NotificationRepositoryFirestoreUnitTest {
     val latch = CountDownLatch(1)
 
     notificationRepositoryFirestore.deleteAllNotificationsForUser(
-      "userUid",
-      {
-        succeeded = true
-        latch.countDown()
-      },
-      {
-        failed = true
-        latch.countDown()
-      }
-    )
+        "userUid",
+        {
+          succeeded = true
+          latch.countDown()
+        },
+        {
+          failed = true
+          latch.countDown()
+        })
 
     val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
     verify(mockTask).addOnSuccessListener(onSuccessListenerCaptor.capture())
@@ -417,10 +418,7 @@ class NotificationRepositoryFirestoreUnitTest {
     var failed = false
 
     notificationRepositoryFirestore.deleteAllNotificationsForUser(
-      "userUid",
-      { succeeded = true },
-      { failed = true }
-    )
+        "userUid", { succeeded = true }, { failed = true })
 
     val onFailureListenerCaptor = argumentCaptor<OnFailureListener>()
     verify(mockTask).addOnFailureListener(onFailureListenerCaptor.capture())

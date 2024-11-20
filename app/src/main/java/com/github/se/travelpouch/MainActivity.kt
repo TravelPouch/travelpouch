@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -51,9 +50,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var auth: AuthenticationService
-
+  @Inject lateinit var auth: AuthenticationService
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -66,76 +63,65 @@ class MainActivity : ComponentActivity() {
         ) {
           TravelPouchApp()
         }
+      }
     }
+  }
 
+  @Composable
+  fun TravelPouchApp() {
+    val context = LocalContext.current
+    val navController = rememberNavController()
+    val navigationActions = NavigationActions(navController)
+    val listTravelViewModel = hiltViewModel<ListTravelViewModel>()
+    val documentViewModel: DocumentViewModel =
+        viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
+    val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
+    val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
+    val profileModelView = hiltViewModel<ProfileModelView>()
+    val notificationViewModel: NotificationViewModel =
+        viewModel(factory = NotificationViewModel.Factory)
+    val calendarViewModel: CalendarViewModel =
+        viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
-    @Composable
-    fun TravelPouchApp() {
-        val context = LocalContext.current
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        val listTravelViewModel = hiltViewModel<ListTravelViewModel>()
-        val documentViewModel: DocumentViewModel =
-            viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
-        val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
-        val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
-        val profileModelView = hiltViewModel<ProfileModelView>()
-        val notificationViewModel: NotificationViewModel =
-            viewModel(factory = NotificationViewModel.Factory)
-        val calendarViewModel: CalendarViewModel =
-            viewModel(factory = CalendarViewModel.Factory(activityModelView))
+    NavHost(navController = navController, startDestination = Route.DEFAULT) {
+      navigation(
+          startDestination = Screen.AUTH,
+          route = Route.DEFAULT,
+      ) {
+        composable(Screen.AUTH) {
+          SignInScreen(navigationActions, profileModelView, listTravelViewModel)
+        }
 
-        NavHost(navController = navController, startDestination = Route.DEFAULT) {
-            navigation(
-                startDestination = Screen.AUTH,
-                route = Route.DEFAULT,
-            ) {
-                composable(Screen.AUTH) {
-                    SignInScreen(navigationActions, profileModelView, listTravelViewModel)
-                }
-
-                composable(Screen.TRAVEL_LIST) {
-                    TravelListScreen(
-                        navigationActions,
-                        listTravelViewModel,
-                        activityModelView,
-                        eventsViewModel,
-                        documentViewModel,
-                        profileModelView
-                    )
-                }
-                composable(Screen.TRAVEL_ACTIVITIES) {
-                    TravelActivitiesScreen(navigationActions, activityModelView)
-                }
-                composable(Screen.ADD_ACTIVITY) {
-                    AddActivityScreen(
-                        navigationActions,
-                        activityModelView
-                    )
-                }
-                composable(Screen.EDIT_ACTIVITY) {
-                    EditActivity(
-                        navigationActions,
-                        activityModelView
-                    )
-                }
-                composable(Screen.ADD_TRAVEL) {
-                    AddTravelScreen(
-                        listTravelViewModel,
-                        navigationActions,
-                        profileModelView = profileModelView
-                    )
-                }
-                composable(Screen.EDIT_TRAVEL_SETTINGS) {
-                    EditTravelSettingsScreen(listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
-                }
+        composable(Screen.TRAVEL_LIST) {
+          TravelListScreen(
+              navigationActions,
+              listTravelViewModel,
+              activityModelView,
+              eventsViewModel,
+              documentViewModel,
+              profileModelView)
+        }
+        composable(Screen.TRAVEL_ACTIVITIES) {
+          TravelActivitiesScreen(navigationActions, activityModelView)
+        }
+        composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
+        composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
+        composable(Screen.ADD_TRAVEL) {
+          AddTravelScreen(
+              listTravelViewModel, navigationActions, profileModelView = profileModelView)
+        }
+        composable(Screen.EDIT_TRAVEL_SETTINGS) {
+          EditTravelSettingsScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+        }
 
         composable(Screen.ACTIVITIES_MAP) {
           ActivitiesMapScreen(activityModelView, navigationActions)
         }
 
         composable(Screen.PARTICIPANT_LIST) {
-          ParticipantListScreen(listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
         }
         composable(Screen.DOCUMENT_LIST) {
           DocumentListScreen(
@@ -151,34 +137,28 @@ class MainActivity : ComponentActivity() {
         }
         composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
 
-                composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
-                composable(Screen.EDIT_PROFILE) {
-                    ModifyingProfileScreen(navigationActions, profileModelView)
-                }
-
-                composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
-
-                composable(Screen.SIGN_IN_PASSWORD) {
-                    SignInWithPassword(
-                        navigationActions,
-                        profileModelView,
-                        listTravelViewModel,
-                        auth
-                    )
-                }
-
-                composable(Screen.NOTIFICATION) {
-                    NotificationsScreen(
-                        navigationActions,
-                        notificationViewModel,
-                        profileModelView,
-                        listTravelViewModel,
-                        activityModelView,
-                        documentViewModel,
-                        eventsViewModel
-                    )
-                }
-            }
+        composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
+        composable(Screen.EDIT_PROFILE) {
+          ModifyingProfileScreen(navigationActions, profileModelView)
         }
+
+        composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
+
+        composable(Screen.SIGN_IN_PASSWORD) {
+          SignInWithPassword(navigationActions, profileModelView, listTravelViewModel, auth)
+        }
+
+        composable(Screen.NOTIFICATION) {
+          NotificationsScreen(
+              navigationActions,
+              notificationViewModel,
+              profileModelView,
+              listTravelViewModel,
+              activityModelView,
+              documentViewModel,
+              eventsViewModel)
+        }
+      }
     }
+  }
 }

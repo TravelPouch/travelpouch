@@ -20,8 +20,8 @@ interface ProfileRepository {
    * This function retrieves the Firestore UID associated with the given email.
    *
    * @param email (String) : the email address to search for
-   * @param onSuccess ((String?) -> Unit) : the function to apply with the UID when the
-   *   information is fetched correctly. The UID can be null if no user is found.
+   * @param onSuccess ((String?) -> Unit) : the function to apply with the UID when the information
+   *   is fetched correctly. The UID can be null if no user is found.
    * @param onFailure ((Exception) -> Unit) : the function to apply when an error occurs while
    *   fetching the UID
    */

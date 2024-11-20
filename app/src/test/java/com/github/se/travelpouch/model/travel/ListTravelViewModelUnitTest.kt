@@ -12,7 +12,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockedStatic
@@ -338,24 +337,21 @@ class ListTravelViewModelTest {
             mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER),
             emptyList())
 
-      var succeeded = false
-      var failed = false
+    var succeeded = false
+    var failed = false
 
-      doAnswer { invocation ->
+    doAnswer { invocation ->
           val onSuccess = invocation.getArgument(1) as (TravelContainer) -> Unit
           onSuccess(travel)
           null
-      }
-          .whenever(travelRepository)
-          .getTravelById(anyString(), anyOrNull(), anyOrNull())
+        }
+        .whenever(travelRepository)
+        .getTravelById(anyString(), anyOrNull(), anyOrNull())
 
-      listTravelViewModel.getTravelById(
-          travelId,
-          {succeeded = true},
-          {failed = true})
+    listTravelViewModel.getTravelById(travelId, { succeeded = true }, { failed = true })
 
-        assert(succeeded)
-        assert(!failed)
-      verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
+    assert(succeeded)
+    assert(!failed)
+    verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
   }
 }

@@ -27,7 +27,8 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    * @param notification The notification to be added.
    */
   override fun addNotification(notification: Notification) {
-      firestore.collection(FirebasePaths.notifications)
+    firestore
+        .collection(FirebasePaths.notifications)
         .document(notification.notificationUid)
         .set(notification)
         .addOnSuccessListener { Log.d("NotificationRepository", "Notification added successfully") }
@@ -47,7 +48,8 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       userId: String,
       onNotificationFetched: (List<Notification?>) -> Unit
   ) {
-      firestore.collection(FirebasePaths.notifications)
+    firestore
+        .collection(FirebasePaths.notifications)
         .whereEqualTo("receiverUid", userId)
         .orderBy("timestamp", Query.Direction.DESCENDING)
         .get()
@@ -71,29 +73,35 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    * @param onSuccess Callback function to be invoked when the operation is successful.
    * @param onFailure Callback function to be invoked when the operation fails.
    */
-    override fun markNotificationAsRead(
-        notificationUid: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        firestore.collection(FirebasePaths.notifications).document(notificationUid).update("status", NotificationStatus.READ)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { e -> onFailure(e) }
-    }
+  override fun markNotificationAsRead(
+      notificationUid: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    firestore
+        .collection(FirebasePaths.notifications)
+        .document(notificationUid)
+        .update("status", NotificationStatus.READ)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { e -> onFailure(e) }
+  }
 
   override fun deleteAllNotificationsForUser(
       userUid: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-      firestore.collection(FirebasePaths.notifications)
+    firestore
+        .collection(FirebasePaths.notifications)
         .whereEqualTo("receiverUid", userUid)
         .get()
         .addOnSuccessListener { documents ->
           for (document in documents) {
-              firestore.collection(FirebasePaths.notifications).document(document.id).delete().addOnFailureListener { exception ->
-              onFailure(exception)
-            }
+            firestore
+                .collection(FirebasePaths.notifications)
+                .document(document.id)
+                .delete()
+                .addOnFailureListener { exception -> onFailure(exception) }
           }
           onSuccess()
         }
@@ -108,11 +116,19 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    * @param onSuccess Callback function to be invoked when the operation is successful.
    * @param onFailure Callback function to be invoked when the operation fails.
    */
-    override fun changeNotificationType(notificationUid: String, notificationType: NotificationType, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        firestore.collection(FirebasePaths.notifications).document(notificationUid).update("notificationType", notificationType)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { e -> onFailure(e) }
-    }
+  override fun changeNotificationType(
+      notificationUid: String,
+      notificationType: NotificationType,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    firestore
+        .collection(FirebasePaths.notifications)
+        .document(notificationUid)
+        .update("notificationType", notificationType)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { e -> onFailure(e) }
+  }
 
   private fun documentToNotification(document: DocumentSnapshot): Notification? {
     return try {
@@ -124,32 +140,28 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       val notificationType = NotificationType.valueOf(document.getString("notificationType")!!)
       val content =
           when (notificationType) {
-              NotificationType.INVITATION -> {
-                  val inviterName = contentData["inviterName"] as? String ?: "Unknown Inviter"
-                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
-                  val role = contentData["role"] as? String ?: "PARTICIPANT"
-                  NotificationContent.InvitationNotification(
-                      inviterName, travelTitle, Role.valueOf(role)
-                  )
-              }
-              NotificationType.ROLE_UPDATE -> {
-                  val travelTitle = contentData["travelTitle"] as? String ?: "No Title"
-                  val role = contentData["role"] as? String ?: "PARTICIPANT"
-                  NotificationContent.RoleChangeNotification(
-                      travelTitle, Role.valueOf(role)
-                  )
-              }
-              NotificationType.ACCEPTED -> {
-                  val userName = contentData["userName"] as? String ?: "Unknown User"
-                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
-                  NotificationContent.InvitationResponseNotification(userName, travelTitle, true)
-              }
-              NotificationType.DECLINED -> {
-                  val userName = contentData["userName"] as? String ?: "Unknown User"
-                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
-                  NotificationContent.InvitationResponseNotification(userName, travelTitle, false)
-              }
-
+            NotificationType.INVITATION -> {
+              val inviterName = contentData["inviterName"] as? String ?: "Unknown Inviter"
+              val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+              val role = contentData["role"] as? String ?: "PARTICIPANT"
+              NotificationContent.InvitationNotification(
+                  inviterName, travelTitle, Role.valueOf(role))
+            }
+            NotificationType.ROLE_UPDATE -> {
+              val travelTitle = contentData["travelTitle"] as? String ?: "No Title"
+              val role = contentData["role"] as? String ?: "PARTICIPANT"
+              NotificationContent.RoleChangeNotification(travelTitle, Role.valueOf(role))
+            }
+            NotificationType.ACCEPTED -> {
+              val userName = contentData["userName"] as? String ?: "Unknown User"
+              val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+              NotificationContent.InvitationResponseNotification(userName, travelTitle, true)
+            }
+            NotificationType.DECLINED -> {
+              val userName = contentData["userName"] as? String ?: "Unknown User"
+              val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+              NotificationContent.InvitationResponseNotification(userName, travelTitle, false)
+            }
           }
       val timestamp = document.getTimestamp("timestamp")!!
       val status = NotificationStatus.valueOf(document.getString("status")!!)
@@ -164,8 +176,8 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
           timestamp,
           status)
     } catch (e: Exception) {
-        Log.e("NotificationRepository", "Error converting document to Notification", e)
-        null
+      Log.e("NotificationRepository", "Error converting document to Notification", e)
+      null
     }
   }
 }

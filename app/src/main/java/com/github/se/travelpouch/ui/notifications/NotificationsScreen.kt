@@ -48,20 +48,18 @@ fun NotificationsScreen(
     documentViewModel: DocumentViewModel,
     eventsViewModel: EventViewModel
 ) {
-    // Collect the profile state
-    val profile = profileModelView.profile.collectAsState()
+  // Collect the profile state
+  val profile = profileModelView.profile.collectAsState()
 
-    // Only trigger `getProfile()` if the fsUid changes
-    LaunchedEffect(profile.value.fsUid) {
-        profileModelView.getProfile()
-    }
+  // Only trigger `getProfile()` if the fsUid changes
+  LaunchedEffect(profile.value.fsUid) { profileModelView.getProfile() }
 
-    // Load notifications when the profile is available
-    LaunchedEffect(profile.value.fsUid) {
-        if (profile.value.fsUid.isNotEmpty()) {
-            notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
-        }
+  // Load notifications when the profile is available
+  LaunchedEffect(profile.value.fsUid) {
+    if (profile.value.fsUid.isNotEmpty()) {
+      notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
     }
+  }
 
   notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
   val notifications by notificationViewModel.notifications.collectAsState()
@@ -135,10 +133,7 @@ fun NotificationsScreen(
       bottomBar = {
         BottomNavigationMenu(
             navigationActions = navigationActions,
-            tabList =
-                listOf(
-                    TopLevelDestinations.NOTIFICATION,
-                    TopLevelDestinations.TRAVELS))
+            tabList = listOf(TopLevelDestinations.NOTIFICATION, TopLevelDestinations.TRAVELS))
       })
 }
 

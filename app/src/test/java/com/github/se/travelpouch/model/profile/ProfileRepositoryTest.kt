@@ -285,12 +285,12 @@ class ProfileRepositoryTest {
     var idGot: String? = null
 
     profileRepositoryFirestore.getFsUidByEmail(
-      "email",
-      {
-        successCalled = true
-        idGot = it
-      },
-      { failed = true })
+        "email",
+        {
+          successCalled = true
+          idGot = it
+        },
+        { failed = true })
 
     val onCompleteListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
     verify(mockTask).addOnSuccessListener(onCompleteListenerCaptor.capture())
@@ -321,12 +321,12 @@ class ProfileRepositoryTest {
     var successCalled = false
     var failed = false
     profileRepositoryFirestore.getFsUidByEmail(
-      "email",
-      {
-        successCalled = true
-        idGot = it
-      },
-      { failed = true })
+        "email",
+        {
+          successCalled = true
+          idGot = it
+        },
+        { failed = true })
 
     val onCompleteListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
     verify(mockTask).addOnSuccessListener(onCompleteListenerCaptor.capture())
@@ -355,12 +355,12 @@ class ProfileRepositoryTest {
     var successCalled = false
     var failed = false
     profileRepositoryFirestore.getFsUidByEmail(
-      "email",
-      {
-        successCalled = true
-        idGot = profile.fsUid
-      },
-      { failed = true })
+        "email",
+        {
+          successCalled = true
+          idGot = profile.fsUid
+        },
+        { failed = true })
 
     val onCompleteListenerCaptor = argumentCaptor<OnFailureListener>()
     verify(mockTask).addOnFailureListener(onCompleteListenerCaptor.capture())

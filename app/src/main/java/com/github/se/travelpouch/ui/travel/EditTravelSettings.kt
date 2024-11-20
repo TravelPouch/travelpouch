@@ -393,7 +393,6 @@ fun EditTravelSettingsScreen(
     if (expandedAddUserDialog) {
       val addUserEmail = remember { mutableStateOf("") }
       Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
-
         Box(
             Modifier.fillMaxWidth(1f)
                 .height(250.dp)
@@ -418,23 +417,24 @@ fun EditTravelSettingsScreen(
                         placeholder = { Text("Enter User's Email") },
                         modifier = Modifier.testTag("addUserEmailField"))
                     Button(
-                        onClick = profileViewModel.getFsUidByEmail(
-                          addUserEmail.value,
-                          onSuccess = { fsUid ->
-                            val isUserAlreadyAdded =
-                                selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
-                            if (fsUid == profileViewModel.profile.value.fsUid) {
-                              Toast.makeText(
-                                      context,
-                                      "Error: You can't invite yourself",
-                                      Toast.LENGTH_SHORT)
-                                  .show()
-                            } else if (isUserAlreadyAdded) {
-                              Toast.makeText(
-                                      context, "Error: User already added", Toast.LENGTH_SHORT)
-                                  .show()
-                            } else if (fsUid != null) {
-                                try {
+                        onClick = {
+                          profileViewModel.getFsUidByEmail(
+                              addUserEmail.value,
+                              onSuccess = { fsUid ->
+                                val isUserAlreadyAdded =
+                                    selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
+                                if (fsUid == profileViewModel.profile.value.fsUid) {
+                                  Toast.makeText(
+                                          context,
+                                          "Error: You can't invite yourself",
+                                          Toast.LENGTH_SHORT)
+                                      .show()
+                                } else if (isUserAlreadyAdded) {
+                                  Toast.makeText(
+                                          context, "Error: User already added", Toast.LENGTH_SHORT)
+                                      .show()
+                                } else if (fsUid != null) {
+                                  try {
                                     notificationViewModel.sendNotification(
                                         Notification(
                                             notificationViewModel.getNewUid(),
@@ -445,28 +445,30 @@ fun EditTravelSettingsScreen(
                                                 profileViewModel.profile.value.name,
                                                 selectedTravel!!.title,
                                                 Role.PARTICIPANT),
-                                            NotificationType.INVITATION)
-                                    )
-                                } catch (e: Exception) {
-                                    Log.e("NotificationError", "Failed to send notification: ${e.message}")
-                                    // Handle any additional actions here if needed, e.g., show a Toast or alert
+                                            NotificationType.INVITATION))
+                                  } catch (e: Exception) {
+                                    Log.e(
+                                        "NotificationError",
+                                        "Failed to send notification: ${e.message}")
+                                    // Handle any additional actions here if needed, e.g., show a
+                                    // Toast or alert
+                                  }
+                                  // Go back
+                                  setExpandedAddUserDialog(false)
+                                } else {
+                                  Toast.makeText(
+                                          context,
+                                          "Error: User with email not found",
+                                          Toast.LENGTH_SHORT)
+                                      .show()
                                 }
-                                // Go back
-                              setExpandedAddUserDialog(false)
-                            } else {
-                              Toast.makeText(
-                                      context,
-                                      "Error: User with email not found",
-                                      Toast.LENGTH_SHORT)
-                                  .show()
-                            }
-                          },
-                          onFailure = { e ->
-                            Log.e("EditTravelSettingsScreen", "Error getting fsUid by email", e)
-                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                                .show()
-                          })
-                    },
+                              },
+                              onFailure = { e ->
+                                Log.e("EditTravelSettingsScreen", "Error getting fsUid by email", e)
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                                    .show()
+                              })
+                        },
                         modifier = Modifier.testTag("addUserButton")) {
                           Text("Add User")
                         }

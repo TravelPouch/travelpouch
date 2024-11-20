@@ -103,10 +103,10 @@ class ParticipantListScreenTest {
 
   @Test
   fun testemptyView() {
-      composeTestRule.setContent {
-          ParticipantListScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
-      }
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     // Check if all elements are displayed
     composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
@@ -179,10 +179,10 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewChangeRoleFailed() {
-      composeTestRule.setContent {
-          ParticipantListScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
-      }
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     listTravelViewModel.selectTravel(container)
 
@@ -239,10 +239,10 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewChangeRoleToSameRole() {
-      composeTestRule.setContent {
-          ParticipantListScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
-      }
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     listTravelViewModel.selectTravel(container)
 
@@ -293,10 +293,10 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewRemoveParticipant() {
-      composeTestRule.setContent {
-          ParticipantListScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
-      }
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     listTravelViewModel.selectTravel(container)
 
@@ -332,10 +332,10 @@ class ParticipantListScreenTest {
 
   @Test
   fun testNonEmptyViewRemoveParticipantFail() {
-      composeTestRule.setContent {
-          ParticipantListScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
-      }
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     listTravelViewModel.selectTravel(container)
 
