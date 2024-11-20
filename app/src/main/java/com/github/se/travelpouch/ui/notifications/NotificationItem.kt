@@ -186,7 +186,7 @@ fun handleInvitationResponse(
                 notification.senderUid,
                 notification.travelUid,
                 NotificationContent.InvitationResponseNotification(
-                    profileViewModel.profile.value.name, travel!!.title, isAccepted),
+                    profileViewModel.profile.value.username, travel!!.title, isAccepted),
                 responseType)
 
         notificationViewModel.sendNotification(invitationResponse)

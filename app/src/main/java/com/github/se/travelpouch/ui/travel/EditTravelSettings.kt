@@ -450,8 +450,6 @@ fun EditTravelSettingsScreen(
                                     Log.e(
                                         "NotificationError",
                                         "Failed to send notification: ${e.message}")
-                                    // Handle any additional actions here if needed, e.g., show a
-                                    // Toast or alert
                                   }
                                   // Go back
                                   setExpandedAddUserDialog(false)
