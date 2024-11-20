@@ -11,21 +11,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,6 +50,7 @@ import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.github.se.travelpouch.ui.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,55 +70,42 @@ fun ParticipantListScreen(
     val (selectedParticipant, setSelectedParticipant) =
         remember { mutableStateOf<Map.Entry<fsUid, Profile>?>(null) }
 
-    Scaffold(
-        modifier = Modifier.testTag("participantListScreen"),
-        topBar = {
-            MediumTopAppBar(
-                modifier = Modifier.testTag("participantListSettingTopBar"),
-                colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text(
-                        "Participant Settings",
-                        modifier = Modifier.testTag("participantListSettingText")
-                    )
-                },
-                navigationIcon = {
-                    Button(
-                        onClick = { navigationActions.goBack() },
-                        modifier = Modifier.testTag("goBackButton")
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                })
-        },
-    ) { paddingValues ->
-        if (selectedTravel != null) {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxWidth()
-                    .testTag("participantColumn")
-            ) {
-                participants.entries.forEach { participantEntry ->
-                    item {
-                        // display all participants in travel
-                        ParticipantRow(
-                            participant = participantEntry,
-                            selectedTravel = selectedTravel!!,
-                            onClick = {
-                                setSelectedParticipant(participantEntry)
-                                setExpanded(true)
-                            })
-                        HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
-                    }
-                }
+
+  Scaffold(
+      modifier = Modifier.testTag("participantListScreen"),
+      topBar = {
+        TopAppBar(
+            modifier = Modifier.testTag("participantListSettingTopBar"),
+            title = {
+              Text(
+                  "Participant Settings", modifier = Modifier.testTag("participantListSettingText"))
+            },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Localized description")
+                  }
+            })
+      },
+  ) { paddingValues ->
+    if (selectedTravel != null) {
+      LazyColumn(
+          modifier = Modifier.padding(paddingValues).fillMaxWidth().testTag("participantColumn")) {
+            participants.entries.forEach { participantEntry ->
+              item {
+                // display all participants in travel
+                ParticipantRow(
+                    participant = participantEntry,
+                    selectedTravel = selectedTravel!!,
+                    onClick = {
+                      setSelectedParticipant(participantEntry)
+                      setExpanded(true)
+                    })
+                HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
+              }
             }
         } else {
             Text(
@@ -129,49 +116,35 @@ fun ParticipantListScreen(
             )
         }
 
-        selectedParticipant?.let { participant ->
-            if (expanded) {
-                Dialog(onDismissRequest = { setExpanded(false) }) {
-                    Box(
-                        Modifier
-                            .size(2000.dp, 200.dp)
-                            .background(Color.White)
-                            .testTag("participantDialogBox")
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .testTag("participantDialogColumn")
-                        ) {
-                            Row(
-                                modifier = Modifier.testTag("participantDialogRow"),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = "Localized description",
-                                    modifier = Modifier
-                                        .padding(5.dp)
-                                        .testTag("participantDialogIcon")
-                                )
-                                TruncatedText(
-                                    text = participant.value.name,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLength = 20,
-                                    modifier = Modifier
-                                        .padding(5.dp)
-                                        .testTag("participantDialogName")
-                                )
-                                TruncatedText(
-                                    text = participant.value.email,
-                                    maxLength = 20,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                        .padding(5.dp)
-                                        .testTag("participantDialogEmail")
-                                )
-                            }
+
+    selectedParticipant?.let { participant ->
+      if (expanded) {
+        Dialog(onDismissRequest = { setExpanded(false) }) {
+          Box(
+              Modifier.fillMaxWidth(1f)
+                  .height(250.dp)
+                  .background(MaterialTheme.colorScheme.surface)
+                  .testTag("participantDialogBox")) {
+                Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
+                  Row(
+                      modifier = Modifier.testTag("participantDialogRow"),
+                      verticalAlignment = Alignment.CenterVertically,
+                      horizontalArrangement = Arrangement.SpaceBetween) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.padding(5.dp).testTag("participantDialogIcon"))
+                        TruncatedText(
+                            text = participant.value.name,
+                            fontWeight = FontWeight.Bold,
+                            maxLength = 25,
+                            modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
+                      }
+                  TruncatedText(
+                      text = participant.value.email,
+                      maxLength = 30,
+                      fontWeight = FontWeight.Bold,
+                      modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
 
                             RoleEntryDialog(
                                 selectedTravel = selectedTravel,
@@ -214,23 +187,19 @@ fun ParticipantListScreen(
                 }
             }
 
-            if (expandedRoleDialog) {
-                Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
-                    Box(
-                        Modifier
-                            .size(800.dp, 250.dp)
-                            .background(Color.White)
-                            .testTag("roleDialogBox")
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp)
-                                .testTag("roleDialogColumn"),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            ChangeRoleDialog(selectedTravel, participant) { newRole ->
+
+      if (expandedRoleDialog) {
+        Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
+          Box(
+              Modifier.fillMaxWidth(1f)
+                  .height(250.dp)
+                  .background(MaterialTheme.colorScheme.surface)
+                  .testTag("roleDialogBox")) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                      ChangeRoleDialog(selectedTravel, participant) { newRole ->
                                 handleRoleChange(
                                     context,
                                     selectedTravel,
@@ -243,10 +212,8 @@ fun ParticipantListScreen(
                                     setExpanded
                                 )
                             }
-                        }
                     }
-                }
-            }
+              }
         }
     }
 }

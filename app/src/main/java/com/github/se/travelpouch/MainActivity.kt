@@ -54,19 +54,17 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var auth: AuthenticationService
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            SampleAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .testTag("MainScreenContainer"),
-                ) {
-                    TravelPouchApp()
-                }
-            }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      SampleAppTheme(dynamicColor = false) {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
+            // color = MaterialTheme.colorScheme.background,
+        ) {
+          TravelPouchApp()
         }
     }
 
