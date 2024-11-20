@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -18,6 +19,7 @@ import com.github.se.travelpouch.ui.navigation.Screen
 
 @Composable
 fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: ProfileModelView) {
+  val context = LocalContext.current
   val onboardingPages =
       listOf(
           OnboardingPage(
@@ -35,7 +37,6 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
               description = "Store important travel documents securely within the app.",
               imageResId = R.drawable.google_logo // Replace with your actual drawable resource
               ))
-
   var pageIndex by remember { mutableStateOf(0) }
 
   Column(
@@ -49,8 +50,9 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
           if (pageIndex < onboardingPages.size - 1) {
             Button(
                 onClick = {
-                  navigationActions.navigateTo(
-                      Screen.TRAVEL_LIST) // TODO change the onboarding value
+                  profileModelView.profile.value.needsOnboarding = false
+                  profileModelView.updateProfile(profileModelView.profile.value, context)
+                  navigationActions.navigateTo(Screen.TRAVEL_LIST)
                 }) {
                   Text("Skip")
                 }
@@ -59,6 +61,7 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
             Button(
                 onClick = {
                   profileModelView.profile.value.needsOnboarding = false
+                  profileModelView.updateProfile(profileModelView.profile.value, context)
                   navigationActions.navigateTo(Screen.TRAVEL_LIST)
                 }) {
                   Text("Get Started")

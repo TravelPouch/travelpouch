@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +64,7 @@ fun SignInScreen(
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
   val methodChosen = rememberSaveable { mutableStateOf(false) }
+  val waitUntilProfileFetched = rememberSaveable { mutableStateOf(false) }
 
   // launcher for Firebase authentication
   val launcher =
@@ -75,12 +77,10 @@ fun SignInScreen(
                 GlobalScope.launch {
                   profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
                   isLoading.value = false
+                  waitUntilProfileFetched.value = true
                 }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-            if (profileModelView.profile.value.needsOnboarding) {
-              navigationActions.navigateTo(Screen.ONBOARDING)
-            } else navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
             methodChosen.value = false
@@ -90,6 +90,16 @@ fun SignInScreen(
           })
 
   val token = stringResource(R.string.default_web_client_id)
+
+  LaunchedEffect(waitUntilProfileFetched.value) {
+    if (waitUntilProfileFetched.value) {
+      if (profileModelView.profile.value.needsOnboarding) {
+        navigationActions.navigateTo(Screen.ONBOARDING)
+      } else {
+        navigationActions.navigateTo(Screen.TRAVEL_LIST)
+      }
+    }
+  }
 
   // The main container for the screen
   Scaffold(
