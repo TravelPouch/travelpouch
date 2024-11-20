@@ -112,7 +112,7 @@ fun EditTravelSettingsScreen(
                     Log.d("EditTravelSettingsScreen", "Add User clicked")
                   },
                   containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                  contentColor = if (darkTheme) Color.White else Color.Black,
+                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                   modifier = Modifier.testTag("addUserFab").padding(start = 16.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -143,7 +143,7 @@ fun EditTravelSettingsScreen(
                     Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
                   },
                   containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                  contentColor = if (darkTheme) Color.White else Color.Black,
+                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                   modifier = Modifier.testTag("importEmailFab")) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

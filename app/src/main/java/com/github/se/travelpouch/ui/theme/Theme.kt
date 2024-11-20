@@ -31,9 +31,10 @@ private val DarkColorScheme =
         onSecondary = Color.White, // White text for secondary color
         secondaryContainer = Color(0xFFE7DDF6), // Lighter text for secondary color
         onTertiary = Color.White, // White text for tertiary color
+        onTertiaryContainer = Color.White, // Black text for tertiary color on dark background
         onBackground = Color.White, // White text on dark background
         onSurface = Color.White, // White text on dark surface
-        inverseOnSurface = Color(0xFF1C1B1F)) // Inverse text color for the dark mode surfaces
+        inverseOnSurface = Color.White) // Inverse text color for the dark mode surfaces
 
 private val LightColorScheme =
     lightColorScheme(
@@ -42,10 +43,11 @@ private val LightColorScheme =
         tertiary = Pink80,
         background = Color(0xFFFeF7FF),
         surface = Color(0xFFF0ECEF),
-        inverseSurface = Color(0xFFFFFBFE),
+        inverseSurface = Color.Black,
         onPrimary = Color.White,
         onSecondary = Color.White,
         onTertiary = Color.White,
+        onTertiaryContainer = Color.Black,
         onBackground = Color(0xFF1C1B1F),
         onSurface = Color(0xFF1C1B1F),
         inverseOnSurface = Color(0xFF1C1B1F))
