@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
+import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -348,59 +349,84 @@ class NotificationRepositoryFirestoreUnitTest {
   }
 
   @Test
-  fun deleteAllNotificationsForUser_callsDelete() {
-    // Mocking the Task object
+  fun deleteAllNotificationsForUser_successful() {
     val mockTask: Task<QuerySnapshot> = mock()
     val mockQuerySnapshot: QuerySnapshot = mock()
-
-    // Creating a list of mock QueryDocumentSnapshots
     val mockQueryDocumentSnapshot: QueryDocumentSnapshot = mock()
     val mockDocuments = listOf(mockQueryDocumentSnapshot)
-
-    // Mocking the DocumentReference and delete method
     val mockDocumentReference: DocumentReference = mock()
-    whenever(mockQueryDocumentSnapshot.id).thenReturn("documentId") // Mock document ID
-    whenever(notificationCollection.document("documentId")).thenReturn(mockDocumentReference)
-    whenever(mockDocumentReference.delete()).thenReturn(mock()) // Mock delete() method
+    val mockDeleteTask: Task<Void> = mock()
 
-    // Mocking methods for the Task object
+    whenever(mockQueryDocumentSnapshot.id).thenReturn("documentId")
+    whenever(notificationCollection.document("documentId")).thenReturn(mockDocumentReference)
+    whenever(mockDocumentReference.delete()).thenReturn(mockDeleteTask)
     whenever(mockTask.isSuccessful).thenReturn(true)
     whenever(mockTask.result).thenReturn(mockQuerySnapshot)
-
-    // Mocking methods for QuerySnapshot
     whenever(mockQuerySnapshot.iterator()).thenReturn(mockDocuments.iterator() as MutableIterator<QueryDocumentSnapshot>?)
-
-    // Mocking the Firestore collection and query methods
     whenever(firestore.collection("notifications")).thenReturn(notificationCollection)
     whenever(notificationCollection.whereEqualTo("receiverUid", "userUid")).thenReturn(query)
     whenever(query.get()).thenReturn(mockTask)
+    whenever(mockTask.addOnSuccessListener(any())).thenReturn(mockTask)
+    whenever(mockTask.addOnFailureListener(any())).thenReturn(mockTask)
+    whenever(mockDeleteTask.addOnSuccessListener(any())).thenReturn(mockDeleteTask)
+    whenever(mockDeleteTask.addOnFailureListener(any())).thenReturn(mockDeleteTask)
 
-    // Mocking addOnSuccessListener and addOnFailureListener
+    var succeeded = false
+    var failed = false
+
+    val latch = CountDownLatch(1)
+
+    notificationRepositoryFirestore.deleteAllNotificationsForUser(
+      "userUid",
+      {
+        succeeded = true
+        latch.countDown()
+      },
+      {
+        failed = true
+        latch.countDown()
+      }
+    )
+
+    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(mockTask).addOnSuccessListener(onSuccessListenerCaptor.capture())
+    onSuccessListenerCaptor.firstValue.onSuccess(mockQuerySnapshot)
+
+    // Wait for the latch to be released
+    latch.await(2, TimeUnit.SECONDS)
+
+    assertTrue(succeeded)
+    assertFalse(failed)
+    verify(mockDocumentReference).delete()
+  }
+
+  @Test
+  fun deleteAllNotificationsForUser_failure() {
+    val mockTask: Task<QuerySnapshot> = mock()
+    val exception = Exception("Simulated Firestore failure")
+
+    whenever(mockTask.isSuccessful).thenReturn(false)
+    whenever(mockTask.exception).thenReturn(exception)
+    whenever(firestore.collection("notifications")).thenReturn(notificationCollection)
+    whenever(notificationCollection.whereEqualTo("receiverUid", "userUid")).thenReturn(query)
+    whenever(query.get()).thenReturn(mockTask)
     whenever(mockTask.addOnSuccessListener(any())).thenReturn(mockTask)
     whenever(mockTask.addOnFailureListener(any())).thenReturn(mockTask)
 
     var succeeded = false
     var failed = false
 
-    // Call the method under test
     notificationRepositoryFirestore.deleteAllNotificationsForUser(
       "userUid",
       { succeeded = true },
       { failed = true }
     )
 
-    // Capture the onSuccessListener for the query.get() call
-    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
-    verify(mockTask).addOnSuccessListener(onSuccessListenerCaptor.capture())
+    val onFailureListenerCaptor = argumentCaptor<OnFailureListener>()
+    verify(mockTask).addOnFailureListener(onFailureListenerCaptor.capture())
+    onFailureListenerCaptor.firstValue.onFailure(exception)
 
-    // Trigger the onSuccess callback with mock documents
-    onSuccessListenerCaptor.firstValue.onSuccess(mockQuerySnapshot)
-
-    // Assertions to verify the expected behavior
-    assertTrue(succeeded)
-    assertFalse(failed)
-
-    // Verifying that delete() was called on the correct document reference
-    verify(mockDocumentReference).delete()
+    assertFalse(succeeded)
+    assertTrue(failed)
   }
 }

@@ -3,7 +3,6 @@ package com.github.se.travelpouch.model.notifications
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.travels.Role
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -90,21 +89,14 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       firestore.collection(FirebasePaths.notifications)
         .whereEqualTo("receiverUid", userUid)
         .get()
-          .addOnSuccessListener { documents ->
-              val deleteTasks = documents.map { document ->
-                  firestore.collection(FirebasePaths.notifications)
-                      .document(document.id)
-                      .delete()
-              }
-
-              Tasks.whenAllComplete(deleteTasks)
-                  .addOnSuccessListener {
-                      onSuccess()
-                  }
-                  .addOnFailureListener { exception ->
-                      onFailure(exception)
-                  }
+        .addOnSuccessListener { documents ->
+          for (document in documents) {
+              firestore.collection(FirebasePaths.notifications).document(document.id).delete().addOnFailureListener { exception ->
+              onFailure(exception)
+            }
           }
+          onSuccess()
+        }
         .addOnFailureListener { exception -> onFailure(exception) }
   }
 
