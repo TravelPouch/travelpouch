@@ -197,6 +197,9 @@ class EditTravelSettingsScreenTest {
         }
         .`when`(profileRepository)
         .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
     verify(notificationRepository, never()).addNotification(anyOrNull())
@@ -257,6 +260,9 @@ class EditTravelSettingsScreenTest {
         }
         .`when`(profileRepository)
         .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
     // Mock the repository.updateTravel method to do nothing
     doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
     doAnswer { "sigmasigmasigmasigm2" }.`when`(travelRepository).getNewUid()
@@ -297,6 +303,9 @@ class EditTravelSettingsScreenTest {
         }
         .`when`(profileRepository)
         .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
     // Mock the repository.updateTravel method to do nothing
     doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
@@ -344,6 +353,9 @@ class EditTravelSettingsScreenTest {
         }
         .`when`(profileRepository)
         .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
     // Mock the repository.updateTravel method to do nothing
     doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
