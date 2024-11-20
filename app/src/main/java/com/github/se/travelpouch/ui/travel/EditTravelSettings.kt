@@ -228,7 +228,6 @@ fun EditTravelSettingsScreen(
                 }
 
                 val textFieldModifier = Modifier
-                    .testTag("inputField")
                     .width(300.dp) // Set a fixed width for all text fields
                     .padding(vertical = 4.dp)
 
