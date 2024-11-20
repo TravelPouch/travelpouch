@@ -71,30 +71,37 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     }
   }
 
-  @SuppressLint("SuspiciousIndentation")
-  override fun getFsUidByEmail(
-      email: String,
-      onSuccess: (String?) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection(collectionPath)
-        .whereEqualTo("email", email)
-        .get()
-        .addOnSuccessListener { result ->
-          if (result.documents.isNotEmpty()) {
-            val fsUid = result.documents[0].id
-              Log.d("ProfileRepository", "fsUid: $fsUid")
-            onSuccess(fsUid)
-          } else {
-              Log.d("ProfileRepository", "fsUid: null")
-            onSuccess(null)
-          }
-        }
-        .addOnFailureListener { e ->
-          Log.e("ProfileRepository", "Error getting fsUid by email", e)
-          onFailure(e)
-        }
-  }
+    /**
+     * Retrieves the Firestore UID associated with the given email.
+     *
+     * @param email The email address to search for.
+     * @param onSuccess A callback function that is invoked with the Firestore UID if found, or null if not found.
+     * @param onFailure A callback function that is invoked with an Exception if an error occurs during the operation.
+     */
+    @SuppressLint("SuspiciousIndentation")
+    override fun getFsUidByEmail(
+        email: String,
+        onSuccess: (String?) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection(collectionPath)
+            .whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.documents.isNotEmpty()) {
+                    val fsUid = result.documents[0].id
+                    Log.d("ProfileRepository", "fsUid: $fsUid")
+                    onSuccess(fsUid)
+                } else {
+                    Log.d("ProfileRepository", "fsUid: null")
+                    onSuccess(null)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ProfileRepository", "Error getting fsUid by email", e)
+                onFailure(e)
+            }
+    }
 
   /**
    * This function adds a profile to Firebase
@@ -123,29 +130,42 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         })
   }
 
-  override fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection(collectionPath)
-        .document(documentPath)
-        .get()
-        .addOnSuccessListener { result ->
-          val profile = ProfileRepositoryConvert.documentToProfile(result)
-          onSuccess(profile)
-        }
-        .addOnFailureListener { e ->
-          Log.e("EventRepository", "Error getting documents", e)
-          onFailure(e)
-        }
-  }
+    /**
+     * Retrieves the profile elements from the Firestore database.
+     *
+     * @param onSuccess A callback function that is invoked with the retrieved Profile object.
+     * @param onFailure A callback function that is invoked with an Exception if an error occurs during the operation.
+     */
+    override fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection(collectionPath)
+            .document(documentPath)
+            .get()
+            .addOnSuccessListener { result ->
+                val profile = ProfileRepositoryConvert.documentToProfile(result)
+                onSuccess(profile)
+            }
+            .addOnFailureListener { e ->
+                Log.e("EventRepository", "Error getting documents", e)
+                onFailure(e)
+            }
+    }
 
-  override fun updateProfile(
-      newProfile: Profile,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    Log.d("ProfileRepositoryFirestore", "updateProfile")
-    performFirestoreOperation(
-        db.collection(collectionPath).document(documentPath).set(newProfile), onSuccess, onFailure)
-  }
+    /**
+     * Updates the profile in the Firestore database.
+     *
+     * @param newProfile The new profile data to be updated.
+     * @param onSuccess A callback function that is invoked when the profile is successfully updated.
+     * @param onFailure A callback function that is invoked with an Exception if an error occurs during the update operation.
+     */
+    override fun updateProfile(
+        newProfile: Profile,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        Log.d("ProfileRepositoryFirestore", "updateProfile")
+        performFirestoreOperation(
+            db.collection(collectionPath).document(documentPath).set(newProfile), onSuccess, onFailure)
+    }
 
   /**
    * This function is a helper function that safely performs a Firebase operation. A task has

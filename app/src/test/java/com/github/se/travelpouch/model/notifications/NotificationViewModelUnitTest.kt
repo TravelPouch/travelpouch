@@ -111,7 +111,7 @@ class NotificationViewModelUnitTest {
   fun markNotificationAsRead() {
     val notificationUid = generateAutoObjectId()
     notificationViewModel.markNotificationAsRead(notificationUid)
-    verify(notificationRepositoryFirestore, times(1)).markNotificationAsRead(eq(notificationUid))
+    verify(notificationRepositoryFirestore, times(1)).markNotificationAsRead(eq(notificationUid), any(), any())
   }
 
   @Test
@@ -168,7 +168,7 @@ class NotificationViewModelUnitTest {
     notificationViewModel.changeNotificationType(notificationUid, notificationType)
 
     verify(notificationRepositoryFirestore)
-        .changeNotificationType(eq(notificationUid), eq(notificationType))
+        .changeNotificationType(eq(notificationUid), eq(notificationType), any(), any())
   }
 
   @Test

@@ -8,7 +8,7 @@ interface NotificationRepository {
 
   fun fetchNotificationsForUser(userId: String, onNotificationFetched: (List<Notification?>) -> Unit)
 
-  fun markNotificationAsRead(notificationUid: String)
+  fun markNotificationAsRead(notificationUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   fun deleteAllNotificationsForUser(
       userUid: String,
@@ -16,5 +16,5 @@ interface NotificationRepository {
       onFailure: (Exception) -> Unit
   )
 
-  fun changeNotificationType(notificationUid: String, notificationType: NotificationType)
+  fun changeNotificationType(notificationUid: String, notificationType: NotificationType, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 }

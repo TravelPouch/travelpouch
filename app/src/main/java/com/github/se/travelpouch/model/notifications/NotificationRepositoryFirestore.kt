@@ -3,6 +3,7 @@ package com.github.se.travelpouch.model.notifications
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.travels.Role
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -68,10 +69,18 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    * Marks a notification as read in the Firestore database.
    *
    * @param notificationUid The UID of the notification to be marked as read.
+   * @param onSuccess Callback function to be invoked when the operation is successful.
+   * @param onFailure Callback function to be invoked when the operation fails.
    */
-  override fun markNotificationAsRead(notificationUid: String) {
-      firestore.collection(FirebasePaths.notifications).document(notificationUid).update("status", NotificationStatus.READ)
-  }
+    override fun markNotificationAsRead(
+        notificationUid: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        firestore.collection(FirebasePaths.notifications).document(notificationUid).update("status", NotificationStatus.READ)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
+    }
 
   override fun deleteAllNotificationsForUser(
       userUid: String,
@@ -81,14 +90,21 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       firestore.collection(FirebasePaths.notifications)
         .whereEqualTo("receiverUid", userUid)
         .get()
-        .addOnSuccessListener { documents ->
-          for (document in documents) {
-              firestore.collection(FirebasePaths.notifications).document(document.id).delete().addOnFailureListener { exception ->
-              onFailure(exception)
-            }
+          .addOnSuccessListener { documents ->
+              val deleteTasks = documents.map { document ->
+                  firestore.collection(FirebasePaths.notifications)
+                      .document(document.id)
+                      .delete()
+              }
+
+              Tasks.whenAllComplete(deleteTasks)
+                  .addOnSuccessListener {
+                      onSuccess()
+                  }
+                  .addOnFailureListener { exception ->
+                      onFailure(exception)
+                  }
           }
-          onSuccess()
-        }
         .addOnFailureListener { exception -> onFailure(exception) }
   }
 
@@ -97,10 +113,14 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    *
    * @param notificationUid The UID of the notification to be changed.
    * @param notificationType The new type of the notification.
+   * @param onSuccess Callback function to be invoked when the operation is successful.
+   * @param onFailure Callback function to be invoked when the operation fails.
    */
-  override fun changeNotificationType(notificationUid: String, notificationType: NotificationType) {
-      firestore.collection(FirebasePaths.notifications).document(notificationUid).update("notificationType", notificationType)
-  }
+    override fun changeNotificationType(notificationUid: String, notificationType: NotificationType, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        firestore.collection(FirebasePaths.notifications).document(notificationUid).update("notificationType", notificationType)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
+    }
 
   private fun documentToNotification(document: DocumentSnapshot): Notification? {
     return try {

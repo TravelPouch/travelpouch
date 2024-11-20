@@ -140,7 +140,7 @@ class NotificationRepositoryFirestoreUnitTest {
     `when`(notificationCollection.document(notificationUid)).thenReturn(documentReference)
     `when`(documentReference.update("status", NotificationStatus.READ)).thenReturn(task)
 
-    notificationRepositoryFirestore.markNotificationAsRead(notificationUid)
+    notificationRepositoryFirestore.markNotificationAsRead(notificationUid, {}, {})
 
     verify(documentReference).update("status", NotificationStatus.READ)
   }
@@ -342,7 +342,7 @@ class NotificationRepositoryFirestoreUnitTest {
         .thenReturn(task)
 
     notificationRepositoryFirestore.changeNotificationType(
-        notificationUid, NotificationType.INVITATION)
+        notificationUid, NotificationType.INVITATION, {}, {})
 
     verify(documentReference).update("notificationType", NotificationType.INVITATION)
   }

@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -47,9 +48,21 @@ fun NotificationsScreen(
     documentViewModel: DocumentViewModel,
     eventsViewModel: EventViewModel
 ) {
-  profileModelView.getProfile()
+    // Collect the profile state
+    val profile = profileModelView.profile.collectAsState()
 
-  val profile = profileModelView.profile.collectAsState()
+    // Only trigger `getProfile()` if the fsUid changes
+    LaunchedEffect(profile.value.fsUid) {
+        profileModelView.getProfile()
+    }
+
+    // Load notifications when the profile is available
+    LaunchedEffect(profile.value.fsUid) {
+        if (profile.value.fsUid.isNotEmpty()) {
+            notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
+        }
+    }
+
   notificationViewModel.loadNotificationsForUser(profile.value.fsUid)
   val notifications by notificationViewModel.notifications.collectAsState()
 

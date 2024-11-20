@@ -56,7 +56,7 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    * @param notificationsUid The UID of the notification to be marked as read.
    */
   fun markNotificationAsRead(notificationsUid: String) {
-    notificationRepository.markNotificationAsRead(notificationsUid)
+    notificationRepository.markNotificationAsRead(notificationsUid, {}, {})
   }
 
   /**
@@ -75,7 +75,7 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    * @param notificationType The new type of the notification.
    */
   fun changeNotificationType(notificationsUid: String, notificationType: NotificationType) {
-    notificationRepository.changeNotificationType(notificationsUid, notificationType)
+    notificationRepository.changeNotificationType(notificationsUid, notificationType, {}, {})
   }
 
   fun deleteAllNotificationsForUser(
