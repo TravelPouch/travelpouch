@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -87,27 +88,28 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                     .padding(16.dp)
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
                   value = title,
                   onValueChange = { title = it },
                   enabled = true,
                   label = { Text("Title") },
-                  modifier = Modifier.testTag("titleField"))
+                  modifier = Modifier.fillMaxWidth().testTag("titleField"))
 
               OutlinedTextField(
                   value = description,
                   onValueChange = { description = it },
                   enabled = true,
                   label = { Text("Description") },
-                  modifier = Modifier.testTag("descriptionField"))
+                  modifier = Modifier.fillMaxWidth().testTag("descriptionField"))
 
               OutlinedTextField(
                   value = location,
                   onValueChange = {},
                   enabled = true,
                   label = { Text("Location") },
-                  modifier = Modifier.testTag("locationField"))
+                  modifier = Modifier.fillMaxWidth().testTag("locationField"))
 
               // Date Input
               OutlinedTextField(

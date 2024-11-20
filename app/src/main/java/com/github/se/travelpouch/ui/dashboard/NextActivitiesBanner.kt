@@ -5,6 +5,7 @@ import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,9 @@ fun NextActivitiesBanner(
   val showOutline = remember { mutableStateOf(false) }
   val reminderRange = 86400L // 24 hours in milliseconds
   val nowTime = Timestamp.now().seconds
+  val darkTheme = isSystemInDarkTheme()
+  val overlayColor =
+      if (darkTheme) Color.DarkGray.copy(alpha = 0.85f) else Color.Gray.copy(alpha = 0.85f)
 
   // Filter activities due within the next 24 hours
   val upcomingActivities =
@@ -75,7 +79,7 @@ fun NextActivitiesBanner(
                     max =
                         (0.3f * LocalConfiguration.current.screenHeightDp.dp.value)
                             .dp) // 30% of screen height
-                .background(Color.Gray.copy(alpha = 0.85f), RoundedCornerShape(8.dp))
+                .background(overlayColor, RoundedCornerShape(8.dp))
                 .clickable { showOutline.value = true } // Set the outline on first tap
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .testTag("NextActivitiesBannerBox"),
@@ -87,12 +91,13 @@ fun NextActivitiesBanner(
               modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Upcoming Activities in the next 24 hours",
-                    color = Color.DarkGray,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                    color = if (darkTheme) Color.LightGray else Color.DarkGray,
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
                     modifier =
                         Modifier.padding(bottom = 8.dp, start = 2.dp, end = 2.dp)
                             .testTag("reminderTitle")
-                            .background(Color.LightGray, RoundedCornerShape(4.dp)))
+                            .background(
+                                MaterialTheme.colorScheme.surface, RoundedCornerShape(4.dp)))
 
                 // Scrollable list of upcoming activities
                 LazyColumn(
@@ -123,7 +128,7 @@ fun NextActivitiesBanner(
                         Modifier.size(dismissButtonSize)
                             .border(
                                 width = if (showOutline.value) 2.dp else 0.dp,
-                                color = if (showOutline.value) Color.Black else Color.Transparent,
+                                color = if (showOutline.value) Color.White else Color.Transparent,
                                 shape = CircleShape)
                             .testTag("NextActivitiesBannerDismissButton")
                             .padding(

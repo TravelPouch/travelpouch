@@ -39,6 +39,7 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.SwipePager
+import com.github.se.travelpouch.ui.notifications.NotificationsScreen
 import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
 import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
@@ -55,10 +56,11 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      SampleAppTheme {
+      SampleAppTheme(dynamicColor = false) {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
+            // color = MaterialTheme.colorScheme.background,
         ) {
           TravelPouchApp()
         }
@@ -76,14 +78,11 @@ class MainActivity : ComponentActivity() {
         viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
     val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
     val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
-    // val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
     val profileModelView = hiltViewModel<ProfileModelView>()
-
-    val calendarViewModel: CalendarViewModel =
-        viewModel(factory = CalendarViewModel.Factory(activityModelView))
-
     val notificationViewModel: NotificationViewModel =
         viewModel(factory = NotificationViewModel.Factory)
+    val calendarViewModel: CalendarViewModel =
+        viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
     NavHost(navController = navController, startDestination = Route.DEFAULT) {
       navigation(
@@ -117,7 +116,8 @@ class MainActivity : ComponentActivity() {
               listTravelViewModel, navigationActions, profileModelView = profileModelView)
         }
         composable(Screen.EDIT_TRAVEL_SETTINGS) {
-          EditTravelSettingsScreen(listTravelViewModel, navigationActions)
+          EditTravelSettingsScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
         }
 
         composable(Screen.ACTIVITIES_MAP) {
@@ -125,7 +125,8 @@ class MainActivity : ComponentActivity() {
         }
 
         composable(Screen.PARTICIPANT_LIST) {
-          ParticipantListScreen(listTravelViewModel, navigationActions)
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
         }
         composable(Screen.DOCUMENT_LIST) {
           DocumentListScreen(
@@ -150,6 +151,17 @@ class MainActivity : ComponentActivity() {
 
         composable(Screen.SIGN_IN_PASSWORD) {
           SignInWithPassword(navigationActions, profileModelView, listTravelViewModel, auth)
+        }
+
+        composable(Screen.NOTIFICATION) {
+          NotificationsScreen(
+              navigationActions,
+              notificationViewModel,
+              profileModelView,
+              listTravelViewModel,
+              activityModelView,
+              documentViewModel,
+              eventsViewModel)
         }
       }
     }
