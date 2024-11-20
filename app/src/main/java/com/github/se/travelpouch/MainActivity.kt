@@ -38,6 +38,7 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.navigation.SwipePager
 import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
 import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
@@ -91,6 +92,10 @@ class MainActivity : ComponentActivity() {
       ) {
         composable(Screen.AUTH) {
           SignInScreen(navigationActions, profileModelView, listTravelViewModel)
+        }
+
+        composable(Screen.SWIPER) {
+          SwipePager(navigationActions, activityModelView, calendarViewModel)
         }
 
         composable(Screen.TRAVEL_LIST) {

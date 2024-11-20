@@ -101,7 +101,7 @@ fun TravelListScreen(
                     TravelItem(travelContainer = travelList.value[index]) {
                       val travelId = travelList.value[index].fsUid
                       listTravelViewModel.selectTravel(travelList.value[index])
-                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      navigationActions.navigateTo(Screen.SWIPER)
                       eventViewModel.setIdTravel(travelId)
                       activityViewModel.setIdTravel(travelId)
                       documentViewModel.setIdTravel(travelId)
