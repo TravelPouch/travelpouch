@@ -78,6 +78,7 @@ class MainActivity : ComponentActivity() {
     val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
     // val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
     val profileModelView = hiltViewModel<ProfileModelView>()
+    val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
 
 
     val calendarViewModel: CalendarViewModel =
@@ -113,7 +114,7 @@ class MainActivity : ComponentActivity() {
         AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
       }
       composable(Screen.EDIT_TRAVEL_SETTINGS) {
-        EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel )
+        EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel)
       }
 
 

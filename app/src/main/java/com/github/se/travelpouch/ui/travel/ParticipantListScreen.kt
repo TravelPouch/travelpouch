@@ -110,10 +110,9 @@ fun ParticipantListScreen(
   ) { paddingValues ->
     if (selectedTravel != null) {
       LazyColumn(
-          modifier = Modifier.padding(paddingValues).fillMaxWidth().testTag("participantColumn")) {
+          modifier = Modifier.padding(paddingValues).fillMaxWidth()) {
             participants.entries.forEach { participantEntry ->
               item {
-                // display all participants in travel
                 ParticipantRow(
                     participant = participantEntry,
                     selectedTravel = selectedTravel!!,
@@ -121,6 +120,7 @@ fun ParticipantListScreen(
                       setSelectedParticipant(participantEntry)
                       setExpanded(true)
                     })
+
                 HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
               }
             }

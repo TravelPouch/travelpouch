@@ -159,10 +159,8 @@ class EditTravelSettingsScreenTest {
     // perform add user
     // Check that the dialog is displayed
     composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
-    // Check that the title text is displayed and correct
     composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
-    // Check that the OutlinedTextField is displayed and has the correct default value
     composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("addUserEmailField")
@@ -223,19 +221,40 @@ class EditTravelSettingsScreenTest {
 
   @Test
   fun testInput() {
-    val travelContainer = createContainer()
-    listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel) }
+    val travelContainer = createContainer() // Ensure this is valid data
+    listTravelViewModel.selectTravel(travelContainer)  // Make sure selectedTravel is set correctly
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(listTravelViewModel, navigationActions, locationViewModel)
+    }
 
+    // Wait until the UI is idle and fully rendered
+    composeTestRule.waitForIdle()
+
+    // Ensure the "inputTravelStartTime" field exists and is displayed
+    composeTestRule.onNodeWithTag("inputTravelStartTime")
+      .performScrollTo() // Ensure it's in the viewport
+      .assertExists("Start time input should be present")
+      .assertIsDisplayed()  // Check visibility
+
+    // Optionally, test input actions as well:
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
     inputText("inputTravelEndTime", "16/02/2009", "15/02/2009")
-    composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().assertIsDisplayed()
+
+    // Verify other UI elements
+    composeTestRule.onNodeWithTag("travelSaveButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelSaveButton").assertTextContains("Save")
-    composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("travelDeleteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").assertTextContains("Delete")
+
+    // Perform final click
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
+
+    // Verify repository interaction
     verify(travelRepository, atLeastOnce()).updateTravel(any(), any(), any())
   }
+
+
+
 
   @Test
   fun testbadInputs() {
