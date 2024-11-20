@@ -68,6 +68,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
       }
     }
   }
+
   /**
    * Checks if a participant exists in the Firestore database by their email.
    *
@@ -191,6 +192,30 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
             }
           }
         }
+  }
+
+  override fun getTravelById(
+      id: String,
+      onSuccess: (TravelContainer?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(collectionPath).document(id).get().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val document = task.result
+        if (document.exists()) {
+          val travel = documentToTravel(document)
+          if (travel != null) {
+            onSuccess(travel)
+          } else {
+            onFailure(Exception("Travel corrupted"))
+          }
+        } else {
+          onFailure(Exception("Document does not exist"))
+        }
+      } else {
+        task.exception?.let { e -> onFailure(e) }
+      }
+    }
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.profile
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
@@ -71,6 +72,40 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   }
 
   /**
+   * Retrieves the Firestore UID associated with the given email.
+   *
+   * @param email The email address to search for.
+   * @param onSuccess A callback function that is invoked with the Firestore UID if found, or null
+   *   if not found.
+   * @param onFailure A callback function that is invoked with an Exception if an error occurs
+   *   during the operation.
+   */
+  @SuppressLint("SuspiciousIndentation")
+  override fun getFsUidByEmail(
+      email: String,
+      onSuccess: (String?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(collectionPath)
+        .whereEqualTo("email", email)
+        .get()
+        .addOnSuccessListener { result ->
+          if (result.documents.isNotEmpty()) {
+            val fsUid = result.documents[0].id
+            Log.d("ProfileRepository", "fsUid: $fsUid")
+            onSuccess(fsUid)
+          } else {
+            Log.d("ProfileRepository", "fsUid: null")
+            onSuccess(null)
+          }
+        }
+        .addOnFailureListener { e ->
+          Log.e("ProfileRepository", "Error getting fsUid by email", e)
+          onFailure(e)
+        }
+  }
+
+  /**
    * This function adds a profile to Firebase
    *
    * @param email (String) : the email of the user
@@ -97,6 +132,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         })
   }
 
+  /**
+   * Retrieves the profile elements from the Firestore database.
+   *
+   * @param onSuccess A callback function that is invoked with the retrieved Profile object.
+   * @param onFailure A callback function that is invoked with an Exception if an error occurs
+   *   during the operation.
+   */
   override fun getProfileElements(onSuccess: (Profile) -> Unit, onFailure: (Exception) -> Unit) {
     db.collection(collectionPath)
         .document(documentPath)
@@ -111,6 +153,14 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         }
   }
 
+  /**
+   * Updates the profile in the Firestore database.
+   *
+   * @param newProfile The new profile data to be updated.
+   * @param onSuccess A callback function that is invoked when the profile is successfully updated.
+   * @param onFailure A callback function that is invoked with an Exception if an error occurs
+   *   during the update operation.
+   */
   override fun updateProfile(
       newProfile: Profile,
       onSuccess: () -> Unit,
