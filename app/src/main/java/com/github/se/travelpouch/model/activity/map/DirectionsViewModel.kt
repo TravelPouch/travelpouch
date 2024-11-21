@@ -17,17 +17,28 @@ typealias Path = List<LatLng>
 
 // Data class to hold the details of the route between origin and destination
 data class RouteDetails(
-    val origin: LatLng,
-    val destination: LatLng,
-    val route: Path,
-    val legsRoute: List<Path>
-)
+    val origin: LatLng, // Origin location
+    val destination: LatLng, // Destination location
+    val route: Path, // List of path for the entire route
+    val legsRoute:
+        List<Path> // List of paths for each leg of the route. Each leg is a segment between
+    // waypoints
+) {
+  companion object {
+    val EMPTY =
+        RouteDetails(
+            origin = LatLng(0.0, 0.0),
+            destination = LatLng(0.0, 0.0),
+            route = emptyList(),
+            legsRoute = emptyList())
+  }
+}
 
 /** ViewModel for fetching and managing directions data from the Google Maps Directions API. */
 class DirectionsViewModel(private val repository: DirectionsRepositoryInterface) : ViewModel() {
 
   // StateFlow to hold the fetched route details for activities
-  private val _activityRouteDetails = MutableStateFlow<RouteDetails?>(null)
+  private val _activityRouteDetails = MutableStateFlow<RouteDetails?>(RouteDetails.EMPTY)
   val activityRouteDetails: StateFlow<RouteDetails?>
     get() = _activityRouteDetails
 
