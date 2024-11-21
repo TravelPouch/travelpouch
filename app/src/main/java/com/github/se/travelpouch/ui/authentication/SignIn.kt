@@ -79,11 +79,10 @@ fun SignInScreen(
             methodChosen.value = false
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
-            val job =
-                GlobalScope.launch {
-                  profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
-                  isLoading.value = false
-                }
+            GlobalScope.launch {
+              profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+              isLoading.value = false
+            }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
@@ -174,28 +173,23 @@ fun SignInScreen(
                 }
           }
           if (currentUser != null) {
-            Log.d("SignInScreen", "we're here")
             LaunchedEffect(Unit) {
               try {
                 isLoading.value = true
                 methodChosen.value = true
 
-                val gaming =
-                    currentUser.getIdToken(true).await() // to get the result asynchronously
+                currentUser.getIdToken(true).await() // We shouldn't continue until this passes
 
                 Log.d(
                     "SignInScreen",
                     "User already signed in: ${currentUser.displayName}, Token: $token")
 
-                // Continue with post-login setup
-                val job =
-                    GlobalScope.launch {
-                      profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
-                    }
+                GlobalScope.launch {
+                  profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                }
                 navigationActions.navigateTo(Screen.TRAVEL_LIST)
                 isLoading.value = false
               } catch (refreshError: Exception) {
-
                 Log.e(
                     "SignInScreen",
                     "Failed to reauthenticate from session: ${refreshError.localizedMessage}")
