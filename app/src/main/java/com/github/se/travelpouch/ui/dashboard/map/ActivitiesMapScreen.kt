@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,6 +55,12 @@ fun ActivitiesMapScreen(
   // Collect the list of activities from the ViewModel
   val listOfActivities by activityViewModel.activities.collectAsState()
 
+  // Filter out activities with invalid locations (latitude and longitude are both 0.0)
+  val validActivities =
+      listOfActivities.filter { activity ->
+        activity.location.latitude != 0.0 && activity.location.longitude != 0.0
+      }
+
   val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
   // Default location to use if activities are not yet loaded (e.g., Paris)
@@ -68,16 +74,16 @@ fun ActivitiesMapScreen(
   // Collect the path points from the DirectionsViewModel
   val routeDetails by directionsViewModel.activityRouteDetails.collectAsState()
 
-  var selectedRouteIndex by remember { mutableStateOf(0) } // Track selected route index
+  var selectedRouteIndex by remember { mutableIntStateOf(0) } // Track selected route index
 
   // Use DisposableEffect to monitor when the screen is composed/destroyed
-  LaunchedEffect(listOfActivities) {
+  LaunchedEffect(validActivities) {
     // Fetch directions if the list of activities changes
-    directionsViewModel.fetchDirectionsForActivities(listOfActivities, "walking")
+    directionsViewModel.fetchDirectionsForActivities(validActivities, "walking")
   }
 
   // Effect that runs whenever the list of activities changes
-  CameraUpdater(listOfActivities, cameraPositionState)
+  CameraUpdater(validActivities, cameraPositionState)
 
   Scaffold(
       modifier = Modifier.testTag("ActivityMapScreen"),
@@ -90,10 +96,10 @@ fun ActivitiesMapScreen(
               modifier = Modifier.padding(paddingValues).testTag("Map"),
               cameraPositionState = cameraPositionState) {
                 // Add a marker for each activity's location
-                listOfActivities.forEachIndexed { index, activity ->
+                validActivities.forEachIndexed { index, activity ->
                   activity.location.let { location -> // Ensure location is not null
                     // Use the helper function to get the appropriate marker icon
-                    val icon = getMarkerIcon(index, listOfActivities.size)
+                    val icon = getMarkerIcon(index, validActivities.size)
 
                     // Display the marker with the customized icon
                     Marker(
