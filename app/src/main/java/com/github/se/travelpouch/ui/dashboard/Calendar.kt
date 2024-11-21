@@ -36,6 +36,7 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
 
   // Application
   Scaffold(
+      modifier = Modifier.testTag("calenmdarScreen")
       //      topBar = {
       //        // TopAppBar with title and icon to indicate the calendar feature
       //        TopAppBar(

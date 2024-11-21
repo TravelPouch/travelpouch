@@ -55,8 +55,10 @@ fun SwipePager(
   LaunchedEffect(pagerState.currentPage) { selectedScreen = pagerState.currentPage }
 
   Scaffold(
+      modifier = Modifier.testTag("pagerSwipe"),
       topBar = {
         TopAppBar(
+            modifier = Modifier.testTag("topBar"),
             title = {
               Text(
                   listOfTopLevelDestinationForSwipe[selectedScreen].textId,
