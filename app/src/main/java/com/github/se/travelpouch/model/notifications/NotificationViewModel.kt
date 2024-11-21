@@ -1,11 +1,12 @@
 package com.github.se.travelpouch.model.notifications
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * ViewModel class for managing notifications in the travel pouch application.
@@ -16,8 +17,8 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
     ViewModel() {
 
   // LiveData holding the list of notifications
-  private val _notifications = MutableLiveData<List<Notification>>(emptyList())
-  val notifications: LiveData<List<Notification>> = _notifications
+  private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
+  val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
 
   /**
    * Factory object for creating instances of NotificationViewModel. This factory is used to provide
@@ -29,9 +30,13 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return NotificationViewModel(NotificationRepository(Firebase.firestore)) as T
+            return NotificationViewModel(NotificationRepositoryFirestore(Firebase.firestore)) as T
           }
         }
+  }
+
+  fun getNewUid(): String {
+    return notificationRepository.getNewUid()
   }
 
   /**
@@ -40,8 +45,8 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    * @param userId The UID of the user whose notifications are to be loaded.
    */
   fun loadNotificationsForUser(userId: String) {
-    notificationRepository.fetchNotificationsForUser(userId) { notifications ->
-      _notifications.value = notifications
+    notificationRepository.fetchNotificationsForUser(userId) {
+      _notifications.value = it.filterNotNull()
     }
   }
 
@@ -51,7 +56,7 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    * @param notificationsUid The UID of the notification to be marked as read.
    */
   fun markNotificationAsRead(notificationsUid: String) {
-    notificationRepository.markNotificationAsRead(notificationsUid)
+    notificationRepository.markNotificationAsRead(notificationsUid, {}, {})
   }
 
   /**
@@ -70,6 +75,14 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
    * @param notificationType The new type of the notification.
    */
   fun changeNotificationType(notificationsUid: String, notificationType: NotificationType) {
-    notificationRepository.changeNotificationType(notificationsUid, notificationType)
+    notificationRepository.changeNotificationType(notificationsUid, notificationType, {}, {})
+  }
+
+  fun deleteAllNotificationsForUser(
+      userUid: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    notificationRepository.deleteAllNotificationsForUser(userUid, onSuccess, onFailure)
   }
 }

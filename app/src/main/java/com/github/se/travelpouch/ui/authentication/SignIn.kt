@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -43,9 +45,13 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 /**
  * A composable function that displays the sign-in screen.
@@ -58,11 +64,14 @@ fun SignInScreen(
     navigationActions: NavigationActions,
     profileModelView: ProfileModelView,
     travelViewModel: ListTravelViewModel,
-    isLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+    isLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+    auth: FirebaseAuth = Firebase.auth
 ) {
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
   val methodChosen = rememberSaveable { mutableStateOf(false) }
+
+  val currentUser = auth.currentUser
 
   // launcher for Firebase authentication
   val launcher =
@@ -71,11 +80,10 @@ fun SignInScreen(
             methodChosen.value = false
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
-            val job =
-                GlobalScope.launch {
-                  profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
-                  isLoading.value = false
-                }
+            GlobalScope.launch {
+              profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+              isLoading.value = false
+            }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.TRAVEL_LIST)
@@ -127,8 +135,8 @@ fun SignInScreen(
                   // Google Sign-In Button (before the loading state)
                   this@Column.AnimatedVisibility(
                       visible = !isLoading.value,
-                      enter = fadeIn(animationSpec = tween(150)),
-                      exit = fadeOut(animationSpec = tween(300))) {
+                      enter = fadeIn(animationSpec = tween(0)),
+                      exit = fadeOut(animationSpec = tween(150))) {
                         // Assuming `GoogleSignInButton` is provided by Google Sign-In SDK
                         GoogleSignInButton(
                             onSignInClick = {
@@ -147,14 +155,15 @@ fun SignInScreen(
                   // CircularProgressIndicator (when loading)
                   this@Column.AnimatedVisibility(
                       visible = isLoading.value,
-                      enter = fadeIn(animationSpec = tween(300)),
-                      exit = fadeOut(animationSpec = tween(300))) {
+                      enter = fadeIn(animationSpec = tween(150)),
+                      exit = fadeOut(animationSpec = tween(150))) {
                         CircularProgressIndicator(
                             modifier =
                                 Modifier.height(28.dp)
                                     .testTag(
                                         "loadingSpinner"), // Same height as Google Sign-In button
                             color = MaterialTheme.colorScheme.primary,
+                            strokeCap = StrokeCap.Round,
                             strokeWidth = 5.dp)
                       }
                 }
@@ -164,6 +173,35 @@ fun SignInScreen(
                 enabled = !methodChosen.value) {
                   Text("Sign in with email and password")
                 }
+          }
+          if (currentUser != null) {
+            LaunchedEffect(Unit) {
+              try {
+                isLoading.value = true
+                methodChosen.value = true
+
+                currentUser.getIdToken(true).await() // We shouldn't continue until this passes
+
+                Log.d(
+                    "SignInScreen",
+                    "User already signed in: ${currentUser.displayName}, Token: $token")
+
+                GlobalScope.launch {
+                  profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                }
+                navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                isLoading.value = false
+              } catch (refreshError: Exception) {
+                Log.e(
+                    "SignInScreen",
+                    "Failed to reauthenticate from session: ${refreshError.localizedMessage}")
+                Toast.makeText(
+                        context, "Failed to refresh token, please sign in again", Toast.LENGTH_LONG)
+                    .show()
+                isLoading.value = false
+                methodChosen.value = false
+              }
+            }
           }
         }
       })

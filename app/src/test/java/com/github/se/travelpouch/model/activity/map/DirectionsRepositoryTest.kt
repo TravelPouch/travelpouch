@@ -35,17 +35,34 @@ class DirectionsRepositoryTest {
     // Mocking the response body
     val responseBody =
         """
-            {
-                "status": "OK",
-                "routes": [
-                    {
-                        "overview_polyline": {
-                            "points": "encodedPolylineString"
+        {
+            "status": "OK",
+            "routes": [
+                {
+                    "overview_polyline": {
+                        "points": "encodedPolylineString"
+                    },
+                    "legs": [
+                        {
+                            "distance": { "text": "5 km", "value": 5000 },
+                            "duration": { "text": "10 mins", "value": 600 },
+                            "start_address": "Origin Address",
+                            "end_address": "Destination Address",
+                            "start_location": { "lat": 1.0, "lng": 2.0 },
+                            "end_location": { "lat": 3.0, "lng": 4.0 },
+                            "steps": [
+                                {
+                                    "polyline": {
+                                        "points": "u{~vFvyys@fC_y@"
+                                    }
+                                }
+                            ]
                         }
-                    }
-                ]
-            }
-            """
+                    ]
+                }
+            ]
+        }
+        """
             .trimIndent()
 
     val mockResponse = mock(Response::class.java)
@@ -74,6 +91,7 @@ class DirectionsRepositoryTest {
         "destination",
         "driving",
         "apiKey",
+        "37.7749,-122.4194|34.0522,-118.2437",
         { response -> directionsResponse = response },
         { exception -> failureException = exception })
 
@@ -81,7 +99,14 @@ class DirectionsRepositoryTest {
     assertTrue(failureException == null)
     assertTrue(directionsResponse?.routes?.isNotEmpty() == true)
     val route = directionsResponse!!.routes[0]
+    val leg = route.legs[0]
     assertEquals("encodedPolylineString", route.overviewPolyline.points)
+    assertEquals("5 km", leg.distanceText)
+    assertEquals(5000, leg.distanceValue)
+    assertEquals("10 mins", leg.durationText)
+    assertEquals(600, leg.durationValue)
+    assertEquals("Origin Address", leg.startAddress)
+    assertEquals("Destination Address", leg.endAddress)
   }
 
   @Test
@@ -121,6 +146,7 @@ class DirectionsRepositoryTest {
         "destination",
         "driving",
         "apiKey",
+        null,
         {},
         { exception -> failureException = exception })
 
@@ -152,6 +178,7 @@ class DirectionsRepositoryTest {
         "destination",
         "driving",
         "apiKey",
+        null,
         { response -> directionsResponse = response },
         { exception -> failureException = exception })
 
@@ -185,6 +212,7 @@ class DirectionsRepositoryTest {
         "destination",
         "driving",
         "apiKey",
+        null,
         {},
         { exception -> failureException = exception })
 
@@ -220,6 +248,7 @@ class DirectionsRepositoryTest {
         "destination",
         "driving",
         "apiKey",
+        null,
         { response -> directionsResponse = response },
         { exception -> failureException = exception })
 
@@ -257,6 +286,7 @@ class DirectionsRepositoryTest {
         "destination",
         "driving",
         "apiKey",
+        null,
         {},
         { exception -> failureException = exception })
 

@@ -106,7 +106,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
       },
   ) { paddingValue ->
     Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
-      Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.inversePrimary)) {
+      Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(modifier = Modifier.fillMaxWidth()) {
           Text(
               text = "Document ID: ${documentContainer.ref.id}",
