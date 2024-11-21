@@ -34,7 +34,11 @@ data class RouteDetails(
   }
 }
 
-/** ViewModel for fetching and managing directions data from the Google Maps Directions API. */
+/**
+ * ViewModel for fetching directions between activities using the Google Maps Directions API.
+ *
+ * @param repository The repository to fetch directions from.
+ */
 class DirectionsViewModel(private val repository: DirectionsRepositoryInterface) : ViewModel() {
 
   // StateFlow to hold the fetched route details for activities
@@ -45,17 +49,26 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
   /** Factory class for creating DirectionsViewModel instances. */
   // create factory
   companion object {
-    val Factory: ViewModelProvider.Factory =
+    fun provideFactory(apiKey: String): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return DirectionsViewModel(DirectionsRepository(OkHttpClient())) as T
+            return DirectionsViewModel(
+                DirectionsRepository(
+                    client = OkHttpClient(), apiKey = apiKey // Inject API key dynamically
+                    ))
+                as T
           }
         }
   }
 
-  /** Function to fetch directions between activities sequentially. */
-  fun fetchDirectionsForActivities(activities: List<Activity>, mode: String, apiKey: String) {
+  /**
+   * Fetches directions for a list of activities using the specified travel mode.
+   *
+   * @param activities The list of activities to create a route for.
+   * @param mode The travel mode ("driving", "walking", "bicycling", or "transit").
+   */
+  fun fetchDirectionsForActivities(activities: List<Activity>, mode: String) {
     if (activities.size < 2) {
       Log.e("DirectionsViewModel", "Not enough activities to create a route")
       return
@@ -84,7 +97,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
         }
 
     // Fetch directions using the extracted origin, destination, and waypoints
-    fetchDirections(origin, destination, mode, apiKey, waypoints)
+    fetchDirections(origin, destination, mode, waypoints)
   }
 
   /**
@@ -93,13 +106,11 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
    * @param origin The starting point of the route as a LatLng object.
    * @param destination The ending point of the route as a LatLng object.
    * @param mode The travel mode ("driving", "walking", "bicycling", or "transit").
-   * @param apiKey The API key for the Google Maps Directions API.
    */
   fun fetchDirections(
       origin: LatLng,
       destination: LatLng,
       mode: String,
-      apiKey: String,
       waypoints: List<LatLng>? = null
   ) {
 
@@ -113,7 +124,6 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
           origin = originStr,
           destination = destinationStr,
           mode = mode,
-          apiKey = apiKey,
           waypoints = waypointsStr,
           onSuccess = { directionsResponse ->
             // Use extractRouteDetails to extract the route details
