@@ -39,24 +39,32 @@ class ActivitiesMapScreenTest {
   private lateinit var mockkDirectionsViewModel: DirectionsViewModel
   private lateinit var mockkDirectionsRepository: DirectionsRepositoryInterface
 
-  val listOfActivities =
-      listOf(
-          Activity(
-              uid = "1",
-              title = "Team Meeting",
-              description = "Monthly team meeting to discuss project progress.",
-              location = Location(48.8566, 2.3522, Timestamp.now(), "Paris"),
-              date = Timestamp.now(),
-              documentsNeeded = mapOf("Agenda" to 1, "Meeting Notes" to 2)),
-          Activity(
-              uid = "2",
-              title = "Client Presentation",
-              description = "Presentation to showcase the project to the client.",
-              location = Location(40.0, -122.4194, Timestamp.now(), "Paris"),
-              date = Timestamp(Timestamp.now().seconds + 3600, Timestamp.now().nanoseconds),
-              documentsNeeded = null))
+    private val listOfActivities =
+        listOf(
+            Activity(
+                uid = "1",
+                title = "Team Meeting",
+                description = "Monthly team meeting to discuss project progress.",
+                location = Location(48.8566, 2.3522, Timestamp.now(), "Paris"),
+                date = Timestamp.now(),
+                documentsNeeded = mapOf("Agenda" to 1, "Meeting Notes" to 2)),
+            Activity(
+                uid = "2",
+                title = "Client Presentation",
+                description = "Presentation to showcase the project to the client.",
+                location = Location(40.0, -122.4194, Timestamp.now(), "Paris"),
+                date = Timestamp(Timestamp.now().seconds + 3600, Timestamp.now().nanoseconds),
+                documentsNeeded = null),
+            Activity(
+                uid = "3",
+                title = "Workshop",
+                description = "Workshop on team building and skill development.",
+                location = Location(51.5074, -0.1278, Timestamp.now(), "London"),
+                date = Timestamp(Timestamp.now().seconds + 7200, Timestamp.now().nanoseconds),
+                documentsNeeded = mapOf("Workshop Material" to 1))
+        )
 
-  val mockLeg =
+  private val mockLeg =
       Leg(
           distanceText = "3.4 km",
           distanceValue = 3400,
@@ -68,9 +76,21 @@ class ActivitiesMapScreenTest {
           endLocation = LatLng(34.0522, -118.2437),
           overviewPolyline = OverviewPolyline("u{~vFvyys@fC_y@"))
 
-  val mockResponse =
+    private val mockLeg2 =
+        Leg(
+            distanceText = "5.2 km",
+            distanceValue = 5200,
+            durationText = "25 mins",
+            durationValue = 1500,
+            startAddress = "End Address",
+            endAddress = "Next Address",
+            startLocation = LatLng(34.0522, -118.2437),
+            endLocation = LatLng(36.1699, -115.1398),
+            overviewPolyline = OverviewPolyline("a~bcFghij@dE_g@"))
+
+    private val mockResponse =
       DirectionsResponse(
-          routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"), legs = listOf(mockLeg))))
+          routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"), legs = listOf(mockLeg, mockLeg2))))
 
   @get:Rule val composeTestRule = createComposeRule()
 
