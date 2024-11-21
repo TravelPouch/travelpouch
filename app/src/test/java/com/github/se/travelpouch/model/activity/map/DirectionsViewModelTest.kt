@@ -116,7 +116,7 @@ class DirectionsViewModelTest {
 
     // Assert
     val routeDetails = viewModel.activityRouteDetails.value
-    assertTrue(routeDetails == null) // Expect pathPoints to remain empty on failure
+    assertTrue(routeDetails == RouteDetails.EMPTY) // Expect pathPoints to remain empty on failure
   }
 
   @Test
@@ -210,7 +210,7 @@ class DirectionsViewModelTest {
 
     // Assert
     val routeDetails = viewModel.activityRouteDetails.value
-    assertTrue(routeDetails == null)
+    assertTrue(routeDetails == RouteDetails.EMPTY)
   }
 
   @Test
