@@ -181,6 +181,7 @@ fun ModifyingProfileScreen(
                           Text("Add Friend")
                       }
                   }
+
               }
           }
       }

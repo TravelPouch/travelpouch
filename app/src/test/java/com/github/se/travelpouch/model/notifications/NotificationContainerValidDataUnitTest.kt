@@ -3,6 +3,7 @@ package com.github.se.travelpouch.model.notifications
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
+import com.google.firebase.Timestamp
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -102,5 +103,42 @@ class NotificationContainerLastCaseTest {
   @Test(expected = IllegalArgumentException::class)
   fun valueOf_withInvalidName_throwsException_notificationStatus() {
     NotificationStatus.valueOf("INVALID")
+  }
+
+  @Test
+  fun toMap_returnsCorrectMap() {
+    val notificationUid = generateAutoObjectId()
+    val senderUid = generateAutoUserId()
+    val receiverUid = generateAutoUserId()
+    val travelUid = generateAutoObjectId()
+    val content =
+        NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
+    val notificationType = NotificationType.INVITATION
+    val timestamp = Timestamp.now()
+    val status = NotificationStatus.UNREAD
+
+    val notification =
+        Notification(
+            notificationUid = notificationUid,
+            senderUid = senderUid,
+            receiverUid = receiverUid,
+            travelUid = travelUid,
+            content = content,
+            notificationType = notificationType,
+            timestamp = timestamp,
+            status = status)
+
+    val expectedMap =
+        mapOf(
+            "notificationUid" to notificationUid,
+            "senderUid" to senderUid,
+            "receiverUid" to receiverUid,
+            "travelUid" to travelUid,
+            "content" to content,
+            "notificationType" to notificationType,
+            "timestamp" to timestamp,
+            "status" to status)
+
+    assertEquals(expectedMap, notification.toMap())
   }
 }

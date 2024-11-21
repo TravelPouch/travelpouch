@@ -66,7 +66,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier =
             Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .padding(pd)
                 .testTag("ProfileColumn")) {
           OutlinedTextField(
@@ -74,14 +74,14 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
               onValueChange = {},
               enabled = false,
               label = { Text("Email") },
-              modifier = Modifier.testTag("emailField"))
+              modifier = Modifier.fillMaxWidth().testTag("emailField"))
 
           OutlinedTextField(
               value = profile.value.username,
               onValueChange = {},
               enabled = false,
               label = { Text("Username") },
-              modifier = Modifier.testTag("usernameField"))
+              modifier = Modifier.fillMaxWidth().testTag("usernameField"))
 
           OutlinedTextField(
               value = profile.value.name,
@@ -95,7 +95,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
               onValueChange = {},
               enabled = false,
               label = { Text("Friends") },
-              modifier = Modifier.testTag("friendsField"))
+              modifier = Modifier.fillMaxWidth().testTag("friendsField"))
         }
   }
 }

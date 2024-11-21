@@ -5,34 +5,38 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,7 +44,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -48,8 +51,14 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.se.travelpouch.model.notifications.Notification
+import com.github.se.travelpouch.model.notifications.NotificationContent
+import com.github.se.travelpouch.model.notifications.NotificationType
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
+import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
@@ -75,26 +84,23 @@ import java.util.Locale
 fun EditTravelSettingsScreen(
     listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
+    notificationViewModel: NotificationViewModel,
+    profileViewModel: ProfileModelView
 ) {
   val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
   val context = LocalContext.current
   val clipboardManager = LocalClipboardManager.current
   val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
-
+  val darkTheme = isSystemInDarkTheme()
   val dateTimeUtils = DateTimeUtils("dd/MM/yyyy")
 
   Scaffold(
       modifier = Modifier.testTag("editScreen"),
       topBar = {
-        MediumTopAppBar(
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
+        TopAppBar(
             title = { Text("Edit Travel", modifier = Modifier.testTag("editTravelText")) },
             navigationIcon = {
-              Button(
+              IconButton(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
@@ -105,15 +111,37 @@ fun EditTravelSettingsScreen(
       },
       floatingActionButton = {
         Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(150.dp)) {
+            modifier = Modifier.padding(start = 16.dp, end = 0.dp),
+            horizontalArrangement = Arrangement.spacedBy(95.dp)) {
               FloatingActionButton(
                   onClick = {
                     setExpandedAddUserDialog(true)
                     Log.d("EditTravelSettingsScreen", "Add User clicked")
                   },
-                  modifier = Modifier.testTag("addUserFab").padding(end = 16.dp)) {
-                    Text("Add User")
+                  containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                  modifier = Modifier.testTag("addUserFab").padding(start = 16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 10.dp) // Adjust padding for better alignment
+                        ) {
+                          Icon(
+                              imageVector =
+                                  Icons.Default
+                                      .PersonAddAlt1, // Replace with your mail icon resource
+                              contentDescription = "Mail Icon",
+                              modifier = Modifier.size(24.dp) // Adjust size as needed
+                              )
+                          Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                          Text(
+                              text = "Add User",
+                              style = MaterialTheme.typography.bodyLarge // Or customize further
+                              )
+                        }
+
+                    // Text("Add User")
                   }
               FloatingActionButton(
                   onClick = {
@@ -121,8 +149,27 @@ fun EditTravelSettingsScreen(
                         AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com"))
                     Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
                   },
+                  containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                   modifier = Modifier.testTag("importEmailFab")) {
-                    Text("Import Email to Clipboard")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 12.dp) // Adjust padding for better alignment
+                        ) {
+                          Icon(
+                              imageVector =
+                                  Icons.Default.MailOutline, // Replace with your mail icon resource
+                              contentDescription = "Mail Icon",
+                              modifier = Modifier.size(24.dp) // Adjust size as needed
+                              )
+                          Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                          Text(
+                              text = "Import Email",
+                              style = MaterialTheme.typography.bodyLarge // Or customize further
+                              )
+                        }
                   }
             }
       },
@@ -147,12 +194,14 @@ fun EditTravelSettingsScreen(
               Modifier.padding(padding)
                   .testTag("editTravelColumn")
                   .verticalScroll(rememberScrollState()),
-          Arrangement.Top,
+          Arrangement.spacedBy(8.dp),
           Alignment.CenterHorizontally) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(8.dp).testTag("editTravelRow")) {
+                modifier =
+                    Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
+                        .testTag("editTravelRow")) {
                   Icon(
                       imageVector = Icons.Default.Person,
                       contentDescription = "Participants",
@@ -175,7 +224,9 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelTitle").fillMaxWidth().padding(horizontal = 10.dp),
                 label = { Text("Title") },
-                placeholder = { Text("Name the Travel") })
+                placeholder = { Text("Name the Travel") },
+                shape = RoundedCornerShape(6.dp),
+            )
             OutlinedTextField(
                 value = descriptionText.value,
                 onValueChange = { keystroke -> descriptionText.value = keystroke },
@@ -184,7 +235,8 @@ fun EditTravelSettingsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
                 label = { Text("Description") },
-                placeholder = { Text("Describe the Travel") })
+                placeholder = { Text("Describe the Travel") },
+                shape = RoundedCornerShape(6.dp))
 
             OutlinedTextField(
                 value = locationName.value,
@@ -194,7 +246,8 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelLocationName")
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp))
+                        .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp))
 
             // Latitude Input
             OutlinedTextField(
@@ -205,7 +258,8 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelLatitude")
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp))
+                        .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp))
 
             // Longitude Input
             OutlinedTextField(
@@ -216,7 +270,8 @@ fun EditTravelSettingsScreen(
                 modifier =
                     Modifier.testTag("inputTravelLongitude")
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp))
+                        .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp))
             OutlinedTextField(
                 value = startTime.value,
                 onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
@@ -226,6 +281,7 @@ fun EditTravelSettingsScreen(
                     Modifier.testTag("inputTravelStartTime")
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
                       onClick = {
@@ -250,6 +306,7 @@ fun EditTravelSettingsScreen(
                     Modifier.testTag("inputTravelEndTime")
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
                       onClick = {
@@ -322,18 +379,10 @@ fun EditTravelSettingsScreen(
                   listTravelViewModel.deleteTravelById(selectedTravel!!.fsUid)
                   Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
                 },
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent, contentColor = Color.Red),
-                shape = RoundedCornerShape(8.dp),
-                modifier =
-                    Modifier.testTag("travelDeleteButton")
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)) {
+                modifier = Modifier.testTag("travelDeleteButton").padding(vertical = 8.dp)) {
                   Text(
-                      // text = "🗑  Delete",
                       text = "Delete",
-                      fontWeight = FontWeight.Bold)
+                  )
                 }
           }
     } else {
@@ -342,47 +391,87 @@ fun EditTravelSettingsScreen(
           modifier = Modifier.padding(padding).testTag("noTravelSelectedText"))
     }
     if (expandedAddUserDialog) {
-      val addUserEmail = remember { mutableStateOf("newuser.email@example.org") }
+      val addUserEmail = remember { mutableStateOf("") }
       Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
-        Box(Modifier.size(800.dp, 250.dp).background(Color.White).testTag("addUserDialogBox")) {
-          Column(
-              modifier =
-                  Modifier.fillMaxSize()
-                      .padding(16.dp)
-                      .verticalScroll(rememberScrollState())
-                      .testTag("roleDialogColumn"),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center) {
-                Text(
-                    "Add User by Email",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle"))
-                OutlinedTextField(
-                    value = addUserEmail.value,
-                    onValueChange = { addUserEmail.value = it },
-                    label = { Text("Enter User's Email") },
-                    placeholder = { Text("Enter User's Email") },
-                    modifier = Modifier.testTag("addUserEmailField"))
-                Button(
-                    onClick = {
-                      listTravelViewModel.addUserToTravel(
-                          addUserEmail.value,
-                          selectedTravel!!,
-                          { updatedContainer ->
-                            listTravelViewModel.selectTravel(updatedContainer)
-                            Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT)
-                                .show()
-                            setExpandedAddUserDialog(false)
-                          },
-                          {
-                            Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
-                          })
-                    },
-                    modifier = Modifier.testTag("addUserButton")) {
-                      Text("Add User")
-                    }
-              }
-        }
+        Box(
+            Modifier.fillMaxWidth(1f)
+                .height(250.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .testTag("addUserDialogBox")) {
+              Column(
+                  modifier =
+                      Modifier.fillMaxSize()
+                          .padding(16.dp)
+                          .verticalScroll(rememberScrollState())
+                          .testTag("roleDialogColumn"),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.Center) {
+                    Text(
+                        "Add User by Email",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle"))
+                    OutlinedTextField(
+                        value = addUserEmail.value,
+                        onValueChange = { addUserEmail.value = it },
+                        label = { Text("Enter User's Email") },
+                        placeholder = { Text("Enter User's Email") },
+                        modifier = Modifier.testTag("addUserEmailField"))
+                    Button(
+                        onClick = {
+                          profileViewModel.getFsUidByEmail(
+                              addUserEmail.value,
+                              onSuccess = { fsUid ->
+                                val isUserAlreadyAdded =
+                                    selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
+                                if (fsUid == profileViewModel.profile.value.fsUid) {
+                                  Toast.makeText(
+                                          context,
+                                          "Error: You can't invite yourself",
+                                          Toast.LENGTH_SHORT)
+                                      .show()
+                                } else if (isUserAlreadyAdded) {
+                                  Toast.makeText(
+                                          context, "Error: User already added", Toast.LENGTH_SHORT)
+                                      .show()
+                                } else if (fsUid != null) {
+                                  try {
+                                    notificationViewModel.sendNotification(
+                                        Notification(
+                                            notificationViewModel.getNewUid(),
+                                            profileViewModel.profile.value.fsUid,
+                                            fsUid,
+                                            selectedTravel!!.fsUid,
+                                            NotificationContent.InvitationNotification(
+                                                profileViewModel.profile.value.name,
+                                                selectedTravel!!.title,
+                                                Role.PARTICIPANT),
+                                            NotificationType.INVITATION))
+                                  } catch (e: Exception) {
+                                    Log.e(
+                                        "NotificationError",
+                                        "Failed to send notification: ${e.message}")
+                                  }
+                                  // Go back
+                                  setExpandedAddUserDialog(false)
+                                } else {
+                                  Toast.makeText(
+                                          context,
+                                          "Error: User with email not found",
+                                          Toast.LENGTH_SHORT)
+                                      .show()
+                                }
+                              },
+                              onFailure = { e ->
+                                Log.e("EditTravelSettingsScreen", "Error getting fsUid by email", e)
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                                    .show()
+                              })
+                        },
+                        modifier = Modifier.testTag("addUserButton")) {
+                          Text("Add User")
+                        }
+                  }
+            }
       }
     }
   }

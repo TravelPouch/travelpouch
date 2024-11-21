@@ -10,13 +10,18 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import com.github.se.travelpouch.model.notifications.NotificationRepository
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
+import com.github.se.travelpouch.model.profile.ProfileModelView
+import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelRepository
+import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -25,9 +30,12 @@ import org.junit.Test
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.never
 
 class EditTravelSettingsScreenTest {
   // Helper function to input text into a text field
@@ -46,7 +54,7 @@ class EditTravelSettingsScreenTest {
     val user1ID = "rythwEmprFhOOgsANXnv12345678"
     val user2ID = "sigmasigmasigmasigma12345678"
     val participants: MutableMap<Participant, Role> = HashMap()
-    val listParticipant = emptyList<String>()
+    val listParticipant = listOf(user1ID, user2ID)
     participants[Participant(user1ID)] = Role.OWNER
     participants[Participant(user2ID)] = Role.PARTICIPANT
     val travelContainer =
@@ -66,6 +74,10 @@ class EditTravelSettingsScreenTest {
   private lateinit var travelRepository: TravelRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listTravelViewModel: ListTravelViewModel
+  private lateinit var notificationViewModel: NotificationViewModel
+  private lateinit var notificationRepository: NotificationRepository
+  private lateinit var profileModelView: ProfileModelView
+  private lateinit var profileRepository: ProfileRepository
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -74,11 +86,18 @@ class EditTravelSettingsScreenTest {
     travelRepository = mock(TravelRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listTravelViewModel = ListTravelViewModel(travelRepository)
+    notificationRepository = mock(NotificationRepository::class.java)
+    notificationViewModel = NotificationViewModel(notificationRepository)
+    profileRepository = mock(ProfileRepository::class.java)
+    profileModelView = ProfileModelView(profileRepository)
   }
 
   @Test
   fun checkNoSelectedTravel() {
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editTravelText").assertIsDisplayed()
@@ -98,7 +117,10 @@ class EditTravelSettingsScreenTest {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(
         travelContainer) // this causes strange overwrite, shouldn't happen IRL
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editTravelText").assertIsDisplayed()
@@ -125,7 +147,10 @@ class EditTravelSettingsScreenTest {
   fun testChangeInput() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     inputText("inputTravelTitle", travelContainer.title, "Test Title")
     inputText("inputTravelDescription", travelContainer.description, "Test Description")
@@ -143,10 +168,13 @@ class EditTravelSettingsScreenTest {
   }
 
   @Test
-  fun pressALotOfButtons() {
+  fun addUserButtonFails() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
 
@@ -158,11 +186,255 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
     // Check that the OutlinedTextField is displayed and has the correct default value
     composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("addUserEmailField")
-        .assertTextContains("newuser.email@example.org")
+    composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("")
+
     val randomEmail = "random.email@example.org"
-    inputText("addUserEmailField", "newuser.email@example.org", randomEmail)
+    inputText("addUserEmailField", "", randomEmail)
+    // Now this is an invalid user that doesn't exist
+    doAnswer { invocation ->
+          val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
+          onFailure(Exception("Unknown API Error"))
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+    verify(notificationRepository, never()).addNotification(anyOrNull())
+  }
+
+  @Test
+  fun addUserButtonWithUserUid() {
+    val travelContainer = createContainer()
+
+    val profile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "username",
+            "email@gmail.com",
+            null,
+            "name",
+            emptyList())
+
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(profile)
+    }
+    profileModelView.getProfile()
+
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
+    composeTestRule.onNodeWithTag("importEmailFab").performClick()
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+    // perform add user
+    // Check that the dialog is displayed
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    // Check that the title text is displayed and correct
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+    // Check that the OutlinedTextField is displayed and has the correct default value
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("")
+
+    val randomEmail = "random.email@example.org"
+    inputText("addUserEmailField", "", randomEmail)
+
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = profileModelView.profile.value.fsUid,
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = null)
+          // Call the onSuccess callback with the custom UserInfo
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
+    // Mock the repository.updateTravel method to do nothing
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doAnswer { "sigmasigmasigmasigm2" }.`when`(travelRepository).getNewUid()
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+    verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+    verify(notificationRepository, never()).addNotification(anyOrNull())
+  }
+
+  @Test
+  fun addUserButtonWithNullUid() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
+    composeTestRule.onNodeWithTag("importEmailFab").performClick()
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+    // perform add user
+    // Check that the dialog is displayed
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    // Check that the title text is displayed and correct
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+    // Check that the OutlinedTextField is displayed and has the correct default value
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("")
+
+    val randomEmail = "random.email@example.org"
+    inputText("addUserEmailField", "", randomEmail)
+
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
+          // Call the onSuccess callback with null
+          onSuccess(null)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
+    // Mock the repository.updateTravel method to do nothing
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+    verify(notificationRepository, never()).addNotification(anyOrNull())
+  }
+
+  @Test
+  fun addUserButtonFailsIfUserAlreadyInTravel() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
+    composeTestRule.onNodeWithTag("importEmailFab").performClick()
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+    // perform add user
+    // Check that the dialog is displayed
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    // Check that the title text is displayed and correct
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+    // Check that the OutlinedTextField is displayed and has the correct default value
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("")
+
+    val randomEmail = "random.email@example.org"
+    inputText("addUserEmailField", "", randomEmail)
+
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = travelContainer.listParticipant[1],
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = null)
+          // Call the onSuccess callback with the custom UserInfo
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
+    // Mock the repository.updateTravel method to do nothing
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+    verify(notificationRepository, never()).addNotification(anyOrNull())
+  }
+
+  @Test
+  fun addUserButtonWorksIfValidUidAndUserNotInTravel() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
+    composeTestRule.onNodeWithTag("importEmailFab").performClick()
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+    // perform add user
+    // Check that the dialog is displayed
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    // Check that the title text is displayed and correct
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+    // Check that the OutlinedTextField is displayed and has the correct default value
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("")
+
+    val randomEmail = "random.email@example.org"
+    inputText("addUserEmailField", "", randomEmail)
+
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = "qwertzuiopasdfghjklyxcvbnm12",
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = null)
+          // Call the onSuccess callback with the custom UserInfo
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+    // Mock the repository.updateTravel method to do nothing
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+
+    verify(notificationRepository).addNotification(anyOrNull())
+  }
+
+  @Test
+  fun pressALotOfButtons() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
+    composeTestRule.onNodeWithTag("importEmailFab").performClick()
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+    // perform add user
+    // Check that the dialog is displayed
+    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+    // Check that the title text is displayed and correct
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+    // Check that the OutlinedTextField is displayed and has the correct default value
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+
+    val randomEmail = "random.email@example.org"
+    inputText("addUserEmailField", "", randomEmail)
     // Now this is an invalid user that doesn't exist
     doAnswer { invocation ->
           val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
@@ -219,7 +491,10 @@ class EditTravelSettingsScreenTest {
   fun testInput() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
     inputText("inputTravelEndTime", "16/02/2009", "15/02/2009")
@@ -235,7 +510,10 @@ class EditTravelSettingsScreenTest {
   fun testbadInputs() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
     // check bad dates
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
     inputText("inputTravelEndTime", "16/02/2009", "gyat")
@@ -254,7 +532,10 @@ class EditTravelSettingsScreenTest {
 
   @Test
   fun backButtonNavigatesCorrectly() {
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     composeTestRule.onNodeWithTag("goBackButton").performClick()
 
@@ -263,7 +544,10 @@ class EditTravelSettingsScreenTest {
 
   @Test
   fun saveButtonPressed() {
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     composeTestRule.onNodeWithTag("travelSaveButton").isDisplayed()
   }
@@ -274,7 +558,10 @@ class EditTravelSettingsScreenTest {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
 
-    composeTestRule.setContent { EditTravelSettingsScreen(listTravelViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+    }
 
     // The startDate picker button should be displayed
     composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()

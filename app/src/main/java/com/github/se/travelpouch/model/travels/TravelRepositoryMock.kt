@@ -41,6 +41,14 @@ class TravelRepositoryMock : TravelRepository {
     onSuccess(travelsOfUsers)
   }
 
+  override fun getTravelById(
+      id: String,
+      onSuccess: (TravelContainer?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    TODO("Not yet implemented")
+  }
+
   override fun addTravel(
       travel: TravelContainer,
       onSuccess: () -> Unit,

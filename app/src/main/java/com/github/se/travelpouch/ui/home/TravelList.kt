@@ -3,9 +3,9 @@ package com.github.se.travelpouch.ui.home
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,12 +14,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +53,7 @@ import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
@@ -108,17 +111,32 @@ fun TravelListScreen(
           }
         }
       },
-      drawerState = drawerState) {
-        Scaffold(
-            modifier = Modifier.testTag("TravelListScreen"),
-            topBar = {
-              TopAppBar(
-                  title = { Text("Dashboard") },
-                  navigationIcon = {
-                    IconButton(
-                        onClick = { scope.launch { drawerState.open() } },
-                    ) {
-                      Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+
+      bottomBar = {
+        BottomNavigationMenu(
+            tabList = listOf(TopLevelDestinations.NOTIFICATION, TopLevelDestinations.TRAVELS),
+            navigationActions = navigationActions)
+      },
+      content = { pd ->
+        Column(modifier = Modifier.fillMaxSize().padding(pd)) {
+          // Map placed outside the LazyColumn to prevent it from being part of the scrollable
+          // content
+          MapContent(
+              modifier = Modifier.fillMaxWidth().height(mapHeight),
+              travelContainers = travelList.value)
+
+          LazyColumn(
+              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).padding(pd),
+              contentPadding = PaddingValues(bottom = 80.dp)) {
+                if (travelList.value.isNotEmpty()) {
+                  items(travelList.value.size) { index ->
+                    TravelItem(travelContainer = travelList.value[index]) {
+                      val travelId = travelList.value[index].fsUid
+                      listTravelViewModel.selectTravel(travelList.value[index])
+                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      eventViewModel.setIdTravel(travelId)
+                      activityViewModel.setIdTravel(travelId)
+                      documentViewModel.setIdTravel(travelId)
                     }
                   })
             },
@@ -128,28 +146,33 @@ fun TravelListScreen(
                   modifier = Modifier.testTag("createTravelFab")) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                   }
-            },
-            content = { pd ->
-              Column(modifier = Modifier.fillMaxSize().padding(pd)) {
-                // Map placed outside the LazyColumn to prevent it from being part of the scrollable
-                // content
-                MapContent(
-                    modifier = Modifier.fillMaxWidth().height(mapHeight),
-                    travelContainers = travelList.value)
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).padding(pd),
-                    contentPadding = PaddingValues(bottom = 80.dp)) {
-                      if (travelList.value.isNotEmpty()) {
-                        items(travelList.value.size) { index ->
-                          TravelItem(travelContainer = travelList.value[index]) {
-                            val travelId = travelList.value[index].fsUid
-                            listTravelViewModel.selectTravel(travelList.value[index])
-                            navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
-                            eventViewModel.setIdTravel(travelId)
-                            activityViewModel.setIdTravel(travelId)
-                            documentViewModel.setIdTravel(travelId)
+                } else {
+                  item {
+                    Row(
+                        modifier =
+                            Modifier.fillParentMaxSize()
+                                .padding(top = 32.dp, start = 16.dp, end = 0.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.Top) {
+                          AnimatedVisibility(visible = isLoading.value) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.testTag("loadingSpinner").size(100.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 5.dp,
+                                strokeCap = StrokeCap.Round,
+                            )
                           }
+
+                          Spacer(modifier = Modifier.fillMaxWidth(0.1f))
+
+                          Text(
+                              modifier = Modifier.testTag("emptyTravelPrompt"),
+                              text = "You have no travels yet.",
+                              style =
+                                  MaterialTheme.typography.bodyLarge.copy(
+                                      fontWeight = FontWeight.Bold),
+                              color = MaterialTheme.colorScheme.onBackground)
                         }
                       } else {
                         item {
@@ -190,36 +213,45 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
               .fillMaxWidth()
               .padding(vertical = 6.dp)
               .clickable(onClick = onClick),
-  ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-      // Date and Title Row
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(
-            text =
-                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    .format(travelContainer.startTime.toDate()),
-            style = MaterialTheme.typography.bodySmall)
+      colors =
+          CardColors(
+              containerColor = MaterialTheme.colorScheme.surface,
+              disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+              contentColor = MaterialTheme.colorScheme.onSurface,
+              disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+          )) {
+        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+          // Date and Title Row
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text =
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            .format(travelContainer.startTime.toDate()),
+                    style = MaterialTheme.typography.bodySmall)
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Text(
+                      text = travelContainer.title,
+                      style = MaterialTheme.typography.bodySmall,
+                      fontWeight = FontWeight.Bold)
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                      contentDescription = null)
+                }
+              }
+
+          Spacer(modifier = Modifier.height(4.dp))
+
+          // Description
+          Text(text = travelContainer.description, style = MaterialTheme.typography.bodyMedium)
+
+          // Location Name
           Text(
-              text = travelContainer.title,
+              text = travelContainer.location.name,
               style = MaterialTheme.typography.bodySmall,
-              fontWeight = FontWeight.Bold)
-          Icon(
-              imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+              fontWeight = FontWeight.Light)
         }
       }
-
-      Spacer(modifier = Modifier.height(4.dp))
-
-      // Description
-      Text(text = travelContainer.description, style = MaterialTheme.typography.bodyMedium)
-
-      // Location Name
-      Text(
-          text = travelContainer.location.name,
-          style = MaterialTheme.typography.bodySmall,
-          color = Color.Gray)
-    }
-  }
 }
