@@ -57,6 +57,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
   fun getNewUid(): String {
     return repository.getNewUid()
   }
+
   /**
    * Fetches participant information from the repository using their unique ID.
    *
@@ -78,6 +79,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
         },
         onFailure = { Log.e("ListTravelViewModel", "Failed to get participant", it) })
   }
+
   /**
    * Checks if a participant with the given email exists.
    *
@@ -176,6 +178,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
   fun selectTravel(travel: TravelContainer) {
     selectedTravel_.value = travel
   }
+
   /**
    * Fetches information for all participants of the selected travel.
    *
@@ -209,6 +212,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
           "lastFetchedParticipants: $lastFetchedParticipants and currentParticipants: $currentParticipants")
     }
   }
+
   /**
    * Adds a user to the selected travel by their email.
    *
@@ -248,5 +252,13 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
           onSuccess(newTravel)
         },
         onFailure = { onFailure() })
+  }
+
+  fun getTravelById(
+      id: String,
+      onSuccess: (TravelContainer?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    repository.getTravelById(id, onSuccess, onFailure)
   }
 }

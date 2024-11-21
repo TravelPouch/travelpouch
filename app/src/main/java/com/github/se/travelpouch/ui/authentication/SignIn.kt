@@ -28,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -155,6 +156,7 @@ fun SignInScreen(
                                     .testTag(
                                         "loadingSpinner"), // Same height as Google Sign-In button
                             color = MaterialTheme.colorScheme.primary,
+                            strokeCap = StrokeCap.Round,
                             strokeWidth = 5.dp)
                       }
                 }
