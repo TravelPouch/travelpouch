@@ -36,7 +36,16 @@ data class Leg(
     val startLocation: LatLng, // LatLng representing the start point of the leg
     val endLocation: LatLng, // LatLng representing the end point of the leg
     val overviewPolyline: OverviewPolyline // Encoded polyline representing the path for this leg
-)
+) {
+  init {
+    require(distanceValue >= 0) { "distanceValue must be non-negative" }
+    require(durationValue >= 0) { "durationValue must be non-negative" }
+    require(startLocation.latitude in -90.0..90.0) { "Invalid latitude for startLocation" }
+    require(startLocation.longitude in -180.0..180.0) { "Invalid longitude for startLocation" }
+    require(endLocation.latitude in -90.0..90.0) { "Invalid latitude for endLocation" }
+    require(endLocation.longitude in -180.0..180.0) { "Invalid longitude for endLocation" }
+  }
+}
 
 /**
  * Data model for the polyline object within a route. The polyline is encoded as a string and needs
