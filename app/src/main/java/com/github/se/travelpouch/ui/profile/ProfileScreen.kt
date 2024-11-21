@@ -46,7 +46,8 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
             title = { Text("Profile", Modifier.testTag("ProfileBar")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
+
+                  onClick = { navigationActions.navigateTo(Screen.SWIPER) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,

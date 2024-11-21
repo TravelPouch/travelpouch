@@ -162,8 +162,12 @@ fun ParticipantListScreen(
                         }
                         val participantMap = selectedTravel!!.allParticipants.toMutableMap()
                         participantMap.remove(Participant(participant.key))
+                        val participantList = selectedTravel!!.listParticipant.toMutableList()
+                        participantList.remove(participant.key)
                         val updatedContainer =
-                            selectedTravel!!.copy(allParticipants = participantMap.toMap())
+                            selectedTravel!!.copy(
+                                allParticipants = participantMap.toMap(),
+                                listParticipant = participantList)
                         listTravelViewModel.updateTravel(updatedContainer)
                         listTravelViewModel.selectTravel(updatedContainer)
                         listTravelViewModel.fetchAllParticipantsInfo()

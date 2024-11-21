@@ -17,8 +17,8 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Folder
+
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -30,7 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -48,10 +47,8 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
-import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -82,47 +79,7 @@ fun TravelActivitiesScreen(
           "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
   Scaffold(
       modifier = Modifier.testTag("travelActivitiesScreen"),
-      topBar = {
-        TopAppBar(
-            title = { Text("Travel", Modifier.testTag("travelTitle")) },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back")
-                  }
-            },
-            actions = {
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
-                  modifier = Modifier.testTag("settingsButton")) {
-                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-                  }
 
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TIMELINE) },
-                  modifier = Modifier.testTag("eventTimelineButton")) {
-                    Icon(imageVector = Icons.Default.AccountBalance, contentDescription = null)
-                  }
-
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.DOCUMENT_LIST) },
-                  modifier = Modifier.testTag("documentListButton")) {
-                    Icon(imageVector = Icons.Default.Folder, contentDescription = null)
-                  }
-            })
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            tabList =
-                listOf(
-                    TopLevelDestinations.ACTIVITIES,
-                    TopLevelDestinations.CALENDAR,
-                    TopLevelDestinations.MAP),
-            navigationActions = navigationActions)
-      },
       floatingActionButton = {
         FloatingActionButton(
             onClick = { navigationActions.navigateTo(Screen.ADD_ACTIVITY) },
@@ -167,6 +124,7 @@ fun TravelActivitiesScreen(
 
               if (showBanner.value) {
                 NextActivitiesBanner(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     activities = listOfActivities.value,
                     onDismiss = { showBanner.value = false },
                     localConfig = LocalConfiguration.current)

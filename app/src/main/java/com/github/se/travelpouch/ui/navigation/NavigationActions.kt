@@ -31,6 +31,8 @@ object Screen {
   const val CALENDAR = "Calendar Screen"
   const val NOTIFICATION = "Notification Screen"
   const val SIGN_IN_PASSWORD = "Sign in with password Screen"
+
+  const val SWIPER = "Swiper"
 }
 
 data class TopLevelDestination(val screen: String, val icon: ImageVector, val textId: String)
