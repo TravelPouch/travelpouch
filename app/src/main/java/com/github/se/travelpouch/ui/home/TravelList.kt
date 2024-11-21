@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +56,7 @@ import java.util.Locale
  * @param navigationActions Actions for navigation.
  * @param listTravelViewModel List of travels as a viewmodel, to display.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun TravelListScreen(
@@ -103,14 +105,14 @@ fun TravelListScreen(
               travelContainers = travelList.value)
 
           LazyColumn(
-              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).padding(pd),
+              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
               contentPadding = PaddingValues(bottom = 80.dp)) {
                 if (travelList.value.isNotEmpty()) {
                   items(travelList.value.size) { index ->
                     TravelItem(travelContainer = travelList.value[index]) {
                       val travelId = travelList.value[index].fsUid
                       listTravelViewModel.selectTravel(travelList.value[index])
-                      navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                      navigationActions.navigateTo(Screen.SWIPER)
                       eventViewModel.setIdTravel(travelId)
                       activityViewModel.setIdTravel(travelId)
                       documentViewModel.setIdTravel(travelId)
@@ -121,7 +123,8 @@ fun TravelListScreen(
                     Row(
                         modifier =
                             Modifier.fillParentMaxSize()
-                                .padding(top = 32.dp, start = 16.dp, end = 0.dp),
+                                .padding(top = 32.dp, start = 16.dp, end = 0.dp)
+                                .padding(pd),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.Top) {
                           AnimatedVisibility(visible = isLoading.value) {
