@@ -9,9 +9,16 @@
     "singleProjectMode": true,
     "auth": {
       "port": 9099
+    },
+    "firestore": {
+      "port": 8080
     }
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   }
 }
