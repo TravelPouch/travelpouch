@@ -7,13 +7,21 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.activity.map.DirectionsRepositoryInterface
+import com.github.se.travelpouch.model.activity.map.DirectionsResponse
+import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
+import com.github.se.travelpouch.model.activity.map.Leg
+import com.github.se.travelpouch.model.activity.map.OverviewPolyline
+import com.github.se.travelpouch.model.activity.map.Route
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -28,6 +36,8 @@ class ActivitiesMapScreenTest {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityModelView: ActivityViewModel
   private lateinit var mockNavigationActions: NavigationActions
+  private lateinit var mockkDirectionsViewModel: DirectionsViewModel
+  private lateinit var mockkDirectionsRepository: DirectionsRepositoryInterface
 
   val listOfActivities =
       listOf(
@@ -46,6 +56,22 @@ class ActivitiesMapScreenTest {
               date = Timestamp(Timestamp.now().seconds + 3600, Timestamp.now().nanoseconds),
               documentsNeeded = null))
 
+  val mockLeg =
+      Leg(
+          distanceText = "3.4 km",
+          distanceValue = 3400,
+          durationText = "15 mins",
+          durationValue = 900,
+          startAddress = "Start Address",
+          endAddress = "End Address",
+          startLocation = LatLng(37.7749, -122.4194),
+          endLocation = LatLng(34.0522, -118.2437),
+          overviewPolyline = OverviewPolyline("u{~vFvyys@fC_y@"))
+
+  val mockResponse =
+      DirectionsResponse(
+          routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"), legs = listOf(mockLeg))))
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -53,6 +79,23 @@ class ActivitiesMapScreenTest {
     mockNavigationActions = mock(NavigationActions::class.java)
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
     mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
+
+    mockkDirectionsRepository = mock(DirectionsRepositoryInterface::class.java)
+    mockkDirectionsViewModel = DirectionsViewModel(mockkDirectionsRepository)
+
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument(4) as (DirectionsResponse) -> Unit
+          onSuccess(mockResponse)
+          null
+        }
+        .whenever(mockkDirectionsRepository)
+        .getDirections(
+            origin = anyString(),
+            destination = anyString(),
+            mode = anyString(),
+            waypoints = anyOrNull(),
+            onSuccess = any(),
+            onFailure = any())
   }
 
   @Test
@@ -68,7 +111,9 @@ class ActivitiesMapScreenTest {
 
     mockActivityModelView.getAllActivities()
 
-    composeTestRule.setContent { ActivitiesMapScreen(mockActivityModelView, mockNavigationActions) }
+    composeTestRule.setContent {
+      ActivitiesMapScreen(mockActivityModelView, mockNavigationActions, mockkDirectionsViewModel)
+    }
 
     composeTestRule.onNodeWithTag("Map").assertExists()
   }
@@ -79,26 +124,26 @@ class ActivitiesMapScreenTest {
     `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf())
     }
-    composeTestRule.setContent { ActivitiesMapScreen(mockActivityModelView, mockNavigationActions) }
+    composeTestRule.setContent {
+      ActivitiesMapScreen(mockActivityModelView, mockNavigationActions, mockkDirectionsViewModel)
+    }
 
     composeTestRule.onNodeWithTag("Map").assertExists()
   }
 
   @Test
   fun testGoBackButton() {
-    // Configurer le contenu de la règle Compose
     composeTestRule.setContent {
       ActivitiesMapScreen(
-          activityViewModel = mockActivityModelView, navigationActions = mockNavigationActions)
+          activityViewModel = mockActivityModelView,
+          navigationActions = mockNavigationActions,
+          directionsViewModel = mockkDirectionsViewModel)
     }
 
-    // Attendre que l'interface utilisateur soit prête
     composeTestRule.waitForIdle()
 
-    // Simuler le clic sur le bouton "Go Back"
     composeTestRule.onNodeWithTag("GoBackButton").performClick()
 
-    // Vérifier que la méthode goBack() a été appelée
     verify(mockNavigationActions).goBack()
   }
 }
