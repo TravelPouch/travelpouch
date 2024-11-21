@@ -63,7 +63,7 @@ class DirectionsViewModelTest {
             routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"), legs = listOf(mockLeg))))
 
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(5) as (DirectionsResponse) -> Unit
+          val onSuccess = invocation.getArgument(4) as (DirectionsResponse) -> Unit
           onSuccess(mockResponse)
           null
         }
@@ -72,13 +72,12 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
             waypoints = anyOrNull(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
 
     // Advance the dispatcher to execute pending coroutines
     testDispatcher.scheduler.advanceUntilIdle()
@@ -96,7 +95,7 @@ class DirectionsViewModelTest {
     val exception = Exception("Network error")
 
     doAnswer { invocation ->
-          val onFailure = invocation.getArgument<(Exception) -> Unit>(5)
+          val onFailure = invocation.getArgument<(Exception) -> Unit>(4)
           onFailure(exception)
           null
         }
@@ -105,13 +104,12 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
             waypoints = anyString(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert
@@ -139,7 +137,7 @@ class DirectionsViewModelTest {
         DirectionsResponse(
             routes = listOf(Route(OverviewPolyline("INVALID_POLYLINE"), legs = listOf(mockLeg))))
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(4)
+          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(3)
           onSuccess(mockResponse)
           null
         }
@@ -148,13 +146,12 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
             waypoints = anyString(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
 
     // Advance the dispatcher to execute pending coroutines
     testDispatcher.scheduler.advanceUntilIdle()
@@ -188,7 +185,7 @@ class DirectionsViewModelTest {
             routes =
                 listOf(Route(OverviewPolyline("INVALID_POLYLINE"), legs = listOf(malformedLeg))))
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(4)
+          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(3)
           onSuccess(mockResponse)
           null
         }
@@ -197,13 +194,12 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
             waypoints = anyString(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
 
     // Advance the dispatcher to execute pending coroutines
     testDispatcher.scheduler.advanceUntilIdle()
@@ -253,7 +249,7 @@ class DirectionsViewModelTest {
             routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"), legs = listOf(mockLeg))))
 
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(5) as (DirectionsResponse) -> Unit
+          val onSuccess = invocation.getArgument(4) as (DirectionsResponse) -> Unit
           onSuccess(mockResponse)
           null
         }
@@ -262,13 +258,12 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
             waypoints = anyOrNull(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirectionsForActivities(listOf(activity, activity2), "driving", "mockApiKey")
+    viewModel.fetchDirectionsForActivities(listOf(activity, activity2), "driving")
 
     // Advance the dispatcher to execute pending coroutines
     testDispatcher.scheduler.advanceUntilIdle()
