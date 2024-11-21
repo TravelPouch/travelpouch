@@ -61,15 +61,26 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
       return
     }
 
-    // Extract the origin from the first activity and the destination from the last activity
-    val origin = LatLng(activities.first().location.latitude, activities.first().location.longitude)
-    val destination =
-        LatLng(activities.last().location.latitude, activities.last().location.longitude)
+    // Extract the origin from the first activity
+    val firstLocation = activities.firstOrNull()?.location
+    if (firstLocation == null) {
+      Log.e("DirectionsViewModel", "First activity has no location")
+      return
+    }
+    val origin = LatLng(firstLocation.latitude, firstLocation.longitude)
 
-    // Extract the waypoints from the activities in between
+    // Extract the destination from the last activity
+    val lastLocation = activities.lastOrNull()?.location
+    if (lastLocation == null) {
+      Log.e("DirectionsViewModel", "Last activity has no location")
+      return
+    }
+    val destination = LatLng(lastLocation.latitude, lastLocation.longitude)
+
+    // Extract the waypoints, skipping activities with null location
     val waypoints =
-        activities.subList(1, activities.size - 1).map {
-          LatLng(it.location.latitude, it.location.longitude)
+        activities.subList(1, activities.size - 1).mapNotNull {
+          it.location?.let { loc -> LatLng(loc.latitude, loc.longitude) }
         }
 
     // Fetch directions using the extracted origin, destination, and waypoints
