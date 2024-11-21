@@ -2,6 +2,7 @@ package com.github.se.travelpouch.model.events
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewbinding.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +55,10 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return EventViewModel(EventRepositoryFirebase(Firebase.firestore)) as T
+            val firestore = Firebase.firestore
+            if (BuildConfig.DEBUG)
+              firestore.useEmulator("10.0.2.2", 8080)
+            return EventViewModel(EventRepositoryFirebase(firestore)) as T
           }
         }
   }

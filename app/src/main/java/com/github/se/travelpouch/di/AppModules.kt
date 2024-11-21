@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.di
 
+import androidx.viewbinding.BuildConfig
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.authentication.FirebaseAuthenticationService
 import com.github.se.travelpouch.model.profile.ProfileRepository
@@ -23,13 +24,19 @@ object AppModule {
   @Provides
   @Singleton
   fun provideFirebaseAuth(): AuthenticationService {
-    return FirebaseAuthenticationService(Firebase.auth)
+    val auth = Firebase.auth
+    if (BuildConfig.DEBUG)
+      auth.useEmulator("10.0.2.2", 9099)
+    return FirebaseAuthenticationService(auth)
   }
 
   @Provides
   @Singleton
   fun provideFirebaseFirestore(): FirebaseFirestore {
-    return Firebase.firestore
+    val firestore = Firebase.firestore
+    if (BuildConfig.DEBUG)
+      firestore.useEmulator("10.0.2.2", 8080)
+    return firestore
   }
 
   @Provides

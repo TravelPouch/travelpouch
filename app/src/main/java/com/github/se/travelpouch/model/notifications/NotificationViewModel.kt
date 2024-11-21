@@ -2,6 +2,7 @@ package com.github.se.travelpouch.model.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewbinding.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +31,10 @@ class NotificationViewModel(private val notificationRepository: NotificationRepo
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return NotificationViewModel(NotificationRepositoryFirestore(Firebase.firestore)) as T
+            val firestore = Firebase.firestore
+            if (BuildConfig.DEBUG)
+              firestore.useEmulator("10.0.2.2", 8080)
+            return NotificationViewModel(NotificationRepositoryFirestore(firestore)) as T
           }
         }
   }

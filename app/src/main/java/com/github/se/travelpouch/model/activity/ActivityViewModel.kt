@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewbinding.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,10 @@ class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : Vi
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ActivityViewModel(ActivityRepositoryFirebase(Firebase.firestore)) as T
+            val firestore = Firebase.firestore
+            if (BuildConfig.DEBUG)
+              firestore.useEmulator("10.0.2.2", 8080)
+            return ActivityViewModel(ActivityRepositoryFirebase(firestore)) as T
           }
         }
   }

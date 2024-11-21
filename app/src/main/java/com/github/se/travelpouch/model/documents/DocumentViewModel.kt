@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewbinding.BuildConfig
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.google.firebase.Firebase
@@ -50,8 +51,11 @@ open class DocumentViewModel(
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val firestore = Firebase.firestore
+            if (BuildConfig.DEBUG)
+              firestore.useEmulator("10.0.2.2", 8080)
             return DocumentViewModel(
-                DocumentRepositoryFirestore(Firebase.firestore), FileDownloader(contentResolver))
+                DocumentRepositoryFirestore(firestore), FileDownloader(contentResolver))
                 as T
           }
         }

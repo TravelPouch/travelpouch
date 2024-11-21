@@ -38,17 +38,6 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
     repository.initAfterLogin { getTravels() }
   }
 
-  //  // create factory
-  //  companion object {
-  //    val Factory: ViewModelProvider.Factory =
-  //        object : ViewModelProvider.Factory {
-  //          @Suppress("UNCHECKED_CAST")
-  //          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-  //            return ListTravelViewModel(TravelRepositoryFirestore(Firebase.firestore)) as T
-  //          }
-  //        }
-  //  }
-
   /**
    * Generates a new unique ID.
    *
