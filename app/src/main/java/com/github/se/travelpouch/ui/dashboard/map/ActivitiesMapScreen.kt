@@ -159,7 +159,6 @@ fun ActivitiesMapScreen(
       })
 }
 
-// Helper function to generate a gradient color based on the index
 // Helper function to generate a consistent gradient color
 fun getGradientColor(
     index: Int,
