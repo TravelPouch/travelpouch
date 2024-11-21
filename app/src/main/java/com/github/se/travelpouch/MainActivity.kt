@@ -27,10 +27,8 @@ import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.authentication.SignInWithPassword
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
-import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.EditActivity
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
-import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
@@ -39,6 +37,7 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.navigation.SwipePager
 import com.github.se.travelpouch.ui.notifications.NotificationsScreen
 import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
 import com.github.se.travelpouch.ui.profile.ProfileScreen
@@ -99,6 +98,10 @@ class MainActivity : ComponentActivity() {
           SignInScreen(navigationActions, profileModelView, listTravelViewModel)
         }
 
+        composable(Screen.SWIPER) {
+          SwipePager(navigationActions, activityModelView, calendarViewModel)
+        }
+
         composable(Screen.TRAVEL_LIST) {
           TravelListScreen(
               navigationActions,
@@ -108,9 +111,7 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               profileModelView)
         }
-        composable(Screen.TRAVEL_ACTIVITIES) {
-          TravelActivitiesScreen(navigationActions, activityModelView)
-        }
+
         composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
         composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
         composable(Screen.ADD_TRAVEL) {
@@ -148,8 +149,6 @@ class MainActivity : ComponentActivity() {
         composable(Screen.EDIT_PROFILE) {
           ModifyingProfileScreen(navigationActions, profileModelView)
         }
-
-        composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
 
         composable(Screen.SIGN_IN_PASSWORD) {
           SignInWithPassword(navigationActions, profileModelView, listTravelViewModel, auth)
