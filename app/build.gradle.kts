@@ -184,6 +184,7 @@ dependencies {
     implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.testing)
+    implementation(libs.firebase.messaging.ktx)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
