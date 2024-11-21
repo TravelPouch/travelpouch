@@ -91,29 +91,6 @@ fun TravelListScreen(
               Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
       },
-      //      topBar = {
-      //          TopAppBar(
-      //              title = { Text("Travel") },
-      //              navigationIcon = {
-      //              IconButton(
-      //                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
-      //                  modifier = Modifier.testTag("goBackButton")) {
-      //                    Icon(
-      //                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-      //                        contentDescription = "Back")
-      //                  }
-      //            },
-      //            actions = {
-      //                IconButton(
-      //                    onClick = { navigationActions.navigateTo(Screen.NOTIFICATION) },
-      //                    modifier = Modifier.testTag("settingsButton")
-      //                ) {
-      //                    Icon(imageVector = Icons.Default.Notifications, contentDescription =
-      // null)
-      //                }
-      //            }
-      //          )
-      //      },
       bottomBar = {
         BottomNavigationMenu(
             tabList = listOf(TopLevelDestinations.NOTIFICATION, TopLevelDestinations.TRAVELS),

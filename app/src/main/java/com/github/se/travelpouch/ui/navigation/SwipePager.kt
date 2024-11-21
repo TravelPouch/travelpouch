@@ -66,7 +66,12 @@ fun SwipePager(
             },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
+                  onClick = {
+                    when (pagerState.currentPage) {
+                      0 -> navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                      1 -> selectedScreen = 0
+                    }
+                  },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -117,8 +122,8 @@ fun SwipePager(
           }
         }
       }) { pd ->
-        HorizontalPager(state = pagerState, modifier = Modifier.padding(pd)) { i ->
-          when (i) {
+        HorizontalPager(state = pagerState, modifier = Modifier.padding(pd)) { pageIndex ->
+          when (pageIndex) {
             0 -> TravelActivitiesScreen(navigationActions, activityViewModel)
             1 -> CalendarScreen(calendarViewModel, navigationActions)
           }

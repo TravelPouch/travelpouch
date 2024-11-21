@@ -35,63 +35,35 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
   CalendarScreenLaunchedEffect(calendarViewModel = calendarViewModel)
 
   // Application
-  Scaffold(
-      modifier = Modifier.testTag("calenmdarScreen")
-      //      topBar = {
-      //        // TopAppBar with title and icon to indicate the calendar feature
-      //        TopAppBar(
-      //            title = { Text("Calendar") },
-      //            navigationIcon = {
-      //              IconButton(
-      //                  modifier = Modifier.testTag("goBackIcon"),
-      //                  onClick = { navigationActions.goBack() }) {
-      //                    // Back icon for navigation
-      //                    Icon(
-      //                        Icons.AutoMirrored.Filled.ArrowBack,
-      //                        contentDescription = null,
-      //                    )
-      //                  }
-      //            },
-      //            modifier = Modifier.testTag("calendarTopAppBar"))
-      //      },
-      //      bottomBar = {
-      //        BottomNavigationMenu(
-      //            tabList =
-      //                listOf(
-      //                    TopLevelDestinations.ACTIVITIES,
-      //                    TopLevelDestinations.CALENDAR,
-      //                    TopLevelDestinations.MAP),
-      //            navigationActions = navigationActions)
-      //      }
-      ) { innerPadding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("calendarScreenColumn"),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top) {
-              // CalendarView composable to wrap Android's CalendarView
-              CalendarView(
-                  selectedDate = calendarViewModel.selectedDate,
-                  onDateSelected = { date -> calendarViewModel.onDateSelected(date) },
-                  modifier = Modifier.fillMaxWidth().testTag("androidCalendarView"))
+  Scaffold(modifier = Modifier.testTag("calenmdarScreen")) { innerPadding ->
+    Column(
+        modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("calendarScreenColumn"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top) {
+          // CalendarView composable to wrap Android's CalendarView
+          CalendarView(
+              selectedDate = calendarViewModel.selectedDate,
+              onDateSelected = { date -> calendarViewModel.onDateSelected(date) },
+              modifier = Modifier.fillMaxWidth().testTag("androidCalendarView"))
 
-              // Activities list
-              LazyColumn(modifier = Modifier.fillMaxSize().testTag("activityList")) {
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val selectedDateFormatted = dateFormat.format(calendarViewModel.selectedDate)
-                val selectedDayActivities =
-                    calendarState
-                        .filter { activity ->
-                          val activityDate = activity.date.toDate() // Convert Timestamp to Date
-                          val activityDateFormatted = dateFormat.format(activityDate)
-                          selectedDateFormatted == activityDateFormatted
-                        }
-                        .sortedBy { it.date }
+          // Activities list
+          LazyColumn(modifier = Modifier.fillMaxSize().testTag("activityList")) {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val selectedDateFormatted = dateFormat.format(calendarViewModel.selectedDate)
+            val selectedDayActivities =
+                calendarState
+                    .filter { activity ->
+                      val activityDate = activity.date.toDate() // Convert Timestamp to Date
+                      val activityDateFormatted = dateFormat.format(activityDate)
+                      selectedDateFormatted == activityDateFormatted
+                    }
+                    .sortedBy { it.date }
 
-                // Display each activity as a row in the list
-                items(selectedDayActivities) { activity ->
-                  ActivityRow(activity = activity) // Composable to render each activity item
-                }
-              }
+            // Display each activity as a row in the list
+            items(selectedDayActivities) { activity ->
+              ActivityRow(activity = activity) // Composable to render each activity item
             }
-      }
+          }
+        }
+  }
 }

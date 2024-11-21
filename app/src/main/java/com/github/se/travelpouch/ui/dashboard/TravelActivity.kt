@@ -75,54 +75,6 @@ fun TravelActivitiesScreen(
           "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
   Scaffold(
       modifier = Modifier.testTag("travelActivitiesScreen"),
-      //      topBar = {
-      //        TopAppBar(
-      //            title = { Text("Travel", Modifier.testTag("travelTitle")) },
-      //            navigationIcon = {
-      //              IconButton(
-      //                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
-      //                  modifier = Modifier.testTag("goBackButton")) {
-      //                    Icon(
-      //                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-      //                        contentDescription = "Back")
-      //                  }
-      //            },
-      //            actions = {
-      //              IconButton(
-      //                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
-      //                  modifier = Modifier.testTag("settingsButton")) {
-      //                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-      //                  }
-      //
-      //              IconButton(
-      //                  onClick = { navigationActions.navigateTo(Screen.TIMELINE) },
-      //                  modifier = Modifier.testTag("eventTimelineButton")) {
-      //                    Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
-      //                  }
-      //
-      //              IconButton(
-      //                  onClick = { navigationActions.navigateTo(Screen.DOCUMENT_LIST) },
-      //                  modifier = Modifier.testTag("documentListButton")) {
-      //                    Icon(imageVector = Icons.Default.Folder, contentDescription = null)
-      //                  }
-      //
-      //              IconButton(
-      //                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
-      //                  modifier = Modifier.testTag("ProfileButton")) {
-      //                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription =
-      // null)
-      //                  }
-      //            })
-      //      },
-      //      bottomBar = {
-      //        BottomNavigationMenu(
-      //            tabList =
-      //                listOf(
-      //                    TopLevelDestinations.ACTIVITIES,
-      //                    TopLevelDestinations.CALENDAR,
-      //                    TopLevelDestinations.MAP),
-      //            navigationActions = navigationActions)
-      //      },
       floatingActionButton = {
         FloatingActionButton(
             onClick = { navigationActions.navigateTo(Screen.ADD_ACTIVITY) },

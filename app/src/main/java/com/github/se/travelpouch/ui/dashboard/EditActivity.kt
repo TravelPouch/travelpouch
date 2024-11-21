@@ -74,7 +74,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
             title = { Text("Edit Activity", Modifier.testTag("travelTitle")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES) },
+                  onClick = { navigationActions.navigateTo(Screen.SWIPER) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -183,7 +183,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                                 mapOf())
 
                         activityViewModel.updateActivity(activity, context)
-                        navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                        navigationActions.navigateTo(Screen.SWIPER)
                       } catch (e: java.text.ParseException) {
                         Toast.makeText(
                                 context,
@@ -201,7 +201,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   enabled = true,
                   onClick = {
                     activityViewModel.deleteActivityById(selectedActivity.value!!, context)
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    navigationActions.navigateTo(Screen.SWIPER)
                   },
                   modifier = Modifier.testTag("deleteButton")) {
                     Text("Delete")

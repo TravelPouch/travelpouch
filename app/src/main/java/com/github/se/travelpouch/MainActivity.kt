@@ -104,9 +104,7 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               profileModelView)
         }
-        //        composable(Screen.TRAVEL_ACTIVITIES) {
-        //          TravelActivitiesScreen(navigationActions, activityModelView)
-        //        }
+
         composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
         composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
         composable(Screen.ADD_TRAVEL) {
@@ -144,8 +142,6 @@ class MainActivity : ComponentActivity() {
         composable(Screen.EDIT_PROFILE) {
           ModifyingProfileScreen(navigationActions, profileModelView)
         }
-
-        // composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
 
         composable(Screen.SIGN_IN_PASSWORD) {
           SignInWithPassword(navigationActions, profileModelView, listTravelViewModel, auth)
