@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.fail
@@ -950,5 +951,174 @@ class TravelRepositoryFirestoreUnitTest {
 
     assertEquals(profileGot, null)
     assertEquals(failed, true)
+  }
+
+  @Test
+  fun getTravelByIdTestSucceedsIfValidDocument() {
+
+    // setting the document
+    whenever(mockDocumentSnapshot.id).thenReturn("6NU2zp2oGdA34s1Q1q5h")
+    whenever(mockDocumentSnapshot.getString("title")).thenReturn("Test Title")
+    whenever(mockDocumentSnapshot.getString("description")).thenReturn("Test Description")
+    whenever(mockDocumentSnapshot.getTimestamp("startTime")).thenReturn(Timestamp.now())
+    whenever(mockDocumentSnapshot.getTimestamp("endTime"))
+        .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+    val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+    whenever(mockDocumentSnapshot.get("allAttachments")).thenReturn(attachmentsMap)
+
+    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER)
+    whenever(mockDocumentSnapshot.get("allParticipants"))
+        .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+    val locationMap =
+        mapOf(
+            "latitude" to null,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to Timestamp.now())
+    whenever(mockDocumentSnapshot.get("location")).thenReturn(locationMap)
+    whenever(mockDocumentSnapshot.get("listParticipant")).thenReturn(listOf("uid"))
+    whenever(mockDocumentSnapshot.exists()).thenReturn(true)
+
+    val mockFirestoreBis: FirebaseFirestore = mock()
+    val travelRepositoryFirestoreBis = TravelRepositoryFirestore(mockFirestoreBis)
+    val mockCollectionReference: CollectionReference = mock()
+    val documentReference: DocumentReference = mock()
+
+    val mockTask: Task<DocumentSnapshot> = mock()
+    whenever(mockTask.isSuccessful).thenReturn(true)
+    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
+
+    whenever(mockFirestoreBis.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.document(anyOrNull())).thenReturn(documentReference)
+    whenever(documentReference.get()).thenReturn(mockTask)
+
+    var succeeded = false
+    var failed = false
+
+    travelRepositoryFirestoreBis.getTravelById("id", { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<DocumentSnapshot>>()
+    verify(mockTask).addOnCompleteListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onComplete(mockTask)
+
+    assert(succeeded)
+    assertFalse(failed)
+  }
+
+  @Test
+  fun getTravelByIdTestFailsIfInvalidDocument() {
+
+    // setting the document
+    whenever(mockDocumentSnapshot.id).thenReturn(null)
+    whenever(mockDocumentSnapshot.getString("title")).thenReturn("Test Title")
+    whenever(mockDocumentSnapshot.getString("description")).thenReturn("Test Description")
+    whenever(mockDocumentSnapshot.getTimestamp("startTime")).thenReturn(Timestamp.now())
+    whenever(mockDocumentSnapshot.getTimestamp("endTime"))
+        .thenReturn(Timestamp(Timestamp.now().seconds + 1000, 0))
+    val attachmentsMap = mapOf("Test Key item" to "Test Value item")
+    whenever(mockDocumentSnapshot.get("allAttachments")).thenReturn(attachmentsMap)
+
+    val participantsMap = mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER)
+    whenever(mockDocumentSnapshot.get("allParticipants"))
+        .thenReturn(participantsMap.map { (key, value) -> key.fsUid to value.name }.toMap())
+
+    val locationMap =
+        mapOf(
+            "latitude" to null,
+            "longitude" to 20.0,
+            "name" to "Test Location",
+            "insertTime" to Timestamp.now())
+    whenever(mockDocumentSnapshot.get("location")).thenReturn(locationMap)
+    whenever(mockDocumentSnapshot.get("listParticipant")).thenReturn(listOf("uid"))
+    whenever(mockDocumentSnapshot.exists()).thenReturn(true)
+
+    val mockFirestoreBis: FirebaseFirestore = mock()
+    val travelRepositoryFirestoreBis = TravelRepositoryFirestore(mockFirestoreBis)
+    val mockCollectionReference: CollectionReference = mock()
+    val documentReference: DocumentReference = mock()
+
+    val mockTask: Task<DocumentSnapshot> = mock()
+    whenever(mockTask.isSuccessful).thenReturn(true)
+    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
+
+    whenever(mockFirestoreBis.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.document(anyOrNull())).thenReturn(documentReference)
+    whenever(documentReference.get()).thenReturn(mockTask)
+
+    var succeeded = false
+    var failed = false
+
+    travelRepositoryFirestoreBis.getTravelById("id", { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<DocumentSnapshot>>()
+    verify(mockTask).addOnCompleteListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onComplete(mockTask)
+
+    assert(failed)
+    assertFalse(succeeded)
+  }
+
+  @Test
+  fun getTravelByIdTestFailsIfInexistantDocument() {
+
+    // setting the document
+    whenever(mockDocumentSnapshot.exists()).thenReturn(false)
+
+    val mockFirestoreBis: FirebaseFirestore = mock()
+    val travelRepositoryFirestoreBis = TravelRepositoryFirestore(mockFirestoreBis)
+    val mockCollectionReference: CollectionReference = mock()
+    val documentReference: DocumentReference = mock()
+
+    val mockTask: Task<DocumentSnapshot> = mock()
+    whenever(mockTask.isSuccessful).thenReturn(true)
+    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
+
+    whenever(mockFirestoreBis.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.document(anyOrNull())).thenReturn(documentReference)
+    whenever(documentReference.get()).thenReturn(mockTask)
+
+    var succeeded = false
+    var failed = false
+
+    travelRepositoryFirestoreBis.getTravelById("id", { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<DocumentSnapshot>>()
+    verify(mockTask).addOnCompleteListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onComplete(mockTask)
+
+    assert(failed)
+    assertFalse(succeeded)
+  }
+
+  @Test
+  fun getTravelByIdTestFailsIfException() {
+
+    // setting the document
+
+    val mockFirestoreBis: FirebaseFirestore = mock()
+    val travelRepositoryFirestoreBis = TravelRepositoryFirestore(mockFirestoreBis)
+    val mockCollectionReference: CollectionReference = mock()
+    val documentReference: DocumentReference = mock()
+
+    val mockTask: Task<DocumentSnapshot> = mock()
+    whenever(mockTask.isSuccessful).thenReturn(false)
+    whenever(mockTask.exception).thenReturn(Exception("message"))
+
+    whenever(mockFirestoreBis.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.document(anyOrNull())).thenReturn(documentReference)
+    whenever(documentReference.get()).thenReturn(mockTask)
+
+    var succeeded = false
+    var failed = false
+
+    travelRepositoryFirestoreBis.getTravelById("id", { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<DocumentSnapshot>>()
+    verify(mockTask).addOnCompleteListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onComplete(mockTask)
+
+    assert(failed)
+    assertFalse(succeeded)
   }
 }
