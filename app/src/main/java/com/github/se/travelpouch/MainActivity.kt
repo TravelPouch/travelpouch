@@ -43,6 +43,7 @@ import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.SwipePager
 import com.github.se.travelpouch.ui.notifications.NotificationsScreen
+import com.github.se.travelpouch.ui.notifications.PushNotificationScreen
 import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
 import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
@@ -66,7 +67,11 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
             // color = MaterialTheme.colorScheme.background,
         ) {
-          TravelPouchApp()
+          PushNotificationScreen(
+              token = "token",
+                onTokenChange = {},
+                onSubmit = { }
+          )
         }
       }
     }
