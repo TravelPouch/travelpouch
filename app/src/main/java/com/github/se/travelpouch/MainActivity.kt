@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+      requestNotificationPermission()
     setContent {
       SampleAppTheme(dynamicColor = false) {
         // A surface container using the 'background' color from the theme
@@ -71,7 +72,24 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  @Composable
+    private fun requestNotificationPermission() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if(!hasPermission) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
+        }
+    }
+
+    @Composable
   fun TravelPouchApp() {
     val context = LocalContext.current
     val navController = rememberNavController()
