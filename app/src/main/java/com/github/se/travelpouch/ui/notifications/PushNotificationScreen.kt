@@ -32,8 +32,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
-@OptIn(ExperimentalMaterial3Api::class)
+/*
+ * This code was taken from the following source :
+ * https://github.com/philipplackner/FcmPushNotificationsHttpV1/blob/master/app/src/main/java/com/plcoding/fcmpushnotificationshttpv1/EnterTokenDialog.kt
+ */
 @Composable
 fun PushNotificationScreen(
     token: String,
