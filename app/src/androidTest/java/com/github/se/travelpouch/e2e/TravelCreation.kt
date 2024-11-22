@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.endtoend
+package com.github.se.travelpouch.e2e
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -23,7 +23,7 @@ import org.junit.Test
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
-class EndToEndTest {
+class TravelCreation {
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
