@@ -19,7 +19,6 @@ interface DirectionsRepositoryInterface {
       origin: String,
       destination: String,
       mode: String,
-      apiKey: String,
       waypoints: String? = null,
       onSuccess: (DirectionsResponse) -> Unit,
       onFailure: (Exception) -> Unit

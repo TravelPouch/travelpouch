@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
@@ -25,10 +26,8 @@ import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.authentication.SignInWithPassword
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
-import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.EditActivity
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
-import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
@@ -37,6 +36,7 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.navigation.SwipePager
 import com.github.se.travelpouch.ui.notifications.NotificationsScreen
 import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
 import com.github.se.travelpouch.ui.profile.ProfileScreen
@@ -79,6 +79,12 @@ class MainActivity : ComponentActivity() {
     val calendarViewModel: CalendarViewModel =
         viewModel(factory = CalendarViewModel.Factory(activityModelView))
 
+    val directionsViewModel: DirectionsViewModel =
+        viewModel(
+            factory =
+                DirectionsViewModel.provideFactory(
+                    BuildConfig.MAPS_API_KEY) // Inject the API key for the DirectionsViewModel
+            )
     NavHost(navController = navController, startDestination = Route.DEFAULT) {
       navigation(
           startDestination = Screen.AUTH,
@@ -86,6 +92,10 @@ class MainActivity : ComponentActivity() {
       ) {
         composable(Screen.AUTH) {
           SignInScreen(navigationActions, profileModelView, listTravelViewModel)
+        }
+
+        composable(Screen.SWIPER) {
+          SwipePager(navigationActions, activityModelView, calendarViewModel)
         }
 
         composable(Screen.TRAVEL_LIST) {
@@ -97,9 +107,7 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               profileModelView)
         }
-        composable(Screen.TRAVEL_ACTIVITIES) {
-          TravelActivitiesScreen(navigationActions, activityModelView)
-        }
+
         composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
         composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
         composable(Screen.ADD_TRAVEL) {
@@ -112,7 +120,7 @@ class MainActivity : ComponentActivity() {
         }
 
         composable(Screen.ACTIVITIES_MAP) {
-          ActivitiesMapScreen(activityModelView, navigationActions)
+          ActivitiesMapScreen(activityModelView, navigationActions, directionsViewModel)
         }
 
         composable(Screen.PARTICIPANT_LIST) {
@@ -137,8 +145,6 @@ class MainActivity : ComponentActivity() {
         composable(Screen.EDIT_PROFILE) {
           ModifyingProfileScreen(navigationActions, profileModelView)
         }
-
-        composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
 
         composable(Screen.SIGN_IN_PASSWORD) {
           SignInWithPassword(navigationActions, profileModelView, listTravelViewModel, auth)
