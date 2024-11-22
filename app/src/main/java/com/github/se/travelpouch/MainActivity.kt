@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,17 +68,14 @@ class MainActivity : ComponentActivity() {
 
   @Composable
   fun TravelPouchApp() {
-    val context = LocalContext.current
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val listTravelViewModel = hiltViewModel<ListTravelViewModel>()
-    val documentViewModel: DocumentViewModel =
-        viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
-    val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
-    val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
+    val documentViewModel: DocumentViewModel = hiltViewModel<DocumentViewModel>()
+    val activityModelView: ActivityViewModel = hiltViewModel<ActivityViewModel>()
+    val eventsViewModel: EventViewModel = hiltViewModel<EventViewModel>()
     val profileModelView = hiltViewModel<ProfileModelView>()
-    val notificationViewModel: NotificationViewModel =
-        viewModel(factory = NotificationViewModel.Factory)
+    val notificationViewModel: NotificationViewModel = viewModel<NotificationViewModel>()
     val calendarViewModel: CalendarViewModel =
         viewModel(factory = CalendarViewModel.Factory(activityModelView))
 

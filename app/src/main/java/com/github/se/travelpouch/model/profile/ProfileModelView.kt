@@ -23,16 +23,6 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
 
   private val onFailureTag = "ProfileViewModel"
 
-  //  companion object {
-  //    val Factory: ViewModelProvider.Factory =
-  //        object : ViewModelProvider.Factory {
-  //          @Suppress("UNCHECKED_CAST")
-  //          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-  //            return ProfileModelView(ProfileRepositoryFirebase(Firebase.firestore)) as T
-  //          }
-  //        }
-  //  }
-
   private val profile_ = MutableStateFlow<Profile>(ErrorProfile.errorProfile)
   val profile: StateFlow<Profile> = profile_.asStateFlow()
 

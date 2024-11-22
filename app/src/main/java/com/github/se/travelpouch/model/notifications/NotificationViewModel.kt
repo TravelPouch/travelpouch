@@ -1,10 +1,8 @@
 package com.github.se.travelpouch.model.notifications
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.viewbinding.BuildConfig
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,30 +12,14 @@ import kotlinx.coroutines.flow.asStateFlow
  *
  * @property notificationRepository The repository used for notification operations.
  */
-class NotificationViewModel(private val notificationRepository: NotificationRepository) :
-    ViewModel() {
+@HiltViewModel
+class NotificationViewModel
+@Inject
+constructor(private val notificationRepository: NotificationRepository) : ViewModel() {
 
   // LiveData holding the list of notifications
   private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
   val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
-
-  /**
-   * Factory object for creating instances of NotificationViewModel. This factory is used to provide
-   * the NotificationViewModel with a NotificationRepository that is initialized with Firebase
-   * Firestore.
-   */
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val firestore = Firebase.firestore
-            if (BuildConfig.DEBUG)
-              firestore.useEmulator("10.0.2.2", 8080)
-            return NotificationViewModel(NotificationRepositoryFirestore(firestore)) as T
-          }
-        }
-  }
 
   fun getNewUid(): String {
     return notificationRepository.getNewUid()

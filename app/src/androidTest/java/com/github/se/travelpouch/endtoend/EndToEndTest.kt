@@ -16,13 +16,11 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
 class EndToEndTest {
@@ -57,7 +55,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithText("Sign in").performClick()
 
         // wait until we are in the travel list screen
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.waitUntil(timeoutMillis = 500) {
           composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
         }
 
@@ -69,7 +67,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("createTravelFab").performClick()
 
         // wait until we are in the screen to add a travel
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.waitUntil(timeoutMillis = 2000) {
           composeTestRule.onNodeWithTag("travelTitle", useUnmergedTree = true).isDisplayed()
         }
 
@@ -92,7 +90,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
 
         // wait to have La paz displayed
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.waitUntil(timeoutMillis = 4000) {
           composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
         }
 
