@@ -1,6 +1,9 @@
 package com.github.se.travelpouch.model.activity.map
 
+import com.github.se.travelpouch.model.activity.Activity
+import com.github.se.travelpouch.model.travels.Location
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -13,10 +16,12 @@ import org.junit.Test
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.whenever
 
 class DirectionsViewModelTest {
 
-  private lateinit var mockRepository: DirectionsRepositoryInterface
+  private lateinit var mockRepository: DirectionsRepository
   private lateinit var viewModel: DirectionsViewModel
 
   // Create a test dispatcher for the async operations
@@ -25,7 +30,7 @@ class DirectionsViewModelTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    mockRepository = mock(DirectionsRepositoryInterface::class.java)
+    mockRepository = mock(DirectionsRepository::class.java)
     viewModel = DirectionsViewModel(mockRepository)
 
     // Set the Main dispatcher to the test dispatcher
@@ -40,34 +45,47 @@ class DirectionsViewModelTest {
 
   @Test
   fun fetchDirectionsShouldUpdatePathPointsOnSuccess() = runTest {
-    // Arrange
     val mockLatLng = LatLng(37.7749, -122.4194)
+
+    val mockLeg =
+        Leg(
+            distanceText = "3.4 km",
+            distanceValue = 3400,
+            durationText = "15 mins",
+            durationValue = 900,
+            startAddress = "Start Address",
+            endAddress = "End Address",
+            startLocation = LatLng(37.7749, -122.4194),
+            endLocation = LatLng(34.0522, -118.2437),
+            overviewPolyline = OverviewPolyline("u{~vFvyys@fC_y@"))
     val mockResponse =
-        DirectionsResponse(routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"))))
+        DirectionsResponse(
+            routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"), legs = listOf(mockLeg))))
 
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(4)
+          val onSuccess = invocation.getArgument(4) as (DirectionsResponse) -> Unit
           onSuccess(mockResponse)
           null
         }
-        .`when`(mockRepository)
+        .whenever(mockRepository)
         .getDirections(
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
+            waypoints = anyOrNull(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
 
     // Advance the dispatcher to execute pending coroutines
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert
-    val pathPoints = viewModel.routeOptionsList.value
-    assertTrue(pathPoints.isNotEmpty())
+    val routeDetails = viewModel.activityRouteDetails.value
+    assertTrue(routeDetails != null)
+    assertTrue(routeDetails!!.route.isNotEmpty())
   }
 
   @Test
@@ -77,7 +95,7 @@ class DirectionsViewModelTest {
     val exception = Exception("Network error")
 
     doAnswer { invocation ->
-          val onFailure = invocation.getArgument<(Exception) -> Unit>(5)
+          val onFailure = invocation.getArgument<(Exception) -> Unit>(4)
           onFailure(exception)
           null
         }
@@ -86,28 +104,40 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
+            waypoints = anyString(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert
-    val pathPoints = viewModel.routeOptionsList.value
-    assertTrue(pathPoints.isEmpty()) // Expect pathPoints to remain empty on failure
+    val routeDetails = viewModel.activityRouteDetails.value
+    assertTrue(routeDetails == RouteDetails.EMPTY) // Expect pathPoints to remain empty on failure
   }
 
   @Test
   fun extractPathPointsShouldHandleInvalidPolyline() = runTest {
     // Arrange
     val mockLatLng = LatLng(37.7749, -122.4194)
-    val mockResponse =
-        DirectionsResponse(routes = listOf(Route(OverviewPolyline("INVALID_POLYLINE"))))
 
+    val mockLeg =
+        Leg(
+            distanceText = "3.4 km",
+            distanceValue = 3400,
+            durationText = "15 mins",
+            durationValue = 900,
+            startAddress = "Start Address",
+            endAddress = "End Address",
+            startLocation = LatLng(37.7749, -122.4194),
+            endLocation = LatLng(34.0522, -118.2437),
+            overviewPolyline = OverviewPolyline("u{~vFvyys@fC_y@"))
+    val mockResponse =
+        DirectionsResponse(
+            routes = listOf(Route(OverviewPolyline("INVALID_POLYLINE"), legs = listOf(mockLeg))))
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(4)
+          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(3)
           onSuccess(mockResponse)
           null
         }
@@ -116,31 +146,46 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
+            waypoints = anyString(),
             onSuccess = any(),
             onFailure = any())
 
     // Act
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
 
     // Advance the dispatcher to execute pending coroutines
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Assert
-    val pathPoints = viewModel.routeOptionsList.value
-    assertTrue(pathPoints.isEmpty())
+    val routeDetails = viewModel.activityRouteDetails.value
+    assertTrue(routeDetails == null || routeDetails.route.isEmpty())
   }
 
   @Test
-  fun clearRoutesShouldResetRouteOptionsList() = runTest {
+  fun extractRouteDetailsShouldHandleMalformedLegs() = runTest {
     // Arrange
     val mockLatLng = LatLng(37.7749, -122.4194)
-    val mockResponse =
-        DirectionsResponse(routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"))))
 
-    // Populate the route options list by fetching directions
+    // Create a malformed leg with an empty polyline
+    val malformedLeg =
+        Leg(
+            distanceText = "0 km",
+            distanceValue = 0,
+            durationText = "0 mins",
+            durationValue = 0,
+            startAddress = "Malformed Start",
+            endAddress = "Malformed End",
+            startLocation = LatLng(0.0, 0.0),
+            endLocation = LatLng(0.0, 0.0),
+            overviewPolyline = OverviewPolyline("") // Invalid empty polyline
+            )
+
+    val mockResponse =
+        DirectionsResponse(
+            routes =
+                listOf(Route(OverviewPolyline("INVALID_POLYLINE"), legs = listOf(malformedLeg))))
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(4)
+          val onSuccess = invocation.getArgument<(DirectionsResponse) -> Unit>(3)
           onSuccess(mockResponse)
           null
         }
@@ -149,22 +194,83 @@ class DirectionsViewModelTest {
             origin = anyString(),
             destination = anyString(),
             mode = anyString(),
-            apiKey = anyString(),
+            waypoints = anyString(),
             onSuccess = any(),
             onFailure = any())
 
-    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving", "mockApiKey")
+    // Act
+    viewModel.fetchDirections(mockLatLng, mockLatLng, "driving")
 
     // Advance the dispatcher to execute pending coroutines
     testDispatcher.scheduler.advanceUntilIdle()
 
-    // Assert that the route options list is not empty
-    assertTrue(viewModel.routeOptionsList.value.isNotEmpty())
+    // Assert
+    val routeDetails = viewModel.activityRouteDetails.value
+    assertTrue(routeDetails == RouteDetails.EMPTY)
+  }
+
+  @Test
+  fun fetchDirectionsForActivitiesShouldCallFetchDirections() = runTest {
+
+    // Arrange
+    val activity =
+        Activity(
+            "uid",
+            "title",
+            "description",
+            Location(0.0, 0.0, Timestamp(0, 0), "location"),
+            Timestamp(0, 0),
+            mapOf())
+
+    val activity2 =
+        Activity(
+            "uid2",
+            "title2",
+            "description2",
+            Location(0.0, 0.0, Timestamp(0, 0), "location2"),
+            Timestamp(50, 0),
+            mapOf())
+
+    val mockLatLng = LatLng(37.7749, -122.4194)
+
+    val mockLeg =
+        Leg(
+            distanceText = "3.4 km",
+            distanceValue = 3400,
+            durationText = "15 mins",
+            durationValue = 900,
+            startAddress = "Start Address",
+            endAddress = "End Address",
+            startLocation = LatLng(37.7749, -122.4194),
+            endLocation = LatLng(34.0522, -118.2437),
+            overviewPolyline = OverviewPolyline("u{~vFvyys@fC_y@"))
+    val mockResponse =
+        DirectionsResponse(
+            routes = listOf(Route(OverviewPolyline("u{~vFvyys@fC_y@"), legs = listOf(mockLeg))))
+
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument(4) as (DirectionsResponse) -> Unit
+          onSuccess(mockResponse)
+          null
+        }
+        .whenever(mockRepository)
+        .getDirections(
+            origin = anyString(),
+            destination = anyString(),
+            mode = anyString(),
+            waypoints = anyOrNull(),
+            onSuccess = any(),
+            onFailure = any())
 
     // Act
-    viewModel.clearRoutesOptions()
+    viewModel.fetchDirectionsForActivities(listOf(activity, activity2), "driving")
 
-    // Assert that the route options list is now empty
-    assertTrue(viewModel.routeOptionsList.value.isEmpty())
+    // Advance the dispatcher to execute pending coroutines
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    // Assert
+    val routeDetails = viewModel.activityRouteDetails.value
+    assertTrue(routeDetails != null)
+    assertTrue(routeDetails!!.route.isNotEmpty())
   }
 }

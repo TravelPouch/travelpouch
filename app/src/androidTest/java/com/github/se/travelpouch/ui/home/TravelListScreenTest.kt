@@ -240,7 +240,7 @@ class TravelListScreenTest {
     composeTestRule.waitForIdle()
 
     // Verify that the navigation action was called for TRAVEL_ACTIVITIES
-    verify(navigationActions).navigateTo(Screen.TRAVEL_ACTIVITIES)
+    verify(navigationActions).navigateTo(Screen.SWIPER)
   }
 
   @Test
