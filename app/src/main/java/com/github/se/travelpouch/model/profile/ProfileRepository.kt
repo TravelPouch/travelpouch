@@ -39,4 +39,12 @@ interface ProfileRepository {
 
   /** This is the initialisation function of the profile repository */
   suspend fun initAfterLogin(onSuccess: (Profile) -> Unit)
+
+  fun addFriend(
+      email: String,
+      userProfile: Profile,
+      updatingFunction: (Profile, String) -> Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
 }

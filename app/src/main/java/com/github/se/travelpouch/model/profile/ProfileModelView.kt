@@ -72,4 +72,22 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
               .show()
         })
   }
+
+  fun addFriend(email: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    repository.addFriend(
+        email = email,
+        userProfile = profile_.value,
+        updatingFunction = { a, b -> updatingFriendList(a, b) },
+        onSuccess = {
+          profile_.value = it
+          onSuccess()
+        },
+        onFailure = onFailure)
+  }
+
+  private fun updatingFriendList(profile: Profile, fsUid: String): Profile {
+    var friends = profile.friends.toMutableList()
+    friends.add(fsUid)
+    return profile.copy(friends = friends.toList())
+  }
 }

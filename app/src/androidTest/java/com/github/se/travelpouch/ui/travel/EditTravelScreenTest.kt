@@ -214,7 +214,7 @@ class EditTravelSettingsScreenTest {
             "qwertzuiopasdfghjklyxcvbnm12",
             "username",
             "email@gmail.com",
-            null,
+            emptyList(),
             "name",
             emptyList())
 
@@ -254,7 +254,7 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -347,7 +347,7 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -397,7 +397,7 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -468,7 +468,7 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo)
         }

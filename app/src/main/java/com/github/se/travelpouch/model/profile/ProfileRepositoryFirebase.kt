@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -20,6 +21,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
 
   private var collectionPath = "userslist"
   private var documentPath = ""
+  private var documentReference: DocumentReference? = null
 
   override suspend fun initAfterLogin(onSuccess: (Profile) -> Unit) {
     val user = Firebase.auth.currentUser
@@ -51,6 +53,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         Log.e("nullEmail", "Email of user was null, deleting user")
       }
     } else {
+      documentReference = document.reference
       onSuccess(ProfileRepositoryConvert.documentToProfile(document))
     }
   }
@@ -117,11 +120,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             fsUid = uid,
             username = email.substringBefore("@") + uid,
             email = email,
-            friends = null,
+            friends = emptyList(),
             name = email.substringBefore("@"),
             emptyList())
+
+    documentReference = db.collection(collectionPath).document(uid)
     performFirestoreOperation(
-        db.collection(collectionPath).document(uid).set(profile),
+        documentReference!!.set(profile),
         onSuccess = {
           Log.d("ProfileCreated", "profile created")
           onSuccess(profile)
@@ -171,6 +176,47 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         db.collection(collectionPath).document(documentPath).set(newProfile), onSuccess, onFailure)
   }
 
+  override fun addFriend(
+      email: String,
+      userProfile: Profile,
+      updatingFunction: (Profile, String) -> Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    var friendsDocumentReference: DocumentReference? = null
+    db.collection(collectionPath)
+        .whereEqualTo("email", email)
+        .get()
+        .addOnSuccessListener {
+          if (it.isEmpty) {
+            onFailure(Exception("user not found"))
+          } else {
+            val document = it.documents[0]
+            friendsDocumentReference = document.reference
+            val friendProfile = ProfileRepositoryConvert.documentToProfile(document)
+            if (friendProfile == ErrorProfile.errorProfile) {
+              onFailure(Exception("user corrupted"))
+            } else {
+              if (userProfile.friends.contains(friendProfile.fsUid)) {
+                onFailure(Exception("you are already friends with this user"))
+              } else {
+                val userProfileUpdated = updatingFunction(userProfile, friendProfile.fsUid)
+                db.runTransaction { t ->
+                      t.update(documentReference!!, "friends", userProfileUpdated.friends)
+                      t.update(
+                          friendsDocumentReference!!,
+                          "friends",
+                          updatingFunction(friendProfile, userProfile.fsUid).friends)
+                    }
+                    .addOnSuccessListener { onSuccess(userProfileUpdated) }
+                    .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
+              }
+            }
+          }
+        }
+        .addOnFailureListener { onFailure(Exception("getting friend profile failed")) }
+  }
+
   /**
    * This function is a helper function that safely performs a Firebase operation. A task has
    * listeners added to it. If the task is successful, we apply onSuccess. Otherwise we perform
@@ -212,8 +258,7 @@ class ProfileRepositoryConvert {
         val uid = document.id
         val username = document.getString("username")
         val email = document.getString("email")
-        val friendsData = document["documentsNeeded"] as? Map<*, *>
-        val friends = friendsData?.map { (key, value) -> key as Int to value as String }?.toMap()
+        val friends = document.get("friends") as? List<String>
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
 
@@ -221,7 +266,7 @@ class ProfileRepositoryConvert {
             fsUid = uid,
             username = username!!,
             email = email!!,
-            friends = friends,
+            friends = friends ?: emptyList(),
             name = name!!,
             userTravelList = userTravelList ?: emptyList())
       } catch (e: Exception) {

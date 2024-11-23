@@ -84,6 +84,13 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
               modifier = Modifier.fillMaxWidth().testTag("usernameField"))
 
           OutlinedTextField(
+              value = profile.value.name,
+              onValueChange = {},
+              enabled = false,
+              label = { Text("Name") },
+              modifier = Modifier.fillMaxWidth().testTag("nameField"))
+
+          OutlinedTextField(
               value = "No Friend, sadge :(",
               onValueChange = {},
               enabled = false,

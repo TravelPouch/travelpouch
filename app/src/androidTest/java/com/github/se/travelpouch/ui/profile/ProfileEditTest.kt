@@ -29,7 +29,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
-          friends = null,
+          friends = emptyList(),
           name = "name",
           userTravelList = emptyList())
 
@@ -38,7 +38,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "newtest@test.ch",
           username = "newUsername",
-          friends = null,
+          friends = emptyList(),
           name = "name",
           userTravelList = emptyList())
 
