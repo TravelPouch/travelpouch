@@ -44,6 +44,14 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Declare the API key as a BuildConfig field
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+
+        // Enable BuildConfig functionality
+        buildFeatures {
+            buildConfig = true
+        }
     }
 
     buildTypes {

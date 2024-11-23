@@ -11,7 +11,8 @@ import okhttp3.Request
 import org.json.JSONObject
 
 /** Repository for fetching directions using the Google Maps Directions API. */
-class DirectionsRepository(client: OkHttpClient) : DirectionsRepositoryInterface {
+class DirectionsRepository(client: OkHttpClient, private val apiKey: String) :
+    DirectionsRepositoryInterface {
 
   private val networkManager: NetworkManager = NetworkManager(client)
 
@@ -120,7 +121,6 @@ class DirectionsRepository(client: OkHttpClient) : DirectionsRepositoryInterface
    * @param origin The starting point of the route, formatted as "latitude,longitude".
    * @param destination The ending point of the route, formatted as "latitude,longitude".
    * @param mode The travel mode ("driving", "walking", "bicycling", or "transit").
-   * @param apiKey The API key used to authenticate the request.
    * @param waypoints A string of waypoints formatted as "latitude,longitude|latitude,longitude"
    *   (optional).
    * @param onSuccess Callback that is called when the request is successful.
@@ -131,7 +131,6 @@ class DirectionsRepository(client: OkHttpClient) : DirectionsRepositoryInterface
       origin: String,
       destination: String,
       mode: String,
-      apiKey: String,
       waypoints: String?,
       onSuccess: (DirectionsResponse) -> Unit,
       onFailure: (Exception) -> Unit
