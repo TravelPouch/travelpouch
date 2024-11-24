@@ -38,6 +38,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableFloatStateOf
@@ -51,6 +53,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.model.activity.ActivityViewModel
@@ -114,21 +117,32 @@ fun TravelListScreen(
       content = { pd ->
         Column(modifier = Modifier.fillMaxSize().padding(pd)) {
           // Map placed outside the LazyColumn to prevent it from being part of the scrollable
-          ResizableStowableMapWithGoogleMap(mapHeight, travelList)
+          ResizableStowableMapWithGoogleMap(mapHeight, travelList) { travelContainer ->
+            selectAndNavigateToTravel(
+                travelContainer,
+                listTravelViewModel,
+                navigationActions,
+                eventViewModel,
+                activityViewModel,
+                documentViewModel)
+          }
 
           LazyColumn(
               modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
               contentPadding = PaddingValues(bottom = 80.dp)) {
                 if (travelList.value.isNotEmpty()) {
                   items(travelList.value.size) { index ->
-                    TravelItem(travelContainer = travelList.value[index]) {
-                      val travelId = travelList.value[index].fsUid
-                      listTravelViewModel.selectTravel(travelList.value[index])
-                      navigationActions.navigateTo(Screen.SWIPER)
-                      eventViewModel.setIdTravel(travelId)
-                      activityViewModel.setIdTravel(travelId)
-                      documentViewModel.setIdTravel(travelId)
-                    }
+                    TravelItem(
+                        travelContainer = travelList.value[index],
+                        onClick = {
+                          selectAndNavigateToTravel(
+                              travelList.value[index],
+                              listTravelViewModel,
+                              navigationActions,
+                              eventViewModel,
+                              activityViewModel,
+                              documentViewModel)
+                        })
                   }
                 } else {
                   item {
@@ -163,6 +177,33 @@ fun TravelListScreen(
               }
         }
       })
+}
+
+/**
+ * Selects a travel container and navigates to the SWIPER screen.
+ *
+ * @param travelContainer The travel container to select.
+ * @param listTravelViewModel The view model for the list of travels.
+ * @param navigationActions The actions for navigation.
+ * @param eventViewModel The view model for events.
+ * @param activityViewModel The view model for activities.
+ * @param documentViewModel The view model for documents.
+ * @return A lambda function that performs the selection and navigation.
+ */
+fun selectAndNavigateToTravel(
+    travelContainer: TravelContainer,
+    listTravelViewModel: ListTravelViewModel,
+    navigationActions: NavigationActions,
+    eventViewModel: EventViewModel,
+    activityViewModel: ActivityViewModel,
+    documentViewModel: DocumentViewModel
+) {
+  val travelId = travelContainer.fsUid
+  listTravelViewModel.selectTravel(travelContainer)
+  navigationActions.navigateTo(Screen.SWIPER)
+  eventViewModel.setIdTravel(travelId)
+  activityViewModel.setIdTravel(travelId)
+  documentViewModel.setIdTravel(travelId)
 }
 
 /**
@@ -224,10 +265,20 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
 
 // inspired from :
 // https://developer.android.com/develop/ui/compose/touch-input/pointer-input/drag-swipe-fling
+
+/**
+ * Composable function that displays a resizable and stowable map with Google Map integration.
+ *
+ * @param maxMapHeightDp The maximum height of the map in Dp. Default is 300.dp.
+ * @param travelList The list of travel containers to be displayed on the map.
+ * @param onInfoWindowClickCallback Callback function to be invoked when a marker info window is
+ *   clicked.
+ */
 @Composable
 fun ResizableStowableMapWithGoogleMap(
     maxMapHeightDp: Dp = 300.dp,
-    travelList: State<List<TravelContainer>>
+    travelList: State<List<TravelContainer>>,
+    onInfoWindowClickCallback: (TravelContainer) -> Unit = {},
 ) {
 
   // State to track the height of the map
@@ -246,7 +297,11 @@ fun ResizableStowableMapWithGoogleMap(
     Box(modifier = Modifier.fillMaxWidth().requiredHeight(mapHeight.floatValue.dp)) {
       MapContent(
           modifier = Modifier.fillMaxWidth().height(mapHeight.floatValue.dp),
-          travelContainers = travelList.value)
+          travelContainers = travelList.value,
+          onInfoWindowClickCallback = { travelContainer ->
+            // Handle the click event
+            onInfoWindowClickCallback(travelContainer)
+          })
     }
 
     // Strap handle at the bottom to drag and resize the map
@@ -256,10 +311,7 @@ fun ResizableStowableMapWithGoogleMap(
                 .graphicsLayer {
                   shape =
                       CutCornerShape(
-                          topStart = 0.dp, // Adjust these values for the trapezoidal effect
-                          topEnd = 0.dp,
-                          bottomStart = 16.dp,
-                          bottomEnd = 16.dp)
+                          topStart = 0.dp, topEnd = 0.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
                   clip = true
                 }
                 .height(latchDp)
@@ -268,33 +320,53 @@ fun ResizableStowableMapWithGoogleMap(
                     orientation = Orientation.Vertical,
                     state =
                         rememberDraggableState { delta ->
-                          val scaledDelta =
-                              delta / density.density // Adjusting by the density scale factor
-
-                          // Calculate the new map height based on the delta drag amount
-                          if (mapHeight.floatValue + scaledDelta > maxHeightPx) {
-                            mapHeight.floatValue = maxHeightPx
-                          } else if (mapHeight.floatValue + scaledDelta < minHeightPx &&
-                              !isCollapsed.value) {
-                            isCollapsed.value = true
-                            mapHeight.floatValue = 0f
-                          } else {
-                            if (isCollapsed.value &&
-                                mapHeight.floatValue + scaledDelta > minHeightPx) {
-                              isCollapsed.value = false
-                            }
-                            // clamp the to the min value to avoid
-                            if (mapHeight.floatValue + scaledDelta < 0) {
-                              mapHeight.floatValue = 0f
-                            } else {
-                              mapHeight.value += scaledDelta
-                            }
-                          }
+                          resizeFromDragMotion(
+                              delta, density, mapHeight, maxHeightPx, minHeightPx, isCollapsed)
                         })) {
           Icon(
               imageVector = Icons.Default.StopCircle,
               contentDescription = "MapLatch",
               modifier = Modifier.align(Alignment.Center))
         }
+  }
+}
+
+/**
+ * Adjusts the height of the map based on the drag motion.
+ *
+ * @param delta The change in position from the drag motion.
+ * @param density The density scale factor.
+ * @param mapHeight The current height of the map.
+ * @param maxHeightPx The maximum height of the map in pixels.
+ * @param minHeightPx The minimum height of the map in pixels.
+ * @param isCollapsed A state indicating whether the map is collapsed.
+ */
+private fun resizeFromDragMotion(
+    delta: Float,
+    density: Density,
+    mapHeight: MutableFloatState,
+    maxHeightPx: Float,
+    minHeightPx: Float,
+    isCollapsed: MutableState<Boolean>
+) {
+  val scaledDelta = delta / density.density // Adjusting by the density scale factor
+
+  // Calculate the new map height based on the delta drag amount
+  // clamp to the max value to avoid exceeding the max height
+  if (mapHeight.floatValue + scaledDelta > maxHeightPx) {
+    mapHeight.floatValue = maxHeightPx
+  } else if (mapHeight.floatValue + scaledDelta < minHeightPx && !isCollapsed.value) {
+    isCollapsed.value = true
+    mapHeight.floatValue = 0f
+  } else {
+    if (isCollapsed.value && mapHeight.floatValue + scaledDelta > minHeightPx) {
+      isCollapsed.value = false
+    }
+    // clamp to the min value to avoid negatives values
+    if (mapHeight.floatValue + scaledDelta < 0) {
+      mapHeight.floatValue = 0f
+    } else {
+      mapHeight.value += scaledDelta
+    }
   }
 }
