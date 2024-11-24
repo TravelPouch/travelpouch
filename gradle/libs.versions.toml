@@ -69,6 +69,7 @@ navigationTesting = "2.8.3"
 playServicesMlkitDocumentScanner = "16.0.0-beta1"
 coil = "2.1.0"
 bouquet = "1.1.2"
+playServicesLocation = "21.3.0"
 
 [libraries]
 androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
@@ -147,6 +148,7 @@ play-services-mlkit-document-scanner = { group = "com.google.android.gms", name 
 firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-functions-ktx", version.ref = "firebaseFunctionsKtx" }
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 bouquet = { group = "io.github.grizzi91", name = "bouquet", version.ref = "bouquet" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
