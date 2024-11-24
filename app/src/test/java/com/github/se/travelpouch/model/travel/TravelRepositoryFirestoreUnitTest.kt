@@ -65,7 +65,7 @@ class TravelRepositoryFirestoreUnitTest {
 
   private val profile =
       Profile(
-          "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", null, "name", emptyList())
+          "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", emptyList(), "name", emptyList())
 
   private val travel =
       TravelContainer(
@@ -182,7 +182,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     var successCalled = false
     travelRepositoryFirestore.updateTravel(
-        travel, { successCalled = true }, { fail("Should not call onFailure") })
+        travel, 0, null, { successCalled = true }, { fail("Should not call onFailure") })
 
     // Simulate task completion
     val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
@@ -202,7 +202,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     var failureCalled = false
     travelRepositoryFirestore.updateTravel(
-        travel, { fail("Should not call onSuccess") }, { failureCalled = true })
+        travel, 0, null, { fail("Should not call onSuccess") }, { failureCalled = true })
 
     // Simulate task completion
     val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()

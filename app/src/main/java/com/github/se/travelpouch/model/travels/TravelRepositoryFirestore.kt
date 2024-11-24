@@ -125,10 +125,24 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
       onFailure: (Exception) -> Unit
   ) {
     Log.d("TravelRepositoryFirestore", "addTravel")
-    performFirestoreOperation(
-        db.collection(collectionPath).document(travel.fsUid).set(travel.toMap()),
-        onSuccess,
-        onFailure)
+
+    val profileDocumentReference =
+        db.collection(FirebasePaths.ProfilesSuperCollection).document(currentUserUid)
+    val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
+
+    db.runTransaction {
+          val profile = it.get(profileDocumentReference)
+          val travelListProfile = profile.get("userTravelList") as? List<String> ?: emptyList()
+          val travelList = travelListProfile.toMutableList()
+          travelList.add(travel.fsUid)
+          it.update(profileDocumentReference, "userTravelList", travelList.toList())
+          it.set(travelDocumentReference, travel.toMap())
+        }
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { e ->
+          Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
+          onFailure(e)
+        }
   }
 
   /**
@@ -140,14 +154,58 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    */
   override fun updateTravel(
       travel: TravelContainer,
+      modeOfUpdate: Int,
+      fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     Log.d("TravelRepositoryFirestore", "updateTravel")
-    performFirestoreOperation(
-        db.collection(collectionPath).document(travel.fsUid).set(travel.toMap()),
-        onSuccess,
-        onFailure)
+    if (modeOfUpdate == 0) {
+      performFirestoreOperation(
+          db.collection(collectionPath).document(travel.fsUid).set(travel.toMap()),
+          onSuccess,
+          onFailure)
+    } else if (modeOfUpdate == 1) {
+      val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
+      val addedUserDocumentReference =
+          db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
+
+      db.runTransaction {
+            val currentAddedUserProfile =
+                ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
+
+            val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
+            listTravelUpdated.add(travel.fsUid)
+
+            it.set(travelDocumentReference, travel.toMap())
+            it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+          }
+          .addOnSuccessListener { onSuccess() }
+          .addOnFailureListener { e ->
+            Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
+            onFailure(e)
+          }
+    } else {
+      val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
+      val addedUserDocumentReference =
+          db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
+
+      db.runTransaction {
+            val currentAddedUserProfile =
+                ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
+
+            val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
+            listTravelUpdated.remove(travel.fsUid)
+
+            it.set(travelDocumentReference, travel.toMap())
+            it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+          }
+          .addOnSuccessListener { onSuccess() }
+          .addOnFailureListener { e ->
+            Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
+            onFailure(e)
+          }
+    }
   }
 
   /**
@@ -159,8 +217,29 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    */
   override fun deleteTravelById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     Log.d("TravelRepositoryFirestore", "deleteTravelById")
-    performFirestoreOperation(
-        db.collection(collectionPath).document(id).delete(), onSuccess, onFailure)
+
+    db.runTransaction {
+          val travelDocumentReference = db.collection(collectionPath).document(id)
+          val listOfParticipant =
+              documentToTravel(it.get(travelDocumentReference))!!.listParticipant
+
+          for (participant in listOfParticipant) {
+            val participantDocumentReference =
+                db.collection(userCollectionPath).document(participant)
+            val profile =
+                ProfileRepositoryConvert.documentToProfile(it.get(participantDocumentReference))
+            val listOfTravels = profile.userTravelList.toMutableList()
+            listOfTravels.remove(id)
+            it.update(participantDocumentReference, "userTravelList", listOfTravels.toList())
+          }
+
+          it.delete(travelDocumentReference)
+        }
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { e ->
+          Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
+          onFailure(e)
+        }
   }
 
   /**

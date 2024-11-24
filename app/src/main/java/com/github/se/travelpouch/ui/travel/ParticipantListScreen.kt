@@ -168,7 +168,8 @@ fun ParticipantListScreen(
                             selectedTravel!!.copy(
                                 allParticipants = participantMap.toMap(),
                                 listParticipant = participantList)
-                        listTravelViewModel.updateTravel(updatedContainer)
+                        listTravelViewModel.updateTravel(
+                            updatedContainer, listTravelViewModel.REMOVING_USER, participant.key)
                         listTravelViewModel.selectTravel(updatedContainer)
                         listTravelViewModel.fetchAllParticipantsInfo()
                         setExpanded(false)
@@ -250,7 +251,8 @@ fun handleRoleChange(
     val participantMap = selectedTravel.allParticipants.toMutableMap()
     participantMap[Participant(participant.key)] = newRole
     val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
-    listTravelViewModel.updateTravel(updatedContainer)
+    listTravelViewModel.updateTravel(
+        updatedContainer, listTravelViewModel.UPDATE_TRAVEL_FIELDS, null)
     listTravelViewModel.selectTravel(updatedContainer)
     setExpandedRoleDialog(false)
     setExpanded(false)

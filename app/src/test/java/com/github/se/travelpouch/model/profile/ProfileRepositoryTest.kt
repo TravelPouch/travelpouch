@@ -58,7 +58,7 @@ class ProfileRepositoryTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "usernameTest",
           "email@test.ch",
-          null,
+          emptyList(),
           "nameTest",
           emptyList())
 

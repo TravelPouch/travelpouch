@@ -30,7 +30,13 @@ interface TravelRepository {
 
   fun addTravel(travel: TravelContainer, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
-  fun updateTravel(travel: TravelContainer, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun updateTravel(
+      travel: TravelContainer,
+      modeOfUpdate: Int,
+      fsUidOfAddedParticipant: String?,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  )
 
   fun deleteTravelById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 }

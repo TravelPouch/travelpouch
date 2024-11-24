@@ -34,6 +34,10 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
   private val _isLoading = MutableStateFlow(false)
   val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+  val UPDATE_TRAVEL_FIELDS = 0
+  val ADDING_USER = 1
+  val REMOVING_USER = 2
+
   fun initAfterLogin() {
     repository.initAfterLogin { getTravels() }
   }
@@ -149,9 +153,11 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    *
    * @param travel The Travel document to be updated.
    */
-  fun updateTravel(travel: TravelContainer) {
+  fun updateTravel(travel: TravelContainer, modeOfUpdate: Int, fsUidOfAddedParticipant: String?) {
     repository.updateTravel(
         travel = travel,
+        modeOfUpdate = modeOfUpdate,
+        fsUidOfAddedParticipant = fsUidOfAddedParticipant,
         onSuccess = { getTravels() },
         onFailure = { Log.e("ListTravelViewModel", "Failed to update travel", it) })
   }
@@ -248,7 +254,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
               selectedTravel.copy(
                   allParticipants = newParticipantMap.toMap(),
                   listParticipant = newParticipantList.toList())
-          updateTravel(newTravel)
+          updateTravel(newTravel, ADDING_USER, user.fsUid)
           onSuccess(newTravel)
         },
         onFailure = { onFailure() })

@@ -154,7 +154,7 @@ class ListTravelViewModelTest {
           null
         }
         .whenever(travelRepository)
-        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     doAnswer { invocation ->
           val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
@@ -164,7 +164,7 @@ class ListTravelViewModelTest {
         .whenever(travelRepository)
         .getTravels(anyOrNull(), anyOrNull())
 
-    listTravelViewModel.updateTravel(travel)
+    listTravelViewModel.updateTravel(travel, 0, null)
 
     assertThat(listTravelViewModel.travels.value, `is`(travelList))
   }
@@ -178,9 +178,9 @@ class ListTravelViewModelTest {
           null
         }
         .whenever(travelRepository)
-        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
-    listTravelViewModel.updateTravel(travel)
+    listTravelViewModel.updateTravel(travel, 0, null)
 
     assertThat(listTravelViewModel.travels.value, `is`(initialTravels))
   }
@@ -283,14 +283,14 @@ class ListTravelViewModelTest {
           null
         }
         .whenever(travelRepository)
-        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
       logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
 
-      listTravelViewModel.updateTravel(travel)
+      listTravelViewModel.updateTravel(travel, 0, null)
 
-      verify(travelRepository).updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+      verify(travelRepository).updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
   }

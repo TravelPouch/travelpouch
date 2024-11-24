@@ -66,7 +66,7 @@ class TravelRepositoryMockTest {
     travelMockRepository.addTravel(travel, {}, {})
     val travelAdded = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(travelAdded == travel)
-    travelMockRepository.updateTravel(travelUpdated, { succeeded = true }, { failed = true })
+    travelMockRepository.updateTravel(travelUpdated, 0, null, { succeeded = true }, { failed = true })
     assert(succeeded)
     assertFalse(failed)
 

@@ -6,10 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -81,8 +85,27 @@ fun ModifyingProfileScreen(
         )
       },
       floatingActionButton = {
-        FloatingActionButton(onClick = { openDialog = true }) {
-          Icon(imageVector = Icons.Default.PersonAddAlt1, contentDescription = null)
+        FloatingActionButton(
+            onClick = { openDialog = true },
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        ) {
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(horizontal = 10.dp) // Adjust padding for better alignment
+              ) {
+                Icon(
+                    imageVector =
+                        Icons.Default.PersonAddAlt1, // Replace with your mail icon resource
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp) // Adjust size as needed
+                    )
+                Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                Text(
+                    text = "Add Friend",
+                    style = MaterialTheme.typography.bodyLarge // Or customize further
+                    )
+              }
         }
       }) { pd ->
         Column(

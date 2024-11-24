@@ -60,6 +60,8 @@ class TravelRepositoryMock : TravelRepository {
 
   override fun updateTravel(
       travel: TravelContainer,
+      modeOfUpdate: Int,
+      fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
