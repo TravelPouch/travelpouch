@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,11 +40,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
@@ -94,7 +95,7 @@ fun TravelListScreen(
   // Used for the screen orientation redraw
   val configuration = LocalConfiguration.current
   val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-  val mapHeight = if (isPortrait) 300.dp else 200.dp
+  val mapHeight = if (isPortrait) 500.dp else 200.dp
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
@@ -113,10 +114,6 @@ fun TravelListScreen(
       content = { pd ->
         Column(modifier = Modifier.fillMaxSize().padding(pd)) {
           // Map placed outside the LazyColumn to prevent it from being part of the scrollable
-          // content
-          //          MapContent(
-          //              modifier = Modifier.fillMaxWidth().height(mapHeight),
-          //              travelContainers = travelList.value)
           ResizableStowableMapWithGoogleMap(mapHeight, travelList)
 
           LazyColumn(
@@ -234,29 +231,28 @@ fun ResizableStowableMapWithGoogleMap(
 ) {
 
   // State to track the height of the map
-
   val minHeightPx = 100f // Min height of the map (collapsed state)
   val latchDp = 30.dp // Height of the strap handle
-  val maxHeightPx = maxMapHeightDp.value + latchDp.value // Max height of the map
-  val mapHeight = remember { mutableStateOf(maxHeightPx) } // Initial height of the map in pixels
+  val maxHeightPx = maxMapHeightDp.value - latchDp.value // Max height of the map
+  val mapHeight = rememberSaveable {
+    mutableFloatStateOf(maxHeightPx)
+  } // Initial height of the map in pixels
   val density = LocalDensity.current // Get the density scale factor
 
-  // Track whether the map is collapsed (height is 0)
-  val isCollapsed = remember { mutableStateOf(false) }
+  // Track whether the map is collapsed (height passed 0 at some point)
+  val isCollapsed = rememberSaveable { mutableStateOf(false) }
 
   Column(modifier = Modifier.fillMaxWidth()) {
-    Box(modifier = Modifier.fillMaxWidth().requiredHeight(mapHeight.value.dp)) {
+    Box(modifier = Modifier.fillMaxWidth().requiredHeight(mapHeight.floatValue.dp)) {
       MapContent(
-          modifier = Modifier.fillMaxWidth().height(mapHeight.value.dp),
+          modifier = Modifier.fillMaxWidth().height(mapHeight.floatValue.dp),
           travelContainers = travelList.value)
     }
 
     // Strap handle at the bottom to drag and resize the map
     Box(
         modifier =
-            Modifier
-                // .align(Alignment.BottomCenter)
-                .fillMaxWidth()
+            Modifier.fillMaxWidth()
                 .graphicsLayer {
                   shape =
                       CutCornerShape(
@@ -266,8 +262,8 @@ fun ResizableStowableMapWithGoogleMap(
                           bottomEnd = 16.dp)
                   clip = true
                 }
-                .height(30.dp)
-                .background(Color.Blue)
+                .height(latchDp)
+                .background(MaterialTheme.colorScheme.tertiary)
                 .draggable(
                     orientation = Orientation.Vertical,
                     state =
@@ -276,27 +272,28 @@ fun ResizableStowableMapWithGoogleMap(
                               delta / density.density // Adjusting by the density scale factor
 
                           // Calculate the new map height based on the delta drag amount
-                          if (mapHeight.value + scaledDelta > maxHeightPx) {
-                            mapHeight.value = maxHeightPx
-                          } else if (mapHeight.value + scaledDelta < minHeightPx &&
+                          if (mapHeight.floatValue + scaledDelta > maxHeightPx) {
+                            mapHeight.floatValue = maxHeightPx
+                          } else if (mapHeight.floatValue + scaledDelta < minHeightPx &&
                               !isCollapsed.value) {
                             isCollapsed.value = true
-                            mapHeight.value = 0f
+                            mapHeight.floatValue = 0f
                           } else {
-                            if (isCollapsed.value && mapHeight.value + scaledDelta > minHeightPx) {
+                            if (isCollapsed.value &&
+                                mapHeight.floatValue + scaledDelta > minHeightPx) {
                               isCollapsed.value = false
                             }
                             // clamp the to the min value to avoid
-                            if (mapHeight.value + scaledDelta < 0) {
-                              mapHeight.value = 0f
+                            if (mapHeight.floatValue + scaledDelta < 0) {
+                              mapHeight.floatValue = 0f
                             } else {
                               mapHeight.value += scaledDelta
                             }
                           }
                         })) {
-          Text(
-              text = "Drag to resize or stow",
-              color = Color.White,
+          Icon(
+              imageVector = Icons.Default.StopCircle,
+              contentDescription = "MapLatch",
               modifier = Modifier.align(Alignment.Center))
         }
   }
