@@ -14,7 +14,12 @@ class ProfileModelViewTest {
 
   val profile =
       Profile(
-          "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", emptyList(), "name", emptyList())
+          "qwertzuiopasdfghjklyxcvbnm12",
+          "username",
+          "email@test.ch",
+          emptyList(),
+          "name",
+          emptyList())
 
   @Before
   fun setUp() {

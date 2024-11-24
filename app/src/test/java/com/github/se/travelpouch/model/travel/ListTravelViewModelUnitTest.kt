@@ -149,7 +149,7 @@ class ListTravelViewModelTest {
   fun updateTravel_successfulUpdate_updatesTravels() {
     val travelList = listOf(travel)
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(1) as () -> Unit
+          val onSuccess = invocation.getArgument(3) as () -> Unit
           onSuccess()
           null
         }
@@ -173,12 +173,12 @@ class ListTravelViewModelTest {
   fun updateTravel_failureUpdate_doesNotUpdateTravels() {
     val initialTravels = listTravelViewModel.travels.value
     doAnswer { invocation ->
-          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          val onFailure = invocation.getArgument(4) as (Exception) -> Unit
           onFailure(Exception("Update Travel Failed Test"))
           null
         }
         .whenever(travelRepository)
-        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+        .updateTravel(anyOrNull(), anyOrNull(), any(), anyOrNull(), anyOrNull())
 
     listTravelViewModel.updateTravel(travel, 0, null)
 
@@ -278,7 +278,7 @@ class ListTravelViewModelTest {
     val errorMessage = "Failed to update travel"
     val exception = Exception("Update Travel Failed Test")
     doAnswer { invocation ->
-          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          val onFailure = invocation.getArgument(4) as (Exception) -> Unit
           onFailure(exception)
           null
         }
@@ -290,7 +290,8 @@ class ListTravelViewModelTest {
 
       listTravelViewModel.updateTravel(travel, 0, null)
 
-      verify(travelRepository).updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+      verify(travelRepository)
+          .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
   }

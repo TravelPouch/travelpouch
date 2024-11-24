@@ -2,13 +2,18 @@ package com.github.se.travelpouch.model.travel
 
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
+import com.github.se.travelpouch.model.FirebasePaths
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelContainerMock
+import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.model.travels.TravelRepositoryFirestore
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -19,6 +24,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Transaction
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -65,7 +71,12 @@ class TravelRepositoryFirestoreUnitTest {
 
   private val profile =
       Profile(
-          "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", emptyList(), "name", emptyList())
+          "qwertzuiopasdfghjklyxcvbnm12",
+          "username",
+          "email@test.ch",
+          emptyList(),
+          "name",
+          emptyList())
 
   private val travel =
       TravelContainer(
@@ -136,41 +147,101 @@ class TravelRepositoryFirestoreUnitTest {
 
   @Test
   fun addsTravelSuccessfully() {
+    //    val task: Task<Void> = mock()
+    //
+    // whenever(mockFirestore.collection("allTravels").document(travel.fsUid).set(travel.toMap()))
+    //        .thenReturn(task)
+    //    whenever(task.isSuccessful).thenReturn(true)
+    //
+    //    var successCalled = false
+    //    travelRepositoryFirestore.addTravel(
+    //        travel, { successCalled = true }, { fail("Should not call onFailure") })
+    //
+    //    // Simulate task completion
+    //    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
+    //    verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
+    //    onCompleteListenerCaptor.firstValue.onComplete(task)
+    //
+    //    assertTrue(successCalled)
+    val travel = TravelContainerMock.createMockTravelContainer(listParticipant = emptyList())
+
+    val firestoreMock: FirebaseFirestore = mock()
+    val travelCollectionMock: CollectionReference = mock()
+    val profileCollectionMock: CollectionReference = mock()
+
+    val travelDocumentMock: DocumentReference = mock()
+    val profileDocumentMock: DocumentReference = mock()
+
+    val transaction: Transaction = mock()
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("allTravels").document(travel.fsUid).set(travel.toMap()))
-        .thenReturn(task)
+
+    val travelRepository: TravelRepository = TravelRepositoryFirestore(firestoreMock)
+    whenever(firestoreMock.collection(eq(FirebasePaths.TravelsSuperCollection)))
+        .thenReturn(travelCollectionMock)
+    whenever(firestoreMock.collection(eq(FirebasePaths.ProfilesSuperCollection)))
+        .thenReturn(profileCollectionMock)
+
+    whenever(travelCollectionMock.document(anyOrNull())).thenReturn(travelDocumentMock)
+    whenever(profileCollectionMock.document(anyOrNull())).thenReturn(profileDocumentMock)
+
+    whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(task)
     whenever(task.isSuccessful).thenReturn(true)
+    whenever(task.addOnSuccessListener(anyOrNull())).thenReturn(task)
+    whenever(task.addOnFailureListener(anyOrNull())).thenReturn(task)
 
-    var successCalled = false
-    travelRepositoryFirestore.addTravel(
-        travel, { successCalled = true }, { fail("Should not call onFailure") })
+    var succeeded = false
+    var failed = false
 
-    // Simulate task completion
-    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
-    verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
-    onCompleteListenerCaptor.firstValue.onComplete(task)
+    travelRepository.addTravel(travel, { succeeded = true }, { failed = true })
 
-    assertTrue(successCalled)
+    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Void>>()
+    verify(task).addOnSuccessListener(onSuccessListenerCaptor.capture())
+    onSuccessListenerCaptor.firstValue.onSuccess(task.result)
+
+    assertTrue(succeeded)
+    assertFalse(failed)
   }
 
   @Test
   fun failsToAddTravel() {
+    val travel = TravelContainerMock.createMockTravelContainer(listParticipant = emptyList())
+
+    val firestoreMock: FirebaseFirestore = mock()
+    val travelCollectionMock: CollectionReference = mock()
+    val profileCollectionMock: CollectionReference = mock()
+
+    val travelDocumentMock: DocumentReference = mock()
+    val profileDocumentMock: DocumentReference = mock()
+
+    val transaction: Transaction = mock()
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("allTravels").document(travel.fsUid).set(travel.toMap()))
-        .thenReturn(task)
+
+    val travelRepository: TravelRepository = TravelRepositoryFirestore(firestoreMock)
+    whenever(firestoreMock.collection(eq(FirebasePaths.TravelsSuperCollection)))
+        .thenReturn(travelCollectionMock)
+    whenever(firestoreMock.collection(eq(FirebasePaths.ProfilesSuperCollection)))
+        .thenReturn(profileCollectionMock)
+
+    whenever(travelCollectionMock.document(anyOrNull())).thenReturn(travelDocumentMock)
+    whenever(profileCollectionMock.document(anyOrNull())).thenReturn(profileDocumentMock)
+
+    whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(task)
     whenever(task.isSuccessful).thenReturn(false)
-    whenever(task.exception).thenReturn(Exception("Firestore error"))
+    whenever(task.exception).thenReturn(Exception("message"))
+    whenever(task.addOnSuccessListener(anyOrNull())).thenReturn(task)
+    whenever(task.addOnFailureListener(anyOrNull())).thenReturn(task)
 
-    var failureCalled = false
-    travelRepositoryFirestore.addTravel(
-        travel, { fail("Should not call onSuccess") }, { failureCalled = true })
+    var succeeded = false
+    var failed = false
 
-    // Simulate task completion
-    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
-    verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
-    onCompleteListenerCaptor.firstValue.onComplete(task)
+    travelRepository.addTravel(travel, { succeeded = true }, { failed = true })
 
-    assertTrue(failureCalled)
+    val onFailureListenerCaptor = argumentCaptor<OnFailureListener>()
+    verify(task).addOnFailureListener(onFailureListenerCaptor.capture())
+    onFailureListenerCaptor.firstValue.onFailure(task.exception!!)
+
+    assertTrue(failed)
+    assertFalse(succeeded)
   }
 
   @Test
@@ -215,18 +286,20 @@ class TravelRepositoryFirestoreUnitTest {
   @Test
   fun deletesTravelByIdSuccessfully() {
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("allTravels").document(travel.fsUid).delete())
-        .thenReturn(task)
+    whenever(mockFirestore.runTransaction<Void>(anyOrNull())).thenReturn(task)
     whenever(task.isSuccessful).thenReturn(true)
+
+    whenever(task.addOnSuccessListener(anyOrNull())).thenReturn(task)
+    whenever(task.addOnFailureListener(anyOrNull())).thenReturn(task)
 
     var successCalled = false
     travelRepositoryFirestore.deleteTravelById(
         travel.fsUid, { successCalled = true }, { fail("Should not call onFailure") })
 
     // Simulate task completion
-    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
-    verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
-    onCompleteListenerCaptor.firstValue.onComplete(task)
+    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Void>>()
+    verify(task).addOnSuccessListener(onSuccessListenerCaptor.capture())
+    onSuccessListenerCaptor.firstValue.onSuccess(task.result)
 
     assertTrue(successCalled)
   }
@@ -234,8 +307,11 @@ class TravelRepositoryFirestoreUnitTest {
   @Test
   fun failsToDeleteTravelById() {
     val task: Task<Void> = mock()
-    whenever(mockFirestore.collection("allTravels").document(travel.fsUid).delete())
-        .thenReturn(task)
+    whenever(mockFirestore.runTransaction<Void>(anyOrNull())).thenReturn(task)
+
+    whenever(task.addOnSuccessListener(anyOrNull())).thenReturn(task)
+    whenever(task.addOnFailureListener(anyOrNull())).thenReturn(task)
+
     whenever(task.isSuccessful).thenReturn(false)
     whenever(task.exception).thenReturn(Exception("Firestore error"))
 
@@ -244,9 +320,9 @@ class TravelRepositoryFirestoreUnitTest {
         travel.fsUid, { fail("Should not call onSuccess") }, { failureCalled = true })
 
     // Simulate task completion
-    val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
-    verify(task).addOnCompleteListener(onCompleteListenerCaptor.capture())
-    onCompleteListenerCaptor.firstValue.onComplete(task)
+    val onFailureListenerCaptor = argumentCaptor<OnFailureListener>()
+    verify(task).addOnFailureListener(onFailureListenerCaptor.capture())
+    onFailureListenerCaptor.firstValue.onFailure(task.exception!!)
 
     assertTrue(failureCalled)
   }
