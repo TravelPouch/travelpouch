@@ -98,7 +98,7 @@ fun TravelListScreen(
   // Used for the screen orientation redraw
   val configuration = LocalConfiguration.current
   val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-  val mapHeight = if (isPortrait) 500.dp else 200.dp
+  val mapHeight = if (isPortrait) 300.dp else 200.dp
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
