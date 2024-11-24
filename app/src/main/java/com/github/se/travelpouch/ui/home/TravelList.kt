@@ -4,16 +4,9 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
@@ -22,12 +15,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
@@ -36,8 +26,6 @@ import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,31 +37,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.R
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -85,7 +63,6 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.util.Locale
-import kotlin.math.roundToInt
 
 /**
  * Composable function for the travels list screen.
@@ -137,10 +114,10 @@ fun TravelListScreen(
         Column(modifier = Modifier.fillMaxSize().padding(pd)) {
           // Map placed outside the LazyColumn to prevent it from being part of the scrollable
           // content
-//          MapContent(
-//              modifier = Modifier.fillMaxWidth().height(mapHeight),
-//              travelContainers = travelList.value)
-            ResizableStowableMapWithGoogleMap(mapHeight,travelList)
+          //          MapContent(
+          //              modifier = Modifier.fillMaxWidth().height(mapHeight),
+          //              travelContainers = travelList.value)
+          ResizableStowableMapWithGoogleMap(mapHeight, travelList)
 
           LazyColumn(
               modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
@@ -248,84 +225,79 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
       }
 }
 
-// inspired from : https://developer.android.com/develop/ui/compose/touch-input/pointer-input/drag-swipe-fling
+// inspired from :
+// https://developer.android.com/develop/ui/compose/touch-input/pointer-input/drag-swipe-fling
 @Composable
-fun ResizableStowableMapWithGoogleMap(maxMapHeightDp: Dp = 300.dp, travelList: State<List<TravelContainer>>) {
+fun ResizableStowableMapWithGoogleMap(
+    maxMapHeightDp: Dp = 300.dp,
+    travelList: State<List<TravelContainer>>
+) {
 
-    // State to track the height of the map
+  // State to track the height of the map
 
-    val minHeightPx = 100f // Min height of the map (collapsed state)
-    val latchDp = 30.dp // Height of the strap handle
-    val maxHeightPx = maxMapHeightDp.value + latchDp.value// Max height of the map
-    val mapHeight = remember { mutableStateOf(maxHeightPx) }  // Initial height of the map in pixels
-    val density = LocalDensity.current // Get the density scale factor
+  val minHeightPx = 100f // Min height of the map (collapsed state)
+  val latchDp = 30.dp // Height of the strap handle
+  val maxHeightPx = maxMapHeightDp.value + latchDp.value // Max height of the map
+  val mapHeight = remember { mutableStateOf(maxHeightPx) } // Initial height of the map in pixels
+  val density = LocalDensity.current // Get the density scale factor
 
-    // Track whether the map is collapsed (height is 0)
-    val isCollapsed = remember { mutableStateOf(false) }
+  // Track whether the map is collapsed (height is 0)
+  val isCollapsed = remember { mutableStateOf(false) }
 
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .requiredHeight(mapHeight.value.dp)
-        ) {
-            MapContent(
-              modifier = Modifier.fillMaxWidth().height(mapHeight.value.dp),
-              travelContainers = travelList.value)
-        }
+  Column(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = Modifier.fillMaxWidth().requiredHeight(mapHeight.value.dp)) {
+      MapContent(
+          modifier = Modifier.fillMaxWidth().height(mapHeight.value.dp),
+          travelContainers = travelList.value)
+    }
 
-        // Strap handle at the bottom to drag and resize the map
-        Box(
-            modifier = Modifier
-                //.align(Alignment.BottomCenter)
+    // Strap handle at the bottom to drag and resize the map
+    Box(
+        modifier =
+            Modifier
+                // .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .graphicsLayer {
-                    shape = CutCornerShape(
-                        topStart = 0.dp, // Adjust these values for the trapezoidal effect
-                        topEnd = 0.dp,
-                        bottomStart = 16.dp,
-                        bottomEnd = 16.dp
-                    )
-                    clip = true
+                  shape =
+                      CutCornerShape(
+                          topStart = 0.dp, // Adjust these values for the trapezoidal effect
+                          topEnd = 0.dp,
+                          bottomStart = 16.dp,
+                          bottomEnd = 16.dp)
+                  clip = true
                 }
                 .height(30.dp)
                 .background(Color.Blue)
                 .draggable(
                     orientation = Orientation.Vertical,
-                    state = rememberDraggableState { delta ->
+                    state =
+                        rememberDraggableState { delta ->
+                          val scaledDelta =
+                              delta / density.density // Adjusting by the density scale factor
 
-                        val scaledDelta = delta / density.density // Adjusting by the density scale factor
-
-                        // Calculate the new map height based on the delta drag amount
-                        if(mapHeight.value + scaledDelta > maxHeightPx) {
+                          // Calculate the new map height based on the delta drag amount
+                          if (mapHeight.value + scaledDelta > maxHeightPx) {
                             mapHeight.value = maxHeightPx
-                        }
-                        else if (mapHeight.value + scaledDelta < minHeightPx && !isCollapsed.value) {
+                          } else if (mapHeight.value + scaledDelta < minHeightPx &&
+                              !isCollapsed.value) {
                             isCollapsed.value = true
                             mapHeight.value = 0f
-                        }
-                        else {
+                          } else {
                             if (isCollapsed.value && mapHeight.value + scaledDelta > minHeightPx) {
-                                isCollapsed.value = false
+                              isCollapsed.value = false
                             }
                             // clamp the to the min value to avoid
                             if (mapHeight.value + scaledDelta < 0) {
-                                mapHeight.value = 0f
+                              mapHeight.value = 0f
                             } else {
-                                mapHeight.value += scaledDelta
+                              mapHeight.value += scaledDelta
                             }
-                        }
-                    }
-                )
-        ) {
-            Text(
-                text = "Drag to resize or stow",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.Center)
-            )
+                          }
+                        })) {
+          Text(
+              text = "Drag to resize or stow",
+              color = Color.White,
+              modifier = Modifier.align(Alignment.Center))
         }
-    }
+  }
 }
