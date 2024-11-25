@@ -84,7 +84,7 @@ class SignInViewTest {
           navigationActions = mockNavigationActions, profileModelView, travelViewModel, yesSpin)
     }
     composeTestRule.waitForIdle()
-    composeTestRule.waitUntil(2000) { yesSpin.value }
+    composeTestRule.onNodeWithTag("loadingSpinner", useUnmergedTree = true).assertExists()
     composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
   }
 
