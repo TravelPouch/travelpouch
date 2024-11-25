@@ -66,7 +66,7 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("usernameField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(profile.username)
     composeTestRule.onNodeWithTag("nameField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("nameField").assertTextContains(profile.username)
+    composeTestRule.onNodeWithTag("nameField").assertTextContains(profile.name)
 
     composeTestRule.onNodeWithTag("friendsText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("friendsText").assertTextEquals("Friends : ")
