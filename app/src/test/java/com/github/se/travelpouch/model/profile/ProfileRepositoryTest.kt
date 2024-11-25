@@ -35,6 +35,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
@@ -369,5 +370,95 @@ class ProfileRepositoryTest {
     assert(failed)
     assertFalse(successCalled)
     assert(idGot == null)
+  }
+
+  @Test
+  fun addFriendTest() {
+
+    var userProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "usernameTest",
+            "email@test.ch",
+            emptyList(),
+            "nameTest",
+            emptyList())
+
+    var friendProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "usernameTestFriend",
+            "email_friend@test.ch",
+            emptyList(),
+            "nameTestFriend",
+            emptyList())
+
+    val mockDocumentSnapshotFriend: DocumentSnapshot = mock()
+    val mockDocumentReferenceFriend: DocumentReference = mock()
+
+    `when`(mockDocumentSnapshotFriend.id).thenReturn(friendProfile.fsUid)
+    `when`(mockDocumentSnapshotFriend.getString("email")).thenReturn(friendProfile.email)
+    `when`(mockDocumentSnapshotFriend.getString("name")).thenReturn(friendProfile.name)
+    `when`(mockDocumentSnapshotFriend.getString("username")).thenReturn(friendProfile.username)
+    `when`(mockDocumentSnapshotFriend.get("userTravelList"))
+        .thenReturn(friendProfile.userTravelList)
+    `when`(mockDocumentSnapshotFriend.get("friends")).thenReturn(friendProfile.friends)
+
+    val firestoreMock: FirebaseFirestore = mock()
+    val profileRepository: ProfileRepositoryFirebase = ProfileRepositoryFirebase(firestoreMock)
+
+    val collectionReference: CollectionReference = mock()
+    val query: Query = mock()
+    val taskFirstLayerMock: Task<QuerySnapshot> = mock()
+    val taskSecondLayerMock: Task<Void> = mock()
+    val querySnapshot: QuerySnapshot = mock()
+
+    whenever(firestoreMock.collection(anyOrNull())).thenReturn(collectionReference)
+    whenever(collectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(query)
+    whenever(query.get()).thenReturn(taskFirstLayerMock)
+    whenever(taskFirstLayerMock.addOnSuccessListener(anyOrNull())).thenReturn(taskFirstLayerMock)
+    whenever(taskFirstLayerMock.addOnFailureListener(anyOrNull())).thenReturn(taskFirstLayerMock)
+
+    whenever(taskFirstLayerMock.isSuccessful).thenReturn(true)
+    whenever(taskFirstLayerMock.result).thenReturn(querySnapshot)
+    whenever(querySnapshot.documents).thenReturn(listOf(mockDocumentSnapshotFriend))
+    whenever(mockDocumentSnapshotFriend.reference).thenReturn(mockDocumentReferenceFriend)
+
+    whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(taskSecondLayerMock)
+    whenever(taskSecondLayerMock.isSuccessful).thenReturn(true)
+    whenever(taskSecondLayerMock.addOnSuccessListener(anyOrNull())).thenReturn(taskSecondLayerMock)
+    whenever(taskSecondLayerMock.addOnFailureListener(anyOrNull())).thenReturn(taskSecondLayerMock)
+
+    var succeeded = false
+    var failed = false
+
+    profileRepository.addFriend(
+        friendProfile.email,
+        userProfile,
+        { a, b -> updatingFriendList(a, b) },
+        {
+          userProfile = it
+          succeeded = true
+        },
+        { failed = true })
+
+    val onCompleteListenerCaptor1 = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(taskFirstLayerMock).addOnSuccessListener(onCompleteListenerCaptor1.capture())
+    onCompleteListenerCaptor1.firstValue.onSuccess(querySnapshot)
+
+    val onCompleteListenerCaptor2 = argumentCaptor<OnSuccessListener<Void>>()
+    verify(taskSecondLayerMock).addOnSuccessListener(onCompleteListenerCaptor2.capture())
+    onCompleteListenerCaptor2.firstValue.onSuccess(null)
+
+    assert(succeeded)
+    assertFalse(failed)
+
+    assert(userProfile.friends.contains(friendProfile.email))
+  }
+
+  private fun updatingFriendList(profile: Profile, email: String): Profile {
+    var friends = profile.friends.toMutableList()
+    friends.add(email)
+    return profile.copy(friends = friends.toList())
   }
 }
