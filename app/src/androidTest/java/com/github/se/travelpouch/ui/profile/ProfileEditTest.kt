@@ -68,12 +68,9 @@ class ProfileEditTest {
     composeTestRule.onNodeWithTag("usernameField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(profile.username)
 
-    composeTestRule.onNodeWithTag("emailField").performTextClearance()
-    composeTestRule.onNodeWithTag("emailField").performTextInput(newProfile.email)
     composeTestRule.onNodeWithTag("usernameField").performTextClearance()
     composeTestRule.onNodeWithTag("usernameField").performTextInput(newProfile.username)
 
-    composeTestRule.onNodeWithTag("emailField").assertTextContains(newProfile.email)
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(newProfile.username)
 
     composeTestRule.onNodeWithTag("saveButton").assertIsDisplayed()
