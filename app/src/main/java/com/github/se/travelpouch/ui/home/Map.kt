@@ -84,7 +84,6 @@ fun MapContent(
               title = travelContainer.title,
               snippet = travelContainer.description,
               onInfoWindowClick = { marker ->
-                Log.d("MapScreen", "Marker clicked: ${marker.tag}")
                 val foundTravelContainer = markers.find { it.fsUid == marker.tag }
                 if (foundTravelContainer != null) {
                   Log.d("MapScreen", "Travel container clicked: ${foundTravelContainer.title}")
