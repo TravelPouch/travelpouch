@@ -104,18 +104,6 @@ fun MapContent(
 }
 
 // credit to https://dev.to/bubenheimer/effective-map-composables-non-draggable-markers-2b2
-/**
- * Composable function that displays a simple marker on the map.
- *
- * @param position The position of the marker.
- * @param title Optional title for the marker.
- * @param snippet Optional snippet for the marker.
- */
-@Composable
-fun SimpleMarker(position: LatLng, title: String? = null, snippet: String? = null) {
-  val state = rememberUpdatedMarkerState(position)
-  Marker(state = state, title = title, snippet = snippet)
-}
 
 /**
  * Composable function that displays a clickable marker on the map.

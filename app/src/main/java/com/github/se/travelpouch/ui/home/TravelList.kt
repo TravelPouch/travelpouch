@@ -308,6 +308,7 @@ fun ResizableStowableMapWithGoogleMap(
     Box(
         modifier =
             Modifier.fillMaxWidth()
+                .testTag("mapLatch")
                 .graphicsLayer {
                   shape =
                       CutCornerShape(
@@ -366,7 +367,7 @@ private fun resizeFromDragMotion(
     if (mapHeight.floatValue + scaledDelta < 0) {
       mapHeight.floatValue = 0f
     } else {
-      mapHeight.value += scaledDelta
+      mapHeight.floatValue += scaledDelta
     }
   }
 }
