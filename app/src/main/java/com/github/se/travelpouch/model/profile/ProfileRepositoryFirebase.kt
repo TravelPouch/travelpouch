@@ -118,7 +118,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     val profile =
         Profile(
             fsUid = uid,
-            username = email.substringBefore("@") + uid,
+            username = email.substringBefore("@"),
             email = email,
             friends = emptyList(),
             name = email.substringBefore("@"),
@@ -197,20 +197,16 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             if (friendProfile == ErrorProfile.errorProfile) {
               onFailure(Exception("user corrupted"))
             } else {
-              if (userProfile.friends.contains(friendProfile.fsUid)) {
-                onFailure(Exception("you are already friends with this user"))
-              } else {
-                val userProfileUpdated = updatingFunction(userProfile, friendProfile.fsUid)
-                db.runTransaction { t ->
-                      t.update(documentReference!!, "friends", userProfileUpdated.friends)
-                      t.update(
-                          friendsDocumentReference!!,
-                          "friends",
-                          updatingFunction(friendProfile, userProfile.fsUid).friends)
-                    }
-                    .addOnSuccessListener { onSuccess(userProfileUpdated) }
-                    .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
-              }
+              val userProfileUpdated = updatingFunction(userProfile, friendProfile.email)
+              db.runTransaction { t ->
+                    t.update(documentReference!!, "friends", userProfileUpdated.friends)
+                    t.update(
+                        friendsDocumentReference!!,
+                        "friends",
+                        updatingFunction(friendProfile, userProfile.email).friends)
+                  }
+                  .addOnSuccessListener { onSuccess(userProfileUpdated) }
+                  .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
             }
           }
         }

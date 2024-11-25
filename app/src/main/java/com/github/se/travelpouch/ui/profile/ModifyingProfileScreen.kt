@@ -118,8 +118,8 @@ fun ModifyingProfileScreen(
                     .testTag("ProfileColumn")) {
               OutlinedTextField(
                   value = email,
-                  onValueChange = { email = it },
-                  enabled = true,
+                  onValueChange = {},
+                  enabled = false,
                   label = { Text("Email") },
                   modifier = Modifier.fillMaxWidth().testTag("emailField"))
 
@@ -137,18 +137,11 @@ fun ModifyingProfileScreen(
                   label = { Text("Name") },
                   modifier = Modifier.fillMaxWidth().testTag("nameField"))
 
-              OutlinedTextField(
-                  value = "No Friend, sadge :(",
-                  onValueChange = {},
-                  enabled = false,
-                  label = { Text("Friends") },
-                  modifier = Modifier.fillMaxWidth().testTag("friendsField"))
-
               Button(
                   onClick = {
                     val newProfile =
                         Profile(
-                            profile.value.fsUid, username, email, emptyList(), "name", emptyList())
+                            profile.value.fsUid, username, email, emptyList(), name, emptyList())
                     profileModelView.updateProfile(newProfile, context)
                     navigationActions.navigateTo(Screen.PROFILE)
                   },
@@ -185,6 +178,13 @@ fun ModifyingProfileScreen(
                                 Log.d("Friend added", "It is you")
                                 Toast.makeText(
                                         context, "You cannot add yourself", Toast.LENGTH_LONG)
+                                    .show()
+                              } else if (profile.value.friends.contains(friendMail)) {
+                                Log.d("Friend added", "Already friend with this user")
+                                Toast.makeText(
+                                        context,
+                                        "You cannot add a friend you are already friend with",
+                                        Toast.LENGTH_LONG)
                                     .show()
                               } else {
                                 profileModelView.addFriend(
