@@ -99,7 +99,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
               label = { Text("Name") },
               modifier = Modifier.fillMaxWidth().testTag("nameField"))
 
-          Text("Friends : ")
+          Text("Friends : ", modifier = Modifier.testTag("friendsText"))
 
           LazyColumn(
               modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
@@ -109,7 +109,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
                   items(profile.value.friends.size) { friend ->
                     Card(
                         modifier =
-                            Modifier.testTag("travelListItem")
+                            Modifier.testTag("friendCard${friend}")
                                 .fillMaxWidth()
                                 .padding(vertical = 10.dp),
                         colors =
@@ -119,8 +119,10 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                                 disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
                             )) {
-                          Box(Modifier.fillMaxSize()) {
-                            Text(profile.value.friends[friend], Modifier.align(Alignment.Center))
+                          Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
+                            Text(
+                                profile.value.friends[friend],
+                                Modifier.align(Alignment.Center).testTag("friend_${friend}"))
                           }
                         }
                   }
@@ -128,7 +130,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
                   item {
                     Card(
                         modifier =
-                            Modifier.testTag("travelListItem")
+                            Modifier.testTag("emptyFriendCard")
                                 .fillMaxWidth()
                                 .padding(vertical = 10.dp),
                         colors =
@@ -138,10 +140,10 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                                 disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
                             )) {
-                          Box(Modifier.fillMaxSize()) {
+                          Box(Modifier.fillMaxSize().testTag("emptyFriendBox")) {
                             Text(
                                 "You have no friend. [insert sad Titanic music]. \n ... \n [insert phonk tik tok music] Stay hard. They don't know you, son",
-                                Modifier.align(Alignment.Center))
+                                Modifier.align(Alignment.Center).testTag("emptyFriendText"))
                           }
                         }
                   }

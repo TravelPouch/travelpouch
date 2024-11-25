@@ -89,24 +89,27 @@ fun ModifyingProfileScreen(
             onClick = { openDialog = true },
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-        ) {
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.padding(horizontal = 10.dp) // Adjust padding for better alignment
-              ) {
-                Icon(
-                    imageVector =
-                        Icons.Default.PersonAddAlt1, // Replace with your mail icon resource
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp) // Adjust size as needed
-                    )
-                Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
-                Text(
-                    text = "Add Friend",
-                    style = MaterialTheme.typography.bodyLarge // Or customize further
-                    )
-              }
-        }
+            modifier = Modifier.testTag("floatingButtonAddingFriend")) {
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier =
+                      Modifier.padding(horizontal = 10.dp) // Adjust padding for better alignment
+                  ) {
+                    Icon(
+                        imageVector =
+                            Icons.Default.PersonAddAlt1, // Replace with your mail icon resource
+                        contentDescription = null,
+                        modifier =
+                            Modifier.size(24.dp)
+                                .testTag("addingFriendIcon") // Adjust size as needed
+                        )
+                    Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                    Text(
+                        text = "Add Friend",
+                        style = MaterialTheme.typography.bodyLarge // Or customize further
+                        )
+                  }
+            }
       }) { pd ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -156,7 +159,8 @@ fun ModifyingProfileScreen(
             Box(
                 Modifier.fillMaxWidth(1f)
                     .height(250.dp)
-                    .background(MaterialTheme.colorScheme.surface)) {
+                    .background(MaterialTheme.colorScheme.surface)
+                    .testTag("boxAddingFriend")) {
                   Column(
                       modifier =
                           Modifier.fillMaxSize()
@@ -164,13 +168,14 @@ fun ModifyingProfileScreen(
                               .verticalScroll(rememberScrollState()),
                       horizontalAlignment = Alignment.CenterHorizontally,
                       verticalArrangement = Arrangement.Center) {
-                        Text("Adding a friend")
+                        Text("Adding a friend", modifier = Modifier.testTag("addingFriendTitle"))
 
                         OutlinedTextField(
                             value = friendMail,
                             onValueChange = { friendMail = it },
                             label = { Text("Friend Email") },
-                            placeholder = { Text("example@example.com") })
+                            placeholder = { Text("example@example.com") },
+                            modifier = Modifier.testTag("addingFriendField"))
 
                         Button(
                             onClick = {
@@ -199,7 +204,8 @@ fun ModifyingProfileScreen(
                                       Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
                                     })
                               }
-                            }) {
+                            },
+                            modifier = Modifier.testTag("addingFriendButton")) {
                               Text("Add Friend")
                             }
                       }
