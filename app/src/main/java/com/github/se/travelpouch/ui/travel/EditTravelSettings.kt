@@ -133,6 +133,7 @@ fun EditTravelSettingsScreen(
                   onClick = {
                     listTravelViewModel.fetchAllParticipantsInfo()
                     navigationActions.navigateTo(PARTICIPANT_LIST)
+                      toggled = !toggled
                   },
                   modifier = Modifier.testTag("manageParticipantsButton"))
 
@@ -145,6 +146,7 @@ fun EditTravelSettingsScreen(
                     clipboardManager.setText(
                         AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com"))
                     Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
+                      toggled = !toggled
                   },
                   modifier = Modifier.testTag("importEmailFab"))
             }
@@ -169,7 +171,7 @@ fun EditTravelSettingsScreen(
       val locationQuery = remember {
         mutableStateOf(selectedTravel!!.location.name)
       } // Use mutable state for location query
-        // locationViewModel.setQuery(selectedTravel!!.location.name)
+      // locationViewModel.setQuery(selectedTravel!!.location.name)
       var showDropdown by remember { mutableStateOf(false) }
       val locationSuggestions by
           locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())

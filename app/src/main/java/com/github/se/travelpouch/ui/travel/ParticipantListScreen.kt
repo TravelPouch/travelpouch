@@ -3,6 +3,7 @@ package com.github.se.travelpouch.ui.travel
 import TruncatedText
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -57,7 +57,6 @@ import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,9 +101,8 @@ fun ParticipantListScreen(
             text = { Text("Add user", modifier = Modifier.testTag("AddUserButton")) },
             icon = { Icon(Icons.Default.PersonAdd, contentDescription = "Add user") },
             onClick = {
-              listTravelViewModel.fetchAllParticipantsInfo()
-              setExpandedAddUserDialog(true)
-              navigationActions.navigateTo(Screen.PARTICIPANT_LIST)
+                Log.d("ParticipantListScreen", "Add user button clicked")
+                setExpandedAddUserDialog(true)
             },
             modifier = Modifier.testTag("importEmailButton"))
       }) { paddingValues ->
@@ -204,8 +202,9 @@ fun ParticipantListScreen(
             val addUserEmail = remember { mutableStateOf("") }
             Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
               Box(
-                  Modifier.size(800.dp, 250.dp)
-                      .background(Color.White)
+                  Modifier.fillMaxWidth(1f)
+                      .height(250.dp)
+                      .background(MaterialTheme.colorScheme.surface)
                       .testTag("addUserDialogBox")) {
                     Column(
                         modifier =
@@ -224,25 +223,63 @@ fun ParticipantListScreen(
                               onValueChange = { addUserEmail.value = it },
                               label = { Text("Enter User's Email") },
                               placeholder = { Text("Enter User's Email") },
-                              modifier = Modifier.testTag("addUserEmailField"),
-                              maxLines = 1)
+                              modifier = Modifier.testTag("addUserEmailField"))
                           Button(
                               onClick = {
-                                listTravelViewModel.addUserToTravel(
+                                profileViewModel.getFsUidByEmail(
                                     addUserEmail.value,
-                                    selectedTravel!!,
-                                    { updatedContainer ->
-                                      listTravelViewModel.selectTravel(updatedContainer)
-                                      Toast.makeText(
-                                              context,
-                                              "User added successfully!",
-                                              Toast.LENGTH_SHORT)
-                                          .show()
-                                      setExpandedAddUserDialog(false)
+                                    onSuccess = { fsUid ->
+                                      val isUserAlreadyAdded =
+                                          selectedTravel!!.allParticipants.keys.any {
+                                            it.fsUid == fsUid
+                                          }
+                                      if (fsUid == profileViewModel.profile.value.fsUid) {
+                                        Toast.makeText(
+                                                context,
+                                                "Error: You can't invite yourself",
+                                                Toast.LENGTH_SHORT)
+                                            .show()
+                                      } else if (isUserAlreadyAdded) {
+                                        Toast.makeText(
+                                                context,
+                                                "Error: User already added",
+                                                Toast.LENGTH_SHORT)
+                                            .show()
+                                      } else if (fsUid != null) {
+                                        try {
+                                          notificationViewModel.sendNotification(
+                                              Notification(
+                                                  notificationViewModel.getNewUid(),
+                                                  profileViewModel.profile.value.fsUid,
+                                                  fsUid,
+                                                  selectedTravel!!.fsUid,
+                                                  NotificationContent.InvitationNotification(
+                                                      profileViewModel.profile.value.name,
+                                                      selectedTravel!!.title,
+                                                      Role.PARTICIPANT),
+                                                  NotificationType.INVITATION))
+                                        } catch (e: Exception) {
+                                          Log.e(
+                                              "NotificationError",
+                                              "Failed to send notification: ${e.message}")
+                                        }
+                                        // Go back
+                                        setExpandedAddUserDialog(false)
+                                      } else {
+                                        Toast.makeText(
+                                                context,
+                                                "Error: User with email not found",
+                                                Toast.LENGTH_SHORT)
+                                            .show()
+                                      }
                                     },
-                                    {
+                                    onFailure = { e ->
+                                      Log.e(
+                                          "EditTravelSettingsScreen",
+                                          "Error getting fsUid by email",
+                                          e)
                                       Toast.makeText(
-                                              context, "Failed to add user", Toast.LENGTH_SHORT)
+                                              context, "Error: ${e.message}", Toast.LENGTH_SHORT)
                                           .show()
                                     })
                               },
@@ -314,28 +351,32 @@ fun handleRoleChange(
     setExpandedRoleDialog(false)
     setExpanded(false)
   } else {
-    if(oldRole == Role.OWNER) {
-        // Actual role change logic
-        if(participant.key != profileViewModel.profile.value.fsUid){
-            notificationViewModel.sendNotification(
-                Notification(
-                    notificationViewModel.getNewUid(),
-                    profileViewModel.profile.value.fsUid,
-                    participant.key,
-                    selectedTravel.fsUid,
-                    NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
-                    NotificationType.ROLE_UPDATE))
-        }
-        val participantMap = selectedTravel.allParticipants.toMutableMap()
-        participantMap[Participant(participant.key)] = newRole
-        val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
-        listTravelViewModel.updateTravel(updatedContainer)
-        listTravelViewModel.selectTravel(updatedContainer)
-        setExpandedRoleDialog(false)
-        setExpanded(false)
-        listTravelViewModel.fetchAllParticipantsInfo()
+    if (oldRole == Role.OWNER) {
+      // Actual role change logic
+      if (participant.key != profileViewModel.profile.value.fsUid) {
+        notificationViewModel.sendNotification(
+            Notification(
+                notificationViewModel.getNewUid(),
+                profileViewModel.profile.value.fsUid,
+                participant.key,
+                selectedTravel.fsUid,
+                NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
+                NotificationType.ROLE_UPDATE))
+      }
+      val participantMap = selectedTravel.allParticipants.toMutableMap()
+      participantMap[Participant(participant.key)] = newRole
+      val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
+      listTravelViewModel.updateTravel(updatedContainer)
+      listTravelViewModel.selectTravel(updatedContainer)
+      setExpandedRoleDialog(false)
+      setExpanded(false)
+      listTravelViewModel.fetchAllParticipantsInfo()
     } else {
-        Toast.makeText(context, "You do not have the permission to change the role of this participant", Toast.LENGTH_LONG).show()
+      Toast.makeText(
+              context,
+              "You do not have the permission to change the role of this participant",
+              Toast.LENGTH_LONG)
+          .show()
     }
   }
 }
