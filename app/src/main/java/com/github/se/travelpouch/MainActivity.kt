@@ -122,7 +122,11 @@ class MainActivity : ComponentActivity() {
         }
         composable(Screen.EDIT_TRAVEL_SETTINGS) {
           EditTravelSettingsScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
+              listTravelViewModel,
+              navigationActions,
+              notificationViewModel,
+              profileModelView,
+              locationViewModel)
         }
 
         composable(Screen.ACTIVITIES_MAP) {

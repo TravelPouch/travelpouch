@@ -1,18 +1,14 @@
 package com.github.se.travelpouch.ui.travel
 
-import TruncatedText
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -29,30 +25,46 @@ fun ParticipantRow(
     onClick: () -> Unit
 ) {
 
-  Row(
-      modifier = Modifier.fillMaxWidth().testTag("participantRow").clickable { onClick() },
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically) {
+  Column(
+      modifier =
+          Modifier.fillMaxWidth()
+              .testTag("participantColumn")
+              .clickable { onClick() }
+              .padding(10.dp) // Apply padding for the entire column
+      ) {
+        // Icon on top
         Icon(
             imageVector = Icons.Default.Person,
             contentDescription = "Localized description",
-            modifier = Modifier.padding(5.dp).testTag("participantIcon"))
+            modifier =
+                Modifier.padding(bottom = 8.dp) // Add space below the icon
+                    .testTag("participantIcon"))
+
+        // Username
         Text(
             text = participant.value.name,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(5.dp).testTag("participantName").weight(0.8f))
-        TruncatedText(
+            fontWeight = FontWeight.Bold,
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(bottom = 4.dp) // Add space between text elements
+                    .testTag("participantName"))
+
+        // Email
+        Text(
             text = participant.value.email,
-            fontWeight = FontWeight.Light,
-            style = MaterialTheme.typography.labelSmall,
-            maxLength = 25,
-            modifier = Modifier.padding(5.dp).testTag("participantEmail").weight(0.8f))
-        TruncatedText(
+            fontWeight = FontWeight.Bold,
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(bottom = 4.dp) // Add space between text elements
+                    .testTag("participantEmail"))
+
+        // Role
+        Text(
             text = selectedTravel.allParticipants[Participant(participant.key)]!!.name,
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.labelMedium,
-            maxLength = 20,
-            modifier = Modifier.padding(5.dp).testTag("participantRole").weight(1f))
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(bottom = 4.dp) // Add space between text elements
+                    .testTag("participantRole"))
       }
 }
