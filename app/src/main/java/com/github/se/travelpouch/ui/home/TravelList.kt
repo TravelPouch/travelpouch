@@ -188,7 +188,7 @@ fun TravelListScreen(
                       travelContainers = travelList.value)
 
                   LazyColumn(
-                      modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                      modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp),
                       contentPadding = PaddingValues(bottom = 80.dp)) {
                         if (travelList.value.isNotEmpty()) {
                           items(travelList.value.size) { index ->
