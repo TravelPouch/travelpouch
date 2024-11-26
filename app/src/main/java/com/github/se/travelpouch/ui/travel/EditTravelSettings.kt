@@ -139,7 +139,9 @@ fun EditTravelSettingsScreen(
                                     modifier = Modifier.testTag("manageParticipantsText"))
                             },
                             icon = { Icon(Icons.Default.Person, contentDescription = "Manage Participants") },
-                            onClick = { navigationActions.navigateTo(PARTICIPANT_LIST) },
+                            onClick = {
+                                listTravelViewModel.fetchAllParticipantsInfo()
+                                navigationActions.navigateTo(PARTICIPANT_LIST) },
                             modifier = Modifier.testTag("manageParticipantsButton"))
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -209,10 +211,7 @@ fun EditTravelSettingsScreen(
                             .padding(start = 50.dp, end = 8.dp)
                             .size(50.dp)
                             .testTag("editTravelParticipantIcon")
-                            .clickable {
-                                listTravelViewModel.fetchAllParticipantsInfo()
-                                navigationActions.navigateTo(PARTICIPANT_LIST)
-                            })
+                            )
                     Text(
                         "${selectedTravel!!.allParticipants.size} participants",
                         modifier = Modifier
