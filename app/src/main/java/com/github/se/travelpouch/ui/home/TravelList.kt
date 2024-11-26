@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -49,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -96,9 +94,7 @@ fun TravelListScreen(
   val isLoading = listTravelViewModel.isLoading.collectAsState()
 
   // Used for the screen orientation redraw
-  val configuration = LocalConfiguration.current
-  val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-  val mapHeight = if (isPortrait) 300.dp else 200.dp
+  val mapPlusLatchHeight = 300.dp
 
   Scaffold(
       modifier = Modifier.testTag("TravelListScreen"),
@@ -117,7 +113,7 @@ fun TravelListScreen(
       content = { pd ->
         Column(modifier = Modifier.fillMaxSize().padding(pd)) {
           // Map placed outside the LazyColumn to prevent it from being part of the scrollable
-          ResizableStowableMapWithGoogleMap(mapHeight, travelList) { travelContainer ->
+          ResizableStowableMapWithGoogleMap(mapPlusLatchHeight, travelList) { travelContainer ->
             selectAndNavigateToTravel(
                 travelContainer,
                 listTravelViewModel,
@@ -269,29 +265,29 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
 /**
  * Composable function that displays a resizable and stowable map with Google Map integration.
  *
- * @param maxMapHeightDp The maximum height of the map in Dp. Default is 300.dp.
+ * @param maxMapPlusLatchDp The maximum height of the map in Dp. Default is 300.dp.
  * @param travelList The list of travel containers to be displayed on the map.
  * @param onInfoWindowClickCallback Callback function to be invoked when a marker info window is
  *   clicked.
  */
 @Composable
 fun ResizableStowableMapWithGoogleMap(
-    maxMapHeightDp: Dp = 300.dp,
+    maxMapPlusLatchDp: Dp = 300.dp,
     travelList: State<List<TravelContainer>>,
     onInfoWindowClickCallback: (TravelContainer) -> Unit = {},
 ) {
 
   // State to track the height of the map
-  val minHeightPx = 100f // Min height of the map (collapsed state)
+  val minHeight = 100f // Min height of the map (collapsed state)
   val latchDp = 30.dp // Height of the strap handle
-  val maxHeightPx = maxMapHeightDp.value - latchDp.value // Max height of the map
+  val maxHeight = maxMapPlusLatchDp.value - latchDp.value // Max height of the map
   val mapHeight = rememberSaveable {
-    mutableFloatStateOf(maxHeightPx)
+    mutableFloatStateOf(maxHeight)
   } // Initial height of the map in pixels
   val density = LocalDensity.current // Get the density scale factor
 
   // Track whether the map is collapsed (height passed 0 at some point)
-  val isCollapsed = rememberSaveable { mutableStateOf(false) }
+  val belowThreshold = rememberSaveable { mutableStateOf(false) }
 
   Column(modifier = Modifier.fillMaxWidth()) {
     Box(modifier = Modifier.fillMaxWidth().requiredHeight(mapHeight.floatValue.dp)) {
@@ -322,7 +318,7 @@ fun ResizableStowableMapWithGoogleMap(
                     state =
                         rememberDraggableState { delta ->
                           resizeFromDragMotion(
-                              delta, density, mapHeight, maxHeightPx, minHeightPx, isCollapsed)
+                              delta, density, mapHeight, maxHeight, minHeight, belowThreshold)
                         })) {
           Icon(
               imageVector = Icons.Default.StopCircle,
@@ -338,30 +334,30 @@ fun ResizableStowableMapWithGoogleMap(
  * @param delta The change in position from the drag motion.
  * @param density The density scale factor.
  * @param mapHeight The current height of the map.
- * @param maxHeightPx The maximum height of the map in pixels.
- * @param minHeightPx The minimum height of the map in pixels.
- * @param isCollapsed A state indicating whether the map is collapsed.
+ * @param maxHeight The maximum height of the map in pixels.
+ * @param minHeight The minimum height of the map in pixels.
+ * @param belowThreshold A state indicating whether the map is collapsed.
  */
 private fun resizeFromDragMotion(
     delta: Float,
     density: Density,
     mapHeight: MutableFloatState,
-    maxHeightPx: Float,
-    minHeightPx: Float,
-    isCollapsed: MutableState<Boolean>
+    maxHeight: Float,
+    minHeight: Float,
+    belowThreshold: MutableState<Boolean>
 ) {
   val scaledDelta = delta / density.density // Adjusting by the density scale factor
 
   // Calculate the new map height based on the delta drag amount
   // clamp to the max value to avoid exceeding the max height
-  if (mapHeight.floatValue + scaledDelta > maxHeightPx) {
-    mapHeight.floatValue = maxHeightPx
-  } else if (mapHeight.floatValue + scaledDelta < minHeightPx && !isCollapsed.value) {
-    isCollapsed.value = true
+  if (mapHeight.floatValue + scaledDelta > maxHeight) {
+    mapHeight.floatValue = maxHeight
+  } else if (mapHeight.floatValue + scaledDelta < minHeight && !belowThreshold.value) {
+    belowThreshold.value = true
     mapHeight.floatValue = 0f
   } else {
-    if (isCollapsed.value && mapHeight.floatValue + scaledDelta > minHeightPx) {
-      isCollapsed.value = false
+    if (belowThreshold.value && mapHeight.floatValue + scaledDelta > minHeight) {
+      belowThreshold.value = false
     }
     // clamp to the min value to avoid negatives values
     if (mapHeight.floatValue + scaledDelta < 0) {
