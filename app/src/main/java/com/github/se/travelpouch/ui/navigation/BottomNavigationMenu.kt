@@ -21,9 +21,7 @@ fun BottomNavigationMenu(tabList: List<TopLevelDestination>, navigationActions: 
       NavigationBarItem(
           onClick = {
             when (destination.textId) {
-              "Activities" -> navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
               "Map" -> navigationActions.navigateTo(Screen.ACTIVITIES_MAP)
-              "Calendar" -> navigationActions.navigateTo(Screen.CALENDAR)
               "Notifications" -> navigationActions.navigateTo(Screen.NOTIFICATION)
               "Travels" -> navigationActions.navigateTo(Screen.TRAVEL_LIST)
             }
