@@ -81,7 +81,7 @@ fun ParticipantListScreen(
             },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
+                  onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
