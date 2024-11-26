@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Transaction
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.tasks.await
@@ -34,6 +35,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.timeout
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -395,6 +397,11 @@ class ProfileRepositoryTest {
 
     val mockDocumentSnapshotFriend: DocumentSnapshot = mock()
     val mockDocumentReferenceFriend: DocumentReference = mock()
+    val mockDocumentReferenceUser: DocumentReference = mock()
+
+    val transactionMock: Transaction = mock()
+
+    whenever(transactionMock.update(any(), eq("friends"), anyOrNull())).thenReturn(transactionMock)
 
     `when`(mockDocumentSnapshotFriend.id).thenReturn(friendProfile.fsUid)
     `when`(mockDocumentSnapshotFriend.getString("email")).thenReturn(friendProfile.email)
@@ -406,6 +413,10 @@ class ProfileRepositoryTest {
 
     val firestoreMock: FirebaseFirestore = mock()
     val profileRepository: ProfileRepositoryFirebase = ProfileRepositoryFirebase(firestoreMock)
+
+    val privateField = profileRepository.javaClass.getDeclaredField("documentReference")
+    privateField.isAccessible = true
+    privateField.set(profileRepository, mockDocumentReferenceUser)
 
     val collectionReference: CollectionReference = mock()
     val query: Query = mock()
@@ -445,6 +456,12 @@ class ProfileRepositoryTest {
     val onCompleteListenerCaptor1 = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
     verify(taskFirstLayerMock).addOnSuccessListener(onCompleteListenerCaptor1.capture())
     onCompleteListenerCaptor1.firstValue.onSuccess(querySnapshot)
+
+    val transactionCaptor = argumentCaptor<Transaction.Function<Void>>()
+    verify(firestoreMock).runTransaction(transactionCaptor.capture())
+    transactionCaptor.firstValue.apply(transactionMock)
+
+    verify(transactionMock, times(2)).update(anyOrNull(), eq("friends"), anyOrNull())
 
     val onCompleteListenerCaptor2 = argumentCaptor<OnSuccessListener<Void>>()
     verify(taskSecondLayerMock).addOnSuccessListener(onCompleteListenerCaptor2.capture())
