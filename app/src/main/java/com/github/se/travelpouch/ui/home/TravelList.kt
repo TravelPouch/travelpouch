@@ -115,6 +115,7 @@ fun TravelListScreen(
         Box(
             modifier =
                 Modifier.fillMaxSize()
+                    .testTag("closingMenuBox")
                     .padding(start = (configuration.screenWidthDp * 0.75).dp)
                     .pointerInput(Unit) {
                       detectTapGestures(
@@ -127,7 +128,7 @@ fun TravelListScreen(
               FloatingActionButton(
                   onClick = { scope.launch { drawerState.close() } },
                   modifier =
-                      Modifier.testTag("menuFab")
+                      Modifier.testTag("closingMenuFab")
                           .align(Alignment.TopEnd)
                           .zIndex(1f)
                           .padding(end = 8.dp)
@@ -135,25 +136,30 @@ fun TravelListScreen(
                     Icon(imageVector = Icons.Default.Close, contentDescription = "MenuClosing")
                   }
             }
-        ModalDrawerSheet(modifier = Modifier.width((configuration.screenWidthDp * 0.75).dp)) {
-          listOfTopLevelDestinations.forEach { item ->
-            NavigationDrawerItem(
-                icon = { Icon(item.icon, contentDescription = null) },
-                label = { Text(item.textId) },
-                selected = false,
-                onClick = {
-                  scope.launch { drawerState.close() }
-                  when (item.textId) {
-                    TopLevelDestinations.PROFILE.textId ->
-                        navigationActions.navigateTo(Screen.PROFILE)
-                    TopLevelDestinations.NOTIFICATION.textId ->
-                        navigationActions.navigateTo(Screen.NOTIFICATION)
-                    TopLevelDestinations.TRAVELS.textId -> scope.launch { drawerState.close() }
-                  }
-                },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
-          }
-        }
+        ModalDrawerSheet(
+            modifier =
+                Modifier.width((configuration.screenWidthDp * 0.75).dp)
+                    .testTag("drawerSheetMenu")) {
+              listOfTopLevelDestinations.forEach { item ->
+                NavigationDrawerItem(
+                    icon = { Icon(item.icon, contentDescription = null) },
+                    label = { Text(item.textId) },
+                    selected = false,
+                    onClick = {
+                      scope.launch { drawerState.close() }
+                      when (item.textId) {
+                        TopLevelDestinations.PROFILE.textId ->
+                            navigationActions.navigateTo(Screen.PROFILE)
+                        TopLevelDestinations.NOTIFICATION.textId ->
+                            navigationActions.navigateTo(Screen.NOTIFICATION)
+                        TopLevelDestinations.TRAVELS.textId -> scope.launch { drawerState.close() }
+                      }
+                    },
+                    modifier =
+                        Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                            .testTag("item${item.textId}"))
+              }
+            }
       },
       drawerState = drawerState,
       gesturesEnabled = false) {
