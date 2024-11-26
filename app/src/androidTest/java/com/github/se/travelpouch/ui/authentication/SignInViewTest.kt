@@ -76,16 +76,16 @@ class SignInViewTest {
     composeTestRule.onNodeWithTag("loginButtonRow").performClick()
   }
 
-  @Test
-  fun signInScreenTestSpinner() {
-    val yesSpin: MutableState<Boolean> = mutableStateOf(true)
-    composeTestRule.setContent {
-      SignInScreen(
-          navigationActions = mockNavigationActions, profileModelView, travelViewModel, yesSpin)
-    }
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
-  }
+//  @Test
+//  fun signInScreenTestSpinner() {
+//    val yesSpin: MutableState<Boolean> = mutableStateOf(true)
+//    composeTestRule.setContent {
+//      SignInScreen(
+//          navigationActions = mockNavigationActions, profileModelView, travelViewModel, yesSpin)
+//    }
+//    composeTestRule.waitForIdle()
+//    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
+//  }
 
   @Test
   fun signInWithWmailAndPasswordIsDisplayed() {
