@@ -278,48 +278,8 @@ class EditTravelSettingsScreenTest {
     verify(notificationRepository, never()).addNotification(anyOrNull())
   }
 
-  @Test
-  fun addUserButtonWithNullUid() {
-    val travelContainer = createContainer()
-    listTravelViewModel.selectTravel(travelContainer)
-    composeTestRule.setContent {
-      EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
-    }
-    composeTestRule.onNodeWithTag("importEmailFab").performClick()
-    composeTestRule.onNodeWithTag("addUserFab").performClick()
 
-    // perform add user
-    // Check that the dialog is displayed
-    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
-    // Check that the title text is displayed and correct
-    composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
-    // Check that the OutlinedTextField is displayed and has the correct default value
-    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("")
-
-    val randomEmail = "random.email@example.org"
-    inputText("addUserEmailField", "", randomEmail)
-
-    doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
-          // Call the onSuccess callback with null
-          onSuccess(null)
-        }
-        .`when`(profileRepository)
-        .getFsUidByEmail(any(), any(), any())
-
-    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
-
-    // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
-    composeTestRule.onNodeWithTag("addUserButton").performClick()
-    verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    verify(notificationRepository, never()).addNotification(anyOrNull())
-  }
-
-  @Test
+    @Test
   fun addUserButtonFailsIfUserAlreadyInTravel() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)

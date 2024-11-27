@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onFirst
@@ -11,6 +12,8 @@ import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.notifications.NotificationRepository
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
@@ -29,7 +32,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.never
 
 class ParticipantListScreenTest {
 
@@ -368,4 +377,55 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed().performClick()
     composeTestRule.onAllNodesWithTag("participantColumn").onFirst().performScrollTo().performClick()
   }
+
+    @Test
+    fun addUserButtonWithNullUid() {
+        val travelContainer = createContainer()
+        listTravelViewModel.selectTravel(travelContainer)
+        composeTestRule.setContent {
+            ParticipantListScreen(
+                listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+        }
+
+        // Open the Add User dialog
+        composeTestRule.onNodeWithTag("addUserFab").performClick()
+
+        // Assert that the dialog is displayed
+        composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
+
+        // Check that the title text is displayed and correct
+        composeTestRule.onNodeWithTag("addUserDialogTitle").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("addUserDialogTitle").assertTextEquals("Add User by Email")
+
+        // Check that the OutlinedTextField is displayed and has the correct default value
+        composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("addUserEmailField").assertTextContains("")
+
+        // Input random email
+        val randomEmail = "random.email@example.org"
+        composeTestRule.onNodeWithTag("addUserEmailField").performScrollTo()
+        composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed().assertTextContains("")
+        composeTestRule.onNodeWithTag("addUserEmailField").performTextClearance()
+        composeTestRule.onNodeWithTag("addUserEmailField").performTextInput(randomEmail)
+        composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed().assertTextContains(randomEmail)
+
+        // Mock the repository behavior
+        doAnswer { invocation ->
+            val onSuccess = invocation.getArgument<(Profile?) -> Unit>(1)
+            // Call the onSuccess callback with null
+            onSuccess(null)
+        }.`when`(profileRepository).getFsUidByEmail(any(), any(), any())
+
+        doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+
+        // Mock the repository.updateTravel method to do nothing
+        doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+
+        // Click the Add User button
+        composeTestRule.onNodeWithTag("addUserButton").performClick()
+
+        // Verify interactions with the repositories
+        verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+        verify(notificationRepository, never()).addNotification(anyOrNull())
+    }
 }

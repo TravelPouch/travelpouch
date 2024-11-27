@@ -153,7 +153,7 @@ fun EditTravelSettingsScreen(
           } else {
             FloatingActionButton(
                 onClick = { toggled = !toggled }, modifier = Modifier.testTag("plusButton")) {
-                  Icon(Icons.Default.Add, contentDescription = "Add Document")
+                  Icon(Icons.Default.Add, contentDescription = "Expend button")
                 }
           }
         }

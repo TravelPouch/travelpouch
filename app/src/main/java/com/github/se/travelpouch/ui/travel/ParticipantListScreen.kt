@@ -104,7 +104,7 @@ fun ParticipantListScreen(
                 Log.d("ParticipantListScreen", "Add user button clicked")
                 setExpandedAddUserDialog(true)
             },
-            modifier = Modifier.testTag("importEmailButton"))
+            modifier = Modifier.testTag("addUserFab"))
       }) { paddingValues ->
         if (selectedTravel != null) {
           LazyColumn(
