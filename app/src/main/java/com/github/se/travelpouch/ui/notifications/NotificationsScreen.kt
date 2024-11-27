@@ -3,7 +3,6 @@ package com.github.se.travelpouch.ui.notifications
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -13,6 +12,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+
+import androidx.compose.material3.MaterialTheme
+
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -21,12 +23,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -74,14 +74,8 @@ fun NotificationsScreen(
       modifier = Modifier.testTag("ScalNotificationsScreen"),
       topBar = {
         TopAppBar(
-            modifier = Modifier.padding(8.dp).testTag("TopAppBarNotificationsScreen"),
             title = {
-              Text(
-                  text = "Notifications",
-                  fontSize = 32.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color.Black,
-                  modifier = Modifier.fillMaxWidth().testTag("TitleNotificationsScreen"))
+              Text(text = "Notifications", modifier = Modifier.testTag("TitleNotificationsScreen"))
             },
             navigationIcon = {
               IconButton(
@@ -123,7 +117,7 @@ fun NotificationsScreen(
                 item {
                   Text(
                       text = category,
-                      fontSize = 20.sp,
+                      style = MaterialTheme.typography.titleLarge,
                       fontWeight = FontWeight.Bold,
                       modifier = Modifier.padding(8.dp).testTag("CategoryTitle"))
                 }
