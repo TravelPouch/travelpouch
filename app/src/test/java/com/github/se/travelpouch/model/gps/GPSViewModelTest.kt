@@ -1,7 +1,13 @@
 package com.github.se.travelpouch.model.gps
 
+import android.content.Context
 import android.location.Location
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -122,5 +128,33 @@ class GPSViewModelTest {
 
     // Verify the result is null
     assertNull(emittedLocation)
+  }
+
+  @Test
+  fun testGPSViewModelFactoryCreatesInstance() {
+    // Mock context
+    val mockContext = mock(Context::class.java)
+
+    // Mock fused location client
+    val mockFusedLocationProviderClient =
+        mockk<com.google.android.gms.location.FusedLocationProviderClient>()
+
+    // Mock the static method LocationServices.getFusedLocationProviderClient
+    mockkStatic(LocationServices::class)
+    every { LocationServices.getFusedLocationProviderClient(mockContext) } returns
+        mockFusedLocationProviderClient
+
+    // Create the factory
+    val factory = GPSViewModel.Factory(mockContext)
+
+    // Use the factory to create an instance of GPSViewModel
+    val viewModel = factory.create(GPSViewModel::class.java)
+
+    // Verify the instance
+    assertNotNull(viewModel)
+    assertTrue(viewModel is GPSViewModel)
+
+    // Clean up the static mock
+    unmockkStatic(LocationServices::class)
   }
 }
