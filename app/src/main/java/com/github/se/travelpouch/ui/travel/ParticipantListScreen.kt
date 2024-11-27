@@ -109,11 +109,11 @@ fun ParticipantListScreen(
         if (selectedTravel != null) {
           LazyColumn(
               modifier =
-                  Modifier.padding(paddingValues).fillMaxWidth().testTag("participantColumn")) {
+                  Modifier.padding(paddingValues).fillMaxWidth().testTag("callParticipantColumn")) {
                 participants.entries.forEach { participantEntry ->
                   item {
                     // display all participants in travel
-                    ParticipantRow(
+                    ParticipantColumn(
                         participant = participantEntry,
                         selectedTravel = selectedTravel!!,
                         onClick = {

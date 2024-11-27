@@ -10,6 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import com.github.se.travelpouch.model.location.LocationRepository
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.notifications.NotificationRepository
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
@@ -78,6 +80,8 @@ class EditTravelSettingsScreenTest {
   private lateinit var notificationRepository: NotificationRepository
   private lateinit var profileModelView: ProfileModelView
   private lateinit var profileRepository: ProfileRepository
+  private lateinit var locationRepository: LocationRepository
+  private lateinit var locationViewModel: LocationViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -90,13 +94,15 @@ class EditTravelSettingsScreenTest {
     notificationViewModel = NotificationViewModel(notificationRepository)
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView(profileRepository)
+    locationRepository = mock(LocationRepository::class.java)
+      locationViewModel = LocationViewModel(locationRepository)
   }
 
   @Test
   fun checkNoSelectedTravel() {
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
@@ -119,7 +125,7 @@ class EditTravelSettingsScreenTest {
         travelContainer) // this causes strange overwrite, shouldn't happen IRL
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
@@ -149,7 +155,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
 
     inputText("inputTravelTitle", travelContainer.title, "Test Title")
@@ -173,7 +179,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
@@ -226,7 +232,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
@@ -278,7 +284,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
@@ -319,7 +325,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
@@ -369,7 +375,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
@@ -419,7 +425,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
@@ -493,7 +499,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
 
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
@@ -512,7 +518,7 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
     // check bad dates
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
@@ -534,7 +540,7 @@ class EditTravelSettingsScreenTest {
   fun backButtonNavigatesCorrectly() {
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("goBackButton").performClick()
@@ -546,7 +552,7 @@ class EditTravelSettingsScreenTest {
   fun saveButtonPressed() {
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("travelSaveButton").isDisplayed()
@@ -560,7 +566,7 @@ class EditTravelSettingsScreenTest {
 
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, locationViewModel)
     }
 
     // The startDate picker button should be displayed

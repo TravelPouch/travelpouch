@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.ui.travel
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
@@ -202,10 +203,10 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("callParticipantColumn").assertIsDisplayed()
 
-    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
-    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    val first = composeTestRule.onAllNodesWithTag("participantColumn").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantColumn").onLast()
     first.assertExists().assertIsDisplayed()
     second.assertExists().assertIsDisplayed()
     second.performScrollTo().performClick()
@@ -234,7 +235,7 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("organizerButton").performClick()
     composeTestRule.onNodeWithTag("participantDialogBox").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("roleDialogBox").assertIsNotDisplayed()
-    composeTestRule.onAllNodesWithTag("participantRow").onFirst().performScrollTo().performClick()
+    composeTestRule.onAllNodesWithTag("participantColumn").onFirst().performScrollTo().performClick()
   }
 
   @Test
@@ -262,10 +263,10 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("callParticipantColumn").assertIsDisplayed()
 
-    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
-    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    val first = composeTestRule.onAllNodesWithTag("participantColumn").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantColumn").onLast()
     first.assertExists().assertIsDisplayed()
     second.assertExists().assertIsDisplayed()
     second.performScrollTo().performClick()
@@ -316,10 +317,11 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("callParticipantColumn").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("participantColumn").assertCountEquals(2)
 
-    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
-    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    val first = composeTestRule.onAllNodesWithTag("participantColumn").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantColumn").onLast()
     first.assertExists().assertIsDisplayed()
     second.assertExists().assertIsDisplayed()
     first.performScrollTo().performClick()
@@ -352,10 +354,10 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("callParticipantColumn").assertIsDisplayed()
 
-    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
-    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
+    val first = composeTestRule.onAllNodesWithTag("participantColumn").onFirst()
+    val second = composeTestRule.onAllNodesWithTag("participantColumn").onLast()
     first.assertExists().assertIsDisplayed()
     second.assertExists().assertIsDisplayed()
     second.performScrollTo().performClick()
@@ -364,6 +366,6 @@ class ParticipantListScreenTest {
         .assertIsDisplayed()
         .assertTextContains("Role : OWNER")
     composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed().performClick()
-    composeTestRule.onAllNodesWithTag("participantRow").onFirst().performScrollTo().performClick()
+    composeTestRule.onAllNodesWithTag("participantColumn").onFirst().performScrollTo().performClick()
   }
 }

@@ -19,7 +19,7 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.fsUid
 
 @Composable
-fun ParticipantRow(
+fun ParticipantColumn(
     participant: Map.Entry<fsUid, Profile>,
     selectedTravel: TravelContainer,
     onClick: () -> Unit
