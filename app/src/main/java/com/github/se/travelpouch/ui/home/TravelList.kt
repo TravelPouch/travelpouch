@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,7 +45,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -117,13 +115,10 @@ fun TravelListScreen(
                 Modifier.fillMaxSize()
                     .testTag("closingMenuBox")
                     .padding(start = (configuration.screenWidthDp * 0.75).dp)
-                    .pointerInput(Unit) {
-                      detectTapGestures(
-                          onTap = {
-                            if (drawerState.isOpen) {
-                              scope.launch { drawerState.close() }
-                            }
-                          })
+                    .clickable {
+                      if (drawerState.isOpen) {
+                        scope.launch { drawerState.close() }
+                      }
                     }) {
               FloatingActionButton(
                   onClick = { scope.launch { drawerState.close() } },
