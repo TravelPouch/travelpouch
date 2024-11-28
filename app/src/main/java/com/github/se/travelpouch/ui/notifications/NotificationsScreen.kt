@@ -6,8 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,9 +32,8 @@ import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
-import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
+import com.github.se.travelpouch.ui.navigation.Screen
 import java.util.Calendar
 import java.util.Date
 
@@ -71,6 +74,16 @@ fun NotificationsScreen(
         TopAppBar(
             title = {
               Text(text = "Notifications", modifier = Modifier.testTag("TitleNotificationsScreen"))
+            },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
+                  modifier = Modifier.testTag("goBackButton") // Tag for back button
+                  ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
             },
             actions = {
               Button(
@@ -120,11 +133,6 @@ fun NotificationsScreen(
                 }
               }
             }
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            navigationActions = navigationActions,
-            tabList = listOf(TopLevelDestinations.NOTIFICATION, TopLevelDestinations.TRAVELS))
       })
 }
 

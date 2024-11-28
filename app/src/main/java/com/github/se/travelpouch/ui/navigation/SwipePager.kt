@@ -5,7 +5,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Settings
@@ -95,12 +94,6 @@ fun SwipePager(
                   onClick = { navigationActions.navigateTo(Screen.DOCUMENT_LIST) },
                   modifier = Modifier.testTag("documentListButton")) {
                     Icon(imageVector = Icons.Default.Folder, contentDescription = null)
-                  }
-
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
-                  modifier = Modifier.testTag("ProfileButton")) {
-                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
                   }
             })
       },

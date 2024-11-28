@@ -401,4 +401,72 @@ class TravelListScreenTest {
     composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(60.dp)
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
+
+  @Test
+  fun verifiesThatMenuWorksCorrectly() {
+    composeTestRule.setContent {
+      TravelListScreen(
+          navigationActions = navigationActions,
+          listTravelViewModel = listTravelViewModel,
+          activityViewModel,
+          eventViewModel,
+          documentViewModel,
+          profileModelView)
+    }
+
+    // This button is always displayed, but not always visible
+    composeTestRule.onNodeWithTag("menuFab").assertIsDisplayed()
+
+    // When menu is closed
+    composeTestRule.onNodeWithTag("closingMenuBox").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("closingMenuFab").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("drawerSheetMenu").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemProfile").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemHome").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemNotifications").assertIsNotDisplayed()
+
+    // Click on menu button
+    composeTestRule.onNodeWithTag("menuFab").performClick()
+
+    // Menu opened
+    composeTestRule.onNodeWithTag("closingMenuBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closingMenuFab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("drawerSheetMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("itemProfile").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("itemHome").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("itemNotifications").assertIsDisplayed()
+
+    // Click on closing menu button
+    composeTestRule.onNodeWithTag("closingMenuFab").performClick()
+
+    // Menu closed with button
+    composeTestRule.onNodeWithTag("closingMenuBox").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("closingMenuFab").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("drawerSheetMenu").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemProfile").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemHome").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemNotifications").assertIsNotDisplayed()
+
+    // Click on menu button
+    composeTestRule.onNodeWithTag("menuFab").performClick()
+
+    // Menu opened
+    composeTestRule.onNodeWithTag("closingMenuBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closingMenuFab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("drawerSheetMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("itemProfile").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("itemHome").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("itemNotifications").assertIsDisplayed()
+
+    // Click on closing menu button
+    composeTestRule.onNodeWithTag("closingMenuBox").performClick()
+
+    // Menu closed with button
+    composeTestRule.onNodeWithTag("closingMenuBox").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("closingMenuFab").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("drawerSheetMenu").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemProfile").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemHome").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemNotifications").assertIsNotDisplayed()
+  }
 }
