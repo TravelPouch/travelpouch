@@ -65,6 +65,15 @@ class ProfileRepositoryTest {
           "nameTest",
           emptyList())
 
+  val newProfile =
+      Profile(
+          "qwertzuiopasdfghjklyxcvbnm12",
+          "usernameTest",
+          "email@test.ch",
+          listOf("test@test.ch"),
+          "nameTest",
+          emptyList())
+
   val function: (Profile) -> Unit = {}
 
   @Before
@@ -446,7 +455,6 @@ class ProfileRepositoryTest {
     profileRepository.addFriend(
         friendProfile.email,
         userProfile,
-        { a, b -> updatingFriendList(a, b) },
         {
           userProfile = it
           succeeded = true
@@ -473,9 +481,16 @@ class ProfileRepositoryTest {
     assert(userProfile.friends.contains(friendProfile.email))
   }
 
-  private fun updatingFriendList(profile: Profile, email: String): Profile {
-    var friends = profile.friends.toMutableList()
-    friends.add(email)
-    return profile.copy(friends = friends.toList())
+  @Test
+  fun updatingFriendListTest() {
+    val privateFunc =
+        profileRepositoryFirestore.javaClass.getDeclaredMethod(
+            "updatingFriendList", Profile::class.java, String::class.java)
+    privateFunc.isAccessible = true
+    val parameters = arrayOfNulls<Any>(2)
+    parameters[0] = profile
+    parameters[1] = "test@test.ch"
+    val result = privateFunc.invoke(profileRepositoryFirestore, *parameters)
+    assertThat(result, `is`(newProfile))
   }
 }

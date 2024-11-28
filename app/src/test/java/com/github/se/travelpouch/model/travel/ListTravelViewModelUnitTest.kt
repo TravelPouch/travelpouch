@@ -164,7 +164,7 @@ class ListTravelViewModelTest {
         .whenever(travelRepository)
         .getTravels(anyOrNull(), anyOrNull())
 
-    listTravelViewModel.updateTravel(travel, 0, null)
+    listTravelViewModel.updateTravel(travel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
 
     assertThat(listTravelViewModel.travels.value, `is`(travelList))
   }
@@ -180,7 +180,7 @@ class ListTravelViewModelTest {
         .whenever(travelRepository)
         .updateTravel(anyOrNull(), anyOrNull(), any(), anyOrNull(), anyOrNull())
 
-    listTravelViewModel.updateTravel(travel, 0, null)
+    listTravelViewModel.updateTravel(travel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
 
     assertThat(listTravelViewModel.travels.value, `is`(initialTravels))
   }
@@ -288,7 +288,7 @@ class ListTravelViewModelTest {
     mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
       logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
 
-      listTravelViewModel.updateTravel(travel, 0, null)
+      listTravelViewModel.updateTravel(travel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
 
       verify(travelRepository)
           .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())

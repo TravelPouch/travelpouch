@@ -4,6 +4,12 @@ import com.github.se.travelpouch.model.profile.Profile
 
 interface TravelRepository {
 
+  enum class UpdateMode {
+    FIELDS_UPDATE,
+    ADD_PARTICIPANT,
+    REMOVE_PARTICIPANT
+  }
+
   fun getNewUid(): String
 
   fun getParticipantFromfsUid(
@@ -32,7 +38,7 @@ interface TravelRepository {
 
   fun updateTravel(
       travel: TravelContainer,
-      modeOfUpdate: Int,
+      modeOfUpdate: UpdateMode,
       fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit

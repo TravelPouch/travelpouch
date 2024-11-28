@@ -179,7 +179,6 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   override fun addFriend(
       email: String,
       userProfile: Profile,
-      updatingFunction: (Profile, String) -> Profile,
       onSuccess: (Profile) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
@@ -197,13 +196,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             if (friendProfile == ErrorProfile.errorProfile) {
               onFailure(Exception("user corrupted"))
             } else {
-              val userProfileUpdated = updatingFunction(userProfile, friendProfile.email)
+              val userProfileUpdated = updatingFriendList(userProfile, friendProfile.email)
               db.runTransaction { t ->
                     t.update(documentReference!!, "friends", userProfileUpdated.friends)
                     t.update(
                         friendsDocumentReference!!,
                         "friends",
-                        updatingFunction(friendProfile, userProfile.email).friends)
+                        updatingFriendList(friendProfile, userProfile.email).friends)
                   }
                   .addOnSuccessListener { onSuccess(userProfileUpdated) }
                   .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
@@ -211,6 +210,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
           }
         }
         .addOnFailureListener { onFailure(Exception("getting friend profile failed")) }
+  }
+
+  private fun updatingFriendList(profile: Profile, email: String): Profile {
+    return profile.copy(friends = profile.friends + email)
   }
 
   /**

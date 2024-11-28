@@ -154,57 +154,68 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    */
   override fun updateTravel(
       travel: TravelContainer,
-      modeOfUpdate: Int,
+      modeOfUpdate: TravelRepository.UpdateMode,
       fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     Log.d("TravelRepositoryFirestore", "updateTravel")
-    if (modeOfUpdate == 0) {
-      performFirestoreOperation(
-          db.collection(collectionPath).document(travel.fsUid).set(travel.toMap()),
-          onSuccess,
-          onFailure)
-    } else if (modeOfUpdate == 1) {
-      val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
-      val addedUserDocumentReference =
-          db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
+    when (modeOfUpdate) {
+      TravelRepository.UpdateMode.FIELDS_UPDATE -> {
+        performFirestoreOperation(
+            db.collection(collectionPath).document(travel.fsUid).set(travel.toMap()),
+            onSuccess,
+            onFailure)
+      }
+      TravelRepository.UpdateMode.ADD_PARTICIPANT -> {
+        val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
+        val addedUserDocumentReference =
+            db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
 
-      db.runTransaction {
-            val currentAddedUserProfile =
-                ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
+        db.runTransaction {
+              val currentAddedUserProfile =
+                  ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
 
-            val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
-            listTravelUpdated.add(travel.fsUid)
+              val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
+              listTravelUpdated.add(travel.fsUid)
 
-            it.set(travelDocumentReference, travel.toMap())
-            it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
-          }
-          .addOnSuccessListener { onSuccess() }
-          .addOnFailureListener { e ->
-            Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
-            onFailure(e)
-          }
-    } else {
-      val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
-      val addedUserDocumentReference =
-          db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
+              it.set(travelDocumentReference, travel.toMap())
+              it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+            }
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e ->
+              Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
+              onFailure(e)
+            }
+      }
+      TravelRepository.UpdateMode.REMOVE_PARTICIPANT -> {
+        val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
+        val addedUserDocumentReference =
+            db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
 
-      db.runTransaction {
-            val currentAddedUserProfile =
-                ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
+        db.runTransaction {
+              val currentAddedUserProfile =
+                  ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
 
-            val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
-            listTravelUpdated.remove(travel.fsUid)
+              val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
+              listTravelUpdated.remove(travel.fsUid)
 
-            it.set(travelDocumentReference, travel.toMap())
-            it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
-          }
-          .addOnSuccessListener { onSuccess() }
-          .addOnFailureListener { e ->
-            Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
-            onFailure(e)
-          }
+              it.set(travelDocumentReference, travel.toMap())
+              it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+            }
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e ->
+              Log.e("TravelRepositoryFirestore", "Error performing Firestore operation", e)
+              onFailure(e)
+            }
+      }
+      else -> {
+        Log.e(
+            "TravelRepositoryFirestore",
+            "This mode of update does not exist",
+            Exception("This mode of update does not exist"))
+        onFailure(Exception("This mode of update does not exist"))
+      }
     }
   }
 

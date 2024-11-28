@@ -268,7 +268,11 @@ class TravelRepositoryFirestoreUnitTest {
 
     var successCalled = false
     travelRepositoryFirestore.updateTravel(
-        travel, 0, null, { successCalled = true }, { fail("Should not call onFailure") })
+        travel,
+        TravelRepository.UpdateMode.FIELDS_UPDATE,
+        null,
+        { successCalled = true },
+        { fail("Should not call onFailure") })
 
     // Simulate task completion
     val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
@@ -309,7 +313,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     travelRepository.updateTravel(
         TravelContainerMock.createMockTravelContainer(listParticipant = emptyList()),
-        1,
+        TravelRepository.UpdateMode.ADD_PARTICIPANT,
         "user",
         { succeeded = true },
         { failed = true })
@@ -353,7 +357,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     travelRepository.updateTravel(
         TravelContainerMock.createMockTravelContainer(listParticipant = emptyList()),
-        2,
+        TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
         "user",
         { succeeded = true },
         { failed = true })
@@ -376,7 +380,11 @@ class TravelRepositoryFirestoreUnitTest {
 
     var failureCalled = false
     travelRepositoryFirestore.updateTravel(
-        travel, 0, null, { fail("Should not call onSuccess") }, { failureCalled = true })
+        travel,
+        TravelRepository.UpdateMode.FIELDS_UPDATE,
+        null,
+        { fail("Should not call onSuccess") },
+        { failureCalled = true })
 
     // Simulate task completion
     val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()

@@ -1,8 +1,6 @@
 package com.github.se.travelpouch.model.profile
 
 import android.content.Context
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -23,15 +21,6 @@ class ProfileModelViewTest {
           "name",
           emptyList())
 
-  val newProfile =
-      Profile(
-          "qwertzuiopasdfghjklyxcvbnm12",
-          "username",
-          "email@test.ch",
-          listOf("test@test.ch"),
-          "name",
-          emptyList())
-
   @Before
   fun setUp() {
     repository = mock(ProfileRepository::class.java)
@@ -49,18 +38,5 @@ class ProfileModelViewTest {
   fun updateProfileTest() {
     profileViewModel.updateProfile(profile, context)
     verify(repository).updateProfile(anyOrNull(), anyOrNull(), anyOrNull())
-  }
-
-  @Test
-  fun updatingFriendListTest() {
-    val privateFunc =
-        profileViewModel.javaClass.getDeclaredMethod(
-            "updatingFriendList", Profile::class.java, String::class.java)
-    privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(2)
-    parameters[0] = profile
-    parameters[1] = "test@test.ch"
-    val result = privateFunc.invoke(profileViewModel, *parameters)
-    assertThat(result, `is`(newProfile))
   }
 }

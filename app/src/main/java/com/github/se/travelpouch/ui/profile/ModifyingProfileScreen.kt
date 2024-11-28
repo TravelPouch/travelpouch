@@ -195,12 +195,10 @@ fun ModifyingProfileScreen(
                                 profileModelView.addFriend(
                                     friendMail,
                                     onSuccess = {
-                                      Log.d("Friend added", "Friend addded")
                                       Toast.makeText(context, "Friend added", Toast.LENGTH_LONG)
                                           .show()
                                     },
                                     onFailure = { e ->
-                                      Log.d("Friend added", e.message!!)
                                       Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
                                     })
                               }

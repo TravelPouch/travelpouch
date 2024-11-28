@@ -50,7 +50,6 @@ class ProfileRepositoryMock : ProfileRepository {
   override fun addFriend(
       email: String,
       userProfile: Profile,
-      updatingFunction: (Profile, String) -> Profile,
       onSuccess: (Profile) -> Unit,
       onFailure: (Exception) -> Unit
   ) {

@@ -99,11 +99,6 @@ class ProfileScreenTest {
 
     composeTestRule.onNodeWithTag("emptyFriendCard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("emptyFriendText").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("emptyFriendText")
-        .assertTextEquals(
-            "You have no friend. [insert sad Titanic music]. \n" +
-                " ... \n" +
-                " [insert phonk tik tok music] Stay hard. They don't know you, son")
+    composeTestRule.onNodeWithTag("emptyFriendText").assertTextEquals("No friends are saved")
   }
 }

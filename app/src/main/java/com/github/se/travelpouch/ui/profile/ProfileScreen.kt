@@ -142,7 +142,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
                             )) {
                           Box(Modifier.fillMaxSize().testTag("emptyFriendBox")) {
                             Text(
-                                "You have no friend. [insert sad Titanic music]. \n ... \n [insert phonk tik tok music] Stay hard. They don't know you, son",
+                                "No friends are saved",
                                 Modifier.align(Alignment.Center).testTag("emptyFriendText"))
                           }
                         }

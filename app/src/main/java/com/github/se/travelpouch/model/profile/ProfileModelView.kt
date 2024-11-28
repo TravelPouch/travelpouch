@@ -73,21 +73,26 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
         })
   }
 
+  /**
+   * This function allows us to add a friend to a user.
+   *
+   * @param email (String) : The email of the friend to add
+   * @param onSuccess (() -> Unit) : The function to call when the adding of a friend is successful
+   * @param onFailure ((Exception) -> Unit) : The function to call when the adding of a friend
+   *   failed
+   */
   fun addFriend(email: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     repository.addFriend(
         email = email,
         userProfile = profile_.value,
-        updatingFunction = { a, b -> updatingFriendList(a, b) },
         onSuccess = {
+          Log.d("Friend added", "Friend addded")
           profile_.value = it
           onSuccess()
         },
-        onFailure = onFailure)
-  }
-
-  private fun updatingFriendList(profile: Profile, email: String): Profile {
-    var friends = profile.friends.toMutableList()
-    friends.add(email)
-    return profile.copy(friends = friends.toList())
+        onFailure = {
+          Log.d("Friend added", it.message!!)
+          onFailure(it)
+        })
   }
 }

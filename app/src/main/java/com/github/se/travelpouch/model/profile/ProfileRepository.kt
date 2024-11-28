@@ -40,10 +40,18 @@ interface ProfileRepository {
   /** This is the initialisation function of the profile repository */
   suspend fun initAfterLogin(onSuccess: (Profile) -> Unit)
 
+  /**
+   * This function allows us to add a friend to a user.
+   *
+   * @param email (String) : The email of the friend to add
+   * @param userProfile (Profile) : The profile of the user currently of the app
+   * @param onSuccess (() -> Unit) : The function to call when the adding of a friend is successful
+   * @param onFailure ((Exception) -> Unit) : The function to call when the adding of a friend
+   *   failed
+   */
   fun addFriend(
       email: String,
       userProfile: Profile,
-      updatingFunction: (Profile, String) -> Profile,
       onSuccess: (Profile) -> Unit,
       onFailure: (Exception) -> Unit
   )
