@@ -101,8 +101,8 @@ fun ParticipantListScreen(
             text = { Text("Add user", modifier = Modifier.testTag("AddUserButton")) },
             icon = { Icon(Icons.Default.PersonAdd, contentDescription = "Add user") },
             onClick = {
-                Log.d("ParticipantListScreen", "Add user button clicked")
-                setExpandedAddUserDialog(true)
+              Log.d("ParticipantListScreen", "Add user button clicked")
+              setExpandedAddUserDialog(true)
             },
             modifier = Modifier.testTag("addUserFab"))
       }) { paddingValues ->
@@ -130,98 +130,98 @@ fun ParticipantListScreen(
               modifier = Modifier.padding(paddingValues).testTag("noTravelSelected"))
         }
 
-      if (expandedAddUserDialog) {
+        if (expandedAddUserDialog) {
           val addUserEmail = remember { mutableStateOf("") }
           Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
-              Box(
-                  Modifier.fillMaxWidth(1f)
-                      .height(250.dp)
-                      .background(MaterialTheme.colorScheme.surface)
-                      .testTag("addUserDialogBox")) {
+            Box(
+                Modifier.fillMaxWidth(1f)
+                    .height(250.dp)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .testTag("addUserDialogBox")) {
                   Column(
                       modifier =
-                      Modifier.fillMaxSize()
-                          .padding(16.dp)
-                          .verticalScroll(rememberScrollState())
-                          .testTag("roleDialogColumn"),
+                          Modifier.fillMaxSize()
+                              .padding(16.dp)
+                              .verticalScroll(rememberScrollState())
+                              .testTag("roleDialogColumn"),
                       horizontalAlignment = Alignment.CenterHorizontally,
                       verticalArrangement = Arrangement.Center) {
-                      Text(
-                          "Add User by Email",
-                          fontWeight = FontWeight.Bold,
-                          modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle"))
-                      OutlinedTextField(
-                          value = addUserEmail.value,
-                          onValueChange = { addUserEmail.value = it },
-                          label = { Text("Enter User's Email") },
-                          placeholder = { Text("Enter User's Email") },
-                          modifier = Modifier.testTag("addUserEmailField"))
-                      Button(
-                          onClick = {
+                        Text(
+                            "Add User by Email",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle"))
+                        OutlinedTextField(
+                            value = addUserEmail.value,
+                            onValueChange = { addUserEmail.value = it },
+                            label = { Text("Enter User's Email") },
+                            placeholder = { Text("Enter User's Email") },
+                            modifier = Modifier.testTag("addUserEmailField"))
+                        Button(
+                            onClick = {
                               profileViewModel.getFsUidByEmail(
                                   addUserEmail.value,
                                   onSuccess = { fsUid ->
-                                      val isUserAlreadyAdded =
-                                          selectedTravel!!.allParticipants.keys.any {
-                                              it.fsUid == fsUid
-                                          }
-                                      if (fsUid == profileViewModel.profile.value.fsUid) {
-                                          Toast.makeText(
+                                    val isUserAlreadyAdded =
+                                        selectedTravel!!.allParticipants.keys.any {
+                                          it.fsUid == fsUid
+                                        }
+                                    if (fsUid == profileViewModel.profile.value.fsUid) {
+                                      Toast.makeText(
                                               context,
                                               "Error: You can't invite yourself",
                                               Toast.LENGTH_SHORT)
-                                              .show()
-                                      } else if (isUserAlreadyAdded) {
-                                          Toast.makeText(
+                                          .show()
+                                    } else if (isUserAlreadyAdded) {
+                                      Toast.makeText(
                                               context,
                                               "Error: User already added",
                                               Toast.LENGTH_SHORT)
-                                              .show()
-                                      } else if (fsUid != null) {
-                                          try {
-                                              notificationViewModel.sendNotification(
-                                                  Notification(
-                                                      notificationViewModel.getNewUid(),
-                                                      profileViewModel.profile.value.fsUid,
-                                                      fsUid,
-                                                      selectedTravel!!.fsUid,
-                                                      NotificationContent.InvitationNotification(
-                                                          profileViewModel.profile.value.name,
-                                                          selectedTravel!!.title,
-                                                          Role.PARTICIPANT),
-                                                      NotificationType.INVITATION))
-                                          } catch (e: Exception) {
-                                              Log.e(
-                                                  "NotificationError",
-                                                  "Failed to send notification: ${e.message}")
-                                          }
-                                          // Go back
-                                          setExpandedAddUserDialog(false)
-                                      } else {
-                                          Toast.makeText(
+                                          .show()
+                                    } else if (fsUid != null) {
+                                      try {
+                                        notificationViewModel.sendNotification(
+                                            Notification(
+                                                notificationViewModel.getNewUid(),
+                                                profileViewModel.profile.value.fsUid,
+                                                fsUid,
+                                                selectedTravel!!.fsUid,
+                                                NotificationContent.InvitationNotification(
+                                                    profileViewModel.profile.value.name,
+                                                    selectedTravel!!.title,
+                                                    Role.PARTICIPANT),
+                                                NotificationType.INVITATION))
+                                      } catch (e: Exception) {
+                                        Log.e(
+                                            "NotificationError",
+                                            "Failed to send notification: ${e.message}")
+                                      }
+                                      // Go back
+                                      setExpandedAddUserDialog(false)
+                                    } else {
+                                      Toast.makeText(
                                               context,
                                               "Error: User with email not found",
                                               Toast.LENGTH_SHORT)
-                                              .show()
-                                      }
+                                          .show()
+                                    }
                                   },
                                   onFailure = { e ->
-                                      Log.e(
-                                          "EditTravelSettingsScreen",
-                                          "Error getting fsUid by email",
-                                          e)
-                                      Toast.makeText(
-                                          context, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                                          .show()
+                                    Log.e(
+                                        "EditTravelSettingsScreen",
+                                        "Error getting fsUid by email",
+                                        e)
+                                    Toast.makeText(
+                                            context, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                                        .show()
                                   })
-                          },
-                          modifier = Modifier.testTag("addUserButton")) {
-                          Text("Add User")
+                            },
+                            modifier = Modifier.testTag("addUserButton")) {
+                              Text("Add User")
+                            }
                       }
-                  }
-              }
+                }
           }
-      }
+        }
 
         selectedParticipant?.let { participant ->
           if (expanded) {

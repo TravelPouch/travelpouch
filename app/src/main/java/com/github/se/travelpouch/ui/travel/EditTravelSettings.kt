@@ -133,7 +133,7 @@ fun EditTravelSettingsScreen(
                   onClick = {
                     listTravelViewModel.fetchAllParticipantsInfo()
                     navigationActions.navigateTo(PARTICIPANT_LIST)
-                      toggled = !toggled
+                    toggled = !toggled
                   },
                   modifier = Modifier.testTag("manageParticipantsButton"))
 
@@ -146,7 +146,7 @@ fun EditTravelSettingsScreen(
                     clipboardManager.setText(
                         AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com"))
                     Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
-                      toggled = !toggled
+                    toggled = !toggled
                   },
                   modifier = Modifier.testTag("importEmailFab"))
             }
@@ -235,7 +235,10 @@ fun EditTravelSettingsScreen(
                   },
                   label = { Text("Location") },
                   placeholder = { Text("Enter an Address or Location") },
-                  modifier = Modifier.width(300.dp).padding(vertical = 4.dp))
+                  modifier =
+                      Modifier.width(300.dp)
+                          .padding(vertical = 4.dp)
+                          .testTag("inputTravelLocationName"))
 
               // Dropdown for location suggestions
               DropdownMenu(
