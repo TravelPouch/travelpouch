@@ -130,10 +130,7 @@ class DocumentListTest {
     }
 
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("documentListTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("documentListTitle").assertTextEquals("Travel's documents")
 
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("plusButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("plusButton").performClick()
 
