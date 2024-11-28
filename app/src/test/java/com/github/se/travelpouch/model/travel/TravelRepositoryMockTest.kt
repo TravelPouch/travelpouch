@@ -6,6 +6,7 @@ import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelContainerMock
+import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.model.travels.TravelRepositoryMock
 import com.google.firebase.Timestamp
 import junit.framework.TestCase.assertFalse
@@ -66,7 +67,12 @@ class TravelRepositoryMockTest {
     travelMockRepository.addTravel(travel, {}, {})
     val travelAdded = com.github.se.travelpouch.di.travelCollection[travel.fsUid]
     assert(travelAdded == travel)
-    travelMockRepository.updateTravel(travelUpdated, { succeeded = true }, { failed = true })
+    travelMockRepository.updateTravel(
+        travelUpdated,
+        TravelRepository.UpdateMode.FIELDS_UPDATE,
+        null,
+        { succeeded = true },
+        { failed = true })
     assert(succeeded)
     assertFalse(failed)
 
