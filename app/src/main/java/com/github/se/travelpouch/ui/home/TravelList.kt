@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -122,6 +121,8 @@ fun TravelListScreen(
                     }) {
               FloatingActionButton(
                   onClick = { scope.launch { drawerState.close() } },
+                  containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                   modifier =
                       Modifier.testTag("closingMenuFab")
                           .align(Alignment.TopEnd)
@@ -131,36 +132,35 @@ fun TravelListScreen(
                     Icon(imageVector = Icons.Default.Close, contentDescription = "MenuClosing")
                   }
             }
-        ModalDrawerSheet(
-            modifier =
-                Modifier.width((configuration.screenWidthDp * 0.75).dp)
-                    .testTag("drawerSheetMenu")) {
-              listOfTopLevelDestinations.forEach { item ->
-                NavigationDrawerItem(
-                    icon = { Icon(item.icon, contentDescription = null) },
-                    label = { Text(item.textId) },
-                    selected = false,
-                    onClick = {
-                      scope.launch { drawerState.close() }
-                      when (item.textId) {
-                        TopLevelDestinations.PROFILE.textId ->
-                            navigationActions.navigateTo(Screen.PROFILE)
-                        TopLevelDestinations.NOTIFICATION.textId ->
-                            navigationActions.navigateTo(Screen.NOTIFICATION)
-                        TopLevelDestinations.TRAVELS.textId -> scope.launch { drawerState.close() }
-                      }
-                    },
-                    modifier =
-                        Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                            .testTag("item${item.textId}"))
-              }
-            }
+        ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.75f).testTag("drawerSheetMenu")) {
+          listOfTopLevelDestinations.forEach { item ->
+            NavigationDrawerItem(
+                icon = { Icon(item.icon, contentDescription = null) },
+                label = { Text(item.textId) },
+                selected = false,
+                onClick = {
+                  scope.launch { drawerState.close() }
+                  when (item.textId) {
+                    TopLevelDestinations.PROFILE.textId ->
+                        navigationActions.navigateTo(Screen.PROFILE)
+                    TopLevelDestinations.NOTIFICATION.textId ->
+                        navigationActions.navigateTo(Screen.NOTIFICATION)
+                    TopLevelDestinations.TRAVELS.textId -> scope.launch { drawerState.close() }
+                  }
+                },
+                modifier =
+                    Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                        .testTag("item${item.textId}"))
+          }
+        }
       },
       drawerState = drawerState,
       gesturesEnabled = false) {
         Box(modifier = Modifier.fillMaxSize()) {
           FloatingActionButton(
               onClick = { scope.launch { drawerState.open() } },
+              containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+              contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
               modifier =
                   Modifier.testTag("menuFab")
                       .align(Alignment.TopStart)
@@ -175,6 +175,8 @@ fun TravelListScreen(
               floatingActionButton = {
                 FloatingActionButton(
                     onClick = { navigationActions.navigateTo(Screen.ADD_TRAVEL) },
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.testTag("createTravelFab")) {
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                     }
