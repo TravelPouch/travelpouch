@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -43,7 +44,8 @@ fun ParticipantColumn(
         // Username
         Text(
             text = participant.value.name,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
+            style = MaterialTheme.typography.titleSmall,
             modifier =
                 Modifier.fillMaxWidth()
                     .padding(bottom = 4.dp) // Add space between text elements
@@ -52,7 +54,8 @@ fun ParticipantColumn(
         // Email
         Text(
             text = participant.value.email,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
+            style = MaterialTheme.typography.titleSmall,
             modifier =
                 Modifier.fillMaxWidth()
                     .padding(bottom = 4.dp) // Add space between text elements
@@ -61,7 +64,8 @@ fun ParticipantColumn(
         // Role
         Text(
             text = selectedTravel.allParticipants[Participant(participant.key)]!!.name,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
+            style = MaterialTheme.typography.titleSmall,
             modifier =
                 Modifier.fillMaxWidth()
                     .padding(bottom = 4.dp) // Add space between text elements

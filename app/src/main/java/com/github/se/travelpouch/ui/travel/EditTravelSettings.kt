@@ -3,12 +3,17 @@ package com.github.se.travelpouch.ui.travel
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -46,6 +51,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -77,7 +84,7 @@ import java.util.Locale
  * @param listTravelViewModel The ViewModel that holds the state and logic for the travel list.
  * @param navigationActions The navigation actions to handle navigation events.
  */
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTravelSettingsScreen(
@@ -112,43 +119,71 @@ fun EditTravelSettingsScreen(
       floatingActionButton = {
         var toggled by remember { mutableStateOf(false) }
 
-        Column(horizontalAlignment = Alignment.End) {
-          if (toggled) {
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
-              ExtendedFloatingActionButton(
-                  text = {
-                    Text(
-                        "Manage participants",
-                        modifier = Modifier.testTag("manageParticipantsText"))
-                  },
-                  icon = { Icon(Icons.Default.Person, contentDescription = "Manage Participants") },
-                  onClick = {
-                    listTravelViewModel.fetchAllParticipantsInfo()
-                    navigationActions.navigateTo(PARTICIPANT_LIST)
-                    toggled = !toggled
-                  },
-                  modifier = Modifier.testTag("manageParticipantsButton"))
+          Box(modifier = Modifier.fillMaxSize()) {
+              if (toggled) {
+                  Box(
+                      modifier = Modifier
+                          .fillMaxSize()
+                          .background(Color.Transparent)
+                          .clickable(
+                              onClick = { toggled = false }, // Close the menu
+                              indication = null, // No ripple effect
+                              interactionSource = remember { MutableInteractionSource() } // No interaction state
+                          )
+                  )
+              }
 
-              Spacer(modifier = Modifier.height(8.dp))
+              // Floating Action Button and its menu
+              Column(
+                  horizontalAlignment = Alignment.End,
+                  verticalArrangement = Arrangement.Bottom,
+                  modifier = Modifier.fillMaxSize()
+              ) {
+                  if (toggled) {
+                      Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
+                          ExtendedFloatingActionButton(
+                              text = {
+                                  Text(
+                                      "Manage participants",
+                                      modifier = Modifier.testTag("manageParticipantsText")
+                                  )
+                              },
+                              icon = { Icon(Icons.Default.Person, contentDescription = "Manage Participants") },
+                              onClick = {
+                                  // Handle action and collapse menu
+                                  listTravelViewModel.fetchAllParticipantsInfo()
+                                  navigationActions.navigateTo(PARTICIPANT_LIST)
+                                  toggled = !toggled
+                              },
+                              modifier = Modifier.testTag("manageParticipantsButton")
+                          )
 
-              ExtendedFloatingActionButton(
-                  text = { Text("Import Email", modifier = Modifier.testTag("importEmailText")) },
-                  icon = { Icon(Icons.Default.MailOutline, contentDescription = "Import Email") },
-                  onClick = {
-                    clipboardManager.setText(
-                        AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com"))
-                    Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
-                    toggled = !toggled
-                  },
-                  modifier = Modifier.testTag("importEmailFab"))
-            }
-          } else {
-            FloatingActionButton(
-                onClick = { toggled = !toggled }, modifier = Modifier.testTag("plusButton")) {
-                  Icon(Icons.Default.Add, contentDescription = "Expend button")
-                }
+                          Spacer(modifier = Modifier.height(8.dp))
+
+                          ExtendedFloatingActionButton(
+                              text = { Text("Import Email", modifier = Modifier.testTag("importEmailText")) },
+                              icon = { Icon(Icons.Default.MailOutline, contentDescription = "Import Email") },
+                              onClick = {
+                                  // Handle action and collapse menu
+                                  clipboardManager.setText(
+                                      AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com")
+                                  )
+                                  Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
+                                  toggled = !toggled
+                              },
+                              modifier = Modifier.testTag("importEmailFab")
+                          )
+                      }
+                  } else {
+                      FloatingActionButton(
+                          onClick = { toggled = !toggled },
+                          modifier = Modifier.testTag("plusButton")
+                      ) {
+                          Icon(Icons.Default.Add, contentDescription = "Expand button")
+                      }
+                  }
+              }
           }
-        }
       },
       floatingActionButtonPosition = FabPosition.End,
   ) { padding ->
@@ -201,7 +236,7 @@ fun EditTravelSettingsScreen(
                 value = titleText.value,
                 onValueChange = { keystroke -> titleText.value = keystroke },
                 modifier =
-                    Modifier.testTag("inputTravelTitle").width(300.dp).padding(vertical = 4.dp),
+                    Modifier.testTag("inputTravelTitle").fillMaxWidth(0.8f),
                 label = { Text("Title") },
                 placeholder = { Text("Name the Travel") },
                 shape = RoundedCornerShape(6.dp),
@@ -210,14 +245,12 @@ fun EditTravelSettingsScreen(
                 value = descriptionText.value,
                 onValueChange = { keystroke -> descriptionText.value = keystroke },
                 modifier =
-                    Modifier.testTag("inputTravelDescription")
-                        .width(300.dp)
-                        .padding(vertical = 4.dp),
+                    Modifier.testTag("inputTravelDescription").fillMaxWidth(0.8f),
                 label = { Text("Description") },
                 placeholder = { Text("Describe the Travel") },
                 shape = RoundedCornerShape(6.dp))
 
-            Box(modifier = Modifier.width(300.dp).padding(vertical = 4.dp)) {
+            Box(modifier = Modifier.fillMaxWidth(0.8f)) {
               OutlinedTextField(
                   value = locationQuery.value,
                   onValueChange = {
@@ -228,8 +261,7 @@ fun EditTravelSettingsScreen(
                   label = { Text("Location") },
                   placeholder = { Text("Enter an Address or Location") },
                   modifier =
-                      Modifier.width(300.dp)
-                          .padding(vertical = 4.dp)
+                      Modifier.fillMaxWidth()
                           .testTag("inputTravelLocation"))
 
               // Dropdown for location suggestions
@@ -238,7 +270,7 @@ fun EditTravelSettingsScreen(
                   onDismissRequest = { showDropdown = false },
                   properties = PopupProperties(focusable = false),
                   modifier =
-                      Modifier.fillMaxWidth()
+                      Modifier.fillMaxWidth(0.8f)
                           .heightIn(max = 200.dp)
                           .testTag("locationDropdownMenu")) {
                     locationSuggestions.filterNotNull().take(3).forEach { location ->
@@ -281,7 +313,7 @@ fun EditTravelSettingsScreen(
                 label = { Text("Start Date") },
                 placeholder = { Text("DD/MM/YYYY") },
                 modifier =
-                    Modifier.testTag("inputTravelStartTime").width(300.dp).padding(vertical = 4.dp),
+                    Modifier.testTag("inputTravelStartTime").fillMaxWidth(0.8f),
                 shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
@@ -305,7 +337,7 @@ fun EditTravelSettingsScreen(
                 label = { Text("End Date") },
                 placeholder = { Text("DD/MM/YYYY") },
                 modifier =
-                    Modifier.testTag("inputTravelEndTime").width(300.dp).padding(vertical = 4.dp),
+                    Modifier.testTag("inputTravelEndTime").fillMaxWidth(0.8f) ,
                 shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
