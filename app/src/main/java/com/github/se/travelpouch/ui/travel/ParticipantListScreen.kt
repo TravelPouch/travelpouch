@@ -48,6 +48,7 @@ import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
@@ -168,7 +169,10 @@ fun ParticipantListScreen(
                             selectedTravel!!.copy(
                                 allParticipants = participantMap.toMap(),
                                 listParticipant = participantList)
-                        listTravelViewModel.updateTravel(updatedContainer)
+                        listTravelViewModel.updateTravel(
+                            updatedContainer,
+                            TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
+                            participant.key)
                         listTravelViewModel.selectTravel(updatedContainer)
                         listTravelViewModel.fetchAllParticipantsInfo()
                         setExpanded(false)
@@ -250,7 +254,8 @@ fun handleRoleChange(
     val participantMap = selectedTravel.allParticipants.toMutableMap()
     participantMap[Participant(participant.key)] = newRole
     val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
-    listTravelViewModel.updateTravel(updatedContainer)
+    listTravelViewModel.updateTravel(
+        updatedContainer, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
     listTravelViewModel.selectTravel(updatedContainer)
     setExpandedRoleDialog(false)
     setExpanded(false)

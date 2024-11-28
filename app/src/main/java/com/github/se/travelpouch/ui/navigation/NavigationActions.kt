@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -42,7 +43,8 @@ object TopLevelDestinations {
   val CALENDAR = TopLevelDestination(Screen.CALENDAR, Icons.Default.DateRange, "Calendar")
   val NOTIFICATION =
       TopLevelDestination(Screen.NOTIFICATION, Icons.Default.Notifications, "Notifications")
-  val TRAVELS = TopLevelDestination(Screen.TRAVEL_LIST, Icons.Default.Home, "Travels")
+  val TRAVELS = TopLevelDestination(Screen.TRAVEL_LIST, Icons.Default.Home, "Home")
+  val PROFILE = TopLevelDestination(Screen.PROFILE, Icons.Default.AccountCircle, "Profile")
 }
 
 open class NavigationActions(

@@ -63,7 +63,12 @@ class AddTravelScreenTest {
   fun setUp() {
     val profile =
         Profile(
-            "qwertzuiopasdfghjklyxcvbnm12", "username", "email@test.ch", null, "name", emptyList())
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "username",
+            "email@test.ch",
+            emptyList(),
+            "name",
+            emptyList())
 
     // Mocking objects for ViewModel and NavigationActions
     travelRepository = mock(TravelRepository::class.java)
