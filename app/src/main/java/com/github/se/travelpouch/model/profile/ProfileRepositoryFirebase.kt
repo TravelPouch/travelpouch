@@ -266,7 +266,9 @@ class ProfileRepositoryConvert {
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
 
-        Log.d("ProfileRepository", "Document to Profile: $uid, $username, $email, $friends, $name, $userTravelList")
+        Log.d(
+            "ProfileRepository",
+            "Document to Profile: $uid, $username, $email, $friends, $name, $userTravelList")
 
         Profile(
             fsUid = uid,

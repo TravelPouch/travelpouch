@@ -16,11 +16,11 @@ import com.github.se.travelpouch.di.AppModule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.Duration.Companion.seconds
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -111,8 +111,8 @@ class TravelCreation {
         // verify that the empty travel prompt does not exist since we saved a travel
         composeTestRule.waitUntil(timeoutMillis = 5000) {
           composeTestRule
-            .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
-            .isNotDisplayed()
+              .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
+              .isNotDisplayed()
         }
 
         composeTestRule.onNodeWithText("e2e travel 1").assertIsDisplayed()

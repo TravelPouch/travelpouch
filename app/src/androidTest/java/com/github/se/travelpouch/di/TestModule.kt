@@ -17,9 +17,12 @@ import com.github.se.travelpouch.model.profile.ProfileRepositoryFirebase
 import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.model.travels.TravelRepositoryFirestore
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,6 +48,16 @@ object TestModule {
 
   @Provides
   @Singleton
+  fun provideFirebaseStorage(): FirebaseStorage {
+    val storageBucket =
+        FirebaseApp.getInstance().options.storageBucket
+            ?: throw IllegalStateException(
+                "Firebase storage bucket not set in google-services.json")
+    return Firebase.storage("gs://$storageBucket").apply { useEmulator("10.0.2.2", 9199) }
+  }
+
+  @Provides
+  @Singleton
   fun providesActivityRepository(db: FirebaseFirestore): ActivityRepository {
     return ActivityRepositoryFirebase(db)
   }
@@ -63,8 +76,11 @@ object TestModule {
 
   @Provides
   @Singleton
-  fun providesFileDownloader(@ApplicationContext context: Context): FileDownloader {
-    return FileDownloader(context.contentResolver)
+  fun providesFileDownloader(
+      @ApplicationContext context: Context,
+      storage: FirebaseStorage
+  ): FileDownloader {
+    return FileDownloader(context.contentResolver, storage)
   }
 
   @Provides
