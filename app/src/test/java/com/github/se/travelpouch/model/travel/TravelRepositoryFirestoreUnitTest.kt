@@ -284,10 +284,20 @@ class TravelRepositoryFirestoreUnitTest {
 
   @Test
   fun updatesAddingAUserSuccessfully() {
+    val friendProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm16",
+            "usernameFriend",
+            "email@friend.ch",
+            emptyList(),
+            "nameFriend",
+            emptyList())
+
     val task: Task<Void> = mock()
 
     val firestoreMock: FirebaseFirestore = mock()
     val travelRepository: TravelRepository = TravelRepositoryFirestore(firestoreMock)
+    val transactionMock: Transaction = mock()
 
     val travelCollectionReference: CollectionReference = mock()
     val profileCollectionReference: CollectionReference = mock()
@@ -304,6 +314,20 @@ class TravelRepositoryFirestoreUnitTest {
     whenever(profileCollectionReference.document(anyOrNull())).thenReturn(profileDocumentReference)
     whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(task)
 
+    val mockDocumentSnapshotFriend: DocumentSnapshot = mock()
+    whenever(transactionMock.get(anyOrNull())).thenReturn(mockDocumentSnapshotFriend)
+    whenever(transactionMock.update(any(), eq("userTravelList"), anyOrNull()))
+        .thenReturn(transactionMock)
+    whenever(transactionMock.set(anyOrNull(), anyOrNull())).thenReturn(transactionMock)
+
+    `when`(mockDocumentSnapshotFriend.id).thenReturn(friendProfile.fsUid)
+    `when`(mockDocumentSnapshotFriend.getString("email")).thenReturn(friendProfile.email)
+    `when`(mockDocumentSnapshotFriend.getString("name")).thenReturn(friendProfile.name)
+    `when`(mockDocumentSnapshotFriend.getString("username")).thenReturn(friendProfile.username)
+    `when`(mockDocumentSnapshotFriend.get("userTravelList"))
+        .thenReturn(friendProfile.userTravelList)
+    `when`(mockDocumentSnapshotFriend.get("friends")).thenReturn(friendProfile.friends)
+
     whenever(task.isSuccessful).thenReturn(true)
     whenever(task.addOnSuccessListener(anyOrNull())).thenReturn(task)
     whenever(task.addOnFailureListener(anyOrNull())).thenReturn(task)
@@ -314,13 +338,21 @@ class TravelRepositoryFirestoreUnitTest {
     travelRepository.updateTravel(
         TravelContainerMock.createMockTravelContainer(listParticipant = emptyList()),
         TravelRepository.UpdateMode.ADD_PARTICIPANT,
-        "user",
+        friendProfile.fsUid,
         { succeeded = true },
         { failed = true })
 
     val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Void>>()
     verify(task).addOnSuccessListener(onSuccessListenerCaptor.capture())
     onSuccessListenerCaptor.firstValue.onSuccess(task.result)
+
+    val transactionCaptor = argumentCaptor<Transaction.Function<Void>>()
+    verify(firestoreMock).runTransaction(transactionCaptor.capture())
+    transactionCaptor.firstValue.apply(transactionMock)
+
+    verify(transactionMock).update(anyOrNull(), eq("userTravelList"), anyOrNull())
+    verify(transactionMock).set(anyOrNull(), anyOrNull())
+    verify(transactionMock).get(anyOrNull())
 
     assertTrue(succeeded)
     assertFalse(failed)

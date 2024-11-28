@@ -209,13 +209,6 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
               onFailure(e)
             }
       }
-      else -> {
-        Log.e(
-            "TravelRepositoryFirestore",
-            "This mode of update does not exist",
-            Exception("This mode of update does not exist"))
-        onFailure(Exception("This mode of update does not exist"))
-      }
     }
   }
 
