@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.model.authentication
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
