@@ -50,7 +50,7 @@ class ParticipantListScreenTest {
           name = "User One",
           userTravelList = listOf("travel1"),
           email = "user1@example.com",
-          friends = null,
+          friends = emptyList(),
           username = "username")
   private val participant2 =
       Profile(
@@ -58,7 +58,7 @@ class ParticipantListScreenTest {
           name = "User Two",
           userTravelList = listOf("travel2"),
           email = "user2@example.com",
-          friends = null,
+          friends = emptyList(),
           username = "username")
 
   private fun createContainer(): TravelContainer {

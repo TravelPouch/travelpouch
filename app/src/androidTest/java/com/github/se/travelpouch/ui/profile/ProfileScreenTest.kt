@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.github.se.travelpouch.model.profile.Profile
@@ -26,8 +27,17 @@ class ProfileScreenTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
-          friends = null,
-          name = "name",
+          friends = listOf("friend 1", "friend 2"),
+          name = "testName",
+          userTravelList = emptyList())
+
+  val profileWithoutFriend =
+      Profile(
+          fsUid = "qwertzuiopasdfghjklyxcvbnm12",
+          email = "test@swent.ch",
+          username = "test",
+          friends = emptyList(),
+          name = "testName",
           userTravelList = emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -55,7 +65,40 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("emailField").assertTextContains(profile.email)
     composeTestRule.onNodeWithTag("usernameField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(profile.username)
-    composeTestRule.onNodeWithTag("friendsField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("friendsField").assertTextContains("No Friend, sadge :(")
+    composeTestRule.onNodeWithTag("nameField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("nameField").assertTextContains(profile.name)
+
+    composeTestRule.onNodeWithTag("friendsText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friendsText").assertTextEquals("Friends : ")
+  }
+
+  @Test
+  fun verifiesListOfFriendIsDisplayedIfFriendsNonEmpty() {
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(profile)
+    }
+
+    composeTestRule.setContent { ProfileScreen(navigationActions, profileModelView) }
+
+    composeTestRule.onNodeWithTag("friendCard0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friend_0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friend_0").assertTextEquals("friend 1")
+
+    composeTestRule.onNodeWithTag("friendCard1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friend_1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friend_1").assertTextEquals("friend 2")
+  }
+
+  @Test
+  fun verifiesEmptyTextIfNoFriends() {
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(profileWithoutFriend)
+    }
+
+    composeTestRule.setContent { ProfileScreen(navigationActions, profileModelView) }
+
+    composeTestRule.onNodeWithTag("emptyFriendCard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("emptyFriendText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("emptyFriendText").assertTextEquals("No friends are saved")
   }
 }

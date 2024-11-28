@@ -176,10 +176,9 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").assertTextContains("Delete")
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
-    verify(travelRepository).updateTravel(any(), any(), any())
+    verify(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
   }
 
-  @Test
   fun pressALotOfButtons() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
@@ -228,7 +227,7 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").assertTextContains("Delete")
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
-    verify(travelRepository, atLeastOnce()).updateTravel(any(), any(), any())
+    verify(travelRepository, atLeastOnce()).updateTravel(any(), any(), anyOrNull(), any(), any())
   }
 
   @Test
