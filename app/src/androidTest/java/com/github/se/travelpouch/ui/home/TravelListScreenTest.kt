@@ -1,8 +1,14 @@
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
@@ -25,6 +31,7 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.util.Date
+import kotlin.math.roundToInt
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
@@ -266,7 +273,7 @@ class TravelListScreenTest {
   }
 
   @Test
-  fun displayEmptyTravelList() {
+  fun displayEmptyTravelListAndDragStowawayMap() {
     // Arrange
     val emptyTravelList = emptyList<TravelContainer>()
     doAnswer { invocation ->
@@ -291,5 +298,107 @@ class TravelListScreenTest {
 
     // Assert
     composeTestRule.onNodeWithTag("emptyTravelPrompt").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapLatch").assertIsDisplayed()
+    val density = composeTestRule.density
+    val heightBefore =
+        (composeTestRule.onNodeWithTag("mapScreen").captureToImage().height / density.density)
+            .roundToInt()
+    var dragDistance = 100 // For example, drag it 100 dp vertically
+    val correctionFactor = 8 // somehow all values are off by 8 dp
+    // we drag it up by 100 dp
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), -(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule
+        .onNodeWithTag("mapScreen")
+        .assertHeightIsEqualTo((heightBefore - dragDistance).dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+    // we drag it down by 100 dp
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), +(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(heightBefore.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+
+    // we over-drag it to see that nothing changes
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), +(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(heightBefore.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+
+    // we will drag it down by 160 dp so we have map size at 270 - 160 = 110 dp because it's 10 dp
+    // before the threshold for closer
+    dragDistance = 160
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), -(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule
+        .onNodeWithTag("mapScreen")
+        .assertHeightIsEqualTo((heightBefore - dragDistance).dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+    // we will drag it down by 15 dp, so we hit 95 dp, this should lead to the map closing itself
+    dragDistance = 15
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), -(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(0.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsNotDisplayed()
+    // we will now drag it up by 50 dp, and it shouldn't snap back to 0 dp
+    dragDistance = 50
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), +(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(dragDistance.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+    // we will now drag it up by 60 dp, and this means we're in the zone where the snap to 0 is
+    // available again
+    dragDistance = 60
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), +(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(110.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+    // now it we drag it down again by 20dp, we should hit the threshold and it should close
+    dragDistance = 20
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), -(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(0.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsNotDisplayed()
+    // now we drag it up and it shouldn't change anything
+    dragDistance = 20
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), -(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(0.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsNotDisplayed()
+    // and now we don't have any "drag" debt so it we drag it back by 60 dp, it should open
+    dragDistance = 60
+    composeTestRule.onNodeWithTag("mapLatch").performTouchInput {
+      down(center) // Start the drag at the center of the mapLatch
+      moveBy(Offset(0.dp.toPx(), +(dragDistance + correctionFactor).dp.toPx()))
+      up() // End the drag
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertHeightIsEqualTo(60.dp)
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
   }
 }
