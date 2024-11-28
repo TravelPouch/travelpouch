@@ -164,7 +164,7 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").assertTextContains("Delete")
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
-    verify(travelRepository).updateTravel(any(), any(), any())
+    verify(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
   }
 
   @Test
@@ -214,7 +214,7 @@ class EditTravelSettingsScreenTest {
             "qwertzuiopasdfghjklyxcvbnm12",
             "username",
             "email@gmail.com",
-            null,
+            emptyList(),
             "name",
             emptyList())
 
@@ -254,7 +254,7 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -264,7 +264,7 @@ class EditTravelSettingsScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     doAnswer { "sigmasigmasigmasigm2" }.`when`(travelRepository).getNewUid()
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
@@ -307,7 +307,7 @@ class EditTravelSettingsScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
     verify(notificationRepository, never()).addNotification(anyOrNull())
@@ -347,7 +347,7 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -357,7 +357,7 @@ class EditTravelSettingsScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
     verify(notificationRepository, never()).addNotification(anyOrNull())
@@ -397,7 +397,7 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -406,7 +406,7 @@ class EditTravelSettingsScreenTest {
 
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
 
@@ -454,7 +454,7 @@ class EditTravelSettingsScreenTest {
         .`when`(travelRepository)
         .checkParticipantExists(any(), any(), any())
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     // Now this is a valid user that does exist
@@ -468,14 +468,14 @@ class EditTravelSettingsScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo)
         }
         .`when`(travelRepository)
         .checkParticipantExists(any(), any(), any())
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     // perform deletion of travel
@@ -503,7 +503,7 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").assertTextContains("Delete")
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
-    verify(travelRepository, atLeastOnce()).updateTravel(any(), any(), any())
+    verify(travelRepository, atLeastOnce()).updateTravel(any(), any(), anyOrNull(), any(), any())
   }
 
   @Test

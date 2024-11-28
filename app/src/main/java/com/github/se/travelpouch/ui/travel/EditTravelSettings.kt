@@ -60,6 +60,7 @@ import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
+import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
 import com.github.se.travelpouch.utils.DateTimeUtils
@@ -359,7 +360,8 @@ fun EditTravelSettingsScreen(
                             allAttachments = selectedTravel!!.allAttachments,
                             allParticipants = selectedTravel!!.allParticipants,
                             listParticipant = selectedTravel!!.listParticipant)
-                    listTravelViewModel.updateTravel(newTravel)
+                    listTravelViewModel.updateTravel(
+                        newTravel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
                     Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
                   } catch (e: ParseException) {
                     Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
