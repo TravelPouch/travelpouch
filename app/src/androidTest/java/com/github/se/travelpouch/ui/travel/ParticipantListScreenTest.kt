@@ -379,7 +379,7 @@ class ParticipantListScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
 
     // Click the Add User button
     composeTestRule.onNodeWithTag("addUserButton").performClick()
@@ -443,7 +443,7 @@ class ParticipantListScreenTest {
             "qwertzuiopasdfghjklyxcvbnm12",
             "username",
             "email@gmail.com",
-            null,
+            emptyList(),
             "name",
             emptyList())
 
@@ -489,7 +489,7 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -499,7 +499,7 @@ class ParticipantListScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     doAnswer { "sigmasigmasigmasigm2" }.`when`(travelRepository).getNewUid()
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
@@ -547,7 +547,7 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -557,7 +557,7 @@ class ParticipantListScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
     // verify(notificationRepository, never()).addNotification(anyOrNull())
@@ -603,7 +603,7 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -612,7 +612,7 @@ class ParticipantListScreenTest {
 
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
 
@@ -673,7 +673,7 @@ class ParticipantListScreenTest {
         .`when`(travelRepository)
         .checkParticipantExists(any(), any(), any())
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     // Now this is a valid user that does exist
@@ -687,14 +687,14 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = null)
+                  friends = emptyList())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo)
         }
         .`when`(travelRepository)
         .checkParticipantExists(any(), any(), any())
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
   }
 }
