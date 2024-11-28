@@ -5,7 +5,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -101,12 +100,6 @@ fun SwipePager(
                   onClick = { navigationActions.navigateTo(Screen.TIMELINE) },
                   modifier = Modifier.testTag("eventTimelineButton")) {
                     Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
-                  }
-
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
-                  modifier = Modifier.testTag("ProfileButton")) {
-                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
                   }
             })
       },

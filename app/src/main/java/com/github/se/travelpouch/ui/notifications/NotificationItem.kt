@@ -226,7 +226,7 @@ fun onCardClick(
             activityViewModel.setIdTravel(travel.fsUid)
             documentViewModel.setIdTravel(travel.fsUid)
             eventsViewModel.setIdTravel(travel.fsUid)
-            navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+            navigationActions.navigateTo(Screen.SWIPER)
           } else {
             Toast.makeText(context, "You are not a member of this travel", Toast.LENGTH_SHORT)
                 .show()

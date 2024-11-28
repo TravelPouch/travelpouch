@@ -60,7 +60,6 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("settingsButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventTimelineButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ProfileButton").assertIsDisplayed()
   }
 
   private fun assertBottomBarIsDisplayedCorrectly(composeTestRule: ComposeTestRule) {
