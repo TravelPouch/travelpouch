@@ -22,6 +22,7 @@ import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelRepository
+import com.github.se.travelpouch.ui.home.AddTravelScreenTest.FakeLocationRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -29,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doNothing
@@ -45,7 +45,7 @@ class EditTravelSettingsScreenTest {
   }
 
   fun createContainer(): TravelContainer {
-    val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
+    val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Paris")
     val attachments: MutableMap<String, String> = HashMap()
     attachments["Attachment1"] = "UID1"
     val user1ID = "rythwEmprFhOOgsANXnv12345678"
@@ -89,8 +89,9 @@ class EditTravelSettingsScreenTest {
     notificationViewModel = NotificationViewModel(notificationRepository)
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView(profileRepository)
-    locationRepository = mock(LocationRepository::class.java)
-    locationViewModel = LocationViewModel(locationRepository)
+    locationViewModel =
+        LocationViewModel(
+            com.github.se.travelpouch.ui.home.AddTravelScreenTest.FakeLocationRepository())
   }
 
   @Test
@@ -141,7 +142,7 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("inputParticipants").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelDescription").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLocationName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocation").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelStartTime").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelEndTime").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().assertIsDisplayed()
@@ -167,7 +168,7 @@ class EditTravelSettingsScreenTest {
 
     inputText("inputTravelTitle", travelContainer.title, "Test Title")
     inputText("inputTravelDescription", travelContainer.description, "Test Description")
-    inputText("inputTravelLocationName", travelContainer.location.name, "Test Location")
+    inputText("inputTravelLocation", travelContainer.location.name, "Paris")
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
     inputText("inputTravelEndTime", "16/02/2009", "15/02/2009")
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().assertIsDisplayed()
@@ -297,17 +298,70 @@ class EditTravelSettingsScreenTest {
           profileModelView,
           locationViewModel)
     }
-
-    // The startDate picker button should be displayed
     composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
-
-    // Simulate clicking the date picker button
     composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().performClick()
-
-    // The endDate picker button should be displayed
     composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().assertIsDisplayed()
-
-    // Simulate clicking the date picker button
     composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().performClick()
+  }
+
+  @Test
+  fun dropdownMenuOpensOnClick() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
+    }
+
+    // Click on the location dropdown menu
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().performClick()
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Check if the dropdown menu is displayed when change location
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().performTextClearance()
+    composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("New Location")
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Click on the location dropdown menu
+    composeTestRule.onNodeWithTag("locationDropdownMenu").assertIsDisplayed()
+  }
+
+  @Test
+  fun locationDropdownAppearsAndSelectionWorks() {
+    val testQuery = "Paris"
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
+    }
+
+    // Type in the location field
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().performTextClearance()
+    composeTestRule
+        .onNodeWithTag("inputTravelLocation")
+        .performScrollTo()
+        .performTextInput(testQuery)
+
+    // The dropdown should appear with the suggestion
+    composeTestRule
+        .onNodeWithTag("suggestion_${locationViewModel.locationSuggestions.value[0].name}")
+        .performScrollTo()
+        .performClick()
   }
 }

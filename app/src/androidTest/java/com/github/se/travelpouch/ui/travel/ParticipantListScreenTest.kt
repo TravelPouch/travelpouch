@@ -134,60 +134,6 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("goBackButton").performClick()
   }
 
-  /*@Test
-  fun testNonEmptyViewChangeRole() {
-    listTravelViewModel.selectTravel(container)
-
-    // this hack was generated using Github Copilot
-    val participants_field = listTravelViewModel::class.java.getDeclaredField("participants_")
-    participants_field.isAccessible = true
-    val participantFlow =
-        participants_field.get(listTravelViewModel) as MutableStateFlow<Map<fsUid, Profile>>
-    participantFlow.value =
-        mapOf(participant1.fsUid to participant1, participant2.fsUid to participant2)
-
-    // listTravelViewModel.addParticipant(participant1)
-    // listTravelViewModel.addParticipant(participant2)
-
-    // Check if all elements are displayed
-    composeTestRule.onNodeWithTag("participantListScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantListSettingTopBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantListSettingText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantColumn").assertIsDisplayed()
-
-    val first = composeTestRule.onAllNodesWithTag("participantRow").onFirst()
-    val second = composeTestRule.onAllNodesWithTag("participantRow").onLast()
-    first.assertExists().assertIsDisplayed()
-    second.assertExists().assertIsDisplayed()
-    first.performScrollTo().performClick()
-    composeTestRule.onNodeWithTag("participantDialogBox").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantDialogRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantDialogIcon").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantDialogName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantDialogEmail").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("participantDialogRole")
-        .assertIsDisplayed()
-        .assertTextContains("Role : PARTICIPANT")
-    composeTestRule.onNodeWithTag("changeRoleButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("removeParticipantButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("changeRoleButton").performClick()
-    composeTestRule.onNodeWithTag("roleDialogBox").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("roleDialogColumn").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("roleDialogTitle").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("roleDialogCurrentRole")
-        .assertIsDisplayed()
-        .assertTextContains("Current Role: PARTICIPANT")
-    composeTestRule.onNodeWithTag("ownerButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("organizerButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("participantButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ownerButton").performClick()
-    composeTestRule.onNodeWithTag("participantDialogBox").assertIsNotDisplayed()
-    composeTestRule.onNodeWithTag("roleDialogBox").assertIsNotDisplayed()
-  }*/
-
   @Test
   fun testNonEmptyViewChangeRoleFailed() {
     composeTestRule.setContent {

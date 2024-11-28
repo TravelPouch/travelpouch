@@ -3,14 +3,12 @@ package com.github.se.travelpouch.ui.travel
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -36,7 +34,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,19 +50,13 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
 import com.github.se.travelpouch.model.location.LocationViewModel
-import com.github.se.travelpouch.model.notifications.Notification
-import com.github.se.travelpouch.model.notifications.NotificationContent
-import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
-import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen.PARTICIPANT_LIST
@@ -227,18 +218,18 @@ fun EditTravelSettingsScreen(
 
             Box(modifier = Modifier.width(300.dp).padding(vertical = 4.dp)) {
               OutlinedTextField(
-                  value = locationQuery.value, // Use mutable state for locationQuery
+                  value = locationQuery.value,
                   onValueChange = {
-                    locationQuery.value = it // Update the query as the user types
+                    locationQuery.value = it
                     locationViewModel.setQuery(it)
-                    showDropdown = true // Show dropdown when user starts typing
+                    showDropdown = true
                   },
                   label = { Text("Location") },
                   placeholder = { Text("Enter an Address or Location") },
                   modifier =
                       Modifier.width(300.dp)
                           .padding(vertical = 4.dp)
-                          .testTag("inputTravelLocationName"))
+                          .testTag("inputTravelLocation"))
 
               // Dropdown for location suggestions
               DropdownMenu(
@@ -247,19 +238,17 @@ fun EditTravelSettingsScreen(
                   properties = PopupProperties(focusable = false),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .heightIn(
-                              max = 200.dp) // Set max height to make it scrollable if more than 3
-                  ) {
+                          .heightIn(max = 200.dp)
+                          .testTag("locationDropdownMenu")) {
                     locationSuggestions.filterNotNull().take(3).forEach { location ->
                       DropdownMenuItem(
                           text = {
                             Text(
                                 text =
                                     location.name.take(30) +
-                                        if (location.name.length > 30) "..."
-                                        else "", // Limit name length and add ellipsis
-                                maxLines = 1 // Ensure name doesn't overflow
-                                )
+                                        if (location.name.length > 30) "..." else "",
+                                maxLines = 1,
+                                modifier = Modifier.testTag("suggestionText_${location.name}"))
                           },
                           onClick = {
                             locationViewModel.setQuery(location.name)
