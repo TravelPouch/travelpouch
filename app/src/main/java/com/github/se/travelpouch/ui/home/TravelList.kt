@@ -1,10 +1,13 @@
 package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,13 +18,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
+
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,14 +46,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.github.se.travelpouch.model.activity.ActivityViewModel
@@ -100,9 +117,7 @@ fun TravelListScreen(
   val isLoading = listTravelViewModel.isLoading.collectAsState()
 
   // Used for the screen orientation redraw
-  val configuration = LocalConfiguration.current
-  val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-  val mapHeight = if (isPortrait) 300.dp else 200.dp
+  val mapPlusLatchHeight = 300.dp
 
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
@@ -181,28 +196,39 @@ fun TravelListScreen(
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                     }
               },
-              content = { pd ->
-                Column(modifier = Modifier.fillMaxSize().padding(pd)) {
-                  // Map placed outside the LazyColumn to prevent it from being part of the
-                  // scrollable
-                  // content
-                  MapContent(
-                      modifier = Modifier.fillMaxWidth().height(mapHeight),
-                      travelContainers = travelList.value)
 
-                  LazyColumn(
-                      modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp),
-                      contentPadding = PaddingValues(bottom = 80.dp)) {
-                        if (travelList.value.isNotEmpty()) {
-                          items(travelList.value.size) { index ->
-                            TravelItem(travelContainer = travelList.value[index]) {
-                              val travelId = travelList.value[index].fsUid
-                              listTravelViewModel.selectTravel(travelList.value[index])
-                              navigationActions.navigateTo(Screen.SWIPER)
-                              eventViewModel.setIdTravel(travelId)
-                              activityViewModel.setIdTravel(travelId)
-                              documentViewModel.setIdTravel(travelId)
-                            }
+
+      content = { pd ->
+        Column(modifier = Modifier.fillMaxSize().padding(pd)) {
+          // Map placed outside the LazyColumn to prevent it from being part of the scrollable
+          ResizableStowableMapWithGoogleMap(mapPlusLatchHeight, travelList) { travelContainer ->
+            selectAndNavigateToTravel(
+                travelContainer,
+                listTravelViewModel,
+                navigationActions,
+                eventViewModel,
+                activityViewModel,
+                documentViewModel)
+          }
+
+          LazyColumn(
+              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+              contentPadding = PaddingValues(bottom = 80.dp)) {
+                if (travelList.value.isNotEmpty()) {
+                  items(travelList.value.size) { index ->
+                    TravelItem(
+                        travelContainer = travelList.value[index],
+                        onClick = {
+                          selectAndNavigateToTravel(
+                              travelList.value[index],
+                              listTravelViewModel,
+                              navigationActions,
+                              eventViewModel,
+                              activityViewModel,
+                              documentViewModel)
+                        })
+                  }
+
                           }
                         } else {
                           item {
@@ -239,6 +265,33 @@ fun TravelListScreen(
               })
         }
       }
+}
+
+/**
+ * Selects a travel container and navigates to the SWIPER screen.
+ *
+ * @param travelContainer The travel container to select.
+ * @param listTravelViewModel The view model for the list of travels.
+ * @param navigationActions The actions for navigation.
+ * @param eventViewModel The view model for events.
+ * @param activityViewModel The view model for activities.
+ * @param documentViewModel The view model for documents.
+ * @return A lambda function that performs the selection and navigation.
+ */
+fun selectAndNavigateToTravel(
+    travelContainer: TravelContainer,
+    listTravelViewModel: ListTravelViewModel,
+    navigationActions: NavigationActions,
+    eventViewModel: EventViewModel,
+    activityViewModel: ActivityViewModel,
+    documentViewModel: DocumentViewModel
+) {
+  val travelId = travelContainer.fsUid
+  listTravelViewModel.selectTravel(travelContainer)
+  navigationActions.navigateTo(Screen.SWIPER)
+  eventViewModel.setIdTravel(travelId)
+  activityViewModel.setIdTravel(travelId)
+  documentViewModel.setIdTravel(travelId)
 }
 
 /**
@@ -296,4 +349,113 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
               fontWeight = FontWeight.Light)
         }
       }
+}
+
+// inspired from :
+// https://developer.android.com/develop/ui/compose/touch-input/pointer-input/drag-swipe-fling
+
+/**
+ * Composable function that displays a resizable and stowable map with Google Map integration.
+ *
+ * @param maxMapPlusLatchDp The maximum height of the map in Dp. Default is 300.dp.
+ * @param travelList The list of travel containers to be displayed on the map.
+ * @param onInfoWindowClickCallback Callback function to be invoked when a marker info window is
+ *   clicked.
+ */
+@Composable
+fun ResizableStowableMapWithGoogleMap(
+    maxMapPlusLatchDp: Dp = 300.dp,
+    travelList: State<List<TravelContainer>>,
+    onInfoWindowClickCallback: (TravelContainer) -> Unit = {},
+) {
+
+  // State to track the height of the map
+  val minHeight = 100f // Min height of the map (collapsed state)
+  val latchDp = 30.dp // Height of the strap handle
+  val maxHeight = maxMapPlusLatchDp.value - latchDp.value // Max height of the map
+  val mapHeight = rememberSaveable {
+    mutableFloatStateOf(maxHeight)
+  } // Initial height of the map in pixels
+  val density = LocalDensity.current // Get the density scale factor
+
+  // Track whether the map is collapsed (height passed 0 at some point)
+  val belowThreshold = rememberSaveable { mutableStateOf(false) }
+
+  Column(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = Modifier.fillMaxWidth().requiredHeight(mapHeight.floatValue.dp)) {
+      MapContent(
+          modifier = Modifier.fillMaxWidth().height(mapHeight.floatValue.dp),
+          travelContainers = travelList.value,
+          onInfoWindowClickCallback = { travelContainer ->
+            // Handle the click event
+            onInfoWindowClickCallback(travelContainer)
+          })
+    }
+
+    // Strap handle at the bottom to drag and resize the map
+    Box(
+        modifier =
+            Modifier.fillMaxWidth()
+                .testTag("mapLatch")
+                .graphicsLayer {
+                  shape =
+                      CutCornerShape(
+                          topStart = 0.dp, topEnd = 0.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
+                  clip = true
+                }
+                .height(latchDp)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .draggable(
+                    orientation = Orientation.Vertical,
+                    state =
+                        rememberDraggableState { delta ->
+                          resizeFromDragMotion(
+                              delta, density, mapHeight, maxHeight, minHeight, belowThreshold)
+                        })) {
+          Icon(
+              imageVector = Icons.Default.StopCircle,
+              contentDescription = "MapLatch",
+              modifier = Modifier.align(Alignment.Center))
+        }
+  }
+}
+
+/**
+ * Adjusts the height of the map based on the drag motion.
+ *
+ * @param delta The change in position from the drag motion.
+ * @param density The density scale factor.
+ * @param mapHeight The current height of the map.
+ * @param maxHeight The maximum height of the map in pixels.
+ * @param minHeight The minimum height of the map in pixels.
+ * @param belowThreshold A state indicating whether the map is collapsed.
+ */
+private fun resizeFromDragMotion(
+    delta: Float,
+    density: Density,
+    mapHeight: MutableFloatState,
+    maxHeight: Float,
+    minHeight: Float,
+    belowThreshold: MutableState<Boolean>
+) {
+  val scaledDelta = delta / density.density // Adjusting by the density scale factor
+
+  // Calculate the new map height based on the delta drag amount
+  // clamp to the max value to avoid exceeding the max height
+  if (mapHeight.floatValue + scaledDelta > maxHeight) {
+    mapHeight.floatValue = maxHeight
+  } else if (mapHeight.floatValue + scaledDelta < minHeight && !belowThreshold.value) {
+    belowThreshold.value = true
+    mapHeight.floatValue = 0f
+  } else {
+    if (belowThreshold.value && mapHeight.floatValue + scaledDelta > minHeight) {
+      belowThreshold.value = false
+    }
+    // clamp to the min value to avoid negatives values
+    if (mapHeight.floatValue + scaledDelta < 0) {
+      mapHeight.floatValue = 0f
+    } else {
+      mapHeight.floatValue += scaledDelta
+    }
+  }
 }
