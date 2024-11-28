@@ -186,8 +186,6 @@ fun TravelListScreen(
               floatingActionButton = {
                 FloatingActionButton(
                     onClick = { navigationActions.navigateTo(Screen.ADD_TRAVEL) },
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.testTag("createTravelFab")) {
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                     }

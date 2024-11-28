@@ -101,7 +101,15 @@ class MainActivity : ComponentActivity() {
         }
 
         composable(Screen.SWIPER) {
-          SwipePager(navigationActions, activityModelView, calendarViewModel)
+          SwipePager(
+              navigationActions,
+              activityModelView,
+              calendarViewModel,
+              documentViewModel,
+              listTravelViewModel,
+              onNavigateToDocumentPreview = {
+                navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW)
+              })
         }
 
         composable(Screen.TRAVEL_LIST) {

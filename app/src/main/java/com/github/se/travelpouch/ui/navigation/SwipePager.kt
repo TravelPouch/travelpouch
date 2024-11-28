@@ -6,7 +6,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,8 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
+import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
+import com.github.se.travelpouch.ui.documents.DocumentListScreen
 
 // credit to : https://www.youtube.com/watch?v=inrGyNJbZaI&t=620s
 
@@ -36,14 +38,23 @@ import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 fun SwipePager(
     navigationActions: NavigationActions,
     activityViewModel: ActivityViewModel,
-    calendarViewModel: CalendarViewModel
+    calendarViewModel: CalendarViewModel,
+    documentViewModel: DocumentViewModel,
+    listTravelViewModel: ListTravelViewModel,
+    onNavigateToDocumentPreview: () -> Unit
 ) {
   val listOfTopLevelDestinationForSwipe =
-      listOf(TopLevelDestinations.ACTIVITIES, TopLevelDestinations.CALENDAR)
+      listOf(
+          TopLevelDestinations.ACTIVITIES,
+          TopLevelDestinations.CALENDAR,
+          TopLevelDestinations.DOCUMENTS)
 
   val listOfTopLevelDestination =
       listOf(
-          TopLevelDestinations.ACTIVITIES, TopLevelDestinations.CALENDAR, TopLevelDestinations.MAP)
+          TopLevelDestinations.ACTIVITIES,
+          TopLevelDestinations.CALENDAR,
+          TopLevelDestinations.DOCUMENTS,
+          TopLevelDestinations.MAP)
 
   val pagerState = rememberPagerState(initialPage = 0) { listOfTopLevelDestinationForSwipe.size }
 
@@ -69,6 +80,7 @@ fun SwipePager(
                     when (pagerState.currentPage) {
                       0 -> navigationActions.navigateTo(Screen.TRAVEL_LIST)
                       1 -> selectedScreen = 0
+                      2 -> selectedScreen = 0
                     }
                   },
                   modifier = Modifier.testTag("goBackButton")) {
@@ -89,12 +101,6 @@ fun SwipePager(
                   modifier = Modifier.testTag("eventTimelineButton")) {
                     Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
                   }
-
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.DOCUMENT_LIST) },
-                  modifier = Modifier.testTag("documentListButton")) {
-                    Icon(imageVector = Icons.Default.Folder, contentDescription = null)
-                  }
             })
       },
       bottomBar = {
@@ -105,6 +111,7 @@ fun SwipePager(
                   when (destination.textId) {
                     "Activities" -> selectedScreen = 0
                     "Calendar" -> selectedScreen = 1
+                    "Documents" -> selectedScreen = 2
                     "Map" -> navigationActions.navigateTo(Screen.ACTIVITIES_MAP)
                   }
                 },
@@ -119,6 +126,12 @@ fun SwipePager(
           when (pageIndex) {
             0 -> TravelActivitiesScreen(navigationActions, activityViewModel)
             1 -> CalendarScreen(calendarViewModel, navigationActions)
+            2 ->
+                DocumentListScreen(
+                    documentViewModel,
+                    listTravelViewModel,
+                    navigationActions,
+                    onNavigateToDocumentPreview)
           }
         }
       }
