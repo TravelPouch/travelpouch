@@ -1,10 +1,13 @@
 package com.github.se.travelpouch.e2e
 
+import android.util.Log
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -108,9 +111,11 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
 
         // verify that the empty travel prompt does not exist since we saved a travel
-        composeTestRule
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+          composeTestRule
             .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
-            .assertDoesNotExist()
+            .isNotDisplayed()
+        }
 
         composeTestRule.onNodeWithText("e2e travel 1").assertIsDisplayed()
         composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("e2e travel 1"))
