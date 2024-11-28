@@ -27,7 +27,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
-
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -50,15 +49,15 @@ import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
-
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -121,6 +120,7 @@ fun TravelListScreen(
 
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
+  val configuration = LocalConfiguration.current
 
   ModalNavigationDrawer(
       drawerContent = {
@@ -136,8 +136,6 @@ fun TravelListScreen(
                     }) {
               FloatingActionButton(
                   onClick = { scope.launch { drawerState.close() } },
-                  containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                   modifier =
                       Modifier.testTag("closingMenuFab")
                           .align(Alignment.TopEnd)
@@ -174,8 +172,6 @@ fun TravelListScreen(
         Box(modifier = Modifier.fillMaxSize()) {
           FloatingActionButton(
               onClick = { scope.launch { drawerState.open() } },
-              containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-              contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
               modifier =
                   Modifier.testTag("menuFab")
                       .align(Alignment.TopStart)
@@ -196,39 +192,37 @@ fun TravelListScreen(
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                     }
               },
-
-
-      content = { pd ->
-        Column(modifier = Modifier.fillMaxSize().padding(pd)) {
-          // Map placed outside the LazyColumn to prevent it from being part of the scrollable
-          ResizableStowableMapWithGoogleMap(mapPlusLatchHeight, travelList) { travelContainer ->
-            selectAndNavigateToTravel(
-                travelContainer,
-                listTravelViewModel,
-                navigationActions,
-                eventViewModel,
-                activityViewModel,
-                documentViewModel)
-          }
-
-          LazyColumn(
-              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-              contentPadding = PaddingValues(bottom = 80.dp)) {
-                if (travelList.value.isNotEmpty()) {
-                  items(travelList.value.size) { index ->
-                    TravelItem(
-                        travelContainer = travelList.value[index],
-                        onClick = {
-                          selectAndNavigateToTravel(
-                              travelList.value[index],
-                              listTravelViewModel,
-                              navigationActions,
-                              eventViewModel,
-                              activityViewModel,
-                              documentViewModel)
-                        })
+              content = { pd ->
+                Column(modifier = Modifier.fillMaxSize().padding(pd)) {
+                  // Map placed outside the LazyColumn to prevent it from being part of the
+                  // scrollable
+                  ResizableStowableMapWithGoogleMap(mapPlusLatchHeight, travelList) {
+                      travelContainer ->
+                    selectAndNavigateToTravel(
+                        travelContainer,
+                        listTravelViewModel,
+                        navigationActions,
+                        eventViewModel,
+                        activityViewModel,
+                        documentViewModel)
                   }
 
+                  LazyColumn(
+                      modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                      contentPadding = PaddingValues(bottom = 80.dp)) {
+                        if (travelList.value.isNotEmpty()) {
+                          items(travelList.value.size) { index ->
+                            TravelItem(
+                                travelContainer = travelList.value[index],
+                                onClick = {
+                                  selectAndNavigateToTravel(
+                                      travelList.value[index],
+                                      listTravelViewModel,
+                                      navigationActions,
+                                      eventViewModel,
+                                      activityViewModel,
+                                      documentViewModel)
+                                })
                           }
                         } else {
                           item {
