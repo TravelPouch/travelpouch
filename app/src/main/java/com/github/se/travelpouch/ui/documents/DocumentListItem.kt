@@ -46,8 +46,11 @@ fun DocumentListItem(
     onClick: () -> Unit
 ) {
   var thumbnailUri by remember { mutableStateOf("") }
-  LaunchedEffect(documentContainer) { documentViewModel.getDocumentThumbnail(documentContainer, THUMBNAIL_WIDTH) }
-  thumbnailUri = documentViewModel.thumbnailUrls["${documentContainer.ref.id}-thumb-$THUMBNAIL_WIDTH"] ?: ""
+  LaunchedEffect(documentContainer) {
+    documentViewModel.getDocumentThumbnail(documentContainer, THUMBNAIL_WIDTH)
+  }
+  thumbnailUri =
+      documentViewModel.thumbnailUrls["${documentContainer.ref.id}-thumb-$THUMBNAIL_WIDTH"] ?: ""
 
   Card(
       modifier =
@@ -80,17 +83,19 @@ fun DocumentListItem(
           Box(modifier = Modifier.height(200.dp).width(150.dp)) {
             if (thumbnailUri.isNotEmpty()) {
               AsyncImage(
-                model = thumbnailUri,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize(),
+                  model = thumbnailUri,
+                  contentDescription = null,
+                  contentScale = ContentScale.Fit,
+                  modifier =
+                      Modifier.fillMaxSize().testTag("thumbnail-${documentContainer.ref.id}"),
               )
             } else {
               CircularProgressIndicator(
-                modifier =
-                Modifier.align(Alignment.Center).testTag("loadingSpinner-${documentContainer.ref.id}"),
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 5.dp)
+                  modifier =
+                      Modifier.align(Alignment.Center)
+                          .testTag("loadingSpinner-${documentContainer.ref.id}"),
+                  color = MaterialTheme.colorScheme.primary,
+                  strokeWidth = 5.dp)
             }
           }
 
