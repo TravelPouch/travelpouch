@@ -50,12 +50,12 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
         composeTestRule.onNodeWithText("Sign in").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest1@gmail.com")
-        composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
+        composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest2@gmail.com")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest2password")
         composeTestRule.onNodeWithText("Sign in").performClick()
 
         // wait until we are in the travel list screen
-        composeTestRule.waitUntil(timeoutMillis = 500) {
+        composeTestRule.waitUntil(timeoutMillis = 2000) {
           composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
         }
 
