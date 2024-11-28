@@ -12,6 +12,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the GPS feature.
+ *
+ * @param gpsRepository Repository for the GPS feature.
+ * @constructor Creates a GPSViewModel.
+ */
 class GPSViewModel(private val gpsRepository: GPSRepository) : ViewModel() {
 
   // Holds the real-time continuous location updates as a StateFlow
@@ -24,6 +30,7 @@ class GPSViewModel(private val gpsRepository: GPSRepository) : ViewModel() {
   val singleLocationUpdate: StateFlow<LatLng?>
     get() = _singleLocationUpdate
 
+  /** Start the real-time location updates and update the StateFlow. */
   fun startRealTimeLocationUpdates() {
     Log.d("GPSViewModel", "startRealTimeLocationUpdates")
 

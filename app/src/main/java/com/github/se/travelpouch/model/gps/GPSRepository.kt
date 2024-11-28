@@ -7,6 +7,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.map
 
 /**
  * Repository for handling GPS location updates. This class provides a Flow for listening to
- * continuous GPS location updates and a Task for fetching the current location.
+ * continuous GPS location updates and a possibility to request a single location update.
  *
  * @param fusedLocationClient The FusedLocationProviderClient instance to use for location updates.
  */
@@ -34,7 +35,7 @@ class GPSRepository(private val fusedLocationClient: FusedLocationProviderClient
   @SuppressLint("MissingPermission") // Ensure permissions are handled elsewhere
   fun getGPSUpdates(): Flow<Location?> = callbackFlow {
     val locationRequest =
-        LocationRequest.Builder(LocationRequest.PRIORITY_HIGH_ACCURACY, LOCATION_UPDATE_INTERVAL)
+        LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_UPDATE_INTERVAL)
             .setMinUpdateIntervalMillis(LOCATION_FASTEST_INTERVAL)
             .setWaitForAccurateLocation(true) // Ensures more precise location updates
             .build()
