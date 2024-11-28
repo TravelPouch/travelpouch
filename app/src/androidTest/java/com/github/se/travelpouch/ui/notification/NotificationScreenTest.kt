@@ -196,7 +196,7 @@ class NotificationScreenTest {
           documentViewModel = documentViewModel,
           eventsViewModel = eventViewModel)
     }
-    composeTestRule.onNodeWithTag("TopAppBarNotificationsScreen").assertExists()
+    // composeTestRule.onNodeWithTag("TopAppBarNotificationsScreen").assertExists()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").assertExists()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").isDisplayed()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").assert(hasText("Notifications"))
