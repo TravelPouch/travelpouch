@@ -109,9 +109,11 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
 
   /** Gets all Travel documents. */
   fun getTravels() {
+    Log.d("ListTravelViewModel", "Getting travels")
     _isLoading.value = true
     repository.getTravels(
         onSuccess = {
+          Log.d("ListTravelViewModel", "Successfully got travels")
           travels_.value = it
           _isLoading.value = false
         },
@@ -127,9 +129,13 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    * @param travel The Travel document to be added.
    */
   fun addTravel(travel: TravelContainer) {
+    Log.d("ListTravelViewModel", "Adding travel")
     repository.addTravel(
         travel = travel,
-        onSuccess = { getTravels() },
+        onSuccess = {
+          Log.d("ListTravelViewModel", "Successfully added travel")
+          getTravels()
+        },
         onFailure = { Log.e("ListTravelViewModel", "Failed to add travel", it) })
   }
 

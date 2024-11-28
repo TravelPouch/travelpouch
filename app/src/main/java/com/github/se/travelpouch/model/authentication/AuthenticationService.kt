@@ -24,16 +24,19 @@ interface AuthenticationService {
 }
 
 class FirebaseAuthenticationService(private val auth: FirebaseAuth) : AuthenticationService {
+  private val TAG = "AuthenticationService"
+
   override fun createUser(
       email: String,
       password: String,
       onSuccess: (FirebaseUser?) -> Unit,
       onFailure: (Task<AuthResult>) -> Unit
   ) {
+    Log.d(TAG, "createUserWithEmail: $email")
     auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Sign in success, update UI with the signed-in user's information
-        Log.d(TAG, "createUserWithEmail:success")
+        Log.d(TAG, "createUserWithEmail:success ${auth.currentUser}")
         val user = auth.currentUser
 
         onSuccess(user)
@@ -73,6 +76,7 @@ class MockFirebaseAuthenticationService : AuthenticationService {
       onSuccess: (FirebaseUser?) -> Unit,
       onFailure: (Task<AuthResult>) -> Unit
   ) {
+    Log.d("MockFirebaseAuthenticationService", "createUserWithEmail: $email")
     onSuccess(null)
   }
 

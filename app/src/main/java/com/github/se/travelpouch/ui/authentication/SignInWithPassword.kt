@@ -103,11 +103,12 @@ fun SignInWithPassword(
                       !methodChosen.value,
               onClick = {
                 methodChosen.value = true
+                Log.d("SignInScreen", "Creating user with email and password")
                 authService.createUser(
                     email,
                     password,
                     onSuccess = { user ->
-                      Log.d("SignInScreen", "User signed in: ${user?.displayName}")
+                      Log.d("SignInScreen", "User signed in: ${user?.uid} ${user?.email} ${user?.displayName} ${user?.isAnonymous}")
 
                       coroutineScope.launch {
                         profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
