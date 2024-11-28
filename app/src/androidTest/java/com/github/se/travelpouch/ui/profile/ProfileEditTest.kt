@@ -106,21 +106,18 @@ class ProfileEditTest {
     composeTestRule.onNodeWithTag("addingFriendField").performTextInput("email@email.com")
     composeTestRule.onNodeWithTag("addingFriendButton").performClick()
 
-    verify(profileRepository, never())
-        .addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     composeTestRule.onNodeWithTag("addingFriendField").performTextClearance()
     composeTestRule.onNodeWithTag("addingFriendField").performTextInput("test@swent.ch")
     composeTestRule.onNodeWithTag("addingFriendButton").performClick()
 
-    verify(profileRepository, never())
-        .addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     composeTestRule.onNodeWithTag("addingFriendField").performTextClearance()
     composeTestRule.onNodeWithTag("addingFriendField").performTextInput("final@answer.com")
     composeTestRule.onNodeWithTag("addingFriendButton").performClick()
 
-    verify(profileRepository)
-        .addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(profileRepository).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }
