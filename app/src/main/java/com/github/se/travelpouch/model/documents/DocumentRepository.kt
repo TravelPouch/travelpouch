@@ -145,7 +145,7 @@ class DocumentRepositoryFirestore(
                 "travelId" to document.travelRef.id,
                 "documentId" to document.ref.id,
                 "width" to width))
-        .continueWith { task ->
+        .addOnCompleteListener { task ->
           if (task.isSuccessful) {
             onSuccess()
           } else {
@@ -219,7 +219,7 @@ class DocumentRepositoryFirestore(
                 "travelId" to travelId,
                 "fileSize" to bytes.size,
                 "visibility" to DocumentVisibility.PARTICIPANTS.toString()))
-        .continueWith { task ->
+        .addOnCompleteListener { task ->
           if (task.isSuccessful) {
             onSuccess()
           } else {

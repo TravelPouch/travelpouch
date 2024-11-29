@@ -39,6 +39,7 @@ open class DocumentViewModel(
   private val _downloadUrls = mutableStateMapOf<String, String>()
   val downloadUrls: Map<String, String>
     get() = _downloadUrls
+
   private val _thumbnailUrls = mutableStateMapOf<String, String>()
   val thumbnailUrls: Map<String, String>
     get() = _thumbnailUrls
