@@ -122,7 +122,7 @@ fun DocumentListScreen(
             documentViewModel.uploadFile(
                 context.contentResolver.openInputStream(uri),
                 selectedTravel.value,
-                context.contentResolver.getType(uri) ?: "image/png")
+                context.contentResolver.getType(uri))
         else Log.d("DocumentList", "No file selected")
       }
 

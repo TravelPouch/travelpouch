@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Instrumentation
 import android.content.Intent
 import android.icu.util.GregorianCalendar
+import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -125,7 +126,7 @@ class DocumentUpload {
   @Test fun userFlowForDocumentUpload() = runTest(timeout = 30.seconds) {
     // mock the file picker
     intending(hasAction(Intent.ACTION_OPEN_DOCUMENT)).respondWith(
-      Instrumentation.ActivityResult(Activity.RESULT_OK, Intent().setData(file.toUri()))
+      Instrumentation.ActivityResult(Activity.RESULT_OK, Intent().setData(Uri.fromFile(file)))
     )
 
     // assert that login screen is displayed
