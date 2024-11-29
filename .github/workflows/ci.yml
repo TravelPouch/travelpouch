@@ -101,9 +101,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-firebase-emulators
 
-      - name : Install Firebase CLI
+      - name: Install Firebase CLI
         run: |
           curl -sL https://firebase.tools | bash
+
+      - name: Build functions
+        run: |
+          cd cloud-functions/functions
+          npm install
+          npm run build
+          cd ../..
 
       # Run Unit tests
       - name: Run tests
