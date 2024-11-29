@@ -3,6 +3,7 @@ package com.github.se.travelpouch.ui.travel
 import TruncatedText
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,14 +15,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -51,7 +58,6 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +76,7 @@ fun ParticipantListScreen(
   val (expandedRoleDialog, setExpandedRoleDialog) = remember { mutableStateOf(false) }
   val (selectedParticipant, setSelectedParticipant) =
       remember { mutableStateOf<Map.Entry<fsUid, Profile>?>(null) }
+  val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
 
   Scaffold(
       modifier = Modifier.testTag("participantListScreen"),
@@ -82,7 +89,7 @@ fun ParticipantListScreen(
             },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
+                  onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -90,54 +97,157 @@ fun ParticipantListScreen(
                   }
             })
       },
-  ) { paddingValues ->
-    if (selectedTravel != null) {
-      LazyColumn(
-          modifier = Modifier.padding(paddingValues).fillMaxWidth().testTag("participantColumn")) {
-            participants.entries.forEach { participantEntry ->
-              item {
-                // display all participants in travel
-                ParticipantRow(
-                    participant = participantEntry,
-                    selectedTravel = selectedTravel!!,
-                    onClick = {
-                      setSelectedParticipant(participantEntry)
-                      setExpanded(true)
-                    })
-                HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
+      floatingActionButton = {
+        ExtendedFloatingActionButton(
+            text = { Text("Add user", modifier = Modifier.testTag("AddUserButton")) },
+            icon = { Icon(Icons.Default.PersonAdd, contentDescription = "Add user") },
+            onClick = {
+              Log.d("ParticipantListScreen", "Add user button clicked")
+              setExpandedAddUserDialog(true)
+            },
+            modifier = Modifier.testTag("addUserFab"))
+      }) { paddingValues ->
+        if (selectedTravel != null) {
+          LazyColumn(
+              modifier =
+                  Modifier.padding(paddingValues).fillMaxWidth().testTag("callParticipantColumn")) {
+                participants.entries.forEach { participantEntry ->
+                  item {
+                    // display all participants in travel
+                    ParticipantColumn(
+                        participant = participantEntry,
+                        selectedTravel = selectedTravel!!,
+                        onClick = {
+                          setSelectedParticipant(participantEntry)
+                          setExpanded(true)
+                        })
+                    HorizontalDivider(thickness = 0.5.dp, color = Color.Gray)
+                  }
+                }
               }
-            }
-          }
-    } else {
-      Text(
-          "No Travel is selected or the selected travel no longer exists.",
-          modifier = Modifier.padding(paddingValues).testTag("noTravelSelected"))
-    }
+        } else {
+          Text(
+              "No Travel is selected or the selected travel no longer exists.",
+              modifier = Modifier.padding(paddingValues).testTag("noTravelSelected"))
+        }
 
-    selectedParticipant?.let { participant ->
-      if (expanded) {
-        Dialog(onDismissRequest = { setExpanded(false) }) {
-          Box(
-              Modifier.fillMaxWidth(1f)
-                  .height(250.dp)
-                  .background(MaterialTheme.colorScheme.surface)
-                  .testTag("participantDialogBox")) {
-                Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
-                  Row(
-                      modifier = Modifier.testTag("participantDialogRow"),
-                      verticalAlignment = Alignment.CenterVertically,
-                      horizontalArrangement = Arrangement.SpaceBetween) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Localized description",
-                            modifier = Modifier.padding(5.dp).testTag("participantDialogIcon"))
-                        TruncatedText(
-                            text = participant.value.name,
+        if (expandedAddUserDialog) {
+          val addUserEmail = remember { mutableStateOf("") }
+          Dialog(onDismissRequest = { setExpandedAddUserDialog(false) }) {
+            Box(
+                Modifier.fillMaxWidth(1f)
+                    .height(250.dp)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .testTag("addUserDialogBox")) {
+                  Column(
+                      modifier =
+                          Modifier.fillMaxSize()
+                              .padding(16.dp)
+                              .verticalScroll(rememberScrollState())
+                              .testTag("roleDialogColumn"),
+                      horizontalAlignment = Alignment.CenterHorizontally,
+                      verticalArrangement = Arrangement.Center) {
+                        Text(
+                            "Add User by Email",
                             fontWeight = FontWeight.Bold,
-                            maxLength = 25,
-                            modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
+                            modifier = Modifier.padding(8.dp).testTag("addUserDialogTitle"))
+                        OutlinedTextField(
+                            value = addUserEmail.value,
+                            onValueChange = { addUserEmail.value = it },
+                            label = { Text("Enter User's Email") },
+                            placeholder = { Text("Enter User's Email") },
+                            modifier = Modifier.testTag("addUserEmailField"))
+                        Button(
+                            onClick = {
+                              profileViewModel.getFsUidByEmail(
+                                  addUserEmail.value,
+                                  onSuccess = { fsUid ->
+                                    val isUserAlreadyAdded =
+                                        selectedTravel!!.allParticipants.keys.any {
+                                          it.fsUid == fsUid
+                                        }
+                                    if (fsUid == profileViewModel.profile.value.fsUid) {
+                                      Toast.makeText(
+                                              context,
+                                              "Error: You can't invite yourself",
+                                              Toast.LENGTH_SHORT)
+                                          .show()
+                                    } else if (isUserAlreadyAdded) {
+                                      Toast.makeText(
+                                              context,
+                                              "Error: User already added",
+                                              Toast.LENGTH_SHORT)
+                                          .show()
+                                    } else if (fsUid != null) {
+                                      try {
+                                        notificationViewModel.sendNotification(
+                                            Notification(
+                                                notificationViewModel.getNewUid(),
+                                                profileViewModel.profile.value.fsUid,
+                                                fsUid,
+                                                selectedTravel!!.fsUid,
+                                                NotificationContent.InvitationNotification(
+                                                    profileViewModel.profile.value.name,
+                                                    selectedTravel!!.title,
+                                                    Role.PARTICIPANT),
+                                                NotificationType.INVITATION))
+                                      } catch (e: Exception) {
+                                        Log.e(
+                                            "NotificationError",
+                                            "Failed to send notification: ${e.message}")
+                                      }
+                                      // Go back
+                                      setExpandedAddUserDialog(false)
+                                    } else {
+                                      Toast.makeText(
+                                              context,
+                                              "Error: User with email not found",
+                                              Toast.LENGTH_SHORT)
+                                          .show()
+                                    }
+                                  },
+                                  onFailure = { e ->
+                                    Log.e(
+                                        "EditTravelSettingsScreen",
+                                        "Error getting fsUid by email",
+                                        e)
+                                    Toast.makeText(
+                                            context, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                                        .show()
+                                  })
+                            },
+                            modifier = Modifier.testTag("addUserButton")) {
+                              Text("Add User")
+                            }
                       }
-                  TruncatedText(
+                }
+          }
+        }
+
+        selectedParticipant?.let { participant ->
+          if (expanded) {
+            Dialog(onDismissRequest = { setExpanded(false) }) {
+              Box(
+                  Modifier.fillMaxWidth(1f)
+                      .height(250.dp)
+                      .background(MaterialTheme.colorScheme.surface)
+                      .testTag("participantDialogBox")) {
+                    Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
+                      Row(
+                          modifier = Modifier.testTag("participantDialogRow"),
+                          verticalAlignment = Alignment.CenterVertically,
+                          horizontalArrangement = Arrangement.SpaceBetween) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Localized description",
+                                modifier = Modifier.padding(5.dp).testTag("participantDialogIcon"))
+                            TruncatedText(
+                                text = participant.value.name,
+                                fontWeight = FontWeight.Bold,
+                                maxLength = 25,
+                                modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
+                          }
+                      TruncatedText(
                       text = participant.value.email,
                       maxLength = 30,
                       fontWeight = FontWeight.Bold,
@@ -178,40 +288,41 @@ fun ParticipantListScreen(
                         setExpanded(false)
                         Toast.makeText(context, "Participant removed", Toast.LENGTH_LONG).show()
                       })
-                }
-              }
-        }
-      }
-
-      if (expandedRoleDialog) {
-        Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
-          Box(
-              Modifier.fillMaxWidth(1f)
-                  .height(250.dp)
-                  .background(MaterialTheme.colorScheme.surface)
-                  .testTag("roleDialogBox")) {
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center) {
-                      ChangeRoleDialog(selectedTravel, participant) { newRole ->
-                        handleRoleChange(
-                            context,
-                            selectedTravel,
-                            participant,
-                            newRole,
-                            listTravelViewModel,
-                            notificationViewModel,
-                            profileViewModel,
-                            setExpandedRoleDialog,
-                            setExpanded)
-                      }
                     }
-              }
+                  }
+            }
+          }
+
+          if (expandedRoleDialog) {
+            Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
+              Box(
+                  Modifier.fillMaxWidth(1f)
+                      .height(250.dp)
+                      .background(MaterialTheme.colorScheme.surface)
+                      .testTag("roleDialogBox")) {
+                    Column(
+                        modifier =
+                            Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                          ChangeRoleDialog(selectedTravel, participant) { newRole ->
+                            handleRoleChange(
+                                context,
+                                selectedTravel,
+                                participant,
+                                newRole,
+                                listTravelViewModel,
+                                notificationViewModel,
+                                profileViewModel,
+                                setExpandedRoleDialog,
+                                setExpanded)
+                          }
+                        }
+                  }
+            }
+          }
         }
       }
-    }
-  }
 }
 
 fun handleRoleChange(
@@ -242,23 +353,33 @@ fun handleRoleChange(
     setExpandedRoleDialog(false)
     setExpanded(false)
   } else {
-    // Actual role change logic
-    notificationViewModel.sendNotification(
-        Notification(
-            notificationViewModel.getNewUid(),
-            profileViewModel.profile.value.fsUid,
-            participant.key,
-            selectedTravel.fsUid,
-            NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
-            NotificationType.ROLE_UPDATE))
-    val participantMap = selectedTravel.allParticipants.toMutableMap()
-    participantMap[Participant(participant.key)] = newRole
-    val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
-    listTravelViewModel.updateTravel(
-        updatedContainer, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
-    listTravelViewModel.selectTravel(updatedContainer)
-    setExpandedRoleDialog(false)
-    setExpanded(false)
-    listTravelViewModel.fetchAllParticipantsInfo()
+    if (oldRole == Role.OWNER) {
+      // Actual role change logic
+      if (participant.key != profileViewModel.profile.value.fsUid) {
+        notificationViewModel.sendNotification(
+            Notification(
+                notificationViewModel.getNewUid(),
+                profileViewModel.profile.value.fsUid,
+                participant.key,
+                selectedTravel.fsUid,
+                NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
+                NotificationType.ROLE_UPDATE))
+      }
+      val participantMap = selectedTravel.allParticipants.toMutableMap()
+      participantMap[Participant(participant.key)] = newRole
+      val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
+      listTravelViewModel.updateTravel(
+        updatedContainer, TravelRepository.UpdateMode.FIELDS_UPDATE, null)      
+      listTravelViewModel.selectTravel(updatedContainer)
+      setExpandedRoleDialog(false)
+      setExpanded(false)
+      listTravelViewModel.fetchAllParticipantsInfo()
+    } else {
+      Toast.makeText(
+              context,
+              "You do not have the permission to change the role of this participant",
+              Toast.LENGTH_LONG)
+          .show()
+    }
   }
 }

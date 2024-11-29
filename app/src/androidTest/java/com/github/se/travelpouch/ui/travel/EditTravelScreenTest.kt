@@ -10,9 +10,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import com.github.se.travelpouch.model.location.LocationRepository
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.notifications.NotificationRepository
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
-import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
@@ -21,21 +22,17 @@ import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelRepository
-import com.github.se.travelpouch.model.travels.fsUid
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doNothing
-import org.mockito.kotlin.never
 
 class EditTravelSettingsScreenTest {
   // Helper function to input text into a text field
@@ -48,7 +45,7 @@ class EditTravelSettingsScreenTest {
   }
 
   fun createContainer(): TravelContainer {
-    val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Test Location")
+    val location = Location(12.34, 56.78, Timestamp(1234567890L, 0), "Paris")
     val attachments: MutableMap<String, String> = HashMap()
     attachments["Attachment1"] = "UID1"
     val user1ID = "rythwEmprFhOOgsANXnv12345678"
@@ -78,6 +75,8 @@ class EditTravelSettingsScreenTest {
   private lateinit var notificationRepository: NotificationRepository
   private lateinit var profileModelView: ProfileModelView
   private lateinit var profileRepository: ProfileRepository
+  private lateinit var locationRepository: LocationRepository
+  private lateinit var locationViewModel: LocationViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -90,20 +89,28 @@ class EditTravelSettingsScreenTest {
     notificationViewModel = NotificationViewModel(notificationRepository)
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView(profileRepository)
+    locationViewModel =
+        LocationViewModel(
+            com.github.se.travelpouch.ui.home.AddTravelScreenTest.FakeLocationRepository())
   }
 
   @Test
   fun checkNoSelectedTravel() {
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editTravelText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editTravelText").assertTextEquals("Edit Travel")
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("addUserFab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("plusButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("manageParticipantsButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("importEmailFab").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("noTravelSelectedText")
@@ -119,7 +126,11 @@ class EditTravelSettingsScreenTest {
         travelContainer) // this causes strange overwrite, shouldn't happen IRL
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("editScreen").assertIsDisplayed()
@@ -131,15 +142,14 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("inputParticipants").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelDescription").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLocationName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLatitude").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTravelLongitude").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocation").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelStartTime").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTravelEndTime").assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("addUserFab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("plusButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("manageParticipantsButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("importEmailFab").assertIsDisplayed()
   }
 
@@ -149,14 +159,16 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
 
     inputText("inputTravelTitle", travelContainer.title, "Test Title")
     inputText("inputTravelDescription", travelContainer.description, "Test Description")
-    inputText("inputTravelLocationName", travelContainer.location.name, "Test Location")
-    inputText("inputTravelLatitude", travelContainer.location.latitude.toString(), "12.34")
-    inputText("inputTravelLongitude", travelContainer.location.longitude.toString(), "56.78")
+    inputText("inputTravelLocation", travelContainer.location.name, "Paris")
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
     inputText("inputTravelEndTime", "16/02/2009", "15/02/2009")
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().assertIsDisplayed()
@@ -414,13 +426,23 @@ class EditTravelSettingsScreenTest {
   }
 
   @Test
+
   fun pressALotOfButtons() {
     val travelContainer = createContainer()
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
+    composeTestRule.onNodeWithTag("plusButton").performClick()
+    composeTestRule.onNodeWithTag("manageParticipantsButton").performClick()
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
+
+    composeTestRule.onNodeWithTag("plusButton").performClick()
     composeTestRule.onNodeWithTag("importEmailFab").performClick()
     composeTestRule.onNodeWithTag("addUserFab").performClick()
 
@@ -477,6 +499,7 @@ class EditTravelSettingsScreenTest {
     // Mock the repository.updateTravel method to do nothing
     doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
 
     // perform deletion of travel
     composeTestRule.onNodeWithTag("travelDeleteButton").performClick()
@@ -493,7 +516,11 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
 
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
@@ -512,7 +539,11 @@ class EditTravelSettingsScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
     // check bad dates
     inputText("inputTravelStartTime", "14/02/2009", "14/02/2009")
@@ -522,19 +553,18 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
     inputText("inputTravelEndTime", "13/02/2009", "18/02/2009")
     // check bad locations
-    inputText("inputTravelLatitude", travelContainer.location.latitude.toString(), "gyat")
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
 
-    inputText("inputTravelLatitude", "gyat", travelContainer.location.latitude.toString())
-    inputText("inputTravelLongitude", travelContainer.location.longitude.toString(), "-200")
-    composeTestRule.onNodeWithTag("travelSaveButton").performClick()
   }
 
   @Test
   fun backButtonNavigatesCorrectly() {
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("goBackButton").performClick()
@@ -546,7 +576,11 @@ class EditTravelSettingsScreenTest {
   fun saveButtonPressed() {
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
 
     composeTestRule.onNodeWithTag("travelSaveButton").isDisplayed()
@@ -560,19 +594,76 @@ class EditTravelSettingsScreenTest {
 
     composeTestRule.setContent {
       EditTravelSettingsScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
+    }
+    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().performClick()
+  }
+
+  @Test
+  fun dropdownMenuOpensOnClick() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
     }
 
-    // The startDate picker button should be displayed
-    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().assertIsDisplayed()
+    // Click on the location dropdown menu
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().performClick()
 
-    // Simulate clicking the date picker button
-    composeTestRule.onNodeWithTag("startDatePickerButton").performScrollTo().performClick()
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
 
-    // The endDate picker button should be displayed
-    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().assertIsDisplayed()
+    // Check if the dropdown menu is displayed when change location
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().performTextClearance()
+    composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("New Location")
 
-    // Simulate clicking the date picker button
-    composeTestRule.onNodeWithTag("endDatePickerButton").performScrollTo().performClick()
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Click on the location dropdown menu
+    composeTestRule.onNodeWithTag("locationDropdownMenu").assertIsDisplayed()
+  }
+
+  @Test
+  fun locationDropdownAppearsAndSelectionWorks() {
+    val testQuery = "Paris"
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      EditTravelSettingsScreen(
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          locationViewModel)
+    }
+
+    // Type in the location field
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTravelLocation").performScrollTo().performTextClearance()
+    composeTestRule
+        .onNodeWithTag("inputTravelLocation")
+        .performScrollTo()
+        .performTextInput(testQuery)
+
+    // The dropdown should appear with the suggestion
+    composeTestRule
+        .onNodeWithTag("suggestion_${locationViewModel.locationSuggestions.value[0].name}")
+        .performScrollTo()
+        .performClick()
   }
 }
