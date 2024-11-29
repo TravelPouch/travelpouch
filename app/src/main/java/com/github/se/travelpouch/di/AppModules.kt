@@ -18,9 +18,11 @@ import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.model.travels.TravelRepositoryFirestore
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 import dagger.Module
@@ -36,8 +38,8 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun provideFirebaseAuth(): AuthenticationService {
-    return FirebaseAuthenticationService(Firebase.auth)
+  fun provideFirebaseAuth(): FirebaseAuth {
+    return Firebase.auth
   }
 
   @Provides
@@ -58,14 +60,26 @@ object AppModule {
 
   @Provides
   @Singleton
+  fun provideFirebaseFunctions(): FirebaseFunctions {
+    return FirebaseFunctions.getInstance("europe-west9")
+  }
+
+  @Provides
+  @Singleton
+  fun providesAuthenticationService(auth: FirebaseAuth): AuthenticationService {
+    return FirebaseAuthenticationService(auth)
+  }
+
+  @Provides
+  @Singleton
   fun providesActivityRepository(db: FirebaseFirestore): ActivityRepository {
     return ActivityRepositoryFirebase(db)
   }
 
   @Provides
   @Singleton
-  fun providesDocumentRepository(db: FirebaseFirestore): DocumentRepository {
-    return DocumentRepositoryFirestore(db)
+  fun providesDocumentRepository(db: FirebaseFirestore, storage: FirebaseStorage, auth: FirebaseAuth, functions: FirebaseFunctions): DocumentRepository {
+    return DocumentRepositoryFirestore(db, storage, auth, functions)
   }
 
   @Provides

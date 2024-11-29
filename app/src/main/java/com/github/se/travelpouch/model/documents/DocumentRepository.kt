@@ -43,9 +43,9 @@ interface DocumentRepository {
  */
 class DocumentRepositoryFirestore(
     private val db: FirebaseFirestore,
-    private val storage: FirebaseStorage = FirebaseStorage.getInstance(),
-    private val firebaseAuth: FirebaseAuth = Firebase.auth,
-    private val functions: FirebaseFunctions = FirebaseFunctions.getInstance("europe-west9")
+    private val storage: FirebaseStorage,
+    private val firebaseAuth: FirebaseAuth,
+    private val functions: FirebaseFunctions
 ) : DocumentRepository {
   private var collectionPath = ""
 
