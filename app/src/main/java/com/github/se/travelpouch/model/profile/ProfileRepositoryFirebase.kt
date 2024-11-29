@@ -120,7 +120,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             fsUid = uid,
             username = email.substringBefore("@"),
             email = email,
-            friends = emptyList(),
+            friends = emptyMap(),
             name = email.substringBefore("@"),
             emptyList())
 
@@ -196,13 +196,15 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             if (friendProfile == ErrorProfile.errorProfile) {
               onFailure(Exception("user corrupted"))
             } else {
-              val userProfileUpdated = updatingFriendList(userProfile, friendProfile.email)
+              val userProfileUpdated =
+                  updatingFriendList(userProfile, friendProfile.email, friendProfile.fsUid)
               db.runTransaction { t ->
                     t.update(documentReference!!, "friends", userProfileUpdated.friends)
                     t.update(
                         friendsDocumentReference!!,
                         "friends",
-                        updatingFriendList(friendProfile, userProfile.email).friends)
+                        updatingFriendList(friendProfile, userProfile.email, userProfile.fsUid)
+                            .friends)
                   }
                   .addOnSuccessListener { onSuccess(userProfileUpdated) }
                   .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
@@ -212,8 +214,8 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .addOnFailureListener { onFailure(Exception("getting friend profile failed")) }
   }
 
-  private fun updatingFriendList(profile: Profile, email: String): Profile {
-    return profile.copy(friends = profile.friends + email)
+  private fun updatingFriendList(profile: Profile, email: String, fsUid: String): Profile {
+    return profile.copy(friends = profile.friends + Pair(email, fsUid))
   }
 
   /**
@@ -257,7 +259,7 @@ class ProfileRepositoryConvert {
         val uid = document.id
         val username = document.getString("username")
         val email = document.getString("email")
-        val friends = document.get("friends") as? List<String>
+        val friends = document.get("friends") as? Map<String, String>
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
 
@@ -265,7 +267,7 @@ class ProfileRepositoryConvert {
             fsUid = uid,
             username = username!!,
             email = email!!,
-            friends = friends ?: emptyList(),
+            friends = friends ?: emptyMap(),
             name = name!!,
             userTravelList = userTravelList ?: emptyList())
       } catch (e: Exception) {

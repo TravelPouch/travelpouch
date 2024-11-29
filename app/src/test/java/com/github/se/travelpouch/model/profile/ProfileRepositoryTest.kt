@@ -61,7 +61,7 @@ class ProfileRepositoryTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "usernameTest",
           "email@test.ch",
-          emptyList(),
+          emptyMap(),
           "nameTest",
           emptyList())
 
@@ -70,7 +70,7 @@ class ProfileRepositoryTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "usernameTest",
           "email@test.ch",
-          listOf("test@test.ch"),
+          mapOf("test@test.ch" to "qwertzuiopasdfghjklyxcvbnm12"),
           "nameTest",
           emptyList())
 
@@ -391,7 +391,7 @@ class ProfileRepositoryTest {
             "qwertzuiopasdfghjklyxcvbnm12",
             "usernameTest",
             "email@test.ch",
-            emptyList(),
+            emptyMap(),
             "nameTest",
             emptyList())
 
@@ -400,7 +400,7 @@ class ProfileRepositoryTest {
             "qwertzuiopasdfghjklyxcvbnm13",
             "usernameTestFriend",
             "email_friend@test.ch",
-            emptyList(),
+            emptyMap(),
             "nameTestFriend",
             emptyList())
 
@@ -485,11 +485,12 @@ class ProfileRepositoryTest {
   fun updatingFriendListTest() {
     val privateFunc =
         profileRepositoryFirestore.javaClass.getDeclaredMethod(
-            "updatingFriendList", Profile::class.java, String::class.java)
+            "updatingFriendList", Profile::class.java, String::class.java, String::class.java)
     privateFunc.isAccessible = true
     val parameters = arrayOfNulls<Any>(2)
     parameters[0] = profile
     parameters[1] = "test@test.ch"
+    parameters[2] = "qwertzuiopasdfghjklyxcvbnm12"
     val result = privateFunc.invoke(profileRepositoryFirestore, *parameters)
     assertThat(result, `is`(newProfile))
   }

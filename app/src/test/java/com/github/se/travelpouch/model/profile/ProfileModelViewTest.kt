@@ -17,7 +17,7 @@ class ProfileModelViewTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "username",
           "email@test.ch",
-          emptyList(),
+          emptyMap(),
           "name",
           emptyList())
 

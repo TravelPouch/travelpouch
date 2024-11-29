@@ -106,25 +106,28 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
               contentPadding = PaddingValues(bottom = 80.dp)) {
                 if (profile.value.friends.isNotEmpty()) {
 
-                  items(profile.value.friends.size) { friend ->
-                    Card(
-                        modifier =
-                            Modifier.testTag("friendCard${friend}")
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp),
-                        colors =
-                            CardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                                disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-                            )) {
-                          Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
-                            Text(
-                                profile.value.friends[friend],
-                                Modifier.align(Alignment.Center).testTag("friend_${friend}"))
+                  items(profile.value.friends.size) {
+                    profile.value.friends.forEach { (friend, _) ->
+                      Card(
+                          modifier =
+                              Modifier.testTag("friendCard${friend}")
+                                  .fillMaxWidth()
+                                  .padding(vertical = 10.dp),
+                          colors =
+                              CardColors(
+                                  containerColor = MaterialTheme.colorScheme.surface,
+                                  disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+                                  contentColor = MaterialTheme.colorScheme.onSurface,
+                                  disabledContainerColor =
+                                      MaterialTheme.colorScheme.inverseOnSurface,
+                              )) {
+                            Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
+                              Text(
+                                  friend,
+                                  Modifier.align(Alignment.Center).testTag("friend_${friend}"))
+                            }
                           }
-                        }
+                    }
                   }
                 } else {
                   item {
