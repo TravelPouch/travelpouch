@@ -248,46 +248,48 @@ fun ParticipantListScreen(
                                 modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
                           }
                       TruncatedText(
-                      text = participant.value.email,
-                      maxLength = 30,
-                      fontWeight = FontWeight.Bold,
-                      modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
+                          text = participant.value.email,
+                          maxLength = 30,
+                          fontWeight = FontWeight.Bold,
+                          modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
 
-                  RoleEntryDialog(
-                      selectedTravel = selectedTravel,
-                      participant = participant,
-                      changeRoleAction = setExpandedRoleDialog,
-                      removeParticipantAction = {
-                        if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
-                            Role.OWNER) {
-                          if (selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
-                              1) {
-                            Toast.makeText(
-                                    context,
-                                    "You're trying to remove the owner of the travel. Please name another owner before removing.",
-                                    Toast.LENGTH_LONG)
-                                .show()
+                      RoleEntryDialog(
+                          selectedTravel = selectedTravel,
+                          participant = participant,
+                          changeRoleAction = setExpandedRoleDialog,
+                          removeParticipantAction = {
+                            if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
+                                Role.OWNER) {
+                              if (selectedTravel!!
+                                  .allParticipants
+                                  .values
+                                  .count({ it == Role.OWNER }) == 1) {
+                                Toast.makeText(
+                                        context,
+                                        "You're trying to remove the owner of the travel. Please name another owner before removing.",
+                                        Toast.LENGTH_LONG)
+                                    .show()
+                                setExpanded(false)
+                                return@RoleEntryDialog
+                              }
+                            }
+                            val participantMap = selectedTravel!!.allParticipants.toMutableMap()
+                            participantMap.remove(Participant(participant.key))
+                            val participantList = selectedTravel!!.listParticipant.toMutableList()
+                            participantList.remove(participant.key)
+                            val updatedContainer =
+                                selectedTravel!!.copy(
+                                    allParticipants = participantMap.toMap(),
+                                    listParticipant = participantList)
+                            listTravelViewModel.updateTravel(
+                                updatedContainer,
+                                TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
+                                participant.key)
+                            listTravelViewModel.selectTravel(updatedContainer)
+                            listTravelViewModel.fetchAllParticipantsInfo()
                             setExpanded(false)
-                            return@RoleEntryDialog
-                          }
-                        }
-                        val participantMap = selectedTravel!!.allParticipants.toMutableMap()
-                        participantMap.remove(Participant(participant.key))
-                        val participantList = selectedTravel!!.listParticipant.toMutableList()
-                        participantList.remove(participant.key)
-                        val updatedContainer =
-                            selectedTravel!!.copy(
-                                allParticipants = participantMap.toMap(),
-                                listParticipant = participantList)
-                        listTravelViewModel.updateTravel(
-                            updatedContainer,
-                            TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
-                            participant.key)
-                        listTravelViewModel.selectTravel(updatedContainer)
-                        listTravelViewModel.fetchAllParticipantsInfo()
-                        setExpanded(false)
-                        Toast.makeText(context, "Participant removed", Toast.LENGTH_LONG).show()
-                      })
+                            Toast.makeText(context, "Participant removed", Toast.LENGTH_LONG).show()
+                          })
                     }
                   }
             }
@@ -369,7 +371,7 @@ fun handleRoleChange(
       participantMap[Participant(participant.key)] = newRole
       val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
       listTravelViewModel.updateTravel(
-        updatedContainer, TravelRepository.UpdateMode.FIELDS_UPDATE, null)      
+          updatedContainer, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
       listTravelViewModel.selectTravel(updatedContainer)
       setExpandedRoleDialog(false)
       setExpanded(false)

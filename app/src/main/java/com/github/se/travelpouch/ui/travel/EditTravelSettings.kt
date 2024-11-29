@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -52,7 +50,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -119,71 +116,73 @@ fun EditTravelSettingsScreen(
       floatingActionButton = {
         var toggled by remember { mutableStateOf(false) }
 
-          Box(modifier = Modifier.fillMaxSize()) {
-              if (toggled) {
-                  Box(
-                      modifier = Modifier
-                          .fillMaxSize()
-                          .background(Color.Transparent)
-                          .clickable(
-                              onClick = { toggled = false }, // Close the menu
-                              indication = null, // No ripple effect
-                              interactionSource = remember { MutableInteractionSource() } // No interaction state
-                          )
-                  )
-              }
-
-              // Floating Action Button and its menu
-              Column(
-                  horizontalAlignment = Alignment.End,
-                  verticalArrangement = Arrangement.Bottom,
-                  modifier = Modifier.fillMaxSize()
-              ) {
-                  if (toggled) {
-                      Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom) {
-                          ExtendedFloatingActionButton(
-                              text = {
-                                  Text(
-                                      "Manage participants",
-                                      modifier = Modifier.testTag("manageParticipantsText")
-                                  )
-                              },
-                              icon = { Icon(Icons.Default.Person, contentDescription = "Manage Participants") },
-                              onClick = {
-                                  // Handle action and collapse menu
-                                  listTravelViewModel.fetchAllParticipantsInfo()
-                                  navigationActions.navigateTo(PARTICIPANT_LIST)
-                                  toggled = !toggled
-                              },
-                              modifier = Modifier.testTag("manageParticipantsButton")
-                          )
-
-                          Spacer(modifier = Modifier.height(8.dp))
-
-                          ExtendedFloatingActionButton(
-                              text = { Text("Import Email", modifier = Modifier.testTag("importEmailText")) },
-                              icon = { Icon(Icons.Default.MailOutline, contentDescription = "Import Email") },
-                              onClick = {
-                                  // Handle action and collapse menu
-                                  clipboardManager.setText(
-                                      AnnotatedString("travelpouchswent+${selectedTravel!!.fsUid}@gmail.com")
-                                  )
-                                  Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
-                                  toggled = !toggled
-                              },
-                              modifier = Modifier.testTag("importEmailFab")
-                          )
-                      }
-                  } else {
-                      FloatingActionButton(
-                          onClick = { toggled = !toggled },
-                          modifier = Modifier.testTag("plusButton")
-                      ) {
-                          Icon(Icons.Default.Add, contentDescription = "Expand button")
-                      }
-                  }
-              }
+        Box(modifier = Modifier.fillMaxSize()) {
+          if (toggled) {
+            Box(
+                modifier =
+                    Modifier.fillMaxSize()
+                        .background(Color.Transparent)
+                        .clickable(
+                            onClick = { toggled = false }, // Close the menu
+                            indication = null, // No ripple effect
+                            interactionSource =
+                                remember { MutableInteractionSource() } // No interaction state
+                            ))
           }
+
+          // Floating Action Button and its menu
+          Column(
+              horizontalAlignment = Alignment.End,
+              verticalArrangement = Arrangement.Bottom,
+              modifier = Modifier.fillMaxSize()) {
+                if (toggled) {
+                  Column(
+                      horizontalAlignment = Alignment.End,
+                      verticalArrangement = Arrangement.Bottom) {
+                        ExtendedFloatingActionButton(
+                            text = {
+                              Text(
+                                  "Manage participants",
+                                  modifier = Modifier.testTag("manageParticipantsText"))
+                            },
+                            icon = {
+                              Icon(Icons.Default.Person, contentDescription = "Manage Participants")
+                            },
+                            onClick = {
+                              // Handle action and collapse menu
+                              listTravelViewModel.fetchAllParticipantsInfo()
+                              navigationActions.navigateTo(PARTICIPANT_LIST)
+                              toggled = !toggled
+                            },
+                            modifier = Modifier.testTag("manageParticipantsButton"))
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        ExtendedFloatingActionButton(
+                            text = {
+                              Text("Import Email", modifier = Modifier.testTag("importEmailText"))
+                            },
+                            icon = {
+                              Icon(Icons.Default.MailOutline, contentDescription = "Import Email")
+                            },
+                            onClick = {
+                              // Handle action and collapse menu
+                              clipboardManager.setText(
+                                  AnnotatedString(
+                                      "travelpouchswent+${selectedTravel!!.fsUid}@gmail.com"))
+                              Log.d("EditTravelSettingsScreen", "Email copied to clipboard")
+                              toggled = !toggled
+                            },
+                            modifier = Modifier.testTag("importEmailFab"))
+                      }
+                } else {
+                  FloatingActionButton(
+                      onClick = { toggled = !toggled }, modifier = Modifier.testTag("plusButton")) {
+                        Icon(Icons.Default.Add, contentDescription = "Expand button")
+                      }
+                }
+              }
+        }
       },
       floatingActionButtonPosition = FabPosition.End,
   ) { padding ->
@@ -235,8 +234,7 @@ fun EditTravelSettingsScreen(
             OutlinedTextField(
                 value = titleText.value,
                 onValueChange = { keystroke -> titleText.value = keystroke },
-                modifier =
-                    Modifier.testTag("inputTravelTitle").fillMaxWidth(1f),
+                modifier = Modifier.testTag("inputTravelTitle").fillMaxWidth(1f),
                 label = { Text("Title") },
                 placeholder = { Text("Name the Travel") },
                 shape = RoundedCornerShape(6.dp),
@@ -244,8 +242,7 @@ fun EditTravelSettingsScreen(
             OutlinedTextField(
                 value = descriptionText.value,
                 onValueChange = { keystroke -> descriptionText.value = keystroke },
-                modifier =
-                    Modifier.testTag("inputTravelDescription").fillMaxWidth(1f),
+                modifier = Modifier.testTag("inputTravelDescription").fillMaxWidth(1f),
                 label = { Text("Description") },
                 placeholder = { Text("Describe the Travel") },
                 shape = RoundedCornerShape(6.dp))
@@ -260,9 +257,7 @@ fun EditTravelSettingsScreen(
                   },
                   label = { Text("Location") },
                   placeholder = { Text("Enter an Address or Location") },
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .testTag("inputTravelLocation"))
+                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
 
               // Dropdown for location suggestions
               DropdownMenu(
@@ -312,8 +307,7 @@ fun EditTravelSettingsScreen(
                 onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
                 label = { Text("Start Date") },
                 placeholder = { Text("DD/MM/YYYY") },
-                modifier =
-                    Modifier.testTag("inputTravelStartTime").fillMaxWidth(1f),
+                modifier = Modifier.testTag("inputTravelStartTime").fillMaxWidth(1f),
                 shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
@@ -336,8 +330,7 @@ fun EditTravelSettingsScreen(
                 }, // Allow manual input
                 label = { Text("End Date") },
                 placeholder = { Text("DD/MM/YYYY") },
-                modifier =
-                    Modifier.testTag("inputTravelEndTime").fillMaxWidth(1f) ,
+                modifier = Modifier.testTag("inputTravelEndTime").fillMaxWidth(1f),
                 shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(

@@ -12,7 +12,7 @@ class ProfileRepositoryMockTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "username",
           "emailtest1@gmail.com",
-          emptyList(),
+          emptyMap(),
           "name",
           emptyList())
 
@@ -21,7 +21,7 @@ class ProfileRepositoryMockTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "username - modified",
           "emailtest1@gmail.com",
-          emptyList(),
+          emptyMap(),
           "name",
           emptyList())
 
