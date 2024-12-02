@@ -27,27 +27,24 @@ class DirectionsViewModelTest {
   // Create a test dispatcher for the async operations
   private val testDispatcher = StandardTestDispatcher()
 
+  val listOfActivities =
+      listOf(
+          Activity(
+              "uid",
+              "title",
+              "description",
+              Location(0.0, 0.0, Timestamp(0, 0), "location"),
+              Timestamp(0, 0),
+              mapOf()),
+          Activity(
+              "uid2",
+              "title2",
+              "description2",
+              Location(0.0, 0.0, Timestamp(0, 0), "location2"),
+              Timestamp(50, 0),
+              mapOf()))
 
-    val listOfActivities = listOf(
-        Activity(
-            "uid",
-            "title",
-            "description",
-            Location(0.0, 0.0, Timestamp(0, 0), "location"),
-            Timestamp(0, 0),
-            mapOf()),
-
-
-        Activity(
-            "uid2",
-            "title2",
-            "description2",
-            Location(0.0, 0.0, Timestamp(0, 0), "location2"),
-            Timestamp(50, 0),
-            mapOf()))
-
-
-    @Before
+  @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     mockRepository = mock(DirectionsRepository::class.java)
@@ -231,8 +228,6 @@ class DirectionsViewModelTest {
 
   @Test
   fun fetchDirectionsForActivitiesShouldCallFetchDirections() = runTest {
-
-
     val activity =
         Activity(
             "uid",
