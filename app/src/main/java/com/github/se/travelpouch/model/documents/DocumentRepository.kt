@@ -3,10 +3,8 @@ package com.github.se.travelpouch.model.documents
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
 import com.google.android.gms.common.util.Base64Utils
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions

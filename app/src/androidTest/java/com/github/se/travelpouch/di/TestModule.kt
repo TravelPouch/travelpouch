@@ -32,6 +32,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+private const val EMULATORS_ADDRESS = "10.0.2.2"
+
+private const val AUTH_PORT = 9099
+private const val FIRESTORE_PORT = 8080
+private const val STORAGE_PORT = 9199
+private const val FUNCTIONS_PORT = 5001
+
 @InstallIn(SingletonComponent::class)
 @Module
 object TestModule {
@@ -39,13 +46,13 @@ object TestModule {
   @Provides
   @Singleton
   fun provideFirebaseAuth(): FirebaseAuth {
-    return Firebase.auth.apply { useEmulator("10.0.2.2", 9099) }
+    return Firebase.auth.apply { useEmulator(EMULATORS_ADDRESS, AUTH_PORT) }
   }
 
   @Provides
   @Singleton
   fun provideFirebaseFirestore(): FirebaseFirestore {
-    return Firebase.firestore.apply { useEmulator("10.0.2.2", 8080) }
+    return Firebase.firestore.apply { useEmulator(EMULATORS_ADDRESS, FIRESTORE_PORT) }
   }
 
   @Provides
@@ -55,63 +62,72 @@ object TestModule {
         FirebaseApp.getInstance().options.storageBucket
             ?: throw IllegalStateException(
                 "Firebase storage bucket not set in google-services.json")
-    return Firebase.storage("gs://$storageBucket").apply { useEmulator("10.0.2.2", 9199) }
+    return Firebase.storage("gs://$storageBucket").apply {
+      useEmulator(EMULATORS_ADDRESS, STORAGE_PORT)
+    }
   }
 
   @Provides
   @Singleton
   fun provideFirebaseFunctions(): FirebaseFunctions {
-    return FirebaseFunctions.getInstance("europe-west9").apply { useEmulator("10.0.2.2", 5001) }
+    return FirebaseFunctions.getInstance("europe-west9").apply {
+      useEmulator(EMULATORS_ADDRESS, FUNCTIONS_PORT)
+    }
   }
 
   @Provides
   @Singleton
-  fun providesAuthenticationService(auth: FirebaseAuth): AuthenticationService {
+  fun provideAuthenticationService(auth: FirebaseAuth): AuthenticationService {
     return FirebaseAuthenticationService(auth)
   }
 
   @Provides
   @Singleton
-  fun providesActivityRepository(db: FirebaseFirestore): ActivityRepository {
+  fun provideActivityRepository(db: FirebaseFirestore): ActivityRepository {
     return ActivityRepositoryFirebase(db)
   }
 
   @Provides
   @Singleton
-  fun providesDocumentRepository(db: FirebaseFirestore, storage: FirebaseStorage, auth: FirebaseAuth, functions: FirebaseFunctions): DocumentRepository {
+  fun provideDocumentRepository(
+      db: FirebaseFirestore,
+      storage: FirebaseStorage,
+      auth: FirebaseAuth,
+      functions: FirebaseFunctions
+  ): DocumentRepository {
     return DocumentRepositoryFirestore(db, storage, auth, functions)
   }
 
   @Provides
   @Singleton
-  fun providesEventRepository(db: FirebaseFirestore): EventRepository {
+  fun provideEventRepository(db: FirebaseFirestore): EventRepository {
     return EventRepositoryFirebase(db)
   }
 
   @Provides
   @Singleton
-  fun providesFileDownloader(
-    @ApplicationContext context: Context,
-    storage: FirebaseStorage
+  fun provideFileDownloader(
+      @ApplicationContext context: Context,
+      storage: FirebaseStorage
   ): FileDownloader {
     return FileDownloader(context.contentResolver, storage)
   }
 
   @Provides
   @Singleton
-  fun providesNotificationRepository(db: FirebaseFirestore): NotificationRepository {
+  fun provideNotificationRepository(db: FirebaseFirestore): NotificationRepository {
     return NotificationRepositoryFirestore(db)
   }
 
   @Provides
   @Singleton
-  fun providesProfileRepository(db: FirebaseFirestore): ProfileRepository {
+  fun provideProfileRepository(db: FirebaseFirestore): ProfileRepository {
     return ProfileRepositoryFirebase(db)
   }
 
   @Provides
   @Singleton
-  fun providesTravelRepository(db: FirebaseFirestore): TravelRepository {
+  fun provideTravelRepository(db: FirebaseFirestore): TravelRepository {
     return TravelRepositoryFirestore(db)
   }
 }

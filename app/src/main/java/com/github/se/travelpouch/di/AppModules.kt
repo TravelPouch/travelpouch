@@ -66,31 +66,36 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun providesAuthenticationService(auth: FirebaseAuth): AuthenticationService {
+  fun provideAuthenticationService(auth: FirebaseAuth): AuthenticationService {
     return FirebaseAuthenticationService(auth)
   }
 
   @Provides
   @Singleton
-  fun providesActivityRepository(db: FirebaseFirestore): ActivityRepository {
+  fun provideActivityRepository(db: FirebaseFirestore): ActivityRepository {
     return ActivityRepositoryFirebase(db)
   }
 
   @Provides
   @Singleton
-  fun providesDocumentRepository(db: FirebaseFirestore, storage: FirebaseStorage, auth: FirebaseAuth, functions: FirebaseFunctions): DocumentRepository {
+  fun provideDocumentRepository(
+      db: FirebaseFirestore,
+      storage: FirebaseStorage,
+      auth: FirebaseAuth,
+      functions: FirebaseFunctions
+  ): DocumentRepository {
     return DocumentRepositoryFirestore(db, storage, auth, functions)
   }
 
   @Provides
   @Singleton
-  fun providesEventRepository(db: FirebaseFirestore): EventRepository {
+  fun provideEventRepository(db: FirebaseFirestore): EventRepository {
     return EventRepositoryFirebase(db)
   }
 
   @Provides
   @Singleton
-  fun providesFileDownloader(
+  fun provideFileDownloader(
       @ApplicationContext context: Context,
       storage: FirebaseStorage
   ): FileDownloader {
@@ -99,19 +104,19 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun providesNotificationRepository(db: FirebaseFirestore): NotificationRepository {
+  fun provideNotificationRepository(db: FirebaseFirestore): NotificationRepository {
     return NotificationRepositoryFirestore(db)
   }
 
   @Provides
   @Singleton
-  fun providesProfileRepository(db: FirebaseFirestore): ProfileRepository {
+  fun provideProfileRepository(db: FirebaseFirestore): ProfileRepository {
     return ProfileRepositoryFirebase(db)
   }
 
   @Provides
   @Singleton
-  fun providesTravelRepository(db: FirebaseFirestore): TravelRepository {
+  fun provideTravelRepository(db: FirebaseFirestore): TravelRepository {
     return TravelRepositoryFirestore(db)
   }
 }
