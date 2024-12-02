@@ -43,8 +43,13 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
 
   // StateFlow to hold the fetched route details for activities
   private val _activityRouteDetails = MutableStateFlow<RouteDetails?>(RouteDetails.EMPTY)
-  val activityRouteDetails: StateFlow<RouteDetails?>
+  val activitiesRouteDetails: StateFlow<RouteDetails?>
     get() = _activityRouteDetails
+
+  // StateFlow to hold the fetched route details for activities
+  private val _gpsRouteDetails = MutableStateFlow<RouteDetails?>(RouteDetails.EMPTY)
+  val gpsRouteDetails: StateFlow<RouteDetails?>
+    get() = _gpsRouteDetails
 
   /** Factory class for creating DirectionsViewModel instances. */
   // create factory
@@ -63,6 +68,24 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
   }
 
   /**
+   * Fetches directions for the user's location and a selected activity.
+   *
+   * @param gpsLocation The location of the user.
+   * @param selectedActivity The activity selected by the user.
+   */
+  fun fetchDirectionsForGps(gpsLocation: LatLng?, selectedActivity: Activity?) {
+
+    if (gpsLocation == null || selectedActivity == null) {
+      Log.d("DirectionsViewModel", "Null location or activity")
+      return
+    }
+    val selectedActivityLocation =
+        LatLng(selectedActivity.location.latitude, selectedActivity.location.longitude)
+
+    fetchDirections(_gpsRouteDetails, gpsLocation, selectedActivityLocation, "walking")
+  }
+
+  /**
    * Fetches directions for a list of activities using the specified travel mode.
    *
    * @param activities The list of activities to create a route for.
@@ -70,14 +93,14 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
    */
   fun fetchDirectionsForActivities(activities: List<Activity>, mode: String) {
     if (activities.size < 2) {
-      Log.e("DirectionsViewModel", "Not enough activities to create a route")
+      Log.d("DirectionsViewModel", "Not enough activities to create a route")
       return
     }
 
     // Extract the origin from the first activity
     val firstLocation = activities.firstOrNull()?.location
     if (firstLocation == null) {
-      Log.e("DirectionsViewModel", "First activity has no location")
+      Log.d("DirectionsViewModel", "First activity has no location")
       return
     }
     val origin = LatLng(firstLocation.latitude, firstLocation.longitude)
@@ -85,7 +108,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
     // Extract the destination from the last activity
     val lastLocation = activities.lastOrNull()?.location
     if (lastLocation == null) {
-      Log.e("DirectionsViewModel", "Last activity has no location")
+      Log.d("DirectionsViewModel", "Last activity has no location")
       return
     }
     val destination = LatLng(lastLocation.latitude, lastLocation.longitude)
@@ -97,7 +120,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
         }
 
     // Fetch directions using the extracted origin, destination, and waypoints
-    fetchDirections(origin, destination, mode, waypoints)
+    fetchDirections(_activityRouteDetails, origin, destination, mode, waypoints)
   }
 
   /**
@@ -107,7 +130,8 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
    * @param destination The ending point of the route as a LatLng object.
    * @param mode The travel mode ("driving", "walking", "bicycling", or "transit").
    */
-  fun fetchDirections(
+  private fun fetchDirections(
+      targetStateFlow: MutableStateFlow<RouteDetails?>,
       origin: LatLng,
       destination: LatLng,
       mode: String,
@@ -131,7 +155,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
 
             if (routeDetails != null) {
               // Update the appropriate StateFlow
-              _activityRouteDetails.value = routeDetails
+              targetStateFlow.value = routeDetails
             } else {
               Log.e("DirectionsViewModel", "Failed to extract route details")
             }
