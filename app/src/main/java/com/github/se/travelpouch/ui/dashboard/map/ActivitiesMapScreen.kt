@@ -92,8 +92,7 @@ fun ActivitiesMapScreen(
   // Track selected route index
   var selectedRouteIndex by remember { mutableIntStateOf(0) }
 
-  val gpsViewModel: GPSViewModel =
-      viewModel(factory = GPSViewModel.Factory(LocalContext.current)) // TODO
+  val gpsViewModel: GPSViewModel = viewModel(factory = GPSViewModel.Factory(LocalContext.current))
 
   // Collect the current location from GPSViewModel as a Compose state
   val currentLocation by gpsViewModel.realTimeLocation.collectAsState()
