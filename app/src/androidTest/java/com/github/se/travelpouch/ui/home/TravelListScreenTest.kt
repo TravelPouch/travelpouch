@@ -424,6 +424,7 @@ class TravelListScreenTest {
     composeTestRule.onNodeWithTag("itemProfile").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("itemHome").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("itemNotifications").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemLogout").assertIsNotDisplayed()
 
     // Click on menu button
     composeTestRule.onNodeWithTag("menuFab").performClick()
@@ -435,6 +436,7 @@ class TravelListScreenTest {
     composeTestRule.onNodeWithTag("itemProfile").assertIsDisplayed()
     composeTestRule.onNodeWithTag("itemHome").assertIsDisplayed()
     composeTestRule.onNodeWithTag("itemNotifications").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("itemLogout").assertIsDisplayed()
 
     // Click on closing menu button
     composeTestRule.onNodeWithTag("closingMenuFab").performClick()
@@ -446,6 +448,7 @@ class TravelListScreenTest {
     composeTestRule.onNodeWithTag("itemProfile").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("itemHome").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("itemNotifications").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemLogout").assertIsNotDisplayed()
 
     // Click on menu button
     composeTestRule.onNodeWithTag("menuFab").performClick()
@@ -468,5 +471,34 @@ class TravelListScreenTest {
     composeTestRule.onNodeWithTag("itemProfile").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("itemHome").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("itemNotifications").assertIsNotDisplayed()
+
+    // click on menu buttons
+    composeTestRule.onNodeWithTag("menuFab").performClick()
+
+    composeTestRule.onNodeWithTag("itemLogout").performClick()
+    // Verify that the navigation action was called for LOGOUT
+    verify(navigationActions).navigateTo(Screen.AUTH)
+    composeTestRule.onNodeWithTag("menuFab").performClick()
+
+    composeTestRule.onNodeWithTag("itemProfile").performClick()
+    // Verify that the navigation action was called for PROFILE
+    verify(navigationActions).navigateTo(Screen.PROFILE)
+    composeTestRule.onNodeWithTag("menuFab").performClick()
+
+    composeTestRule.onNodeWithTag("itemHome").performClick()
+    // Verify that everything was closed
+    composeTestRule.onNodeWithTag("closingMenuBox").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("closingMenuFab").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("drawerSheetMenu").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemProfile").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemHome").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemNotifications").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("itemLogout").assertIsNotDisplayed()
+
+    composeTestRule.onNodeWithTag("menuFab").performClick()
+
+    composeTestRule.onNodeWithTag("itemNotifications").performClick()
+    // Verify that the navigation action was called for NOTIFICATIONS
+    verify(navigationActions).navigateTo(Screen.NOTIFICATION)
   }
 }
