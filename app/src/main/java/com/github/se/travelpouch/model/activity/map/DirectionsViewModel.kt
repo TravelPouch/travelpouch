@@ -73,7 +73,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
    * @param gpsLocation The location of the user.
    * @param selectedActivity The activity selected by the user.
    */
-  fun fetchDirectionsForGps(gpsLocation: LatLng?, selectedActivity: Activity?) {
+  fun fetchDirectionsForGps(gpsLocation: LatLng?, selectedActivity: Activity?, mode: String) {
 
     if (gpsLocation == null || selectedActivity == null) {
       Log.d("DirectionsViewModel", "Null location or activity")
@@ -82,7 +82,7 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
     val selectedActivityLocation =
         LatLng(selectedActivity.location.latitude, selectedActivity.location.longitude)
 
-    fetchDirections(_gpsRouteDetails, gpsLocation, selectedActivityLocation, "walking")
+    fetchDirections(_gpsRouteDetails, gpsLocation, selectedActivityLocation, mode)
   }
 
   /**

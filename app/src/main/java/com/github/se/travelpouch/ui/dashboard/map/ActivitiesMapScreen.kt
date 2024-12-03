@@ -114,7 +114,7 @@ fun ActivitiesMapScreen(
 
   // Fetch directions for the selected activity and GPS location
   LaunchedEffect(selectedActivity) {
-    directionsViewModel.fetchDirectionsForGps(currentLocation, selectedActivity)
+    directionsViewModel.fetchDirectionsForGps(currentLocation, selectedActivity, "walking")
   }
 
   // Update the camera position when the valid activities change
