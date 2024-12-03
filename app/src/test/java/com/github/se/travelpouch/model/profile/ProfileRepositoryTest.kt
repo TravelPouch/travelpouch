@@ -487,7 +487,7 @@ class ProfileRepositoryTest {
         profileRepositoryFirestore.javaClass.getDeclaredMethod(
             "updatingFriendList", Profile::class.java, String::class.java, String::class.java)
     privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(2)
+    val parameters = arrayOfNulls<Any>(3)
     parameters[0] = profile
     parameters[1] = "test@test.ch"
     parameters[2] = "qwertzuiopasdfghjklyxcvbnm12"
