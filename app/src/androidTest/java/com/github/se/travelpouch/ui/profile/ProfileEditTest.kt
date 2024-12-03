@@ -39,7 +39,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "newtest@test.ch",
           username = "newUsername",
-          friends = emptyMap(),
+          friends = mapOf("email@email.com" to "uid1"),
           name = "newName",
           userTravelList = emptyList())
 
