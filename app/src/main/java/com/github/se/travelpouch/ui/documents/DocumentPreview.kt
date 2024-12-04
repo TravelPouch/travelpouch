@@ -61,7 +61,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
   documentUri = documentViewModel.downloadUrls[documentContainer.ref.id] ?: ""
 
   Scaffold(
-      modifier = Modifier.testTag("documentListScreen"),
+      modifier = Modifier.testTag("documentPreviewScreen"),
       topBar = {
         TopAppBar(
             title = {
@@ -126,7 +126,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   model = documentUri,
                   contentDescription = null,
                   contentScale = ContentScale.Fit,
-                  modifier = Modifier.fillMaxSize())
+                  modifier = Modifier.fillMaxSize().testTag("document"))
             }
           }
         }

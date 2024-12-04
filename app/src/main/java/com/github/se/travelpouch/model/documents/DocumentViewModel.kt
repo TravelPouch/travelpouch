@@ -1,18 +1,16 @@
 package com.github.se.travelpouch.model.documents
 
-import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.travels.TravelContainer
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +22,10 @@ import kotlinx.coroutines.flow.asStateFlow
  * @property repository The repository used for accessing documents data.
  * @property fileDownloader The file downloader to use when downloading files
  */
-open class DocumentViewModel(
+@HiltViewModel
+open class DocumentViewModel
+@Inject
+constructor(
     private val repository: DocumentRepository,
     private val fileDownloader: FileDownloader
 ) : ViewModel() {
@@ -46,19 +47,6 @@ open class DocumentViewModel(
 
   fun setIdTravel(travelId: String) {
     repository.setIdTravel({ getDocuments() }, travelId)
-  }
-
-  // create factory
-  companion object {
-    fun Factory(contentResolver: ContentResolver): ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return DocumentViewModel(
-                DocumentRepositoryFirestore(Firebase.firestore), FileDownloader(contentResolver))
-                as T
-          }
-        }
   }
 
   /** Gets all Documents. */

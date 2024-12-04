@@ -25,6 +25,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
 
   override suspend fun initAfterLogin(onSuccess: (Profile) -> Unit) {
     val user = Firebase.auth.currentUser
+    Log.d("ProfileRepository", "initAfterLogin: ${user?.uid} ${user?.email}")
 
     if (user != null) {
       documentPath = user.uid
@@ -48,12 +49,14 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   ) {
     if (!document.exists()) {
       try {
+        Log.d("ProfileRepository", "Creating profile for user ${user.uid} ${user.email}")
         addProfile(user.email!!, user.uid, onSuccess)
       } catch (e: Exception) {
-        Log.e("nullEmail", "Email of user was null, deleting user")
+        Log.e("ProfileRepository", "Email of user was null, deleting user")
       }
     } else {
       documentReference = document.reference
+      Log.d("ProfileRepository", "addingUserIfNotRegistered: User profile exists")
       onSuccess(ProfileRepositoryConvert.documentToProfile(document))
     }
   }
@@ -66,11 +69,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
    */
   suspend fun gettingUserProfile(user: FirebaseUser, onSuccess: (Profile) -> Unit) {
+    Log.d("ProfileRepository", "Getting user profile")
     try {
       val document = db.collection(collectionPath).document(documentPath).get().await()
+      Log.d("ProfileRepository", "Got document")
       addingUserIfNotRegistered(user, document, onSuccess)
     } catch (e: Exception) {
-      Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
+      Log.e("ProfileRepository", "Failed to fetch the user collection", e)
     }
   }
 
@@ -128,11 +133,11 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     performFirestoreOperation(
         documentReference!!.set(profile),
         onSuccess = {
-          Log.d("ProfileCreated", "profile created")
+          Log.d("ProfileRepository", "profile created")
           onSuccess(profile)
         },
         onFailure = {
-          Log.e("ErrorProfile", "Error while creating profile")
+          Log.e("ProfileRepository", "Error while creating profile")
           // has to correct thing
         })
   }
@@ -153,7 +158,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
           onSuccess(profile)
         }
         .addOnFailureListener { e ->
-          Log.e("EventRepository", "Error getting documents", e)
+          Log.e("ProfileRepository", "Error getting documents", e)
           onFailure(e)
         }
   }
@@ -260,6 +265,10 @@ class ProfileRepositoryConvert {
         val friends = document.get("friends") as? Map<String, String>
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
+
+        Log.d(
+            "ProfileRepository",
+            "Document to Profile: $uid, $username, $email, $friends, $name, $userTravelList")
 
         Profile(
             fsUid = uid,
