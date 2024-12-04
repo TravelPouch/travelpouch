@@ -4,9 +4,8 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,19 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
  *
  * @property activityRepositoryFirebase (ActivityRepository) : the repository of the activites
  */
-class ActivityViewModel(val activityRepositoryFirebase: ActivityRepository) : ViewModel() {
-
-  // create factory
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ActivityViewModel(ActivityRepositoryFirebase(Firebase.firestore)) as T
-          }
-        }
-  }
-
+@HiltViewModel
+class ActivityViewModel @Inject constructor(val activityRepositoryFirebase: ActivityRepository) :
+    ViewModel() {
   private val activities_ = MutableStateFlow<List<Activity>>(emptyList())
   val activities: StateFlow<List<Activity>> = activities_.asStateFlow()
 

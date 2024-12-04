@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.travelpouch.model.events.Event
 import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -68,7 +68,7 @@ data class LineParameters(val strokeWidth: Dp, val brush: Brush)
  */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TimelineScreen(eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)) {
+fun TimelineScreen(eventsViewModel: EventViewModel = hiltViewModel<EventViewModel>()) {
 
   var itemMoreRightOfScreen = false
   val events = eventsViewModel.events.collectAsState()
