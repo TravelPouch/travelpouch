@@ -104,9 +104,11 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
           LazyColumn(
               modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
               contentPadding = PaddingValues(bottom = 80.dp)) {
-                if (profile.value.friends.isNotEmpty()) {
+                val friends = profile.value.friends.keys.toList()
 
-                  items(profile.value.friends.size) { friend ->
+                if (friends.isNotEmpty()) {
+
+                  items(friends.size) { friend ->
                     Card(
                         modifier =
                             Modifier.testTag("friendCard${friend}")
@@ -121,7 +123,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
                             )) {
                           Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
                             Text(
-                                profile.value.friends[friend],
+                                friends[friend],
                                 Modifier.align(Alignment.Center).testTag("friend_${friend}"))
                           }
                         }

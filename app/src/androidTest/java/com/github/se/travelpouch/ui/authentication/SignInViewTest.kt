@@ -107,7 +107,7 @@ class SignInViewTest {
                 fsUid = "qwertzuiopasdfghjklyxcvbnm12",
                 email = "test@swent.ch",
                 username = "test",
-                friends = emptyList(),
+                friends = emptyMap(),
                 name = "name",
                 userTravelList = emptyList())
         onSuccess(profile)
