@@ -6,6 +6,7 @@ import android.content.Intent
 import android.icu.util.GregorianCalendar
 import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -20,6 +21,7 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
+import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -115,10 +117,19 @@ class DocumentUpload {
     runBlocking {
       auth.signOut()
       auth.signInWithEmailAndPassword("example@example.com", "password").await()
+      val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
+
+      firestore.collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents").get().await().documents.forEach {
+        it.reference.delete().await()
+      }
+      firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
+      firestore.collection("userslist").document(uid).delete().await()
     }
 
     file.delete()
+
+    FirebaseApp.clearInstancesForTest()
   }
 
   @Test
@@ -187,6 +198,11 @@ class DocumentUpload {
 
         composeTestRule.waitUntil(timeoutMillis = 5000) {
           composeTestRule.onNodeWithTag("documentListItem", useUnmergedTree = true).isDisplayed()
+        }
+        composeTestRule.onNodeWithTag("documentListItem").performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+          composeTestRule.onNodeWithTag("document").isDisplayed()
         }
       }
 }
