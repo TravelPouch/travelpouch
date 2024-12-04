@@ -198,13 +198,11 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             } else {
               val userProfileUpdated =
                   updatingFriendList(userProfile, friendProfile.email, friendProfile.fsUid)
+              val friendProfileUpdated =
+                  updatingFriendList(friendProfile, userProfile.email, userProfile.fsUid)
               db.runTransaction { t ->
                     t.update(documentReference!!, "friends", userProfileUpdated.friends)
-                    t.update(
-                        friendsDocumentReference!!,
-                        "friends",
-                        updatingFriendList(friendProfile, userProfile.email, userProfile.fsUid)
-                            .friends)
+                    t.update(friendsDocumentReference!!, "friends", friendProfileUpdated.friends)
                   }
                   .addOnSuccessListener { onSuccess(userProfileUpdated) }
                   .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
