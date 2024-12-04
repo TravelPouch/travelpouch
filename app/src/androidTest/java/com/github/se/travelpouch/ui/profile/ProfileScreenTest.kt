@@ -27,7 +27,7 @@ class ProfileScreenTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
-          friends = listOf("friend 1", "friend 2"),
+          friends = mapOf("friend 1" to "uid1", "friend 2" to "uid2"),
           name = "testName",
           userTravelList = emptyList())
 
@@ -36,7 +36,7 @@ class ProfileScreenTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
-          friends = emptyList(),
+          friends = emptyMap(),
           name = "testName",
           userTravelList = emptyList())
 

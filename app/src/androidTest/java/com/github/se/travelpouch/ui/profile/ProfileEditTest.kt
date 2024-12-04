@@ -45,7 +45,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
-          friends = listOf("email@email.com"),
+          friends = mapOf("email@email.com" to "uid1"),
           name = "name",
           userTravelList = emptyList())
 
@@ -54,7 +54,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "newtest@test.ch",
           username = "newUsername",
-          friends = emptyList(),
+          friends = mapOf("email@email.com" to "uid1"),
           name = "newName",
           userTravelList = emptyList())
 
