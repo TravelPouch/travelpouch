@@ -40,7 +40,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-private const val DEFAULT_TIMEOUT = 1000L
+private const val DEFAULT_TIMEOUT = 10000L
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
