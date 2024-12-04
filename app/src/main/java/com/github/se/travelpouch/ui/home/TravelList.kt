@@ -1,7 +1,10 @@
 package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +69,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -74,8 +80,11 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 import java.util.Locale
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 // ChatGpt was used to organised the floating actions buttons and for the logic of tapping outside
 // the drawer menu to close it, while keeping the gestures of the drawer menu disabled
@@ -99,6 +108,9 @@ fun TravelListScreen(
     documentViewModel: DocumentViewModel,
     profileModelView: ProfileModelView
 ) {
+    // Ask for notification permission
+    RequestNotificationPermission()
+
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
     listTravelViewModel.getTravels()
@@ -450,4 +462,33 @@ private fun resizeFromDragMotion(
       mapHeight.floatValue += scaledDelta
     }
   }
+}
+
+@Composable
+private fun RequestNotificationPermission() {
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            android.Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if(!hasPermission) {
+            ActivityCompat.requestPermissions(
+                LocalContext.current as Activity,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
+    }
+}
+
+private fun verifyNotificatioToken() {
+    // Keep current token
+    Firebase.messaging.token.addOnCompleteListener {
+        if(it.isSuccessful) {
+            val token = it.result
+
+
+        }
+    }
 }

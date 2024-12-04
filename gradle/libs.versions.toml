@@ -25,6 +25,12 @@ gms = "4.4.2"
 mockkVersion = "1.13.7"
 navigationCompose = "2.8.2"
 
+converterGson = "2.9.0"
+firebaseMessaging = "24.1.0"
+loggingInterceptor = "4.9.0"
+retrofit = "2.9.0"
+firebaseMessagingKtx = "24.1.0"
+
 # Google Service and Maps
 playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
@@ -120,11 +126,18 @@ firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "
 firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseCommonKtx" }
 
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "converterGson" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
+
 #GOOGLE SERVICES & MAPS
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 # Mockito
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
