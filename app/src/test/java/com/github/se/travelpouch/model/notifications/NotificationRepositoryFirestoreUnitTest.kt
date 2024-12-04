@@ -435,4 +435,152 @@ class NotificationRepositoryFirestoreUnitTest {
     assertFalse(succeeded)
     assertTrue(failed)
   }
+
+  @Test
+  fun convertFriendInvitationNotificationSucceeds() {
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+
+    val notification =
+        Notification(
+            "qwertzuiopasdfghjkly",
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "qwertzuiopasdfghjklyxcvbnm13",
+            null,
+            NotificationContent.FriendInvitationNotification("email@random.com"),
+            NotificationType.INVITATION,
+            Timestamp.now(),
+            NotificationStatus.READ,
+            NotificationSector.PROFILE)
+
+    whenever(mockDocumentSnapshot.id).thenReturn(notification.notificationUid)
+    whenever(mockDocumentSnapshot.getString("senderUid")).thenReturn(notification.senderUid)
+    whenever(mockDocumentSnapshot.getString("receiverUid")).thenReturn(notification.receiverUid)
+    whenever(mockDocumentSnapshot.getString("notificationType")).thenReturn("INVITATION")
+    whenever(mockDocumentSnapshot.getString("sector")).thenReturn("PROFILE")
+    whenever(mockDocumentSnapshot.getTimestamp("timestamp")).thenReturn(notification.timestamp)
+    whenever(mockDocumentSnapshot.getString("status")).thenReturn("READ")
+    whenever(mockDocumentSnapshot["content"]).thenReturn(mapOf("userEmail" to "email@random.com"))
+
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    method.isAccessible = true
+
+    // Invoke the method and check that it returns null (indicating an error was caught)
+    val result = method.invoke(notificationRepositoryFirestore, mockDocumentSnapshot)
+    assert(result == notification)
+  }
+
+  @Test
+  fun convertFriendInvitationAcceptedNotificationSucceeds() {
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+
+    val notification =
+        Notification(
+            "qwertzuiopasdfghjkly",
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "qwertzuiopasdfghjklyxcvbnm13",
+            null,
+            NotificationContent.FriendInvitationResponseNotification("email@random.com", true),
+            NotificationType.ACCEPTED,
+            Timestamp.now(),
+            NotificationStatus.READ,
+            NotificationSector.PROFILE)
+
+    whenever(mockDocumentSnapshot.id).thenReturn(notification.notificationUid)
+    whenever(mockDocumentSnapshot.getString("senderUid")).thenReturn(notification.senderUid)
+    whenever(mockDocumentSnapshot.getString("receiverUid")).thenReturn(notification.receiverUid)
+    whenever(mockDocumentSnapshot.getString("notificationType")).thenReturn("ACCEPTED")
+    whenever(mockDocumentSnapshot.getString("sector")).thenReturn("PROFILE")
+    whenever(mockDocumentSnapshot.getTimestamp("timestamp")).thenReturn(notification.timestamp)
+    whenever(mockDocumentSnapshot.getString("status")).thenReturn("READ")
+    whenever(mockDocumentSnapshot["content"])
+        .thenReturn(
+            mapOf(
+                "email" to "email@random.com",
+            ))
+
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    method.isAccessible = true
+
+    // Invoke the method and check that it returns null (indicating an error was caught)
+    val result = method.invoke(notificationRepositoryFirestore, mockDocumentSnapshot)
+    assert(result == notification)
+  }
+
+  @Test
+  fun convertFriendInvitationDeclinedNotificationSucceeds() {
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+
+    val notification =
+        Notification(
+            "qwertzuiopasdfghjkly",
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "qwertzuiopasdfghjklyxcvbnm13",
+            null,
+            NotificationContent.FriendInvitationResponseNotification("email@random.com", false),
+            NotificationType.DECLINED,
+            Timestamp.now(),
+            NotificationStatus.READ,
+            NotificationSector.PROFILE)
+
+    whenever(mockDocumentSnapshot.id).thenReturn(notification.notificationUid)
+    whenever(mockDocumentSnapshot.getString("senderUid")).thenReturn(notification.senderUid)
+    whenever(mockDocumentSnapshot.getString("receiverUid")).thenReturn(notification.receiverUid)
+    whenever(mockDocumentSnapshot.getString("notificationType")).thenReturn("DECLINED")
+    whenever(mockDocumentSnapshot.getString("sector")).thenReturn("PROFILE")
+    whenever(mockDocumentSnapshot.getTimestamp("timestamp")).thenReturn(notification.timestamp)
+    whenever(mockDocumentSnapshot.getString("status")).thenReturn("READ")
+    whenever(mockDocumentSnapshot["content"]).thenReturn(mapOf("email" to "email@random.com"))
+
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    method.isAccessible = true
+
+    // Invoke the method and check that it returns null (indicating an error was caught)
+    val result = method.invoke(notificationRepositoryFirestore, mockDocumentSnapshot)
+    assert(result == notification)
+  }
+
+  @Test
+  fun convertFriendInvitationNotificationFails() {
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+
+    val notification =
+        Notification(
+            "qwertzuiopasdfghjkly",
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "qwertzuiopasdfghjklyxcvbnm13",
+            null,
+            NotificationContent.FriendInvitationNotification("email@random.com"),
+            NotificationType.INVITATION,
+            Timestamp.now(),
+            NotificationStatus.READ,
+            NotificationSector.PROFILE)
+
+    whenever(mockDocumentSnapshot.id).thenReturn(null)
+    whenever(mockDocumentSnapshot.getString("senderUid")).thenReturn(notification.senderUid)
+    whenever(mockDocumentSnapshot.getString("receiverUid")).thenReturn(notification.receiverUid)
+    whenever(mockDocumentSnapshot.getString("notificationType")).thenReturn("INVITATION")
+    whenever(mockDocumentSnapshot.getString("sector")).thenReturn("PROFILE")
+    whenever(mockDocumentSnapshot.getTimestamp("timestamp")).thenReturn(notification.timestamp)
+    whenever(mockDocumentSnapshot.getString("status")).thenReturn("READ")
+    whenever(mockDocumentSnapshot["content"]).thenReturn(mapOf("userEmail" to "email@random.com"))
+
+    val method =
+        NotificationRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("documentToNotification", DocumentSnapshot::class.java)
+    method.isAccessible = true
+
+    // Invoke the method and check that it returns null (indicating an error was caught)
+    val result = method.invoke(notificationRepositoryFirestore, mockDocumentSnapshot)
+    assert(result == null)
+  }
 }

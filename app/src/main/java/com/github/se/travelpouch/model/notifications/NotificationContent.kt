@@ -129,7 +129,7 @@ sealed class NotificationContent {
       NotificationContent() {
     override fun toDisplayString(): String {
       return if (accepted) {
-        "$email has is now your friend."
+        "$email is now your friend."
       } else {
         "$email has declined your friend invitation."
       }

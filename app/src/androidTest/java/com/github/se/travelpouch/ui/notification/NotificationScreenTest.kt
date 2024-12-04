@@ -8,6 +8,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import com.github.se.travelpouch.helper.FileDownloader
@@ -40,6 +41,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.verify
 
 class NotificationScreenTest {
 
@@ -192,5 +194,36 @@ class NotificationScreenTest {
     composeTestRule.onNodeWithTag("DeleteAllNotificationsButton").assertExists()
     composeTestRule.onNodeWithTag("DeleteAllNotificationsButton").isDisplayed()
     composeTestRule.onNodeWithTag("DeleteAllNotificationsButton").performClick()
+  }
+
+  @Test
+  fun friendInvitationResponseIsHandledCorrectly() {
+    val notification =
+        Notification(
+            "qwertzuiopasdfghjkly",
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "qwertzuiopasdfghjklyxcvbnm14",
+            null,
+            NotificationContent.FriendInvitationNotification("test@test.com"),
+            NotificationType.INVITATION,
+            sector = NotificationSector.PROFILE)
+
+    `when`(notificationRepository.fetchNotificationsForUser(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(List<Notification>) -> Unit>(1)(listOf(notification))
+    }
+
+    composeTestRule.setContent {
+      NotificationsScreen(
+          navigationActions = navigationActions,
+          notificationViewModel = notificationViewModel,
+          profileModelView = profileModelView,
+          listTravelViewModel = listTravelViewModel,
+          activityViewModel = activityViewModel,
+          documentViewModel = documentViewModel,
+          eventsViewModel = eventViewModel)
+    }
+
+    composeTestRule.onNodeWithText("ACCEPT").performClick()
+    verify(profileRepository).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }

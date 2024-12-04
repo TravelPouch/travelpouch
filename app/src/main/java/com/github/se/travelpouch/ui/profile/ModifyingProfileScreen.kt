@@ -222,17 +222,6 @@ fun ModifyingProfileScreen(
                                     onFailure = { e ->
                                       Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
                                     })
-                                //                                profileModelView.addFriend(
-                                //                                    friendMail,
-                                //                                    onSuccess = {
-                                //                                      Toast.makeText(context,
-                                // "Friend added", Toast.LENGTH_LONG)
-                                //                                          .show()
-                                //                                    },
-                                //                                    onFailure = { e ->
-                                //                                      Toast.makeText(context,
-                                // e.message!!, Toast.LENGTH_LONG).show()
-                                //                                    })
                               }
                             },
                             modifier = Modifier.testTag("addingFriendButton")) {
