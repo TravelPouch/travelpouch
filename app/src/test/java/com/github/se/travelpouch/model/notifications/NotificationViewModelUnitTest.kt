@@ -174,12 +174,4 @@ class NotificationViewModelUnitTest {
     verify(notificationRepositoryFirestore)
         .changeNotificationType(eq(notificationUid), eq(notificationType), any(), any())
   }
-
-  @Test
-  fun `Factory creates NotificationViewModel instance 2`() {
-    val factory = NotificationViewModel.Factory
-    val viewModel = factory.create(NotificationViewModel::class.java)
-
-    assertThat(viewModel, instanceOf(NotificationViewModel::class.java))
-  }
 }
