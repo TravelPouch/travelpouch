@@ -50,9 +50,15 @@ interface ProfileRepository {
    *   failed
    */
   fun addFriend(
-      email: String,
+      fsUid: String,
       userProfile: Profile,
       onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
+
+  fun sendFriendNotification(
+      email: String,
+      onSuccess: (String) -> Unit,
       onFailure: (Exception) -> Unit
   )
 }

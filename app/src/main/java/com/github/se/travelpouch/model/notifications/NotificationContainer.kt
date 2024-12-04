@@ -20,11 +20,13 @@ data class Notification(
     val notificationUid: String, // Unique ID of the notification
     val senderUid: String, // UID of the sender
     val receiverUid: String, // UID of the receiver
-    val travelUid: String, // UID of the travel container
+    val travelUid: String?, // UID of the travel container
     val content: NotificationContent,
     val notificationType: NotificationType,
     val timestamp: Timestamp = Timestamp.now(), // By default, timestamp is current time
-    val status: NotificationStatus = NotificationStatus.UNREAD // By default, Notification is unread
+    val status: NotificationStatus =
+        NotificationStatus.UNREAD, // By default, Notification is unread
+    val sector: NotificationSector
 ) {
 
   init {
@@ -34,7 +36,10 @@ data class Notification(
     // Todo: need to check if the receiver exists in the database
     require(isValidUserUid(receiverUid)) { "Receiver UID cannot be blank" }
     // Todo: need to check if the travel exists in the database
-    require(isValidObjectUid(travelUid)) { "Travel UID cannot be blank" }
+    if (sector == NotificationSector.TRAVEL) {
+      requireNotNull(travelUid)
+      require(isValidObjectUid(travelUid)) { "Travel UID cannot be blank" }
+    }
 
     require(senderUid != receiverUid) { "Sender and receiver cannot be the same" }
   }
@@ -44,7 +49,7 @@ data class Notification(
    *
    * @return A map representation of the Notification object.
    */
-  fun toMap(): Map<String, Any> {
+  fun toMap(): Map<String, Any?> {
     return mapOf(
         "notificationUid" to notificationUid,
         "senderUid" to senderUid,
@@ -53,7 +58,8 @@ data class Notification(
         "content" to content,
         "notificationType" to notificationType,
         "timestamp" to timestamp,
-        "status" to status)
+        "status" to status,
+        "sector" to sector)
   }
 }
 
@@ -69,4 +75,9 @@ enum class NotificationType(val isAccepted: Boolean) {
 enum class NotificationStatus {
   READ,
   UNREAD
+}
+
+enum class NotificationSector {
+  TRAVEL,
+  PROFILE
 }

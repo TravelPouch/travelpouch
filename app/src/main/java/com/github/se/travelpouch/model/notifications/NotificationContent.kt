@@ -37,6 +37,15 @@ sealed class NotificationContent {
     }
   }
 
+  data class FriendInvitationNotification(
+      val userEmail: String,
+  ) : NotificationContent() {
+
+    override fun toDisplayString(): String {
+      return "$userEmail wants to be your friend"
+    }
+  }
+
   /**
    * Data class representing a pending invitation reminder.
    *
@@ -112,6 +121,17 @@ sealed class NotificationContent {
         "$userName has accepted your invitation to the '$travelTitle' trip."
       } else {
         "$userName has declined your invitation to the '$travelTitle' trip."
+      }
+    }
+  }
+
+  data class FriendInvitationResponseNotification(val email: String, val accepted: Boolean) :
+      NotificationContent() {
+    override fun toDisplayString(): String {
+      return if (accepted) {
+        "$email has is now your friend."
+      } else {
+        "$email has declined your friend invitation."
       }
     }
   }

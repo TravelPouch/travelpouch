@@ -41,6 +41,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.se.travelpouch.model.notifications.Notification
+import com.github.se.travelpouch.model.notifications.NotificationContent
+import com.github.se.travelpouch.model.notifications.NotificationSector
+import com.github.se.travelpouch.model.notifications.NotificationStatus
+import com.github.se.travelpouch.model.notifications.NotificationType
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -58,7 +64,8 @@ import com.github.se.travelpouch.ui.navigation.Screen
 @Composable
 fun ModifyingProfileScreen(
     navigationActions: NavigationActions,
-    profileModelView: ProfileModelView
+    profileModelView: ProfileModelView,
+    notificationViewModel: NotificationViewModel
 ) {
   val profile = profileModelView.profile.collectAsState()
   val context = LocalContext.current
@@ -192,15 +199,40 @@ fun ModifyingProfileScreen(
                                         Toast.LENGTH_LONG)
                                     .show()
                               } else {
-                                profileModelView.addFriend(
-                                    friendMail,
-                                    onSuccess = {
-                                      Toast.makeText(context, "Friend added", Toast.LENGTH_LONG)
+
+                                profileModelView.sendFriendNotification(
+                                    email = friendMail,
+                                    onSuccess = { friendUid ->
+                                      Toast.makeText(context, "Invitation sent", Toast.LENGTH_LONG)
                                           .show()
+
+                                      notificationViewModel.sendNotification(
+                                          Notification(
+                                              notificationViewModel.getNewUid(),
+                                              senderUid = profile.value.fsUid,
+                                              receiverUid = friendUid,
+                                              travelUid = null,
+                                              content =
+                                                  NotificationContent.FriendInvitationNotification(
+                                                      profile.value.fsUid),
+                                              notificationType = NotificationType.INVITATION,
+                                              status = NotificationStatus.UNREAD,
+                                              sector = NotificationSector.PROFILE))
                                     },
                                     onFailure = { e ->
                                       Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
                                     })
+                                //                                profileModelView.addFriend(
+                                //                                    friendMail,
+                                //                                    onSuccess = {
+                                //                                      Toast.makeText(context,
+                                // "Friend added", Toast.LENGTH_LONG)
+                                //                                          .show()
+                                //                                    },
+                                //                                    onFailure = { e ->
+                                //                                      Toast.makeText(context,
+                                // e.message!!, Toast.LENGTH_LONG).show()
+                                //                                    })
                               }
                             },
                             modifier = Modifier.testTag("addingFriendButton")) {

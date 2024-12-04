@@ -176,13 +176,11 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         db.collection(collectionPath).document(documentPath).set(newProfile), onSuccess, onFailure)
   }
 
-  override fun addFriend(
+  override fun sendFriendNotification(
       email: String,
-      userProfile: Profile,
-      onSuccess: (Profile) -> Unit,
+      onSuccess: (String) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    var friendsDocumentReference: DocumentReference? = null
     db.collection(collectionPath)
         .whereEqualTo("email", email)
         .get()
@@ -191,6 +189,31 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             onFailure(Exception("user not found"))
           } else {
             val document = it.documents[0]
+            val friendProfile = ProfileRepositoryConvert.documentToProfile(document)
+            if (friendProfile == ErrorProfile.errorProfile) {
+              onFailure(Exception("user corrupted"))
+            } else {
+              onSuccess(document.id)
+            }
+          }
+        }
+        .addOnFailureListener { onFailure(Exception("getting profile failed")) }
+  }
+
+  override fun addFriend(
+      fsUid: String,
+      userProfile: Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    var friendsDocumentReference: DocumentReference? = null
+    db.collection(collectionPath)
+        .document(fsUid)
+        .get()
+        .addOnSuccessListener { document ->
+          if (!document.exists()) {
+            onFailure(Exception("user not found"))
+          } else {
             friendsDocumentReference = document.reference
             val friendProfile = ProfileRepositoryConvert.documentToProfile(document)
             if (friendProfile == ErrorProfile.errorProfile) {
