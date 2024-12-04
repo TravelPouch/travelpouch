@@ -125,6 +125,7 @@ class DocumentUpload {
       }
       firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
+      firestore.terminate().await()
     }
 
     file.delete()

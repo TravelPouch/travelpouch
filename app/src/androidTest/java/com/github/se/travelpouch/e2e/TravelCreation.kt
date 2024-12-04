@@ -13,14 +13,19 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -30,9 +35,18 @@ class TravelCreation {
 
   @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+  @Inject lateinit var firestore: FirebaseFirestore
+
   @Before
   fun setUp() {
     hiltRule.inject()
+  }
+
+  @After
+  fun tearDown() {
+    runBlocking {
+      firestore.terminate().await()
+    }
   }
 
   @Test
