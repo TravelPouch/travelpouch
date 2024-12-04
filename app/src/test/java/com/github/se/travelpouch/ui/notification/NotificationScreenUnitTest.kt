@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.notification
 
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
+import com.github.se.travelpouch.model.notifications.NotificationSector
 import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoObjectId
@@ -40,7 +41,8 @@ class NotificationCategorizationTests {
                 travelUid = travel1Uid,
                 content = content1,
                 notificationType = notificationType1,
-                timestamp = now))
+                timestamp = now,
+                sector = NotificationSector.TRAVEL))
     val result = categorizeNotifications(notifications)
     assertEquals(1, result["This week"]?.size)
   }
@@ -57,7 +59,8 @@ class NotificationCategorizationTests {
                 travelUid = travel1Uid,
                 content = content1,
                 notificationType = notificationType1,
-                timestamp = now))
+                timestamp = now,
+                sector = NotificationSector.TRAVEL))
     val result = categorizeNotifications(notifications)
     assertEquals(1, result["Last week"]?.size)
   }
@@ -74,7 +77,8 @@ class NotificationCategorizationTests {
                 travelUid = travel1Uid,
                 content = content1,
                 notificationType = notificationType1,
-                timestamp = now))
+                timestamp = now,
+                sector = NotificationSector.TRAVEL))
     val result = categorizeNotifications(notifications)
     assertEquals(1, result["Last month"]?.size)
   }
@@ -91,7 +95,8 @@ class NotificationCategorizationTests {
                 travelUid = travel1Uid,
                 content = content1,
                 notificationType = notificationType1,
-                timestamp = now))
+                timestamp = now,
+                sector = NotificationSector.TRAVEL))
     val result = categorizeNotifications(notifications)
     assertEquals(1, result["Last year"]?.size)
   }

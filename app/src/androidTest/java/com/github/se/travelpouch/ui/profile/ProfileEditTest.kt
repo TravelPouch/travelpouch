@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import com.github.se.travelpouch.model.notifications.NotificationRepository
+import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.profile.ProfileRepository
@@ -24,6 +26,8 @@ class ProfileEditTest {
   private lateinit var profileModelView: ProfileModelView
   private lateinit var navigationActions: NavigationActions
   private lateinit var profileRepository: ProfileRepository
+  private lateinit var notificationViewModel: NotificationViewModel
+  private lateinit var notificationRepository: NotificationRepository
 
   val profile =
       Profile(
@@ -50,6 +54,8 @@ class ProfileEditTest {
     navigationActions = mock(NavigationActions::class.java)
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView(profileRepository)
+    notificationRepository = mock(NotificationRepository::class.java)
+    notificationViewModel = NotificationViewModel(notificationRepository)
   }
 
   @Test
@@ -59,7 +65,9 @@ class ProfileEditTest {
     }
     profileModelView.getProfile()
 
-    composeTestRule.setContent { ModifyingProfileScreen(navigationActions, profileModelView) }
+    composeTestRule.setContent {
+      ModifyingProfileScreen(navigationActions, profileModelView, notificationViewModel)
+    }
 
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ProfileBar").assertIsDisplayed()
@@ -90,7 +98,9 @@ class ProfileEditTest {
     }
     profileModelView.getProfile()
 
-    composeTestRule.setContent { ModifyingProfileScreen(navigationActions, profileModelView) }
+    composeTestRule.setContent {
+      ModifyingProfileScreen(navigationActions, profileModelView, notificationViewModel)
+    }
 
     composeTestRule.onNodeWithTag("floatingButtonAddingFriend").assertIsDisplayed()
     composeTestRule.onNodeWithTag("floatingButtonAddingFriend").assertTextContains("Add Friend")
@@ -106,18 +116,18 @@ class ProfileEditTest {
     composeTestRule.onNodeWithTag("addingFriendField").performTextInput("email@email.com")
     composeTestRule.onNodeWithTag("addingFriendButton").performClick()
 
-    verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(profileRepository, never()).sendFriendNotification(anyOrNull(), anyOrNull(), anyOrNull())
 
     composeTestRule.onNodeWithTag("addingFriendField").performTextClearance()
     composeTestRule.onNodeWithTag("addingFriendField").performTextInput("test@swent.ch")
     composeTestRule.onNodeWithTag("addingFriendButton").performClick()
 
-    verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(profileRepository, never()).sendFriendNotification(anyOrNull(), anyOrNull(), anyOrNull())
 
     composeTestRule.onNodeWithTag("addingFriendField").performTextClearance()
     composeTestRule.onNodeWithTag("addingFriendField").performTextInput("final@answer.com")
     composeTestRule.onNodeWithTag("addingFriendButton").performClick()
 
-    verify(profileRepository).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(profileRepository).sendFriendNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 }

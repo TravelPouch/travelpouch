@@ -20,6 +20,7 @@ import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationRepository
+import com.github.se.travelpouch.model.notifications.NotificationSector
 import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
@@ -74,7 +75,8 @@ class NotificationScreenTest {
           receiverUid = receiverUid,
           travelUid = travel1Uid,
           content = content1,
-          notificationType = notificationType1)
+          notificationType = notificationType1,
+          sector = NotificationSector.TRAVEL)
 
   @Before
   fun setUp() {

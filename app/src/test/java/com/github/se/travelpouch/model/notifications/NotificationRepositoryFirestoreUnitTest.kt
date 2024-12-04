@@ -158,6 +158,7 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getString("notificationType")).thenReturn("INVITATION")
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
+    whenever(document.getString("sector")).thenReturn("TRAVEL")
 
     whenever(document["content"])
         .thenReturn(
@@ -181,6 +182,7 @@ class NotificationRepositoryFirestoreUnitTest {
       assertEquals("6NU2zp2oGdA34s1Q1q5l", result.travelUid)
       assertEquals(NotificationType.INVITATION, result.notificationType)
       assertEquals(NotificationStatus.UNREAD, result.status)
+      assertEquals(NotificationSector.TRAVEL, result.sector)
     } catch (e: InvocationTargetException) {
       e.printStackTrace()
       fail("Method invocation failed: ${e.cause?.message}")
@@ -202,6 +204,7 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getString("notificationType")).thenReturn("ROLE_UPDATE")
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
+    whenever(document.getString("sector")).thenReturn("TRAVEL")
 
     whenever(document["content"])
         .thenReturn(mapOf("travelTitle" to "Trip to Paris", "role" to "PARTICIPANT"))
@@ -221,6 +224,7 @@ class NotificationRepositoryFirestoreUnitTest {
       assertEquals("6NU2zp2oGdA34s1Q1q5l", result.travelUid)
       assertEquals(NotificationType.ROLE_UPDATE, result.notificationType)
       assertEquals(NotificationStatus.UNREAD, result.status)
+      assertEquals(NotificationSector.TRAVEL, result.sector)
     } catch (e: InvocationTargetException) {
       e.printStackTrace()
       fail("Method invocation failed: ${e.cause?.message}")
@@ -242,6 +246,7 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getString("notificationType")).thenReturn("ACCEPTED")
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
+    whenever(document.getString("sector")).thenReturn("TRAVEL")
 
     whenever(document["content"])
         .thenReturn(mapOf("userName" to "John Doe", "travelTitle" to "Trip to Paris"))
@@ -261,6 +266,7 @@ class NotificationRepositoryFirestoreUnitTest {
       assertEquals("6NU2zp2oGdA34s1Q1q5l", result.travelUid)
       assertEquals(NotificationType.ACCEPTED, result.notificationType)
       assertEquals(NotificationStatus.UNREAD, result.status)
+      assertEquals(NotificationSector.TRAVEL, result.sector)
     } catch (e: InvocationTargetException) {
       e.printStackTrace()
       fail("Method invocation failed: ${e.cause?.message}")
@@ -282,6 +288,7 @@ class NotificationRepositoryFirestoreUnitTest {
     whenever(document.getString("notificationType")).thenReturn("DECLINED")
     whenever(document.getTimestamp("timestamp")).thenReturn(Timestamp.now())
     whenever(document.getString("status")).thenReturn("UNREAD")
+    whenever(document.getString("sector")).thenReturn("TRAVEL")
 
     whenever(document["content"])
         .thenReturn(mapOf("userName" to "John Doe", "travelTitle" to "Trip to Paris"))
@@ -301,6 +308,7 @@ class NotificationRepositoryFirestoreUnitTest {
       assertEquals("6NU2zp2oGdA34s1Q1q5l", result.travelUid)
       assertEquals(NotificationType.DECLINED, result.notificationType)
       assertEquals(NotificationStatus.UNREAD, result.status)
+      assertEquals(NotificationSector.TRAVEL, result.sector)
     } catch (e: InvocationTargetException) {
       e.printStackTrace()
       fail("Method invocation failed: ${e.cause?.message}")
