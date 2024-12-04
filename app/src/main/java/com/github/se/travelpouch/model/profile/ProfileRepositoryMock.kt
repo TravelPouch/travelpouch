@@ -41,9 +41,18 @@ class ProfileRepositoryMock : ProfileRepository {
       onSuccess(profileFetched)
     } else {
       val profile =
-          Profile(profilePath, "username", "emailtest1@gmail.com", null, "name", emptyList())
+          Profile(profilePath, "username", "emailtest1@gmail.com", emptyList(), "name", emptyList())
       profileCollection[profilePath] = profile
       onSuccess(profile)
     }
+  }
+
+  override fun addFriend(
+      email: String,
+      userProfile: Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    TODO("Not yet implemented")
   }
 }

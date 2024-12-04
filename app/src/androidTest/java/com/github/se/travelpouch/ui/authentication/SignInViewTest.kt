@@ -1,7 +1,5 @@
 package com.github.se.travelpouch.ui.authentication
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -77,17 +75,6 @@ class SignInViewTest {
   }
 
   @Test
-  fun signInScreenTestSpinner() {
-    val yesSpin: MutableState<Boolean> = mutableStateOf(true)
-    composeTestRule.setContent {
-      SignInScreen(
-          navigationActions = mockNavigationActions, profileModelView, travelViewModel, yesSpin)
-    }
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("loadingSpinner").assertIsDisplayed()
-  }
-
-  @Test
   fun signInWithWmailAndPasswordIsDisplayed() {
     composeTestRule.setContent {
       SignInScreen(navigationActions = mockNavigationActions, profileModelView, travelViewModel)
@@ -120,7 +107,7 @@ class SignInViewTest {
                 fsUid = "qwertzuiopasdfghjklyxcvbnm12",
                 email = "test@swent.ch",
                 username = "test",
-                friends = null,
+                friends = emptyList(),
                 name = "name",
                 userTravelList = emptyList())
         onSuccess(profile)

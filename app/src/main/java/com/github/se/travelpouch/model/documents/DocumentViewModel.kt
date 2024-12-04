@@ -40,6 +40,10 @@ open class DocumentViewModel(
   val downloadUrls: Map<String, String>
     get() = _downloadUrls
 
+  private val _thumbnailUrls = mutableStateMapOf<String, String>()
+  val thumbnailUrls: Map<String, String>
+    get() = _thumbnailUrls
+
   fun setIdTravel(travelId: String) {
     repository.setIdTravel({ getDocuments() }, travelId)
   }
@@ -68,7 +72,6 @@ open class DocumentViewModel(
    * Downloads a Document from Firebase store adn store it in the folder pointed by documentFile
    *
    * @param documentFile The folder in which to create the file
-   * @param contentResolver A content resolver to
    */
   fun storeSelectedDocument(documentFile: DocumentFile): Job {
     val mimeType = selectedDocument.value?.fileFormat?.mimeType
@@ -84,17 +87,6 @@ open class DocumentViewModel(
 
     return fileDownloader.downloadFile(mimeType, title, ref, documentFile)
   }
-
-  //    /**
-  //     * Updates a Document.
-  //     *
-  //     * @param document The Document to be updated.
-  //     */
-  //    fun updateDocument(document: DocumentContainer) {
-  //        repository.updateDocument(document,
-  //            onSuccess = { getDocuments() },
-  //            onFailure = { Log.e("DocumentsViewModel", "Failed to update Document", it) })
-  //    }
 
   /**
    * Deletes a Document by its ID.
@@ -124,7 +116,18 @@ open class DocumentViewModel(
     repository.getDownloadUrl(
         document,
         onSuccess = { _downloadUrls[document.ref.id] = it },
-        onFailure = { Log.e("DocumentPreview", "Failed to get image uri", it) })
+        onFailure = { Log.e("DocumentsViewModel", "Failed to get thumbnail uri", it) })
+  }
+
+  fun getDocumentThumbnail(document: DocumentContainer, width: Int = 300) {
+    if (_thumbnailUrls.containsKey("${document.ref.id}-thumb-$width")) {
+      return
+    }
+    repository.getThumbnailUrl(
+        document,
+        width,
+        onSuccess = { _thumbnailUrls["${document.ref.id}-thumb-$width"] = it },
+        onFailure = { Log.e("DocumentsViewModel", "Failed to get thumbnail uri", it) })
   }
 
   fun uploadDocument(travelId: String, bytes: ByteArray, format: DocumentFileFormat) {

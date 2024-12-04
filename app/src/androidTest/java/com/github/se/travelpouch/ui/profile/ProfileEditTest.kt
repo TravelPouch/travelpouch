@@ -17,6 +17,7 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 class ProfileEditTest {
@@ -29,7 +30,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
-          friends = null,
+          friends = listOf("email@email.com"),
           name = "name",
           userTravelList = emptyList())
 
@@ -38,8 +39,8 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "newtest@test.ch",
           username = "newUsername",
-          friends = null,
-          name = "name",
+          friends = emptyList(),
+          name = "newName",
           userTravelList = emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -67,20 +68,56 @@ class ProfileEditTest {
     composeTestRule.onNodeWithTag("emailField").assertTextContains(profile.email)
     composeTestRule.onNodeWithTag("usernameField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(profile.username)
-    composeTestRule.onNodeWithTag("friendsField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("friendsField").assertTextContains("No Friend, sadge :(")
+    composeTestRule.onNodeWithTag("nameField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("nameField").assertTextContains(profile.name)
 
-    composeTestRule.onNodeWithTag("emailField").performTextClearance()
-    composeTestRule.onNodeWithTag("emailField").performTextInput(newProfile.email)
     composeTestRule.onNodeWithTag("usernameField").performTextClearance()
     composeTestRule.onNodeWithTag("usernameField").performTextInput(newProfile.username)
-    composeTestRule.onNodeWithTag("friendsField").assertTextContains("No Friend, sadge :(")
+    composeTestRule.onNodeWithTag("nameField").performTextClearance()
+    composeTestRule.onNodeWithTag("nameField").performTextInput(newProfile.name)
 
-    composeTestRule.onNodeWithTag("emailField").assertTextContains(newProfile.email)
     composeTestRule.onNodeWithTag("usernameField").assertTextContains(newProfile.username)
 
     composeTestRule.onNodeWithTag("saveButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("saveButton").performClick()
     verify(profileRepository).updateProfile(anyOrNull(), anyOrNull(), anyOrNull())
+  }
+
+  @Test
+  fun addingAFriendWorks() {
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(profile)
+    }
+    profileModelView.getProfile()
+
+    composeTestRule.setContent { ModifyingProfileScreen(navigationActions, profileModelView) }
+
+    composeTestRule.onNodeWithTag("floatingButtonAddingFriend").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("floatingButtonAddingFriend").assertTextContains("Add Friend")
+    composeTestRule.onNodeWithTag("addingFriendIcon", useUnmergedTree = true).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("floatingButtonAddingFriend").performClick()
+    composeTestRule.onNodeWithTag("boxAddingFriend").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addingFriendTitle").assertTextContains("Adding a friend")
+    composeTestRule.onNodeWithTag("addingFriendButton").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("addingFriendField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addingFriendField").performTextClearance()
+    composeTestRule.onNodeWithTag("addingFriendField").performTextInput("email@email.com")
+    composeTestRule.onNodeWithTag("addingFriendButton").performClick()
+
+    verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+
+    composeTestRule.onNodeWithTag("addingFriendField").performTextClearance()
+    composeTestRule.onNodeWithTag("addingFriendField").performTextInput("test@swent.ch")
+    composeTestRule.onNodeWithTag("addingFriendButton").performClick()
+
+    verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+
+    composeTestRule.onNodeWithTag("addingFriendField").performTextClearance()
+    composeTestRule.onNodeWithTag("addingFriendField").performTextInput("final@answer.com")
+    composeTestRule.onNodeWithTag("addingFriendButton").performClick()
+
+    verify(profileRepository).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }

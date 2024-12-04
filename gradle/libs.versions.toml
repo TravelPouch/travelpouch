@@ -74,6 +74,7 @@ playServicesMlkitDocumentScanner = "16.0.0-beta1"
 coil = "2.1.0"
 bouquet = "1.1.2"
 firebaseMessagingKtx = "24.1.0"
+playServicesLocation = "21.3.0"
 
 [libraries]
 androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
@@ -158,6 +159,7 @@ firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-funct
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 bouquet = { group = "io.github.grizzi91", name = "bouquet", version.ref = "bouquet" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

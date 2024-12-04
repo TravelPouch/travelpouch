@@ -109,7 +109,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
       Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(modifier = Modifier.fillMaxWidth()) {
           Text(
-              text = documentContainer.title,
+              text = "Document ID: ${documentContainer.ref.id}",
               style = MaterialTheme.typography.bodyLarge,
               modifier = Modifier.padding(8.dp).testTag("documentTitle"))
 

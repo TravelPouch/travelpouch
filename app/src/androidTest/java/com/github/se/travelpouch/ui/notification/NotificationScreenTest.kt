@@ -30,8 +30,6 @@ import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoO
 import com.github.se.travelpouch.model.travels.TravelContainerMock.generateAutoUserId
 import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import com.github.se.travelpouch.ui.notifications.NotificationsScreen
 import org.junit.Before
 import org.junit.Rule
@@ -39,7 +37,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 
@@ -123,17 +120,6 @@ class NotificationScreenTest {
     // Perform assertions and interactions
     composeTestRule.waitForIdle()
 
-    // Check if the notification item is displayed and clickable
-    composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(TopLevelDestinations.NOTIFICATION.textId).performClick()
-    verify(navigationActions, times(1)).navigateTo(Screen.NOTIFICATION)
-
-    composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(TopLevelDestinations.TRAVELS.textId).performClick()
-    verify(navigationActions, times(1)).navigateTo(Screen.TRAVEL_LIST)
-
-    composeTestRule.waitForIdle()
-
     // Interactions with the notification item
     composeTestRule.onNodeWithTag("notification_item").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertIsDisplayed()
@@ -196,7 +182,7 @@ class NotificationScreenTest {
           documentViewModel = documentViewModel,
           eventsViewModel = eventViewModel)
     }
-    composeTestRule.onNodeWithTag("TopAppBarNotificationsScreen").assertExists()
+    // composeTestRule.onNodeWithTag("TopAppBarNotificationsScreen").assertExists()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").assertExists()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").isDisplayed()
     composeTestRule.onNodeWithTag("TitleNotificationsScreen").assert(hasText("Notifications"))

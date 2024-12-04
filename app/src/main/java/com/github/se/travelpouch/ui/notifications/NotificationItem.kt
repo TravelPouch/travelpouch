@@ -2,12 +2,14 @@ package com.github.se.travelpouch.ui.notifications
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -80,10 +81,11 @@ fun NotificationItem(
 
 @Composable
 fun NotificationTimestamp(notification: Notification) {
+  val darkTheme = isSystemInDarkTheme()
   Text(
       text = notification.timestamp.toDate().toString(),
-      fontSize = 12.sp,
-      color = Color.Gray,
+      style = MaterialTheme.typography.labelMedium,
+      color = if (darkTheme) Color.LightGray else Color.Gray,
       modifier = Modifier.testTag("notification_item_timestamp"))
 }
 
@@ -91,7 +93,7 @@ fun NotificationTimestamp(notification: Notification) {
 fun NotificationMessage(notification: Notification) {
   Text(
       text = notification.content.toDisplayString(),
-      fontSize = 15.sp,
+      style = MaterialTheme.typography.bodyLarge,
       color = Color(0xFF669bbc),
       modifier = Modifier.testTag("notification_item_message"))
 }
@@ -224,7 +226,7 @@ fun onCardClick(
             activityViewModel.setIdTravel(travel.fsUid)
             documentViewModel.setIdTravel(travel.fsUid)
             eventsViewModel.setIdTravel(travel.fsUid)
-            navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+            navigationActions.navigateTo(Screen.SWIPER)
           } else {
             Toast.makeText(context, "You are not a member of this travel", Toast.LENGTH_SHORT)
                 .show()

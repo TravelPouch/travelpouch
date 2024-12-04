@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 class DocumentPreviewTest {
 
@@ -32,6 +33,8 @@ class DocumentPreviewTest {
   @Before
   fun setUp() {
     mockDocumentReference = mock(DocumentReference::class.java)
+    `when`(mockDocumentReference.id).thenReturn("ref_id")
+
     document =
         DocumentContainer(
             mockDocumentReference,
@@ -65,6 +68,6 @@ class DocumentPreviewTest {
     composeTestRule.onNodeWithTag("deleteButton").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("documentTitle", useUnmergedTree = true)
-        .assertTextContains(document.title)
+        .assertTextContains("Document ID: ref_id")
   }
 }
