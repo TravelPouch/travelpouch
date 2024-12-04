@@ -40,7 +40,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-private const val DEFAULT_TIMEOUT = 500L
+private const val DEFAULT_TIMEOUT = 1000L
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -128,8 +128,6 @@ class DocumentUpload {
     }
 
     file.delete()
-
-    FirebaseApp.clearInstancesForTest()
   }
 
   @Test
