@@ -90,35 +90,6 @@ fun ModifyingProfileScreen(
             },
         )
       },
-      //      floatingActionButton = {
-      //        FloatingActionButton(
-      //            onClick = { openDialog = true },
-      //            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-      //            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-      //            modifier = Modifier.testTag("floatingButtonAddingFriend")) {
-      //              Row(
-      //                  verticalAlignment = Alignment.CenterVertically,
-      //                  modifier =
-      //                      Modifier.padding(horizontal = 10.dp) // Adjust padding for better
-      // alignment
-      //                  ) {
-      //                    Icon(
-      //                        imageVector =
-      //                            Icons.Default.PersonAddAlt1, // Replace with your mail icon
-      // resource
-      //                        contentDescription = null,
-      //                        modifier =
-      //                            Modifier.size(24.dp)
-      //                                .testTag("addingFriendIcon") // Adjust size as needed
-      //                        )
-      //                    Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
-      //                    Text(
-      //                        text = "Add Friend",
-      //                        style = MaterialTheme.typography.bodyLarge // Or customize further
-      //                        )
-      //                  }
-      //            }
-      //      }
   ) { pd ->
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
