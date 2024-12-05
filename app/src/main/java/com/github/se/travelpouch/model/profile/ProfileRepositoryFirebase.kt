@@ -26,6 +26,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
 
   override suspend fun initAfterLogin(onSuccess: (Profile) -> Unit) {
     val user = Firebase.auth.currentUser
+    Log.d("ProfileRepository", "initAfterLogin: ${user?.uid} ${user?.email}")
 
     if (user != null) {
       documentPath = user.uid
@@ -49,12 +50,14 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   ) {
     if (!document.exists()) {
       try {
+        Log.d("ProfileRepository", "Creating profile for user ${user.uid} ${user.email}")
         addProfile(user.email!!, user.uid, onSuccess)
       } catch (e: Exception) {
-        Log.e("nullEmail", "Email of user was null, deleting user")
+        Log.e("ProfileRepository", "Email of user was null, deleting user")
       }
     } else {
       documentReference = document.reference
+      Log.d("ProfileRepository", "addingUserIfNotRegistered: User profile exists")
       onSuccess(ProfileRepositoryConvert.documentToProfile(document))
     }
   }
@@ -67,11 +70,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
    * @param onSuccess (() -> Unit) : the function to apply after having a valid profile
    */
   suspend fun gettingUserProfile(user: FirebaseUser, onSuccess: (Profile) -> Unit) {
+    Log.d("ProfileRepository", "Getting user profile")
     try {
       val document = db.collection(collectionPath).document(documentPath).get().await()
+      Log.d("ProfileRepository", "Got document")
       addingUserIfNotRegistered(user, document, onSuccess)
     } catch (e: Exception) {
-      Log.e("GetProfileCollectionFailed", "Failed to fetch the user collection")
+      Log.e("ProfileRepository", "Failed to fetch the user collection", e)
     }
   }
 
@@ -121,7 +126,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             fsUid = uid,
             username = email.substringBefore("@"),
             email = email,
-            friends = emptyList(),
+            friends = emptyMap(),
             name = email.substringBefore("@"),
             emptyList())
 
@@ -129,11 +134,11 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
     performFirestoreOperation(
         documentReference!!.set(profile),
         onSuccess = {
-          Log.d("ProfileCreated", "profile created")
+          Log.d("ProfileRepository", "profile created")
           onSuccess(profile)
         },
         onFailure = {
-          Log.e("ErrorProfile", "Error while creating profile")
+          Log.e("ProfileRepository", "Error while creating profile")
           // has to correct thing
         })
   }
@@ -154,7 +159,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
           onSuccess(profile)
         }
         .addOnFailureListener { e ->
-          Log.e("EventRepository", "Error getting documents", e)
+          Log.e("ProfileRepository", "Error getting documents", e)
           onFailure(e)
         }
   }
@@ -197,13 +202,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             if (friendProfile == ErrorProfile.errorProfile) {
               onFailure(Exception("user corrupted"))
             } else {
-              val userProfileUpdated = updatingFriendList(userProfile, friendProfile.email)
+              val userProfileUpdated =
+                  updatingFriendList(userProfile, friendProfile.email, friendProfile.fsUid)
+              val friendProfileUpdated =
+                  updatingFriendList(friendProfile, userProfile.email, userProfile.fsUid)
               db.runTransaction { t ->
                     t.update(documentReference!!, "friends", userProfileUpdated.friends)
-                    t.update(
-                        friendsDocumentReference!!,
-                        "friends",
-                        updatingFriendList(friendProfile, userProfile.email).friends)
+                    t.update(friendsDocumentReference!!, "friends", friendProfileUpdated.friends)
                   }
                   .addOnSuccessListener { onSuccess(userProfileUpdated) }
                   .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
@@ -213,8 +218,8 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .addOnFailureListener { onFailure(Exception("getting friend profile failed")) }
   }
 
-  private fun updatingFriendList(profile: Profile, email: String): Profile {
-    return profile.copy(friends = profile.friends + email)
+  private fun updatingFriendList(profile: Profile, email: String, fsUid: String): Profile {
+    return profile.copy(friends = profile.friends + Pair(email, fsUid))
   }
 
   /**
@@ -282,15 +287,19 @@ class ProfileRepositoryConvert {
         val uid = document.id
         val username = document.getString("username")
         val email = document.getString("email")
-        val friends = document.get("friends") as? List<String>
+        val friends = document.get("friends") as? Map<String, String>
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
+
+        Log.d(
+            "ProfileRepository",
+            "Document to Profile: $uid, $username, $email, $friends, $name, $userTravelList")
 
         Profile(
             fsUid = uid,
             username = username!!,
             email = email!!,
-            friends = friends ?: emptyList(),
+            friends = friends ?: emptyMap(),
             name = name!!,
             userTravelList = userTravelList ?: emptyList())
       } catch (e: Exception) {

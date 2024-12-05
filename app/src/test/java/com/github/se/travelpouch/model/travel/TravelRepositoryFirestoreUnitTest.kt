@@ -74,7 +74,7 @@ class TravelRepositoryFirestoreUnitTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "username",
           "email@test.ch",
-          emptyList(),
+          emptyMap(),
           "name",
           emptyList())
 
@@ -197,7 +197,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     val profileDocumentSnapShot: DocumentSnapshot = mock()
     whenever(transaction.get(anyOrNull())).thenReturn(profileDocumentSnapShot)
-    whenever(profileDocumentSnapShot.get("friends")).thenReturn(emptyList<String>())
+    whenever(profileDocumentSnapShot.get("friends")).thenReturn(emptyMap<String, String>())
     whenever(transaction.set(anyOrNull(), anyOrNull())).thenReturn(transaction)
     whenever(transaction.update(anyOrNull(), anyOrNull())).thenReturn(transaction)
 
@@ -289,7 +289,7 @@ class TravelRepositoryFirestoreUnitTest {
             "qwertzuiopasdfghjklyxcvbnm16",
             "usernameFriend",
             "email@friend.ch",
-            emptyList(),
+            emptyMap(),
             "nameFriend",
             emptyList())
 

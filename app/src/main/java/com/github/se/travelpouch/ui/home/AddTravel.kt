@@ -291,6 +291,7 @@ fun AddTravelScreen(
                       // Try to save the TravelContainer using the ViewModel
                       try {
                         // Call the ViewModel method to add the travel data
+                        Log.d("AddTravelScreen", "Adding travel to ViewModel")
                         listTravelViewModel.addTravel(travelContainer)
 
                         Toast.makeText(context, "Travel added successfully!", Toast.LENGTH_SHORT)

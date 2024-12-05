@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.net.Uri
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -122,7 +123,7 @@ fun DocumentListScreen(
             documentViewModel.uploadFile(
                 context.contentResolver.openInputStream(uri),
                 selectedTravel.value,
-                context.contentResolver.getType(uri))
+                MimeTypeMap.getSingleton().getMimeTypeFromExtension(uri.toFile().extension))
         else Log.d("DocumentList", "No file selected")
       }
 
