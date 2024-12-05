@@ -253,6 +253,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
+    // Permission
+    implementation(libs.accompanist.permissions)
+
 
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
