@@ -292,6 +292,11 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
 }
 
+// Globally exclude protobuf-lite
+configurations.configureEach {
+    exclude(group = "com.google.protobuf", module = "protobuf-lite")
+}
+
 // Allow references to generated code
 kapt {
     correctErrorTypes = true

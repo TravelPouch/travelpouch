@@ -50,7 +50,7 @@ class ParticipantListScreenTest {
           name = "User One",
           userTravelList = listOf("travel1"),
           email = "user1@example.com",
-          friends = emptyList(),
+          friends = emptyMap(),
           username = "username")
   private val participant2 =
       Profile(
@@ -58,7 +58,7 @@ class ParticipantListScreenTest {
           name = "User Two",
           userTravelList = listOf("travel2"),
           email = "user2@example.com",
-          friends = emptyList(),
+          friends = emptyMap(),
           username = "username")
 
   private fun createContainer(): TravelContainer {
@@ -443,7 +443,7 @@ class ParticipantListScreenTest {
             "qwertzuiopasdfghjklyxcvbnm12",
             "username",
             "email@gmail.com",
-            emptyList(),
+            emptyMap(),
             "name",
             emptyList())
 
@@ -489,7 +489,7 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = emptyList())
+                  friends = emptyMap())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -547,7 +547,7 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = emptyList())
+                  friends = emptyMap())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -603,7 +603,7 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = emptyList())
+                  friends = emptyMap())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo.fsUid)
         }
@@ -687,7 +687,7 @@ class ParticipantListScreenTest {
                   userTravelList = listOf("00000000000000000000"),
                   email = email,
                   username = "username",
-                  friends = emptyList())
+                  friends = emptyMap())
           // Call the onSuccess callback with the custom UserInfo
           onSuccess(customUserInfo)
         }

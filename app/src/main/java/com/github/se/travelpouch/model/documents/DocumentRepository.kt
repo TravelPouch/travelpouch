@@ -3,10 +3,8 @@ package com.github.se.travelpouch.model.documents
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
 import com.google.android.gms.common.util.Base64Utils
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
@@ -52,9 +50,9 @@ interface DocumentRepository {
  */
 class DocumentRepositoryFirestore(
     private val db: FirebaseFirestore,
-    private val storage: FirebaseStorage = FirebaseStorage.getInstance(),
-    private val firebaseAuth: FirebaseAuth = Firebase.auth,
-    private val functions: FirebaseFunctions = FirebaseFunctions.getInstance("europe-west9")
+    private val storage: FirebaseStorage,
+    private val firebaseAuth: FirebaseAuth,
+    private val functions: FirebaseFunctions
 ) : DocumentRepository {
   private var collectionPath = ""
 
