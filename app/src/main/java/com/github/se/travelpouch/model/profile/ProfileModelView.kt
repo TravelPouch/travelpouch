@@ -87,6 +87,13 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
   }
 
   fun removeFriend(friendUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    repository.removeFriend(friendUid, userProfile = profile_.value, onSuccess, onFailure)
+    repository.removeFriend(
+        friendUid,
+        userProfile = profile_.value,
+        onSuccess = {
+          profile_.value = it
+          onSuccess()
+        },
+        onFailure)
   }
 }

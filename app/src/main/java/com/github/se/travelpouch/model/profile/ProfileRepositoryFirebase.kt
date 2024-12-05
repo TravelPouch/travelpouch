@@ -220,7 +220,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
   override fun removeFriend(
       friendFsUid: String,
       userProfile: Profile,
-      onSuccess: () -> Unit,
+      onSuccess: (Profile) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     db.collection(collectionPath)
@@ -243,7 +243,7 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
                 }
                 .addOnSuccessListener {
                   Log.d("DeleteFriend", "Friend deleted")
-                  onSuccess()
+                  onSuccess(userProfileUpdated)
                 }
                 .addOnFailureListener {
                   Log.e("DeleteFriend", "An error occurred updating user profile")

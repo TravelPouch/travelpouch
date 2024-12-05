@@ -59,7 +59,7 @@ interface ProfileRepository {
   fun removeFriend(
       friendFsUid: String,
       userProfile: Profile,
-      onSuccess: () -> Unit,
+      onSuccess: (Profile) -> Unit,
       onFailure: (Exception) -> Unit
   )
 }

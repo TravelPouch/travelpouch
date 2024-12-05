@@ -296,6 +296,7 @@ fun ModifyingProfileScreen(
                                                   context, "Friend deleted", Toast.LENGTH_LONG)
                                               .show()
                                         })
+                                    openDialogToDeleteFriend = false
                                   },
                                   modifier = Modifier.testTag("deletingFriendButton")) {
                                     Text("Delete Friend")
