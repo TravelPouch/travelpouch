@@ -41,7 +41,7 @@ class ProfileRepositoryMock : ProfileRepository {
       onSuccess(profileFetched)
     } else {
       val profile =
-          Profile(profilePath, "username", "emailtest1@gmail.com", emptyList(), "name", emptyList())
+          Profile(profilePath, "username", "emailtest1@gmail.com", emptyMap(), "name", emptyList())
       profileCollection[profilePath] = profile
       onSuccess(profile)
     }

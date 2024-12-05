@@ -1,9 +1,8 @@
 package com.github.se.travelpouch.model.events
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,8 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
  * @param repository (EventRepository) : the repository that is used as a logic between Firebase and
  *   events
  */
-class EventViewModel(private val repository: EventRepository) : ViewModel() {
-
+@HiltViewModel
+class EventViewModel @Inject constructor(private val repository: EventRepository) : ViewModel() {
   private val events_ = MutableStateFlow<List<Event>>(emptyList())
   val events: StateFlow<List<Event>> = events_.asStateFlow()
 
@@ -46,16 +45,5 @@ class EventViewModel(private val repository: EventRepository) : ViewModel() {
    */
   fun addEvent(event: Event) {
     repository.addEvent(event = event, onSuccess = { getEvents() }, onFailure = {})
-  }
-
-  // create factory
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return EventViewModel(EventRepositoryFirebase(Firebase.firestore)) as T
-          }
-        }
   }
 }

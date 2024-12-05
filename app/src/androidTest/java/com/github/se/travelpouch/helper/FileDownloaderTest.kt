@@ -47,7 +47,7 @@ class FileDownloaderTest {
 
   @Test
   fun assertUnableToCreateFile() {
-    val fileDownloader = FileDownloader(contentResolver)
+    val fileDownloader = FileDownloader(contentResolver, mockFirebaseStorage)
     val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     device.executeShellCommand("logcat -c")
     `when`(mockDestinationFolder.createFile(any(), any())).thenReturn(null)
