@@ -81,4 +81,4 @@ export const generateThumbnailHttp = onRequest(
       return;
     }
     res.json({success: true});
-  })2;
+  });
