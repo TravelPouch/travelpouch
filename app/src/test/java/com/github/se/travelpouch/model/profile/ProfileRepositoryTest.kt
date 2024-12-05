@@ -99,6 +99,7 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshot.getString("username")).thenReturn("usernameTest")
     `when`(mockDocumentSnapshot.get("userTravelList")).thenReturn(emptyList<String>())
     `when`(mockDocumentSnapshot.get("friends")).thenReturn(null)
+    `when`(mockDocumentSnapshot.getBoolean("needsOnboarding")).thenReturn(true)
 
     `when`(mockDocumentSnapshotError.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockDocumentSnapshotError.getString("email")).thenReturn(null)
