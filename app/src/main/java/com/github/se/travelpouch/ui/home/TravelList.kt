@@ -72,6 +72,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.github.se.travelpouch.BuildConfig
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -470,7 +471,7 @@ fun RequestNotificationPermission(profileViewModel: ProfileModelView) {
     val context = LocalContext.current
 
     // Check notification permission
-    val hasPermission = remember {
+    val hasPermission = remember { BuildConfig.DEBUG } || run {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
                 ContextCompat.checkSelfPermission(
                     context,

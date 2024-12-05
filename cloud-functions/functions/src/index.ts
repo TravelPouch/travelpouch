@@ -9,8 +9,6 @@ import {
 import {storeFile} from "./storage.js";
 import {generateThumbnailForDocument} from "./thumbnailing.js";
 
-import { getNotificationTokens } from "./pushNotification.js";
-
 initializeApp();
 
 /**
@@ -83,7 +81,4 @@ export const generateThumbnailHttp = onRequest(
       return;
     }
     res.json({success: true});
-  });
-
-// Export the new push notification function
-export { getNotificationTokens };
+  })2;
