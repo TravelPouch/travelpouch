@@ -6,7 +6,6 @@ import android.content.Intent
 import android.icu.util.GregorianCalendar
 import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,7 +20,6 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
-import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -98,7 +96,8 @@ class DocumentUpload {
                   "fsUid" to uid,
                   "name" to "Example",
                   "username" to "example",
-                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF")))
+                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
+                  "needsOnboarding" to false))
           .await()
 
       auth.signOut()
@@ -144,7 +143,7 @@ class DocumentUpload {
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
         composeTestRule.onNodeWithTag("welcomText").assertIsDisplayed()
         composeTestRule.onNodeWithText("Sign in with email and password").assertIsDisplayed()
-
+        print("BBBBBBBBBBBB")
         // go to sign in screen with email and password and log in
         composeTestRule.onNodeWithText("Sign in with email and password").performClick()
 
