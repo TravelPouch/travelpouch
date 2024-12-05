@@ -90,7 +90,7 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
         })
   }
 
-    fun addNotificationTokenToProfile(token: String) {
+    private fun addNotificationTokenToProfile(token: String) {
         repository.addNotificationTokenToProfile(token, profile_.value.fsUid, {
             Log.d("Notification token added", "Notification token added")
         }, {
@@ -105,7 +105,4 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
         }
     }
 
-    fun resetTokenUpdateFlag() {
-        _isTokenUpdated.value = false // Optional: Reset for testing or specific scenarios
-    }
 }

@@ -210,6 +210,7 @@ dependencies {
     kaptAndroidTest(libs.hilt.android.compiler)
 
     implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.converter.scalars)

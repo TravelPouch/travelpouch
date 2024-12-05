@@ -9,6 +9,8 @@ import {
 import {storeFile} from "./storage.js";
 import {generateThumbnailForDocument} from "./thumbnailing.js";
 
+import {fetchNotificationTokens} from "./pushNotification.js";
+
 initializeApp();
 
 /**
@@ -82,3 +84,6 @@ export const generateThumbnailHttp = onRequest(
     }
     res.json({success: true});
   });
+
+// Register the fetchNotificationTokens function
+export {fetchNotificationTokens};
