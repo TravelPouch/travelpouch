@@ -54,7 +54,7 @@ class GPSViewModel(private val gpsRepository: GPSRepository) : ViewModel() {
       gpsRepository
           .getGPSUpdatesForMap()
           .catch {
-            Log.d("GPSViewModel", "Error: $it")
+            Log.e("GPSViewModel", "Error: $it")
 
             _realTimeLocation.value = null // Reset the StateFlow
             _hasStartedGPS.value = false // Reset the tracking state
