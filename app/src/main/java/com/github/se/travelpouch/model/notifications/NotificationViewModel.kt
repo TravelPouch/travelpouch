@@ -1,6 +1,9 @@
 package com.github.se.travelpouch.model.notifications
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.functions.functions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +23,9 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
   // LiveData holding the list of notifications
   private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
   val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
+
+  private val functions = Firebase.functions
+
 
   fun getNewUid(): String {
     return notificationRepository.getNewUid()
@@ -70,5 +76,27 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
       onFailure: (Exception) -> Unit
   ) {
     notificationRepository.deleteAllNotificationsForUser(userUid, onSuccess, onFailure)
+  }
+
+  fun sendNotificationToUser(userId: String, notificationContent: NotificationContent) {
+    val data = mapOf(
+      "userId" to userId,
+      "notificationContent" to mapOf(
+        "title" to "Travel Pouch",
+        "body" to notificationContent.toDisplayString()
+      )
+    )
+
+    functions.useEmulator("10.0.2.2", 5001) // Use Android emulator's local address
+
+    functions
+      .getHttpsCallable("sendNotificationToUser")
+      .call(data)
+      .addOnSuccessListener { result ->
+        Log.d("Notification", "Success: ${result.data}")
+      }
+      .addOnFailureListener { e ->
+        Log.e("Notification", "Error sending notification", e)
+      }
   }
 }
