@@ -143,7 +143,7 @@ class DocumentUpload {
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
         composeTestRule.onNodeWithTag("welcomText").assertIsDisplayed()
         composeTestRule.onNodeWithText("Sign in with email and password").assertIsDisplayed()
-        print("BBBBBBBBBBBB")
+
         // go to sign in screen with email and password and log in
         composeTestRule.onNodeWithText("Sign in with email and password").performClick()
 
@@ -155,6 +155,12 @@ class DocumentUpload {
         composeTestRule.onNodeWithTag("emailField").performTextInput("example@example.com")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("password")
         composeTestRule.onNodeWithText("Log in").performClick()
+
+        // Skip onboarding
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+            composeTestRule.onNodeWithTag("onboardingScreen", useUnmergedTree = true).isDisplayed()
+        }
+        composeTestRule.onNodeWithTag("SkipButton").performClick()
 
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule
