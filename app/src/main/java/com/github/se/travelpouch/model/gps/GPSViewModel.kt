@@ -66,7 +66,12 @@ class GPSViewModel(private val gpsRepository: GPSRepository) : ViewModel() {
     }
   }
 
-  /** Stop the real-time location updates and reset the tracking state. */
+  /**
+   * Stops the real-time location updates and resets the tracking state.
+   *
+   * Note: This method is not currently in use but might be useful in the future for stopping
+   * real-time location tracking under certain conditions without destroying the ViewModel.
+   */
   fun stopRealTimeLocationUpdates() {
     Log.d("GPSViewModel", "Stopping GPS updates")
     _hasStartedGPS.value = false // Reset the tracking state
