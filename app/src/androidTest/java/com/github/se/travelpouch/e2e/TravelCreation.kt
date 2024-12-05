@@ -1,10 +1,11 @@
-package com.github.se.travelpouch.endtoend
+package com.github.se.travelpouch.e2e
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -12,28 +13,40 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
-class EndToEndTest {
+class TravelCreation {
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
   @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+  @Inject lateinit var firestore: FirebaseFirestore
+
   @Before
   fun setUp() {
     hiltRule.inject()
+  }
+
+  @After
+  fun tearDown() {
+    runBlocking {
+      firestore.terminate().await()
+    }
   }
 
   @Test
@@ -52,12 +65,12 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
         composeTestRule.onNodeWithText("Sign in").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest1@gmail.com")
-        composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
+        composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest2@gmail.com")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest2password")
         composeTestRule.onNodeWithText("Sign in").performClick()
 
         // wait until we are in the travel list screen
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.waitUntil(timeoutMillis = 2000) {
           composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
         }
 
@@ -69,7 +82,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("createTravelFab").performClick()
 
         // wait until we are in the screen to add a travel
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.waitUntil(timeoutMillis = 2000) {
           composeTestRule.onNodeWithTag("travelTitle", useUnmergedTree = true).isDisplayed()
         }
 
@@ -92,7 +105,7 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
 
         // wait to have La paz displayed
-        composeTestRule.waitUntil(timeoutMillis = 40000) {
+        composeTestRule.waitUntil(timeoutMillis = 4000) {
           composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
         }
 
@@ -110,9 +123,11 @@ class EndToEndTest {
         composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
 
         // verify that the empty travel prompt does not exist since we saved a travel
-        composeTestRule
-            .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
-            .assertDoesNotExist()
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+          composeTestRule
+              .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
+              .isNotDisplayed()
+        }
 
         composeTestRule.onNodeWithText("e2e travel 1").assertIsDisplayed()
         composeTestRule.onNodeWithText("e2e travel 1").assert(hasText("e2e travel 1"))

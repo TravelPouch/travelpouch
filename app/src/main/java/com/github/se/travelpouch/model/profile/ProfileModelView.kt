@@ -23,16 +23,6 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
 
   private val onFailureTag = "ProfileViewModel"
 
-  //  companion object {
-  //    val Factory: ViewModelProvider.Factory =
-  //        object : ViewModelProvider.Factory {
-  //          @Suppress("UNCHECKED_CAST")
-  //          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-  //            return ProfileModelView(ProfileRepositoryFirebase(Firebase.firestore)) as T
-  //          }
-  //        }
-  //  }
-
   private val profile_ = MutableStateFlow<Profile>(ErrorProfile.errorProfile)
   val profile: StateFlow<Profile> = profile_.asStateFlow()
 
@@ -52,6 +42,10 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
         onFailure = { Log.e(onFailureTag, "Failed to get profile", it) })
   }
 
+  fun getFsUidByEmail(email: String, onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
+    repository.getFsUidByEmail(email, onSuccess, onFailure)
+  }
+
   /**
    * This function updates the information of the user.
    *
@@ -66,6 +60,29 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
           Log.e(onFailureTag, "Failed to update profile", it)
           Toast.makeText(context, "An error occurred while updating profile", Toast.LENGTH_SHORT)
               .show()
+        })
+  }
+
+  /**
+   * This function allows us to add a friend to a user.
+   *
+   * @param email (String) : The email of the friend to add
+   * @param onSuccess (() -> Unit) : The function to call when the adding of a friend is successful
+   * @param onFailure ((Exception) -> Unit) : The function to call when the adding of a friend
+   *   failed
+   */
+  fun addFriend(email: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    repository.addFriend(
+        email = email,
+        userProfile = profile_.value,
+        onSuccess = {
+          Log.d("Friend added", "Friend addded")
+          profile_.value = it
+          onSuccess()
+        },
+        onFailure = {
+          Log.d("Friend added", it.message!!)
+          onFailure(it)
         })
   }
 }

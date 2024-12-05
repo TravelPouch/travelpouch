@@ -21,13 +21,14 @@ class DirectionsRepositoryTest {
   private lateinit var mockClient: OkHttpClient
   private lateinit var mockCall: Call
   private lateinit var directionsRepository: DirectionsRepository
+  private val TEST_API_KEY = "test-api-key"
 
   @Before
   fun setUp() {
     // Mock OkHttpClient and Call
     mockClient = mock(OkHttpClient::class.java)
     mockCall = mock(Call::class.java)
-    directionsRepository = DirectionsRepository(mockClient)
+    directionsRepository = DirectionsRepository(mockClient, TEST_API_KEY)
   }
 
   @Test
@@ -35,17 +36,34 @@ class DirectionsRepositoryTest {
     // Mocking the response body
     val responseBody =
         """
-            {
-                "status": "OK",
-                "routes": [
-                    {
-                        "overview_polyline": {
-                            "points": "encodedPolylineString"
+        {
+            "status": "OK",
+            "routes": [
+                {
+                    "overview_polyline": {
+                        "points": "encodedPolylineString"
+                    },
+                    "legs": [
+                        {
+                            "distance": { "text": "5 km", "value": 5000 },
+                            "duration": { "text": "10 mins", "value": 600 },
+                            "start_address": "Origin Address",
+                            "end_address": "Destination Address",
+                            "start_location": { "lat": 1.0, "lng": 2.0 },
+                            "end_location": { "lat": 3.0, "lng": 4.0 },
+                            "steps": [
+                                {
+                                    "polyline": {
+                                        "points": "u{~vFvyys@fC_y@"
+                                    }
+                                }
+                            ]
                         }
-                    }
-                ]
-            }
-            """
+                    ]
+                }
+            ]
+        }
+        """
             .trimIndent()
 
     val mockResponse = mock(Response::class.java)
@@ -73,7 +91,7 @@ class DirectionsRepositoryTest {
         "origin",
         "destination",
         "driving",
-        "apiKey",
+        "37.7749,-122.4194|34.0522,-118.2437",
         { response -> directionsResponse = response },
         { exception -> failureException = exception })
 
@@ -81,7 +99,14 @@ class DirectionsRepositoryTest {
     assertTrue(failureException == null)
     assertTrue(directionsResponse?.routes?.isNotEmpty() == true)
     val route = directionsResponse!!.routes[0]
+    val leg = route.legs[0]
     assertEquals("encodedPolylineString", route.overviewPolyline.points)
+    assertEquals("5 km", leg.distanceText)
+    assertEquals(5000, leg.distanceValue)
+    assertEquals("10 mins", leg.durationText)
+    assertEquals(600, leg.durationValue)
+    assertEquals("Origin Address", leg.startAddress)
+    assertEquals("Destination Address", leg.endAddress)
   }
 
   @Test
@@ -117,12 +142,7 @@ class DirectionsRepositoryTest {
     var failureException: Exception? = null
 
     directionsRepository.getDirections(
-        "origin",
-        "destination",
-        "driving",
-        "apiKey",
-        {},
-        { exception -> failureException = exception })
+        "origin", "destination", "driving", null, {}, { exception -> failureException = exception })
 
     // Assert that an exception was thrown with the correct message
     assertTrue(failureException != null)
@@ -151,7 +171,7 @@ class DirectionsRepositoryTest {
         "origin",
         "destination",
         "driving",
-        "apiKey",
+        null,
         { response -> directionsResponse = response },
         { exception -> failureException = exception })
 
@@ -181,12 +201,7 @@ class DirectionsRepositoryTest {
     var failureException: Exception? = null
 
     directionsRepository.getDirections(
-        "origin",
-        "destination",
-        "driving",
-        "apiKey",
-        {},
-        { exception -> failureException = exception })
+        "origin", "destination", "driving", null, {}, { exception -> failureException = exception })
 
     // Assert results
     assertTrue(failureException != null)
@@ -219,7 +234,7 @@ class DirectionsRepositoryTest {
         "origin",
         "destination",
         "driving",
-        "apiKey",
+        null,
         { response -> directionsResponse = response },
         { exception -> failureException = exception })
 

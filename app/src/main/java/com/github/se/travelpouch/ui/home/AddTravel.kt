@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -112,7 +113,8 @@ fun AddTravelScreen(
                     .padding(16.dp)
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
               // Title Input
               OutlinedTextField(
                   value = title,
@@ -289,6 +291,7 @@ fun AddTravelScreen(
                       // Try to save the TravelContainer using the ViewModel
                       try {
                         // Call the ViewModel method to add the travel data
+                        Log.d("AddTravelScreen", "Adding travel to ViewModel")
                         listTravelViewModel.addTravel(travelContainer)
 
                         Toast.makeText(context, "Travel added successfully!", Toast.LENGTH_SHORT)
@@ -308,7 +311,7 @@ fun AddTravelScreen(
                       }
                     }
                   },
-                  modifier = Modifier.fillMaxWidth().testTag("travelSaveButton"),
+                  modifier = Modifier.testTag("travelSaveButton"),
                   enabled =
                       title.isNotBlank() &&
                           selectedLocation != null &&

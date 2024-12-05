@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -73,7 +74,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
             title = { Text("Edit Activity", Modifier.testTag("travelTitle")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES) },
+                  onClick = { navigationActions.navigateTo(Screen.SWIPER) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -87,27 +88,28 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                     .padding(16.dp)
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
                   value = title,
                   onValueChange = { title = it },
                   enabled = true,
                   label = { Text("Title") },
-                  modifier = Modifier.testTag("titleField"))
+                  modifier = Modifier.fillMaxWidth().testTag("titleField"))
 
               OutlinedTextField(
                   value = description,
                   onValueChange = { description = it },
                   enabled = true,
                   label = { Text("Description") },
-                  modifier = Modifier.testTag("descriptionField"))
+                  modifier = Modifier.fillMaxWidth().testTag("descriptionField"))
 
               OutlinedTextField(
                   value = location,
                   onValueChange = {},
                   enabled = true,
                   label = { Text("Location") },
-                  modifier = Modifier.testTag("locationField"))
+                  modifier = Modifier.fillMaxWidth().testTag("locationField"))
 
               // Date Input
               OutlinedTextField(
@@ -181,7 +183,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                                 mapOf())
 
                         activityViewModel.updateActivity(activity, context)
-                        navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                        navigationActions.navigateTo(Screen.SWIPER)
                       } catch (e: java.text.ParseException) {
                         Toast.makeText(
                                 context,
@@ -199,7 +201,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   enabled = true,
                   onClick = {
                     activityViewModel.deleteActivityById(selectedActivity.value!!, context)
-                    navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                    navigationActions.navigateTo(Screen.SWIPER)
                   },
                   modifier = Modifier.testTag("deleteButton")) {
                     Text("Delete")

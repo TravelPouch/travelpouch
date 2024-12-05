@@ -12,8 +12,7 @@ import kotlinx.coroutines.launch
 /** Helper class to download files from Firbase storage to local files */
 open class FileDownloader(
     private val contentResolver: ContentResolver,
-    private val storage: FirebaseStorage =
-        FirebaseStorage.getInstance("gs://travelpouch-7d692.appspot.com")
+    private val storage: FirebaseStorage
 ) {
   /**
    * Download a file described by source and store it in the folder pointed by destinationFolder.

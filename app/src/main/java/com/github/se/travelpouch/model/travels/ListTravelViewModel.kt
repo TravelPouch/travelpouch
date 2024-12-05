@@ -38,17 +38,6 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
     repository.initAfterLogin { getTravels() }
   }
 
-  //  // create factory
-  //  companion object {
-  //    val Factory: ViewModelProvider.Factory =
-  //        object : ViewModelProvider.Factory {
-  //          @Suppress("UNCHECKED_CAST")
-  //          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-  //            return ListTravelViewModel(TravelRepositoryFirestore(Firebase.firestore)) as T
-  //          }
-  //        }
-  //  }
-
   /**
    * Generates a new unique ID.
    *
@@ -57,6 +46,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
   fun getNewUid(): String {
     return repository.getNewUid()
   }
+
   /**
    * Fetches participant information from the repository using their unique ID.
    *
@@ -78,6 +68,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
         },
         onFailure = { Log.e("ListTravelViewModel", "Failed to get participant", it) })
   }
+
   /**
    * Checks if a participant with the given email exists.
    *
@@ -118,9 +109,11 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
 
   /** Gets all Travel documents. */
   fun getTravels() {
+    Log.d("ListTravelViewModel", "Getting travels")
     _isLoading.value = true
     repository.getTravels(
         onSuccess = {
+          Log.d("ListTravelViewModel", "Successfully got travels")
           travels_.value = it
           _isLoading.value = false
         },
@@ -136,9 +129,13 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    * @param travel The Travel document to be added.
    */
   fun addTravel(travel: TravelContainer) {
+    Log.d("ListTravelViewModel", "Adding travel")
     repository.addTravel(
         travel = travel,
-        onSuccess = { getTravels() },
+        onSuccess = {
+          Log.d("ListTravelViewModel", "Successfully added travel")
+          getTravels()
+        },
         onFailure = { Log.e("ListTravelViewModel", "Failed to add travel", it) })
   }
 
@@ -147,9 +144,15 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    *
    * @param travel The Travel document to be updated.
    */
-  fun updateTravel(travel: TravelContainer) {
+  fun updateTravel(
+      travel: TravelContainer,
+      modeOfUpdate: TravelRepository.UpdateMode,
+      fsUidOfAddedParticipant: String?
+  ) {
     repository.updateTravel(
         travel = travel,
+        modeOfUpdate = modeOfUpdate,
+        fsUidOfAddedParticipant = fsUidOfAddedParticipant,
         onSuccess = { getTravels() },
         onFailure = { Log.e("ListTravelViewModel", "Failed to update travel", it) })
   }
@@ -176,6 +179,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
   fun selectTravel(travel: TravelContainer) {
     selectedTravel_.value = travel
   }
+
   /**
    * Fetches information for all participants of the selected travel.
    *
@@ -209,6 +213,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
           "lastFetchedParticipants: $lastFetchedParticipants and currentParticipants: $currentParticipants")
     }
   }
+
   /**
    * Adds a user to the selected travel by their email.
    *
@@ -238,15 +243,23 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
           newParticipantMap[newParticipant] = Role.PARTICIPANT
 
           val newParticipantList = selectedTravel.listParticipant.toMutableList()
-          newParticipantList.plus(user.fsUid)
+          newParticipantList.add(user.fsUid)
 
           val newTravel =
               selectedTravel.copy(
                   allParticipants = newParticipantMap.toMap(),
                   listParticipant = newParticipantList.toList())
-          updateTravel(newTravel)
+          updateTravel(newTravel, TravelRepository.UpdateMode.ADD_PARTICIPANT, user.fsUid)
           onSuccess(newTravel)
         },
         onFailure = { onFailure() })
+  }
+
+  fun getTravelById(
+      id: String,
+      onSuccess: (TravelContainer?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    repository.getTravelById(id, onSuccess, onFailure)
   }
 }

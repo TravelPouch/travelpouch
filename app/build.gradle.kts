@@ -44,6 +44,14 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Declare the API key as a BuildConfig field
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+
+        // Enable BuildConfig functionality
+        buildFeatures {
+            buildConfig = true
+        }
     }
 
     buildTypes {
@@ -184,6 +192,7 @@ dependencies {
     implementation(libs.firebase.functions.ktx)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.testing)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
@@ -278,6 +287,11 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
+}
+
+// Globally exclude protobuf-lite
+configurations.configureEach {
+    exclude(group = "com.google.protobuf", module = "protobuf-lite")
 }
 
 // Allow references to generated code

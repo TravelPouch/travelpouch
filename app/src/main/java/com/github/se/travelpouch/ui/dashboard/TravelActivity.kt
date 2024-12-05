@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.ui.dashboard
 
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,23 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -42,15 +37,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
-import com.github.se.travelpouch.ui.navigation.BottomNavigationMenu
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
-import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -81,53 +75,6 @@ fun TravelActivitiesScreen(
           "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
   Scaffold(
       modifier = Modifier.testTag("travelActivitiesScreen"),
-      topBar = {
-        TopAppBar(
-            title = { Text("Travel", Modifier.testTag("travelTitle")) },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back")
-                  }
-            },
-            actions = {
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.EDIT_TRAVEL_SETTINGS) },
-                  modifier = Modifier.testTag("settingsButton")) {
-                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-                  }
-
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TIMELINE) },
-                  modifier = Modifier.testTag("eventTimelineButton")) {
-                    Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
-                  }
-
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.DOCUMENT_LIST) },
-                  modifier = Modifier.testTag("documentListButton")) {
-                    Icon(imageVector = Icons.Default.Folder, contentDescription = null)
-                  }
-
-              IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
-                  modifier = Modifier.testTag("ProfileButton")) {
-                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null)
-                  }
-            })
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            tabList =
-                listOf(
-                    TopLevelDestinations.ACTIVITIES,
-                    TopLevelDestinations.CALENDAR,
-                    TopLevelDestinations.MAP),
-            navigationActions = navigationActions)
-      },
       floatingActionButton = {
         FloatingActionButton(
             onClick = { navigationActions.navigateTo(Screen.ADD_ACTIVITY) },
@@ -150,6 +97,10 @@ fun TravelActivitiesScreen(
                       item {
                         Text(
                             text = "No activities planned for this trip",
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.testTag("emptyTravel"))
                       }
                     } else {
@@ -168,6 +119,7 @@ fun TravelActivitiesScreen(
 
               if (showBanner.value) {
                 NextActivitiesBanner(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     activities = listOfActivities.value,
                     onDismiss = { showBanner.value = false },
                     localConfig = LocalConfiguration.current)
@@ -197,40 +149,74 @@ fun ActivityItem(
       modifier = Modifier.testTag("activityItem").fillMaxSize(),
       onClick = onClick,
       elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-      border = BorderStroke(1.dp, Color.DarkGray)) {
-        Column(modifier = Modifier.padding(8.dp)) {
-          Text(activity.title)
-          Text(activity.location.name)
-          Text(
-              "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}")
+      colors =
+          CardColors(
+              containerColor = MaterialTheme.colorScheme.surface,
+              disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+              contentColor = MaterialTheme.colorScheme.onSurface,
+              disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+          ),
+      // border = BorderStroke(1.dp, Color.DarkGray)
+  ) {
+    Column(modifier = Modifier.padding(8.dp)) {
+      Text(
+          activity.title,
+          fontWeight = FontWeight.SemiBold,
+          style = MaterialTheme.typography.bodyLarge)
+      Text(activity.location.name, style = MaterialTheme.typography.bodyMedium)
+      Text(
+          "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}",
+          style = MaterialTheme.typography.bodyMedium,
+          fontWeight = FontWeight.Light)
 
-          // Handling image display logic
-          if (images.isEmpty()) {
-            // No images to show, do nothing
-          } else if (images.size == 1) {
-            // Single image
-            Box(
-                modifier =
-                    Modifier.fillMaxWidth() // Fill the width of the parent
-                        .aspectRatio(
-                            A4_ASPECT_RATIO) // Maintain A4 aspect ratio (width / height ~ 1:1.414)
-                        .background(Color.Transparent)) {
-                  AdvancedImageDisplayWithEffects(
-                      imageUrl = images[0],
-                      loadingContent = { DefaultLoadingUI() },
-                      errorContent = { DefaultErrorUI() })
-                }
-          } else if (images.size == 2) {
-            // Two images - display side by side with space in between
+      // Handling image display logic
+      if (images.isEmpty()) {
+        // No images to show, do nothing
+      } else if (images.size == 1) {
+        // Single image
+        Box(
+            modifier =
+                Modifier.fillMaxWidth() // Fill the width of the parent
+                    .aspectRatio(
+                        A4_ASPECT_RATIO) // Maintain A4 aspect ratio (width / height ~ 1:1.414)
+                    .background(Color.Transparent)) {
+              AdvancedImageDisplayWithEffects(
+                  imageUrl = images[0],
+                  loadingContent = { DefaultLoadingUI() },
+                  errorContent = { DefaultErrorUI() })
+            }
+      } else if (images.size == 2) {
+        // Two images - display side by side with space in between
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+              images.take(2).forEach { imageUrl ->
+                Box(
+                    modifier =
+                        Modifier.weight(1f)
+                            .aspectRatio(
+                                A4_ASPECT_RATIO) // Use the same A4 aspect ratio for both images
+                            .background(Color.Transparent)) {
+                      AdvancedImageDisplayWithEffects(
+                          imageUrl = imageUrl,
+                          loadingContent = { DefaultLoadingUI() },
+                          errorContent = { DefaultErrorUI() })
+                    }
+              }
+            }
+      } else if (images.size >= 3) {
+        // Three or more images - show the first two with a button above them
+        Column(modifier = Modifier.fillMaxWidth()) {
+          Box { // Box to layer
+            // Display the first two images inside a Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                   images.take(2).forEach { imageUrl ->
                     Box(
                         modifier =
-                            Modifier.weight(1f)
-                                .aspectRatio(
-                                    A4_ASPECT_RATIO) // Use the same A4 aspect ratio for both images
+                            Modifier.weight(1f) // Ensure the images take equal space
+                                .aspectRatio(A4_ASPECT_RATIO) // Maintain A4 aspect ratio
                                 .background(Color.Transparent)) {
                           AdvancedImageDisplayWithEffects(
                               imageUrl = imageUrl,
@@ -239,57 +225,33 @@ fun ActivityItem(
                         }
                   }
                 }
-          } else if (images.size >= 3) {
-            // Three or more images - show the first two with a button above them
-            Column(modifier = Modifier.fillMaxWidth()) {
-              Box { // Box to layer
-                // Display the first two images inside a Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                      images.take(2).forEach { imageUrl ->
-                        Box(
-                            modifier =
-                                Modifier.weight(1f) // Ensure the images take equal space
-                                    .aspectRatio(A4_ASPECT_RATIO) // Maintain A4 aspect ratio
-                                    .background(Color.Transparent)) {
-                              AdvancedImageDisplayWithEffects(
-                                  imageUrl = imageUrl,
-                                  loadingContent = { DefaultLoadingUI() },
-                                  errorContent = { DefaultErrorUI() })
-                            }
-                      }
-                    }
 
-                // More options button on top of the second image
-                IconButton(
-                    onClick = {
-                      Toast.makeText(
-                              context,
-                              "Placeholder for document view of activity",
-                              Toast.LENGTH_LONG)
-                          .show()
-                    },
-                    modifier =
-                        Modifier.align(
-                                Alignment.BottomEnd) // Position the button on the bottom right
-                            .background(
-                                Color.Gray,
-                                shape =
-                                    androidx.compose.foundation.shape.RoundedCornerShape(
-                                        10)) // Rounded background
-                            .testTag("extraDocumentButton") // Add padding to the button
-                    ) {
-                      Icon(
-                          imageVector = Icons.Default.MoreVert,
-                          contentDescription = "More options",
-                          tint = Color.White)
-                    }
-              }
-            }
+            // More options button on top of the second image
+            IconButton(
+                onClick = {
+                  Toast.makeText(
+                          context, "Placeholder for document view of activity", Toast.LENGTH_LONG)
+                      .show()
+                },
+                modifier =
+                    Modifier.align(Alignment.BottomEnd) // Position the button on the bottom right
+                        .background(
+                            Color.Gray,
+                            shape =
+                                androidx.compose.foundation.shape.RoundedCornerShape(
+                                    10)) // Rounded background
+                        .testTag("extraDocumentButton") // Add padding to the button
+                ) {
+                  Icon(
+                      imageVector = Icons.Default.MoreVert,
+                      contentDescription = "More options",
+                      tint = Color.White)
+                }
           }
         }
       }
+    }
+  }
 }
 
 // 98% of the following code down here was taken without shame from

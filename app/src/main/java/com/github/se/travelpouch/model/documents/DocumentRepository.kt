@@ -3,14 +3,13 @@ package com.github.se.travelpouch.model.documents
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
 import com.google.android.gms.common.util.Base64Utils
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 
 /** Interface for the DocumentRepository. */
 interface DocumentRepository {
@@ -24,6 +23,14 @@ interface DocumentRepository {
       document: DocumentContainer,
       onSuccess: (String) -> Unit,
       onFailure: (Exception) -> Unit
+  )
+
+  fun getThumbnailUrl(
+      document: DocumentContainer,
+      width: Int,
+      onSuccess: (String) -> Unit,
+      onFailure: (Exception) -> Unit,
+      canFail: Boolean = true
   )
 
   fun uploadDocument(
@@ -43,9 +50,9 @@ interface DocumentRepository {
  */
 class DocumentRepositoryFirestore(
     private val db: FirebaseFirestore,
-    private val storage: FirebaseStorage = FirebaseStorage.getInstance(),
-    private val firebaseAuth: FirebaseAuth = Firebase.auth,
-    private val functions: FirebaseFunctions = FirebaseFunctions.getInstance("europe-west9")
+    private val storage: FirebaseStorage,
+    private val firebaseAuth: FirebaseAuth,
+    private val functions: FirebaseFunctions
 ) : DocumentRepository {
   private var collectionPath = ""
 
@@ -123,6 +130,74 @@ class DocumentRepositoryFirestore(
         .addOnFailureListener(onFailure)
   }
 
+  private fun generateThumbnail(
+      document: DocumentContainer,
+      width: Int,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    functions
+        .getHttpsCallable("generateThumbnailCall")
+        .call(
+            mapOf(
+                "travelId" to document.travelRef.id,
+                "documentId" to document.ref.id,
+                "width" to width))
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            Log.e(
+                "DocumentRepositoryFirestore",
+                "Error generating thumbnail for document id=${document.ref.id},width=$width",
+                task.exception)
+            onFailure(task.exception!!)
+          }
+        }
+  }
+
+  /**
+   * Try to get the thumbnailUrl a document from the Firestore database.
+   *
+   * @param document The document to fetch the download URL for.
+   * @param width The width of the thumbnail.
+   * @param onSuccess Callback function to be called when the download URL is fetched successfully.
+   * @param onFailure Callback function to be called when an error occurs.
+   */
+  override fun getThumbnailUrl(
+      document: DocumentContainer,
+      width: Int,
+      onSuccess: (String) -> Unit,
+      onFailure: (Exception) -> Unit,
+      canFail: Boolean
+  ) {
+    storage
+        .getReference("${document.ref.id}-thumb-$width")
+        .downloadUrl
+        .addOnSuccessListener { uri -> onSuccess(uri.toString()) }
+        .addOnFailureListener { err ->
+          if (canFail &&
+              err is StorageException &&
+              err.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
+            Log.d(
+                "DocumentRepositoryFirestore",
+                "Thumbnail for document id=${document.ref.id},width=$width not found, generating one...",
+                err)
+            generateThumbnail(
+                document,
+                width,
+                { getThumbnailUrl(document, width, onSuccess, onFailure, false) },
+                onFailure)
+          } else {
+            Log.e(
+                "DocumentRepositoryFirestore",
+                "Error getting thumbnail for document id=${document.ref.id},width=$width",
+                err)
+            onFailure(err)
+          }
+        }
+  }
+
   override fun uploadDocument(
       travelId: String,
       bytes: ByteArray,
@@ -142,7 +217,7 @@ class DocumentRepositoryFirestore(
                 "travelId" to travelId,
                 "fileSize" to bytes.size,
                 "visibility" to DocumentVisibility.PARTICIPANTS.toString()))
-        .continueWith { task ->
+        .addOnCompleteListener { task ->
           if (task.isSuccessful) {
             onSuccess()
           } else {

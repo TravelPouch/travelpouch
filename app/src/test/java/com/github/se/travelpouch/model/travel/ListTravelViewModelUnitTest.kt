@@ -149,12 +149,12 @@ class ListTravelViewModelTest {
   fun updateTravel_successfulUpdate_updatesTravels() {
     val travelList = listOf(travel)
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(1) as () -> Unit
+          val onSuccess = invocation.getArgument(3) as () -> Unit
           onSuccess()
           null
         }
         .whenever(travelRepository)
-        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     doAnswer { invocation ->
           val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
@@ -164,7 +164,7 @@ class ListTravelViewModelTest {
         .whenever(travelRepository)
         .getTravels(anyOrNull(), anyOrNull())
 
-    listTravelViewModel.updateTravel(travel)
+    listTravelViewModel.updateTravel(travel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
 
     assertThat(listTravelViewModel.travels.value, `is`(travelList))
   }
@@ -173,14 +173,14 @@ class ListTravelViewModelTest {
   fun updateTravel_failureUpdate_doesNotUpdateTravels() {
     val initialTravels = listTravelViewModel.travels.value
     doAnswer { invocation ->
-          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          val onFailure = invocation.getArgument(4) as (Exception) -> Unit
           onFailure(Exception("Update Travel Failed Test"))
           null
         }
         .whenever(travelRepository)
-        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .updateTravel(anyOrNull(), anyOrNull(), any(), anyOrNull(), anyOrNull())
 
-    listTravelViewModel.updateTravel(travel)
+    listTravelViewModel.updateTravel(travel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
 
     assertThat(listTravelViewModel.travels.value, `is`(initialTravels))
   }
@@ -278,19 +278,20 @@ class ListTravelViewModelTest {
     val errorMessage = "Failed to update travel"
     val exception = Exception("Update Travel Failed Test")
     doAnswer { invocation ->
-          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          val onFailure = invocation.getArgument(4) as (Exception) -> Unit
           onFailure(exception)
           null
         }
         .whenever(travelRepository)
-        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
       logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
 
-      listTravelViewModel.updateTravel(travel)
+      listTravelViewModel.updateTravel(travel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
 
-      verify(travelRepository).updateTravel(anyOrNull(), anyOrNull(), anyOrNull())
+      verify(travelRepository)
+          .updateTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
   }
@@ -315,5 +316,43 @@ class ListTravelViewModelTest {
       verify(travelRepository).deleteTravelById(anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
+  }
+
+  @Test
+  fun getTravelById_mockCall() {
+    val travelId = "6NU2zp2oGdA34s1Q1q5h"
+    val travel =
+        TravelContainer(
+            travelId,
+            "Test Title",
+            "Test Description",
+            Timestamp.now(),
+            Timestamp(Timestamp.now().seconds + 1000, 0),
+            Location(
+                0.0,
+                0.0,
+                Timestamp.now(),
+                "Test Location",
+            ),
+            mapOf("Test Key item" to "Test Value item"),
+            mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER),
+            emptyList())
+
+    var succeeded = false
+    var failed = false
+
+    doAnswer { invocation ->
+          val onSuccess = invocation.getArgument(1) as (TravelContainer) -> Unit
+          onSuccess(travel)
+          null
+        }
+        .whenever(travelRepository)
+        .getTravelById(anyString(), anyOrNull(), anyOrNull())
+
+    listTravelViewModel.getTravelById(travelId, { succeeded = true }, { failed = true })
+
+    assert(succeeded)
+    assert(!failed)
+    verify(travelRepository).getTravelById(anyString(), anyOrNull(), anyOrNull())
   }
 }

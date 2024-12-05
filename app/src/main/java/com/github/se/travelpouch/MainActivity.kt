@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,20 +15,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.authentication.SignInScreen
 import com.github.se.travelpouch.ui.authentication.SignInWithPassword
 import com.github.se.travelpouch.ui.dashboard.AddActivityScreen
-import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.EditActivity
 import com.github.se.travelpouch.ui.dashboard.TimelineScreen
-import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
 import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
@@ -39,6 +38,8 @@ import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
 import com.github.se.travelpouch.ui.navigation.Screen
+import com.github.se.travelpouch.ui.navigation.SwipePager
+import com.github.se.travelpouch.ui.notifications.NotificationsScreen
 import com.github.se.travelpouch.ui.profile.ModifyingProfileScreen
 import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
@@ -55,10 +56,11 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      SampleAppTheme {
+      SampleAppTheme(dynamicColor = false) {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().testTag("MainScreenContainer"),
+            // color = MaterialTheme.colorScheme.background,
         ) {
           TravelPouchApp()
         }
@@ -68,23 +70,24 @@ class MainActivity : ComponentActivity() {
 
   @Composable
   fun TravelPouchApp() {
-    val context = LocalContext.current
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val listTravelViewModel = hiltViewModel<ListTravelViewModel>()
-    val documentViewModel: DocumentViewModel =
-        viewModel(factory = DocumentViewModel.Factory(context.contentResolver))
-    val activityModelView: ActivityViewModel = viewModel(factory = ActivityViewModel.Factory)
-    val eventsViewModel: EventViewModel = viewModel(factory = EventViewModel.Factory)
-    // val profileModelView: ProfileModelView = viewModel(factory = ProfileModelView.Factory)
+    val documentViewModel: DocumentViewModel = hiltViewModel<DocumentViewModel>()
+    val activityModelView: ActivityViewModel = hiltViewModel<ActivityViewModel>()
+    val eventsViewModel: EventViewModel = hiltViewModel<EventViewModel>()
     val profileModelView = hiltViewModel<ProfileModelView>()
-
+    val notificationViewModel: NotificationViewModel = viewModel<NotificationViewModel>()
     val calendarViewModel: CalendarViewModel =
         viewModel(factory = CalendarViewModel.Factory(activityModelView))
+    val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
 
-    val notificationViewModel: NotificationViewModel =
-        viewModel(factory = NotificationViewModel.Factory)
-
+    val directionsViewModel: DirectionsViewModel =
+        viewModel(
+            factory =
+                DirectionsViewModel.provideFactory(
+                    BuildConfig.MAPS_API_KEY) // Inject the API key for the DirectionsViewModel
+            )
     NavHost(navController = navController, startDestination = Route.DEFAULT) {
       navigation(
           startDestination = Screen.AUTH,
@@ -92,6 +95,18 @@ class MainActivity : ComponentActivity() {
       ) {
         composable(Screen.AUTH) {
           SignInScreen(navigationActions, profileModelView, listTravelViewModel)
+        }
+
+        composable(Screen.SWIPER) {
+          SwipePager(
+              navigationActions,
+              activityModelView,
+              calendarViewModel,
+              documentViewModel,
+              listTravelViewModel,
+              onNavigateToDocumentPreview = {
+                navigationActions.navigateTo(Screen.DOCUMENT_PREVIEW)
+              })
         }
 
         composable(Screen.TRAVEL_LIST) {
@@ -103,9 +118,7 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               profileModelView)
         }
-        composable(Screen.TRAVEL_ACTIVITIES) {
-          TravelActivitiesScreen(navigationActions, activityModelView)
-        }
+
         composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
         composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
         composable(Screen.ADD_TRAVEL) {
@@ -113,15 +126,21 @@ class MainActivity : ComponentActivity() {
               listTravelViewModel, navigationActions, profileModelView = profileModelView)
         }
         composable(Screen.EDIT_TRAVEL_SETTINGS) {
-          EditTravelSettingsScreen(listTravelViewModel, navigationActions)
+          EditTravelSettingsScreen(
+              listTravelViewModel,
+              navigationActions,
+              notificationViewModel,
+              profileModelView,
+              locationViewModel)
         }
 
         composable(Screen.ACTIVITIES_MAP) {
-          ActivitiesMapScreen(activityModelView, navigationActions)
+          ActivitiesMapScreen(activityModelView, navigationActions, directionsViewModel)
         }
 
         composable(Screen.PARTICIPANT_LIST) {
-          ParticipantListScreen(listTravelViewModel, navigationActions)
+          ParticipantListScreen(
+              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
         }
         composable(Screen.DOCUMENT_LIST) {
           DocumentListScreen(
@@ -142,13 +161,21 @@ class MainActivity : ComponentActivity() {
           ModifyingProfileScreen(navigationActions, profileModelView)
         }
 
-        composable(Screen.CALENDAR) { CalendarScreen(calendarViewModel, navigationActions) }
-
         composable(Screen.SIGN_IN_PASSWORD) {
           SignInWithPassword(navigationActions, profileModelView, listTravelViewModel, auth)
         }
 
-        composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
+        composable(Screen.NOTIFICATION) {
+          NotificationsScreen(
+              navigationActions,
+              notificationViewModel,
+              profileModelView,
+              listTravelViewModel,
+              activityModelView,
+              documentViewModel,
+              eventsViewModel)
+        }
+          composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
       }
     }
   }

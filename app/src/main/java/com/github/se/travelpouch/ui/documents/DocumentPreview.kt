@@ -61,7 +61,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
   documentUri = documentViewModel.downloadUrls[documentContainer.ref.id] ?: ""
 
   Scaffold(
-      modifier = Modifier.testTag("documentListScreen"),
+      modifier = Modifier.testTag("documentPreviewScreen"),
       topBar = {
         TopAppBar(
             title = {
@@ -106,10 +106,10 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
       },
   ) { paddingValue ->
     Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
-      Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.inversePrimary)) {
+      Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(modifier = Modifier.fillMaxWidth()) {
           Text(
-              text = documentContainer.title,
+              text = "Document ID: ${documentContainer.ref.id}",
               style = MaterialTheme.typography.bodyLarge,
               modifier = Modifier.padding(8.dp).testTag("documentTitle"))
 
@@ -126,7 +126,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   model = documentUri,
                   contentDescription = null,
                   contentScale = ContentScale.Fit,
-                  modifier = Modifier.fillMaxSize())
+                  modifier = Modifier.fillMaxSize().testTag("document"))
             }
           }
         }

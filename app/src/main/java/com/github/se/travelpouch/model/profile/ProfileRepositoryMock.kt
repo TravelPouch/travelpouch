@@ -15,6 +15,14 @@ class ProfileRepositoryMock : ProfileRepository {
     }
   }
 
+  override fun getFsUidByEmail(
+      email: String,
+      onSuccess: (String?) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    TODO("Not yet implemented")
+  }
+
   override fun updateProfile(
       newProfile: Profile,
       onSuccess: () -> Unit,
@@ -33,9 +41,18 @@ class ProfileRepositoryMock : ProfileRepository {
       onSuccess(profileFetched)
     } else {
       val profile =
-          Profile(profilePath, "username", "emailtest1@gmail.com", null, "name", emptyList())
+          Profile(profilePath, "username", "emailtest1@gmail.com", emptyMap(), "name", emptyList())
       profileCollection[profilePath] = profile
       onSuccess(profile)
     }
+  }
+
+  override fun addFriend(
+      email: String,
+      userProfile: Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    TODO("Not yet implemented")
   }
 }

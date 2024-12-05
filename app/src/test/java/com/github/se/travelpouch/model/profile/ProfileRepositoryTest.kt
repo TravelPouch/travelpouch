@@ -2,6 +2,8 @@ package com.github.se.travelpouch.model.profile
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -11,6 +13,10 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Transaction
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -25,9 +31,13 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.timeout
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
@@ -51,7 +61,16 @@ class ProfileRepositoryTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "usernameTest",
           "email@test.ch",
-          null,
+          emptyMap(),
+          "nameTest",
+          emptyList())
+
+  val newProfile =
+      Profile(
+          "qwertzuiopasdfghjklyxcvbnm12",
+          "usernameTest",
+          "email@test.ch",
+          mapOf("test@test.ch" to "qwertzuiopasdfghjklyxcvbnm12"),
           "nameTest",
           emptyList())
 
@@ -255,5 +274,224 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     profileRepositoryFirestore.gettingUserProfile(mockFirebaseUser, {})
     verify(mockDocumentSnapshot).exists()
+  }
+
+  @Test
+  fun getFsUidByEmailTestSucceedsWithEmptyList() {
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(true)
+    `when`(mockTask.result).thenReturn(mockQuerySnapshot)
+    `when`(mockQuerySnapshot.documents).thenReturn(emptyList())
+
+    `when`(mockFirestore.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    `when`(mockQuery.get()).thenReturn(mockTask)
+    `when`(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask) // Allow chaining
+
+    var successCalled = false
+    var failed = false
+    var idGot: String? = null
+
+    profileRepositoryFirestore.getFsUidByEmail(
+        "email",
+        {
+          successCalled = true
+          idGot = it
+        },
+        { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(mockTask).addOnSuccessListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onSuccess(mockQuerySnapshot)
+
+    assert(successCalled)
+    assertFalse(failed)
+    assert(idGot == null)
+  }
+
+  @Test
+  fun getFsUidByEmailTestSucceedsWithNonEmptyList() {
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(true)
+    `when`(mockTask.result).thenReturn(mockQuerySnapshot)
+    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
+
+    `when`(mockFirestore.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    `when`(mockQuery.get()).thenReturn(mockTask)
+    `when`(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask) // Allow chaining
+
+    var idGot: String? = null
+    var successCalled = false
+    var failed = false
+    profileRepositoryFirestore.getFsUidByEmail(
+        "email",
+        {
+          successCalled = true
+          idGot = it
+        },
+        { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(mockTask).addOnSuccessListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onSuccess(mockQuerySnapshot)
+
+    assert(successCalled)
+    assertFalse(failed)
+    assert(idGot == profile.fsUid)
+  }
+
+  @Test
+  fun getFsUidByEmailTestFails() {
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+
+    `when`(mockTask.isComplete).thenReturn(true)
+    `when`(mockTask.isSuccessful).thenReturn(false)
+
+    `when`(mockFirestore.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    `when`(mockQuery.get()).thenReturn(mockTask)
+    `when`(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask) // Allow chaining
+
+    var idGot: String? = null
+    var successCalled = false
+    var failed = false
+    profileRepositoryFirestore.getFsUidByEmail(
+        "email",
+        {
+          successCalled = true
+          idGot = profile.fsUid
+        },
+        { failed = true })
+
+    val onCompleteListenerCaptor = argumentCaptor<OnFailureListener>()
+    verify(mockTask).addOnFailureListener(onCompleteListenerCaptor.capture())
+    onCompleteListenerCaptor.firstValue.onFailure(Exception("message"))
+
+    assert(failed)
+    assertFalse(successCalled)
+    assert(idGot == null)
+  }
+
+  @Test
+  fun addFriendTest() {
+
+    var userProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "usernameTest",
+            "email@test.ch",
+            emptyMap(),
+            "nameTest",
+            emptyList())
+
+    var friendProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "usernameTestFriend",
+            "email_friend@test.ch",
+            emptyMap(),
+            "nameTestFriend",
+            emptyList())
+
+    val mockDocumentSnapshotFriend: DocumentSnapshot = mock()
+    val mockDocumentReferenceFriend: DocumentReference = mock()
+    val mockDocumentReferenceUser: DocumentReference = mock()
+
+    val transactionMock: Transaction = mock()
+
+    whenever(transactionMock.update(any(), eq("friends"), anyOrNull())).thenReturn(transactionMock)
+
+    `when`(mockDocumentSnapshotFriend.id).thenReturn(friendProfile.fsUid)
+    `when`(mockDocumentSnapshotFriend.getString("email")).thenReturn(friendProfile.email)
+    `when`(mockDocumentSnapshotFriend.getString("name")).thenReturn(friendProfile.name)
+    `when`(mockDocumentSnapshotFriend.getString("username")).thenReturn(friendProfile.username)
+    `when`(mockDocumentSnapshotFriend.get("userTravelList"))
+        .thenReturn(friendProfile.userTravelList)
+    `when`(mockDocumentSnapshotFriend.get("friends")).thenReturn(friendProfile.friends)
+
+    val firestoreMock: FirebaseFirestore = mock()
+    val profileRepository: ProfileRepositoryFirebase = ProfileRepositoryFirebase(firestoreMock)
+
+    val privateField = profileRepository.javaClass.getDeclaredField("documentReference")
+    privateField.isAccessible = true
+    privateField.set(profileRepository, mockDocumentReferenceUser)
+
+    val collectionReference: CollectionReference = mock()
+    val query: Query = mock()
+    val taskFirstLayerMock: Task<QuerySnapshot> = mock()
+    val taskSecondLayerMock: Task<Void> = mock()
+    val querySnapshot: QuerySnapshot = mock()
+
+    whenever(firestoreMock.collection(anyOrNull())).thenReturn(collectionReference)
+    whenever(collectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(query)
+    whenever(query.get()).thenReturn(taskFirstLayerMock)
+    whenever(taskFirstLayerMock.addOnSuccessListener(anyOrNull())).thenReturn(taskFirstLayerMock)
+    whenever(taskFirstLayerMock.addOnFailureListener(anyOrNull())).thenReturn(taskFirstLayerMock)
+
+    whenever(taskFirstLayerMock.isSuccessful).thenReturn(true)
+    whenever(taskFirstLayerMock.result).thenReturn(querySnapshot)
+    whenever(querySnapshot.documents).thenReturn(listOf(mockDocumentSnapshotFriend))
+    whenever(mockDocumentSnapshotFriend.reference).thenReturn(mockDocumentReferenceFriend)
+
+    whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(taskSecondLayerMock)
+    whenever(taskSecondLayerMock.isSuccessful).thenReturn(true)
+    whenever(taskSecondLayerMock.addOnSuccessListener(anyOrNull())).thenReturn(taskSecondLayerMock)
+    whenever(taskSecondLayerMock.addOnFailureListener(anyOrNull())).thenReturn(taskSecondLayerMock)
+
+    var succeeded = false
+    var failed = false
+
+    profileRepository.addFriend(
+        friendProfile.email,
+        userProfile,
+        {
+          userProfile = it
+          succeeded = true
+        },
+        { failed = true })
+
+    val onCompleteListenerCaptor1 = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(taskFirstLayerMock).addOnSuccessListener(onCompleteListenerCaptor1.capture())
+    onCompleteListenerCaptor1.firstValue.onSuccess(querySnapshot)
+
+    val transactionCaptor = argumentCaptor<Transaction.Function<Void>>()
+    verify(firestoreMock).runTransaction(transactionCaptor.capture())
+    transactionCaptor.firstValue.apply(transactionMock)
+
+    verify(transactionMock, times(2)).update(anyOrNull(), eq("friends"), anyOrNull())
+
+    val onCompleteListenerCaptor2 = argumentCaptor<OnSuccessListener<Void>>()
+    verify(taskSecondLayerMock).addOnSuccessListener(onCompleteListenerCaptor2.capture())
+    onCompleteListenerCaptor2.firstValue.onSuccess(null)
+
+    assert(succeeded)
+    assertFalse(failed)
+
+    assert(userProfile.friends.contains(friendProfile.email))
+  }
+
+  @Test
+  fun updatingFriendListTest() {
+    val privateFunc =
+        profileRepositoryFirestore.javaClass.getDeclaredMethod(
+            "updatingFriendList", Profile::class.java, String::class.java, String::class.java)
+    privateFunc.isAccessible = true
+    val parameters = arrayOfNulls<Any>(3)
+    parameters[0] = profile
+    parameters[1] = "test@test.ch"
+    parameters[2] = "qwertzuiopasdfghjklyxcvbnm12"
+    val result = privateFunc.invoke(profileRepositoryFirestore, *parameters)
+    assertThat(result, `is`(newProfile))
   }
 }

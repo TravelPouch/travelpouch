@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -66,7 +67,7 @@ fun AddActivityScreen(
             title = { Text("Add Activity", Modifier.testTag("travelTitle")) },
             navigationIcon = {
               IconButton(
-                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES) },
+                  onClick = { navigationActions.navigateTo(Screen.SWIPER) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -81,7 +82,8 @@ fun AddActivityScreen(
                     .padding(16.dp)
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
               OutlinedTextField(
                   value = title,
                   onValueChange = { title = it },
@@ -240,7 +242,7 @@ fun AddActivityScreen(
 
                         activityModelView.addActivity(activity, context)
 
-                        navigationActions.navigateTo(Screen.TRAVEL_ACTIVITIES)
+                        navigationActions.navigateTo(Screen.SWIPER)
                       } catch (e: java.text.ParseException) {
                         Toast.makeText(
                                 context,

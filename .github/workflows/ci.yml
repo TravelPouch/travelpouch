@@ -96,14 +96,21 @@ jobs:
       - name: Cache firebase emulators
         uses: actions/cache@v4
         with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators-${{ github.sha }}
+          path: /home/runner/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators
           restore-keys: |
-            ${{ runner.os }}-firebase-emulators-
+            ${{ runner.os }}-firebase-emulators
 
-      - name : Install Firebase CLI
+      - name: Install Firebase CLI
         run: |
           curl -sL https://firebase.tools | bash
+
+      - name: Build functions
+        run: |
+          cd cloud-functions/functions
+          npm install
+          npm run build
+          cd ../..
 
       # Run Unit tests
       - name: Run tests
@@ -114,6 +121,8 @@ jobs:
       # Run connected tests on the emulator
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          FIREBASE_LOGIN_TOKEN: ${{ secrets.FIREBASE_LOGIN_TOKEN }}
         with:
           api-level: 34
           target: google_apis
@@ -121,7 +130,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: firebase emulators:exec "./gradlew connectedCheck --parallel --build-cache"
+          script: firebase emulators:exec --token "$FIREBASE_LOGIN_TOKEN" "./gradlew connectedCheck --parallel --build-cache"
 
       # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report

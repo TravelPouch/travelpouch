@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,6 +37,7 @@ import com.github.se.travelpouch.model.profile.isValidEmail
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +50,6 @@ fun SignInWithPassword(
     authService: AuthenticationService
 ) {
   val context = LocalContext.current
-  val coroutineScope = rememberCoroutineScope()
 
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
@@ -103,13 +102,16 @@ fun SignInWithPassword(
                       !methodChosen.value,
               onClick = {
                 methodChosen.value = true
+                Log.d("SignInScreen", "Creating user with email and password")
                 authService.createUser(
                     email,
                     password,
                     onSuccess = { user ->
-                      Log.d("SignInScreen", "User signed in: ${user?.displayName}")
+                      Log.d(
+                          "SignInScreen",
+                          "User signed in: ${user?.uid} ${user?.email} ${user?.displayName} ${user?.isAnonymous}")
 
-                      coroutineScope.launch {
+                      GlobalScope.launch {
                         profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
                       }
 
@@ -146,7 +148,7 @@ fun SignInWithPassword(
                     onSuccess = { user ->
                       Log.d("SignInScreen", "User logged in: ${user?.displayName}")
 
-                      coroutineScope.launch {
+                      GlobalScope.launch {
                         profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
                       }
 

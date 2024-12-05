@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.net.Uri
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -25,7 +26,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DocumentScanner
@@ -35,11 +35,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -52,7 +50,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
@@ -126,30 +123,12 @@ fun DocumentListScreen(
             documentViewModel.uploadFile(
                 context.contentResolver.openInputStream(uri),
                 selectedTravel.value,
-                context.contentResolver.getType(uri))
+                MimeTypeMap.getSingleton().getMimeTypeFromExtension(uri.toFile().extension))
         else Log.d("DocumentList", "No file selected")
       }
 
   Scaffold(
       modifier = Modifier.testTag("documentListScreen"),
-      topBar = {
-        TopAppBar(
-            title = {
-              Text(
-                  "Travel's documents",
-                  modifier = Modifier.semantics { testTag = "documentListTitle" })
-            },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton") // Tag for back button
-                  ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back")
-                  }
-            })
-      },
       floatingActionButton = {
         var toggled by remember { mutableStateOf(false) }
 

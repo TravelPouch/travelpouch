@@ -18,7 +18,7 @@ data class Profile(
     val fsUid: String,
     val username: String,
     val email: String,
-    val friends: Map<Int, String>?,
+    val friends: Map<String, String>,
     val name: String,
     var userTravelList: List<String>,
     var needsOnboarding: Boolean = true
@@ -34,7 +34,13 @@ data class Profile(
 /** This profile represents the error profile. It is used when a profile is corrupted */
 object ErrorProfile {
   val errorProfile =
-      Profile("000errorerrorerrorerrorerror", "error", "error@error.ch", null, "error", emptyList())
+      Profile(
+          "000errorerrorerrorerrorerror",
+          "error",
+          "error@error.ch",
+          emptyMap(),
+          "error",
+          emptyList())
 }
 
 fun checkProfileValidity(profile: Profile): Boolean {
