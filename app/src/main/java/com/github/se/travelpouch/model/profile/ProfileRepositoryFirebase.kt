@@ -10,6 +10,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.HttpsCallableResult
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -268,6 +270,22 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             onFailure
         )
     }
+
+    fun fetchNotificationTokens(userId: String, onSuccess: (List<String>) -> Unit, onFailure: (Exception) -> Unit) {
+        val functions = FirebaseFunctions.getInstance()
+        val data = hashMapOf("userId" to userId)
+
+        functions.getHttpsCallable("getNotificationTokens")
+            .call(data)
+            .addOnSuccessListener { result: HttpsCallableResult ->
+                val tokens = result.data as? List<String> ?: emptyList()
+                onSuccess(tokens)
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
+    }
+
 
 }
 
