@@ -502,7 +502,7 @@ class ProfileRepositoryTest {
             "qwertzuiopasdfghjklyxcvbnm13",
             "usernameTestFriend",
             "email_friend@test.ch",
-            emptyList(),
+            emptyMap(),
             "nameTestFriend",
             emptyList())
 

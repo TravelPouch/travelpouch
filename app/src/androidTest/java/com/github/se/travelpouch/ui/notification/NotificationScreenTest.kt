@@ -255,7 +255,7 @@ class NotificationScreenTest {
             "qwertzuiopasdfghjklyxcvbnm12",
             "username",
             "email@email.com",
-            emptyList(),
+            emptyMap(),
             "name",
             emptyList())
 
@@ -264,7 +264,7 @@ class NotificationScreenTest {
             "qwertzuiopasdfghjklyxcvbnm13",
             "usernameTest",
             "test@test.com",
-            emptyList(),
+            emptyMap(),
             "nameTest",
             emptyList())
 
@@ -295,7 +295,7 @@ class NotificationScreenTest {
     whenever(mockDocumentSnapshot.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     whenever(mockDocumentSnapshot.getString("username")).thenReturn("username")
     whenever(mockDocumentSnapshot.getString("email")).thenReturn("email@email.com")
-    whenever(mockDocumentSnapshot.get("friends")).thenReturn(emptyList<String>())
+    whenever(mockDocumentSnapshot.get("friends")).thenReturn(emptyMap<String, String>())
     whenever(mockDocumentSnapshot.get("listoftravellinked")).thenReturn(emptyList<String>())
     whenever(mockDocumentSnapshot.getString("name")).thenReturn("name")
     whenever(mockDocumentSnapshot.exists()).thenReturn(true)
@@ -304,7 +304,7 @@ class NotificationScreenTest {
     whenever(mockDocumentSnapshotUser.id).thenReturn(profile.fsUid)
     whenever(mockDocumentSnapshotUser.getString("username")).thenReturn(profile.username)
     whenever(mockDocumentSnapshotUser.getString("email")).thenReturn(profile.email)
-    whenever(mockDocumentSnapshotUser.get("friends")).thenReturn(emptyList<String>())
+    whenever(mockDocumentSnapshotUser.get("friends")).thenReturn(emptyMap<String, String>())
     whenever(mockDocumentSnapshotUser.get("listoftravellinked")).thenReturn(emptyList<String>())
     whenever(mockDocumentSnapshotUser.getString("name")).thenReturn(profile.name)
 

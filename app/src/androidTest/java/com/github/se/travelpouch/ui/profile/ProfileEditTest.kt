@@ -165,7 +165,7 @@ class ProfileEditTest {
     whenever(mockDocumentSnapshot.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     whenever(mockDocumentSnapshot.getString("username")).thenReturn("username")
     whenever(mockDocumentSnapshot.getString("email")).thenReturn("email@email.com")
-    whenever(mockDocumentSnapshot.get("friends")).thenReturn(emptyList<String>())
+    whenever(mockDocumentSnapshot.get("friends")).thenReturn(emptyMap<String, String>())
     whenever(mockDocumentSnapshot.get("listoftravellinked")).thenReturn(emptyList<String>())
     whenever(mockDocumentSnapshot.getString("name")).thenReturn("name")
 
