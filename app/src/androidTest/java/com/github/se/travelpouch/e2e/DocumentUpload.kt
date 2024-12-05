@@ -143,7 +143,7 @@ class DocumentUpload {
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
         composeTestRule.onNodeWithTag("welcomText").assertIsDisplayed()
         composeTestRule.onNodeWithText("Sign in with email and password").assertIsDisplayed()
-        print("BBBBBBBBBBBB")
+
         // go to sign in screen with email and password and log in
         composeTestRule.onNodeWithText("Sign in with email and password").performClick()
 
