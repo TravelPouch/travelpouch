@@ -63,7 +63,8 @@ class ProfileRepositoryTest {
           "email@test.ch",
           emptyMap(),
           "nameTest",
-          emptyList())
+          emptyList(),
+          true)
 
   val newProfile =
       Profile(
@@ -72,7 +73,8 @@ class ProfileRepositoryTest {
           "email@test.ch",
           mapOf("test@test.ch" to "qwertzuiopasdfghjklyxcvbnm12"),
           "nameTest",
-          emptyList())
+          emptyList(),
+          true)
 
   val function: (Profile) -> Unit = {}
 
