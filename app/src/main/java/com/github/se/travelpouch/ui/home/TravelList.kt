@@ -54,6 +54,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -109,7 +110,7 @@ fun TravelListScreen(
     profileModelView: ProfileModelView
 ) {
     // Ask for notification permission
-    RequestNotificationPermission()
+    RequestNotificationPermission(profileModelView)
 
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
@@ -465,30 +466,36 @@ private fun resizeFromDragMotion(
 }
 
 @Composable
-private fun RequestNotificationPermission() {
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            LocalContext.current,
-            android.Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED
+fun RequestNotificationPermission(profileViewModel: ProfileModelView) {
+    val context = LocalContext.current
 
-        if(!hasPermission) {
-            ActivityCompat.requestPermissions(
-                LocalContext.current as Activity,
-                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                0
-            )
+    // Check notification permission
+    val hasPermission = remember {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPermission) {
+        ActivityCompat.requestPermissions(
+            context as Activity,
+            arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+            0
+        )
+    }
+
+    // Only call Firestore logic if not already updated
+    if (hasPermission && !profileViewModel.isTokenUpdated) {
+        LaunchedEffect(Unit) {
+            Firebase.messaging.token.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val token = it.result
+                    profileViewModel.updateNotificationTokenIfNeeded(token)
+                }
+            }
         }
     }
 }
 
-private fun verifyNotificatioToken() {
-    // Keep current token
-    Firebase.messaging.token.addOnCompleteListener {
-        if(it.isSuccessful) {
-            val token = it.result
-
-
-        }
-    }
-}
