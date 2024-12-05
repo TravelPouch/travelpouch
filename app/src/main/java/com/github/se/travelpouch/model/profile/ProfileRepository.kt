@@ -55,4 +55,11 @@ interface ProfileRepository {
       onSuccess: (Profile) -> Unit,
       onFailure: (Exception) -> Unit
   )
+
+  fun removeFriend(
+      friendFsUid: String,
+      userProfile: Profile,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  )
 }

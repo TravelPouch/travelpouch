@@ -3,7 +3,6 @@ package com.github.se.travelpouch.ui.profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -103,54 +102,55 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
 
           LazyColumn(
               modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-              contentPadding = PaddingValues(bottom = 80.dp)) {
-                val friends = profile.value.friends.keys.toList()
+              // contentPadding = PaddingValues(bottom = 80.dp)
+          ) {
+            val friends = profile.value.friends.keys.toList()
 
-                if (friends.isNotEmpty()) {
+            if (friends.isNotEmpty()) {
 
-                  items(friends.size) { friend ->
-                    Card(
-                        modifier =
-                            Modifier.testTag("friendCard${friend}")
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp),
-                        colors =
-                            CardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                                disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-                            )) {
-                          Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
-                            Text(
-                                friends[friend],
-                                Modifier.align(Alignment.Center).testTag("friend_${friend}"))
-                          }
-                        }
-                  }
-                } else {
-                  item {
-                    Card(
-                        modifier =
-                            Modifier.testTag("emptyFriendCard")
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp),
-                        colors =
-                            CardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                                disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-                            )) {
-                          Box(Modifier.fillMaxSize().testTag("emptyFriendBox")) {
-                            Text(
-                                "No friends are saved",
-                                Modifier.align(Alignment.Center).testTag("emptyFriendText"))
-                          }
-                        }
-                  }
-                }
+              items(friends.size) { friend ->
+                Card(
+                    modifier =
+                        Modifier.testTag("friendCard${friend}")
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp),
+                    colors =
+                        CardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        )) {
+                      Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
+                        Text(
+                            friends[friend],
+                            Modifier.align(Alignment.Center).testTag("friend_${friend}"))
+                      }
+                    }
               }
+            } else {
+              item {
+                Card(
+                    modifier =
+                        Modifier.testTag("emptyFriendCard")
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp),
+                    colors =
+                        CardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        )) {
+                      Box(Modifier.fillMaxSize().testTag("emptyFriendBox")) {
+                        Text(
+                            "No friends are saved",
+                            Modifier.align(Alignment.Center).testTag("emptyFriendText"))
+                      }
+                    }
+              }
+            }
+          }
         }
   }
 }
