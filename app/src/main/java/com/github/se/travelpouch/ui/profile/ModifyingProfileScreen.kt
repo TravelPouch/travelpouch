@@ -26,7 +26,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -91,220 +90,229 @@ fun ModifyingProfileScreen(
             },
         )
       },
-      floatingActionButton = {
-        FloatingActionButton(
-            onClick = { openDialog = true },
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            modifier = Modifier.testTag("floatingButtonAddingFriend")) {
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier =
-                      Modifier.padding(horizontal = 10.dp) // Adjust padding for better alignment
-                  ) {
-                    Icon(
-                        imageVector =
-                            Icons.Default.PersonAddAlt1, // Replace with your mail icon resource
-                        contentDescription = null,
-                        modifier =
-                            Modifier.size(24.dp)
-                                .testTag("addingFriendIcon") // Adjust size as needed
-                        )
-                    Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
-                    Text(
-                        text = "Add Friend",
-                        style = MaterialTheme.typography.bodyLarge // Or customize further
-                        )
-                  }
+      //      floatingActionButton = {
+      //        FloatingActionButton(
+      //            onClick = { openDialog = true },
+      //            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+      //            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+      //            modifier = Modifier.testTag("floatingButtonAddingFriend")) {
+      //              Row(
+      //                  verticalAlignment = Alignment.CenterVertically,
+      //                  modifier =
+      //                      Modifier.padding(horizontal = 10.dp) // Adjust padding for better
+      // alignment
+      //                  ) {
+      //                    Icon(
+      //                        imageVector =
+      //                            Icons.Default.PersonAddAlt1, // Replace with your mail icon
+      // resource
+      //                        contentDescription = null,
+      //                        modifier =
+      //                            Modifier.size(24.dp)
+      //                                .testTag("addingFriendIcon") // Adjust size as needed
+      //                        )
+      //                    Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+      //                    Text(
+      //                        text = "Add Friend",
+      //                        style = MaterialTheme.typography.bodyLarge // Or customize further
+      //                        )
+      //                  }
+      //            }
+      //      }
+  ) { pd ->
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(pd)
+                .testTag("ProfileColumn")
+                .verticalScroll(rememberScrollState())) {
+          OutlinedTextField(
+              value = email,
+              onValueChange = {},
+              enabled = false,
+              label = { Text("Email") },
+              modifier = Modifier.fillMaxWidth().testTag("emailField"))
+
+          OutlinedTextField(
+              value = username,
+              onValueChange = { username = it },
+              enabled = true,
+              label = { Text("Username") },
+              modifier = Modifier.fillMaxWidth().testTag("usernameField"))
+
+          OutlinedTextField(
+              value = name,
+              onValueChange = { name = it },
+              enabled = true,
+              label = { Text("Name") },
+              modifier = Modifier.fillMaxWidth().testTag("nameField"))
+
+          if (profile.value.friends.isNotEmpty()) {
+
+            Text("Friends : ", modifier = Modifier.testTag("friendsText"))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).height(150.dp),
+            ) {
+              val friends = profile.value.friends.keys.toList()
+
+              items(friends.size) { friend ->
+                Card(
+                    modifier =
+                        Modifier.testTag("friendCard${friend}")
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp)
+                            .clickable {
+                              val uid = profile.value.friends[friends[friend]]
+                              if (uid == null) {
+                                Toast.makeText(context, "An error occurred", Toast.LENGTH_LONG)
+                                    .show()
+                              } else {
+                                friendUidToDelete = uid
+                                openDialogToDeleteFriend = true
+                              }
+                            },
+                    colors =
+                        CardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        )) {
+                      Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
+                        Text(
+                            friends[friend],
+                            Modifier.align(Alignment.Center).testTag("friend_${friend}"))
+                      }
+                    }
+              }
             }
-      }) { pd ->
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-                    .padding(pd)
-                    .testTag("ProfileColumn")
-                    .verticalScroll(rememberScrollState())) {
-              OutlinedTextField(
-                  value = email,
-                  onValueChange = {},
-                  enabled = false,
-                  label = { Text("Email") },
-                  modifier = Modifier.fillMaxWidth().testTag("emailField"))
+          }
 
-              OutlinedTextField(
-                  value = username,
-                  onValueChange = { username = it },
-                  enabled = true,
-                  label = { Text("Username") },
-                  modifier = Modifier.fillMaxWidth().testTag("usernameField"))
-
-              OutlinedTextField(
-                  value = name,
-                  onValueChange = { name = it },
-                  enabled = true,
-                  label = { Text("Name") },
-                  modifier = Modifier.fillMaxWidth().testTag("nameField"))
-
-              if (profile.value.friends.isNotEmpty()) {
-
-                Text("Friends : ", modifier = Modifier.testTag("friendsText"))
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).height(150.dp),
-                    // contentPadding = PaddingValues(bottom = 80.dp)
-                ) {
-                  val friends = profile.value.friends.keys.toList()
-
-                  items(friends.size) { friend ->
-                    Card(
-                        modifier =
-                            Modifier.testTag("friendCard${friend}")
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp)
-                                .clickable {
-                                  val uid = profile.value.friends[friends[friend]]
-                                  if (uid == null) {
-                                    Toast.makeText(context, "An error occurred", Toast.LENGTH_LONG)
-                                        .show()
-                                  } else {
-                                    friendUidToDelete = uid
-                                    openDialogToDeleteFriend = true
-                                  }
-                                },
-                        colors =
-                            CardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                                disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-                            )) {
-                          Box(Modifier.fillMaxSize().testTag("boxOfFriend${friend}")) {
-                            Text(
-                                friends[friend],
-                                Modifier.align(Alignment.Center).testTag("friend_${friend}"))
-                          }
-                        }
-                  }
-                }
-
-                Button(
-                    onClick = {
-                      val newProfile =
-                          Profile(
-                              profile.value.fsUid, username, email, emptyMap(), name, emptyList())
-                      profileModelView.updateProfile(newProfile, context)
-                      navigationActions.navigateTo(Screen.PROFILE)
-                    },
-                    modifier = Modifier.testTag("saveButton")) {
-                      Text("Save")
+          Button(
+              onClick = { openDialog = true },
+              modifier = Modifier.testTag("floatingButtonAddingFriend")) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier =
+                        Modifier.padding(horizontal = 10.dp) // Adjust padding for better alignment
+                    ) {
+                      Icon(
+                          imageVector =
+                              Icons.Default.PersonAddAlt1, // Replace with your mail icon resource
+                          contentDescription = null,
+                          modifier =
+                              Modifier.size(24.dp)
+                                  .testTag("addingFriendIcon") // Adjust size as needed
+                          )
+                      Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                      Text(
+                          text = "Add Friend",
+                          style = MaterialTheme.typography.bodyLarge // Or customize further
+                          )
                     }
               }
 
-              if (openDialog) {
-                Dialog(onDismissRequest = { openDialog = false }) {
-                  var friendMail by remember { mutableStateOf("") }
-                  Box(
-                      Modifier.fillMaxWidth(1f)
-                          .height(250.dp)
-                          .background(MaterialTheme.colorScheme.surface)
-                          .testTag("boxAddingFriend")) {
-                        Column(
-                            modifier =
-                                Modifier.fillMaxSize()
-                                    .padding(16.dp)
-                                    .verticalScroll(rememberScrollState()),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center) {
-                              Text(
-                                  "Adding a friend",
-                                  modifier = Modifier.testTag("addingFriendTitle"))
-
-                              OutlinedTextField(
-                                  value = friendMail,
-                                  onValueChange = { friendMail = it },
-                                  label = { Text("Friend Email") },
-                                  placeholder = { Text("example@example.com") },
-                                  modifier = Modifier.testTag("addingFriendField"))
-
-                              Button(
-                                  onClick = {
-                                    if (friendMail == profile.value.email) {
-                                      Log.d("Friend added", "It is you")
-                                      Toast.makeText(
-                                              context, "You cannot add yourself", Toast.LENGTH_LONG)
-                                          .show()
-                                    } else if (profile.value.friends.contains(friendMail)) {
-                                      Log.d("Friend added", "Already friend with this user")
-                                      Toast.makeText(
-                                              context,
-                                              "You cannot add a friend you are already friend with",
-                                              Toast.LENGTH_LONG)
-                                          .show()
-                                    } else {
-                                      profileModelView.addFriend(
-                                          friendMail,
-                                          onSuccess = {
-                                            Toast.makeText(
-                                                    context, "Friend added", Toast.LENGTH_LONG)
-                                                .show()
-                                          },
-                                          onFailure = { e ->
-                                            Toast.makeText(context, e.message!!, Toast.LENGTH_LONG)
-                                                .show()
-                                          })
-                                    }
-                                  },
-                                  modifier = Modifier.testTag("addingFriendButton")) {
-                                    Text("Add Friend")
-                                  }
-                            }
-                      }
-                }
+          Button(
+              onClick = {
+                val newProfile =
+                    Profile(profile.value.fsUid, username, email, emptyMap(), name, emptyList())
+                profileModelView.updateProfile(newProfile, context)
+                navigationActions.navigateTo(Screen.PROFILE)
+              },
+              modifier = Modifier.testTag("saveButton")) {
+                Text("Save")
               }
+        }
 
-              if (openDialogToDeleteFriend) {
-                Dialog(onDismissRequest = { openDialogToDeleteFriend = false }) {
-                  Box(
-                      Modifier.fillMaxWidth(1f)
-                          .height(250.dp)
-                          .background(MaterialTheme.colorScheme.surface)
-                          .testTag("boxDeletingFriend")) {
-                        Column(
-                            modifier =
-                                Modifier.fillMaxSize()
-                                    .padding(16.dp)
-                                    .verticalScroll(rememberScrollState()),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center) {
-                              Text(
-                                  "Deleting a friend",
-                                  modifier = Modifier.testTag("DeletingFriendTitle"))
+    if (openDialog) {
+      Dialog(onDismissRequest = { openDialog = false }) {
+        var friendMail by remember { mutableStateOf("") }
+        Box(
+            Modifier.fillMaxWidth(1f)
+                .height(250.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .testTag("boxAddingFriend")) {
+              Column(
+                  modifier =
+                      Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.Center) {
+                    Text("Adding a friend", modifier = Modifier.testTag("addingFriendTitle"))
 
-                              Button(
-                                  onClick = {
-                                    profileModelView.removeFriend(
-                                        friendUidToDelete,
-                                        onFailure = { e ->
-                                          Toast.makeText(context, e.message, Toast.LENGTH_LONG)
-                                              .show()
-                                        },
-                                        onSuccess = {
-                                          Toast.makeText(
-                                                  context, "Friend deleted", Toast.LENGTH_LONG)
-                                              .show()
-                                        })
-                                    openDialogToDeleteFriend = false
-                                  },
-                                  modifier = Modifier.testTag("deletingFriendButton")) {
-                                    Text("Delete Friend")
-                                  }
-                            }
-                      }
-                }
-              }
+                    OutlinedTextField(
+                        value = friendMail,
+                        onValueChange = { friendMail = it },
+                        label = { Text("Friend Email") },
+                        placeholder = { Text("example@example.com") },
+                        modifier = Modifier.testTag("addingFriendField"))
+
+                    Button(
+                        onClick = {
+                          if (friendMail == profile.value.email) {
+                            Log.d("Friend added", "It is you")
+                            Toast.makeText(context, "You cannot add yourself", Toast.LENGTH_LONG)
+                                .show()
+                          } else if (profile.value.friends.contains(friendMail)) {
+                            Log.d("Friend added", "Already friend with this user")
+                            Toast.makeText(
+                                    context,
+                                    "You cannot add a friend you are already friend with",
+                                    Toast.LENGTH_LONG)
+                                .show()
+                          } else {
+                            profileModelView.addFriend(
+                                friendMail,
+                                onSuccess = {
+                                  Toast.makeText(context, "Friend added", Toast.LENGTH_LONG).show()
+                                },
+                                onFailure = { e ->
+                                  Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
+                                })
+                          }
+                        },
+                        modifier = Modifier.testTag("addingFriendButton")) {
+                          Text("Add Friend")
+                        }
+                  }
             }
       }
+    }
+
+    if (openDialogToDeleteFriend) {
+      Dialog(onDismissRequest = { openDialogToDeleteFriend = false }) {
+        Box(
+            Modifier.background(MaterialTheme.colorScheme.surface)
+                .height(100.dp)
+                .width(200.dp)
+                .testTag("boxDeletingFriend")) {
+              Column(
+                  modifier = Modifier.fillMaxSize().padding(16.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.Center) {
+                    Text("Deleting a friend", modifier = Modifier.testTag("DeletingFriendTitle"))
+
+                    Button(
+                        onClick = {
+                          profileModelView.removeFriend(
+                              friendUidToDelete,
+                              onFailure = { e ->
+                                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+                              },
+                              onSuccess = {
+                                Toast.makeText(context, "Friend deleted", Toast.LENGTH_LONG).show()
+                              })
+                          openDialogToDeleteFriend = false
+                        },
+                        modifier = Modifier.testTag("deletingFriendButton")) {
+                          Text("Delete Friend")
+                        }
+                  }
+            }
+      }
+    }
+  }
 }

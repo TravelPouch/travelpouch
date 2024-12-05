@@ -72,6 +72,7 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
   ) { pd ->
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             Modifier.fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 16.dp)
@@ -102,7 +103,6 @@ fun ProfileScreen(navigationActions: NavigationActions, profileModelView: Profil
 
           LazyColumn(
               modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-              // contentPadding = PaddingValues(bottom = 80.dp)
           ) {
             val friends = profile.value.friends.keys.toList()
 

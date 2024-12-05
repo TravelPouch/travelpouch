@@ -217,6 +217,16 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .addOnFailureListener { onFailure(Exception("getting friend profile failed")) }
   }
 
+  /**
+   * This function removes a friend for the user profile, and remove the user profile from the given
+   * friend profile.
+   *
+   * @param friendFsUid (String) : the fsUid of the friend we want to remove from our friend list
+   * @param userProfile (Profile) : the profile of the current user
+   * @param onSuccess ((Profile) -> Unit) : The function to apply when removing the friend is
+   *   successful
+   * @param onFailure ((Exception) -> Unit) : The function to call when an error occurred
+   */
   override fun removeFriend(
       friendFsUid: String,
       userProfile: Profile,
