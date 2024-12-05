@@ -157,4 +157,25 @@ class GPSViewModelTest {
     // Clean up the static mock
     unmockkStatic(LocationServices::class)
   }
+
+  @Test
+  fun testStopRealTimeLocationUpdates() = runBlocking {
+    // Simulate a LatLng
+    val mockLocation = LatLng(48.8566, 2.3522)
+
+    // Simulate repository emitting the location
+    `when`(gpsRepository.getGPSUpdatesForMap()).thenReturn(flow { emit(mockLocation) })
+
+    // Start real-time updates
+    viewModel.startRealTimeLocationUpdates()
+    viewModel.stopRealTimeLocationUpdates()
+
+    // Collect the first emitted value from the ViewModel's StateFlow
+    val emittedLocation = viewModel.realTimeLocation.first()
+    val hasStarted = viewModel.hasStartedGPS.value
+
+    // Verify the result
+    assertNull(emittedLocation)
+    assertFalse(hasStarted)
+  }
 }
