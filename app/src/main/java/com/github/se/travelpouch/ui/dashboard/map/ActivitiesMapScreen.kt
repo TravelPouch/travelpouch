@@ -14,16 +14,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
+import com.github.se.travelpouch.model.activity.map.RouteDetails
+import com.github.se.travelpouch.model.gps.GPSViewModel
+import com.github.se.travelpouch.permissions.LocationPermissionComposable
 import com.github.se.travelpouch.ui.navigation.NavigationActions
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.ButtCap
@@ -32,6 +40,7 @@ import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -61,6 +70,10 @@ fun ActivitiesMapScreen(
         activity.location.latitude != 0.0 && activity.location.longitude != 0.0
       }
 
+  // State to track the selected activity
+  var selectedActivity by remember { mutableStateOf<Activity?>(null) }
+
+  // Date format to display the activity date
   val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
   // Default location to use if activities are not yet loaded (e.g., Paris)
@@ -72,17 +85,38 @@ fun ActivitiesMapScreen(
   }
 
   // Collect the path points from the DirectionsViewModel
-  val routeDetails by directionsViewModel.activityRouteDetails.collectAsState()
+  val activitiesRouteDetails by directionsViewModel.activitiesRouteDetails.collectAsState()
+  // Collect the GPS route details for path between GPS and selected activity
+  val gpsRouteDetails by directionsViewModel.gpsRouteDetails.collectAsState()
 
-  var selectedRouteIndex by remember { mutableIntStateOf(0) } // Track selected route index
+  // Track selected route index
+  var selectedRouteIndex by remember { mutableIntStateOf(0) }
 
-  // Use DisposableEffect to monitor when the screen is composed/destroyed
+  val gpsViewModel: GPSViewModel = viewModel(factory = GPSViewModel.Factory(LocalContext.current))
+
+  // Collect the current location from GPSViewModel as a Compose state
+  val currentLocation by gpsViewModel.realTimeLocation.collectAsState()
+
+  // Request location permission and start location updates when permission is granted
+  LocationPermissionComposable(
+      onPermissionGranted = {
+        Log.d("ActivitiesMapScreen", "Location permission granted.")
+        gpsViewModel.startRealTimeLocationUpdates()
+      },
+      onPermissionDenied = { Log.d("ActivitiesMapScreen", "Location permission denied.") })
+
+  // Fetch directions for the valid activities
   LaunchedEffect(validActivities) {
     // Fetch directions if the list of activities changes
     directionsViewModel.fetchDirectionsForActivities(validActivities, "walking")
   }
 
-  // Effect that runs whenever the list of activities changes
+  // Fetch directions for the selected activity and GPS location
+  LaunchedEffect(selectedActivity) {
+    directionsViewModel.fetchDirectionsForGps(currentLocation, selectedActivity, "walking")
+  }
+
+  // Update the camera position when the valid activities change
   CameraUpdater(validActivities, cameraPositionState)
 
   Scaffold(
@@ -95,62 +129,22 @@ fun ActivitiesMapScreen(
           GoogleMap(
               modifier = Modifier.padding(paddingValues).testTag("Map"),
               cameraPositionState = cameraPositionState) {
-                // Add a marker for each activity's location
-                validActivities.forEachIndexed { index, activity ->
-                  activity.location.let { location -> // Ensure location is not null
-                    // Use the helper function to get the appropriate marker icon
-                    val icon = getMarkerIcon(index, validActivities.size)
+                AddCurrentLocationMarker(currentLocation)
 
-                    // Display the marker with the customized icon
-                    Marker(
-                        state =
-                            rememberMarkerState(
-                                position = LatLng(location.latitude, location.longitude)),
-                        title = activity.title,
-                        snippet = dateFormat.format(activity.date.toDate()),
-                        icon = icon)
-                  }
-                }
+                AddActivityMarkers(
+                    activities = validActivities,
+                    dateFormat = dateFormat,
+                    selectedActivity = selectedActivity,
+                    onActivitySelected = { selectedActivity = it })
 
-                // Draw the walking path using the leg paths
-                if (routeDetails != null && routeDetails!!.legsRoute.isNotEmpty()) {
-                  Log.d("ActivitiesMapScreen", "Drawing leg polylines")
+                DrawActivitiesPaths(
+                    activitiesRouteDetails = activitiesRouteDetails,
+                    selectedRouteIndex = selectedRouteIndex,
+                    onRouteSelected = { selectedRouteIndex = it })
 
-                  // Iterate over each leg path and draw the segment with different styles
-                  routeDetails!!.legsRoute.forEachIndexed { index, legPath ->
-                    val prop = (index.toDouble() / routeDetails!!.legsRoute.size.toDouble()) - 0.5
-
-                    // Use the helper function to get the gradient color
-                    val color =
-                        getGradientColor(
-                            index = index, totalSegments = routeDetails!!.legsRoute.size)
-
-                    // Introduce a small offset by adjusting each point slightly based on index
-                    val offsetLegPath =
-                        legPath.map { point ->
-                          LatLng(point.latitude + prop * 0.0002, point.longitude + prop * 0.00002)
-                        }
-
-                    val zIndex =
-                        if (index == selectedRouteIndex) {
-                          (routeDetails!!.legsRoute.size + 1).toFloat() // Selected route in blue
-                        } else {
-                          (index + 1).toFloat() // Other routes in gray
-                        }
-
-                    Polyline(
-                        points = offsetLegPath,
-                        clickable = true,
-                        width = 20f,
-                        color = color,
-                        endCap = ButtCap(),
-                        jointType = JointType.ROUND,
-                        zIndex = zIndex,
-                        onClick = { selectedRouteIndex = index } // Update selected route
-                        )
-                  }
-                }
+                DrawGpsToActivityPath(gpsRouteDetails)
               }
+
           // Add a floating action button for going back
           FloatingActionButton(
               onClick = { navigationActions.goBack() },
@@ -163,6 +157,92 @@ fun ActivitiesMapScreen(
               }
         }
       })
+}
+
+@Composable
+fun AddCurrentLocationMarker(currentLocation: LatLng?) {
+  Log.d("ActivitiesMapScreen", "Adding current location marker")
+
+  currentLocation?.let { location ->
+    Marker(
+        state = MarkerState(position = location),
+        title = "You are here",
+        snippet = "Current location",
+    )
+  }
+}
+
+@Composable
+fun AddActivityMarkers(
+    activities: List<Activity>,
+    dateFormat: SimpleDateFormat,
+    selectedActivity: Activity?,
+    onActivitySelected: (Activity?) -> Unit
+) {
+  Log.d("ActivitiesMapScreen", "Adding activity markers")
+  activities.forEachIndexed { index, activity ->
+    val icon = getMarkerIcon(index, activities.size)
+    val location = LatLng(activity.location.latitude, activity.location.longitude)
+    Marker(
+        state = rememberMarkerState(position = location),
+        title = activity.title,
+        snippet = dateFormat.format(activity.date.toDate()),
+        icon = icon,
+        onClick = {
+          onActivitySelected(if (selectedActivity == activity) null else activity)
+          true
+        })
+  }
+}
+
+@Composable
+fun DrawActivitiesPaths(
+    activitiesRouteDetails: RouteDetails?,
+    selectedRouteIndex: Int,
+    onRouteSelected: (Int) -> Unit
+) {
+  if (activitiesRouteDetails != null && activitiesRouteDetails.legsRoute.isNotEmpty()) {
+    Log.d("ActivitiesMapScreen", "Drawing activities paths")
+    activitiesRouteDetails.legsRoute.forEachIndexed { index, legPath ->
+      val prop = (index.toDouble() / activitiesRouteDetails.legsRoute.size.toDouble()) - 0.5
+
+      // Use the helper function to get the gradient color
+      val color =
+          getGradientColor(index = index, totalSegments = activitiesRouteDetails.legsRoute.size)
+
+      // Introduce a small offset by adjusting each point slightly based on index
+      val offsetLegPath =
+          legPath.map { point ->
+            LatLng(point.latitude + prop * 0.00001, point.longitude + prop * 0.00001)
+          }
+
+      // Set the zIndex to ensure the selected route is always on top
+      val zIndex =
+          if (index == selectedRouteIndex) {
+            (activitiesRouteDetails.legsRoute.size + 1).toFloat() // Selected route
+          } else {
+            (index + 1).toFloat() // Other routes
+          }
+
+      Polyline(
+          points = offsetLegPath,
+          clickable = true,
+          width = 20f,
+          color = color,
+          endCap = ButtCap(),
+          jointType = JointType.ROUND,
+          zIndex = zIndex,
+          onClick = { onRouteSelected(index) })
+    }
+  }
+}
+
+@Composable
+fun DrawGpsToActivityPath(gpsRouteDetails: RouteDetails?) {
+  Log.d("ActivitiesMapScreen", "Drawing GPS to activity path")
+  gpsRouteDetails?.legsRoute?.forEach { points ->
+    Polyline(points = points, color = Color.Blue, width = 10f)
+  }
 }
 
 // Helper function to generate a consistent gradient color
