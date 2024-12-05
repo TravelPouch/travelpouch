@@ -213,7 +213,7 @@ fun DrawActivitiesPaths(
       // Introduce a small offset by adjusting each point slightly based on index
       val offsetLegPath =
           legPath.map { point ->
-            LatLng(point.latitude + prop * 0.0002, point.longitude + prop * 0.00002)
+            LatLng(point.latitude + prop * 0.00001, point.longitude + prop * 0.00001)
           }
 
       // Set the zIndex to ensure the selected route is always on top
