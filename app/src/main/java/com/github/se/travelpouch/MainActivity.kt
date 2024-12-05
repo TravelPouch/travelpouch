@@ -175,7 +175,7 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               eventsViewModel)
         }
-          composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
+        composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
       }
     }
   }
