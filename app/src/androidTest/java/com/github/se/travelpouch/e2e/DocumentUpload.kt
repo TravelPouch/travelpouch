@@ -96,7 +96,8 @@ class DocumentUpload {
                   "fsUid" to uid,
                   "name" to "Example",
                   "username" to "example",
-                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF")))
+                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
+                  "needsOnboarding" to true))
           .await()
 
       auth.signOut()
@@ -157,6 +158,12 @@ class DocumentUpload {
         composeTestRule.onNodeWithTag("emailField").performTextInput("example@example.com")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("password")
         composeTestRule.onNodeWithText("Log in").performClick()
+
+        // Skip onboarding
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+            composeTestRule.onNodeWithTag("OnboardingScreen", useUnmergedTree = true).isDisplayed()
+        }
+        composeTestRule.onNodeWithTag("SkipButton").performClick()
 
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule

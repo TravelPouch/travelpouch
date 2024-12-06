@@ -76,7 +76,8 @@ class TravelRepositoryFirestoreUnitTest {
           "email@test.ch",
           emptyMap(),
           "name",
-          emptyList())
+          emptyList(),
+          false)
 
   private val travel =
       TravelContainer(

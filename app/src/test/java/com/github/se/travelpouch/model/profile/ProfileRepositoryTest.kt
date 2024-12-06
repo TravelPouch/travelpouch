@@ -63,7 +63,8 @@ class ProfileRepositoryTest {
           "email@test.ch",
           emptyMap(),
           "nameTest",
-          emptyList())
+          emptyList(),
+          true)
 
   val newProfile =
       Profile(
@@ -72,7 +73,8 @@ class ProfileRepositoryTest {
           "email@test.ch",
           mapOf("test@test.ch" to "qwertzuiopasdfghjklyxcvbnm12"),
           "nameTest",
-          emptyList())
+          emptyList(),
+          true)
 
   val function: (Profile) -> Unit = {}
 
@@ -99,6 +101,7 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshot.getString("username")).thenReturn("usernameTest")
     `when`(mockDocumentSnapshot.get("userTravelList")).thenReturn(emptyList<String>())
     `when`(mockDocumentSnapshot.get("friends")).thenReturn(null)
+    `when`(mockDocumentSnapshot.getBoolean("needsOnboarding")).thenReturn(true)
 
     `when`(mockDocumentSnapshotError.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockDocumentSnapshotError.getString("email")).thenReturn(null)

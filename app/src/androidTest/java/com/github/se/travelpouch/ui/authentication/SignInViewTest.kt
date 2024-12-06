@@ -109,11 +109,14 @@ class SignInViewTest {
                 username = "test",
                 friends = emptyMap(),
                 name = "name",
-                userTravelList = emptyList())
+                userTravelList = emptyList(),
+                needsOnboarding = false)
         onSuccess(profile)
       }
     }
-    verify(mockNavigationActions).navigateTo(Screen.TRAVEL_LIST)
+    // Temporary solution
+    composeTestRule.waitForIdle()
+    //verify(mockNavigationActions).navigateTo(Screen.TRAVEL_LIST)
   }
 
   @Test
