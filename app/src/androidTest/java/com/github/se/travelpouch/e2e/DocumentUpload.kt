@@ -161,7 +161,7 @@ class DocumentUpload {
 
         // Skip onboarding
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
-            composeTestRule.onNodeWithTag("onboardingScreen", useUnmergedTree = true).isDisplayed()
+            composeTestRule.onNodeWithTag("OnboardingScreen", useUnmergedTree = true).isDisplayed()
         }
         composeTestRule.onNodeWithTag("SkipButton").performClick()
 
