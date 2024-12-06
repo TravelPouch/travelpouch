@@ -97,7 +97,7 @@ class DocumentUpload {
                   "name" to "Example",
                   "username" to "example",
                   "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
-                  "needsOnboarding" to false))
+                  "needsOnboarding" to true))
           .await()
 
       auth.signOut()
@@ -119,9 +119,12 @@ class DocumentUpload {
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
 
-      firestore.collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents").get().await().documents.forEach {
-        it.reference.delete().await()
-      }
+      firestore
+          .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents")
+          .get()
+          .await()
+          .documents
+          .forEach { it.reference.delete().await() }
       firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
       firestore.terminate().await()

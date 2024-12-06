@@ -55,4 +55,13 @@ class ProfileRepositoryMock : ProfileRepository {
   ) {
     TODO("Not yet implemented")
   }
+
+  override fun removeFriend(
+      friendFsUid: String,
+      userProfile: Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    TODO("Not yet implemented")
+  }
 }

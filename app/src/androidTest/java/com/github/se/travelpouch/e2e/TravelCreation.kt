@@ -17,15 +17,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import javax.inject.Inject
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -44,9 +44,7 @@ class TravelCreation {
 
   @After
   fun tearDown() {
-    runBlocking {
-      firestore.terminate().await()
-    }
+    runBlocking { firestore.terminate().await() }
   }
 
   @Test
