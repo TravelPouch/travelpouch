@@ -141,6 +141,11 @@ class DocumentUpload {
             .respondWith(
                 Instrumentation.ActivityResult(
                     Activity.RESULT_OK, Intent().setData(Uri.fromFile(file))))
+        intending(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
+          .respondWith(
+            Instrumentation.ActivityResult(
+              Activity.RESULT_OK,
+              Intent().setData(Uri.EMPTY)))
 
         // assert that login screen is displayed
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()

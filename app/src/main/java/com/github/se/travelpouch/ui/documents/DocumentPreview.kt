@@ -1,6 +1,11 @@
 package com.github.se.travelpouch.ui.documents
 
+import android.content.Intent
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +39,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentViewModel
@@ -43,6 +49,7 @@ import com.rizzi.bouquet.VerticalPDFReader
 import com.rizzi.bouquet.rememberVerticalPdfReaderState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 /**
@@ -55,10 +62,34 @@ import kotlinx.coroutines.launch
 fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: NavigationActions) {
   val documentContainer: DocumentContainer =
       documentViewModel.selectedDocument.collectAsState().value!!
-  var documentUri by remember { mutableStateOf("") }
+  val uri = documentViewModel.documentUri.value
   val context = LocalContext.current
-  LaunchedEffect(documentContainer) { documentViewModel.getDownloadUrl(documentContainer) }
-  documentUri = documentViewModel.downloadUrls[documentContainer.ref.id] ?: ""
+  val openDirectoryLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) {
+    if (it != null) {
+      val flagsPermission: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+      try {
+        context.contentResolver.takePersistableUriPermission(it, flagsPermission)
+      } catch (e: Exception) {
+        Toast.makeText(context, "Failed to access directory", Toast.LENGTH_SHORT).show()
+        return@rememberLauncherForActivityResult
+      }
+      val documentFile = DocumentFile.fromTreeUri(context, it)
+      if (documentFile != null) {
+        documentViewModel.setSaveDocumentFolder(it)
+        documentViewModel.getSelectedDocument(documentFile)
+      }
+    }
+  }
+  LaunchedEffect(documentContainer) {
+    val documentFileUri = documentViewModel.getSaveDocumentFolder().await()
+    if (documentFileUri == null) {
+      openDirectoryLauncher.launch(null)
+      return@LaunchedEffect
+    }
+    val documentFile = DocumentFile.fromTreeUri(context, documentFileUri)
+    if (documentFile != null) {
+      documentViewModel.getSelectedDocument(documentFile)
+    }}
 
   Scaffold(
       modifier = Modifier.testTag("documentPreviewScreen"),
@@ -80,20 +111,6 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   }
             },
             actions = {
-              StoreDocumentButton(
-                  documentViewModel, modifier = Modifier.testTag("downloadButton")) {
-                    DocumentFile.fromTreeUri(context, it)?.let {
-                      documentViewModel.storeSelectedDocument(it).invokeOnCompletion {
-                        CoroutineScope(Dispatchers.Main).launch {
-                          Toast.makeText(
-                                  context,
-                                  "Document downloaded in ${documentViewModel.saveDocumentFolder.value.lastPathSegment}",
-                                  Toast.LENGTH_SHORT)
-                              .show()
-                        }
-                      }
-                    }
-                  }
               IconButton(
                   onClick = {
                     documentViewModel.deleteDocumentById(documentContainer.ref.id)
@@ -113,17 +130,17 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
               style = MaterialTheme.typography.bodyLarge,
               modifier = Modifier.padding(8.dp).testTag("documentTitle"))
 
-          if (documentUri.isNotEmpty()) {
+          if (uri != null) {
             if (documentContainer.fileFormat == DocumentFileFormat.PDF) {
               val pdfState =
                   rememberVerticalPdfReaderState(
-                      resource = ResourceType.Remote(documentUri), isZoomEnable = true)
+                      resource = ResourceType.Local(uri), isZoomEnable = true)
               VerticalPDFReader(
                   state = pdfState,
                   modifier = Modifier.fillMaxSize().background(color = Color.Gray))
             } else {
-              AsyncImage(
-                  model = documentUri,
+              Image(
+                painter = rememberAsyncImagePainter(uri),
                   contentDescription = null,
                   contentScale = ContentScale.Fit,
                   modifier = Modifier.fillMaxSize().testTag("document"))

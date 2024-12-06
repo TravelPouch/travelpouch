@@ -193,6 +193,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.testing)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.datastore.preferences)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
