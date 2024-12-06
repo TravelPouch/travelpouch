@@ -92,6 +92,7 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
       onFailure: (Exception) -> Unit
   ) {
     repository.sendFriendNotification(email, onSuccess, onFailure)
+  }
 
   /**
    * This function removes a friend for the user profile, and remove the user profile from the given

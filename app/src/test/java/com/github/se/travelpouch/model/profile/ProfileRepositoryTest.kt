@@ -494,7 +494,7 @@ class ProfileRepositoryTest {
     val result = privateFunc.invoke(profileRepositoryFirestore, *parameters)
     assertThat(result, `is`(newProfile))
   }
-  
+
   @Test
   fun removingFriendSucceedingWorks() {
     val userProfile =
@@ -562,7 +562,7 @@ class ProfileRepositoryTest {
     assertFalse(failed)
   }
 
- @Test
+  @Test
   fun sendFriendNotificationWorks() {
     var friendProfile =
         Profile(
@@ -644,7 +644,7 @@ class ProfileRepositoryTest {
     val onCompleteListenerCaptor2 = argumentCaptor<OnFailureListener>()
     verify(mockTask).addOnFailureListener(onCompleteListenerCaptor2.capture())
     onCompleteListenerCaptor2.firstValue.onFailure(Exception("message"))
-    
+
     assert(failed)
     assertFalse(succeeded)
   }

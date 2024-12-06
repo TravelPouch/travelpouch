@@ -72,6 +72,7 @@ interface ProfileRepository {
    *   successful
    * @param onFailure ((Exception) -> Unit) : The function to call when an error occurred
    */
+  fun removeFriend(
       friendFsUid: String,
       userProfile: Profile,
       onSuccess: (Profile) -> Unit,

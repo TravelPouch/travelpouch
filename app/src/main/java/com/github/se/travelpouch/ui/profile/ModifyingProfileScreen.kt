@@ -197,7 +197,13 @@ fun ModifyingProfileScreen(
           Button(
               onClick = {
                 val newProfile =
-                    Profile(profile.value.fsUid, username, email, emptyMap(), name, emptyList())
+                    Profile(
+                        profile.value.fsUid,
+                        username,
+                        email,
+                        profile.value.friends,
+                        name,
+                        profile.value.userTravelList)
                 profileModelView.updateProfile(newProfile, context)
                 navigationActions.navigateTo(Screen.PROFILE)
               },
@@ -243,27 +249,27 @@ fun ModifyingProfileScreen(
                                 .show()
                           } else {
                             profileModelView.sendFriendNotification(
-                                    email = friendMail,
-                                    onSuccess = { friendUid ->
-                                      Toast.makeText(context, "Invitation sent", Toast.LENGTH_LONG)
-                                          .show()
+                                email = friendMail,
+                                onSuccess = { friendUid ->
+                                  Toast.makeText(context, "Invitation sent", Toast.LENGTH_LONG)
+                                      .show()
 
-                                      notificationViewModel.sendNotification(
-                                          Notification(
-                                              notificationViewModel.getNewUid(),
-                                              senderUid = profile.value.fsUid,
-                                              receiverUid = friendUid,
-                                              travelUid = null,
-                                              content =
-                                                  NotificationContent.FriendInvitationNotification(
-                                                      profile.value.fsUid),
-                                              notificationType = NotificationType.INVITATION,
-                                              status = NotificationStatus.UNREAD,
-                                              sector = NotificationSector.PROFILE))
-                                    },
-                                    onFailure = { e ->
-                                      Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
-                                    })
+                                  notificationViewModel.sendNotification(
+                                      Notification(
+                                          notificationViewModel.getNewUid(),
+                                          senderUid = profile.value.fsUid,
+                                          receiverUid = friendUid,
+                                          travelUid = null,
+                                          content =
+                                              NotificationContent.FriendInvitationNotification(
+                                                  profile.value.fsUid),
+                                          notificationType = NotificationType.INVITATION,
+                                          status = NotificationStatus.UNREAD,
+                                          sector = NotificationSector.PROFILE))
+                                },
+                                onFailure = { e ->
+                                  Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
+                                })
                           }
                         },
                         modifier = Modifier.testTag("addingFriendButton")) {
