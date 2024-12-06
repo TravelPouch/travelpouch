@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -190,5 +191,30 @@ class ProfileEditTest {
     composeTestRule.runOnIdle { onCompleteListenerCaptor2.firstValue.onSuccess(mockQuerySnapshot) }
 
     verify(notificationRepository).addNotification(anyOrNull())
+  }
+
+  @Test
+  fun verifiesRemovingFriendWorks() {
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(profile)
+    }
+    profileModelView.getProfile()
+
+    composeTestRule.setContent { ModifyingProfileScreen(navigationActions, profileModelView) }
+
+    composeTestRule.onNodeWithTag("friendCard0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friendCard0").performClick()
+
+    composeTestRule.onNodeWithTag("boxDeletingFriend").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("DeletingFriendTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("deletingFriendButton").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("deletingFriendButton").performClick()
+
+    composeTestRule.onNodeWithTag("boxDeletingFriend").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("DeletingFriendTitle").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("deletingFriendButton").assertIsNotDisplayed()
+
+    verify(profileRepository).removeFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }
