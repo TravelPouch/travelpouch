@@ -107,9 +107,11 @@ fun TravelListScreen(
 
   val listOfTopLevelDestinations =
       listOf(
+        TopLevelDestinations.TRAVELS,
           TopLevelDestinations.NOTIFICATION,
           TopLevelDestinations.PROFILE,
-          TopLevelDestinations.TRAVELS)
+          TopLevelDestinations.STORAGE
+        )
 
   val travelList = listTravelViewModel.travels.collectAsState()
   val currentProfile = profileModelView.profile.collectAsState()
@@ -159,6 +161,8 @@ fun TravelListScreen(
                     TopLevelDestinations.NOTIFICATION.textId ->
                         navigationActions.navigateTo(Screen.NOTIFICATION)
                     TopLevelDestinations.TRAVELS.textId -> scope.launch { drawerState.close() }
+                    TopLevelDestinations.STORAGE.textId ->
+                      navigationActions.navigateTo(Screen.STORAGE)
                   }
                 },
                 modifier =
