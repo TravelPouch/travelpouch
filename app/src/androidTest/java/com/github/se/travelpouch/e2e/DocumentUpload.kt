@@ -6,7 +6,6 @@ import android.content.Intent
 import android.icu.util.GregorianCalendar
 import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,7 +20,6 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
-import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -120,9 +118,12 @@ class DocumentUpload {
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
 
-      firestore.collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents").get().await().documents.forEach {
-        it.reference.delete().await()
-      }
+      firestore
+          .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents")
+          .get()
+          .await()
+          .documents
+          .forEach { it.reference.delete().await() }
       firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
       firestore.terminate().await()
@@ -139,6 +140,11 @@ class DocumentUpload {
             .respondWith(
                 Instrumentation.ActivityResult(
                     Activity.RESULT_OK, Intent().setData(Uri.fromFile(file))))
+        intending(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
+          .respondWith(
+            Instrumentation.ActivityResult(
+              Activity.RESULT_OK,
+              Intent().setData(Uri.EMPTY)))
 
         // assert that login screen is displayed
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
