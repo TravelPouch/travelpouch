@@ -1,4 +1,5 @@
 import {getFirestore} from "firebase-admin/firestore";
+import {getMessaging} from "firebase-admin/messaging"; // Correct import
 import * as admin from "firebase-admin";
 import {logger} from "firebase-functions";
 
@@ -31,8 +32,21 @@ export async function sendPushNotification(tokens: string[], payload: object): P
     return Promise.reject(new Error("No tokens available"));
   }
 
-  return admin.messaging().sendMulticast({
-    tokens,
-    notification: payload as admin.messaging.NotificationMessagePayload,
-  });
+  try {
+    // Use getMessaging() instead of admin.messaging()
+    const messaging = getMessaging(); // Correct usage
+    const response = await messaging.sendMulticast({
+      tokens,
+      notification: payload as admin.messaging.NotificationMessagePayload,
+    });
+    return response;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error("Error sending notification", error);
+      throw new Error(`Failed to send notification: ${error.message}`);
+    } else {
+      logger.error("Unknown error", error);
+      throw new Error("Failed to send notification: Unknown error");
+    }
+  }
 }

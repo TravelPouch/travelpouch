@@ -3,6 +3,7 @@ package com.github.se.travelpouch.model.notifications
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
+import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.functions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -24,8 +25,7 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
   private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
   val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
 
-  private val functions = Firebase.functions
-
+  private val functions = FirebaseFunctions.getInstance("europe-west9")
 
   fun getNewUid(): String {
     return notificationRepository.getNewUid()
@@ -87,7 +87,7 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
       )
     )
 
-    functions.useEmulator("10.0.2.2", 5001) // Use Android emulator's local address
+    //functions.useEmulator("10.0.2.2", 5001) // Use Android emulator's local address
 
     functions
       .getHttpsCallable("sendNotificationToUser")
