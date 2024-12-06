@@ -176,9 +176,7 @@ class MainActivity : ComponentActivity() {
               eventsViewModel)
         }
 
-        composable(Screen.STORAGE) {
-          StorageDashboard(navigationActions)
-        }
+        composable(Screen.STORAGE) { StorageDashboard(navigationActions) }
       }
     }
   }
