@@ -200,7 +200,9 @@ class ProfileEditTest {
     }
     profileModelView.getProfile()
 
-    composeTestRule.setContent { ModifyingProfileScreen(navigationActions, profileModelView) }
+    composeTestRule.setContent {
+      ModifyingProfileScreen(navigationActions, profileModelView, notificationViewModel)
+    }
 
     composeTestRule.onNodeWithTag("friendCard0").assertIsDisplayed()
     composeTestRule.onNodeWithTag("friendCard0").performClick()
