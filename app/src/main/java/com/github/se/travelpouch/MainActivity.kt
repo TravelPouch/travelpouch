@@ -33,6 +33,7 @@ import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
 import com.github.se.travelpouch.ui.home.AddTravelScreen
+import com.github.se.travelpouch.ui.home.OnboardingScreen
 import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
@@ -174,6 +175,7 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               eventsViewModel)
         }
+        composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
       }
     }
   }
