@@ -85,4 +85,23 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
           onFailure(it)
         })
   }
+
+  /**
+   * This function removes a friend for the user profile, and remove the user profile from the given
+   * friend profile. It calls the repository to do it
+   *
+   * @param friendUid (String) : the fsUid of the friend we want to remove from our friend list
+   * @param onSuccess (() -> Unit) : The function to apply when removing the friend is successful
+   * @param onFailure ((Exception) -> Unit) : The function to call when an error occurred
+   */
+  fun removeFriend(friendUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    repository.removeFriend(
+        friendUid,
+        userProfile = profile_.value,
+        onSuccess = {
+          profile_.value = it
+          onSuccess()
+        },
+        onFailure)
+  }
 }
