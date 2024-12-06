@@ -32,6 +32,7 @@ object Screen {
   const val CALENDAR = "Calendar Screen"
   const val NOTIFICATION = "Notification Screen"
   const val SIGN_IN_PASSWORD = "Sign in with password Screen"
+  const val STORAGE = "Storage Dashboard Screen"
 
   const val SWIPER = "Swiper"
 }
@@ -48,6 +49,7 @@ object TopLevelDestinations {
   val DOCUMENTS = TopLevelDestination(Screen.DOCUMENT_LIST, Icons.Default.Folder, "Documents")
   val TRAVELS = TopLevelDestination(Screen.TRAVEL_LIST, Icons.Default.Home, "Home")
   val PROFILE = TopLevelDestination(Screen.PROFILE, Icons.Default.AccountCircle, "Profile")
+  val STORAGE = TopLevelDestination(Screen.STORAGE, Icons.Default.Folder, "Storage")
 }
 
 open class NavigationActions(
