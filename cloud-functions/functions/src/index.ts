@@ -9,6 +9,8 @@ import {
 import {storeFile} from "./storage.js";
 import {generateThumbnailForDocument} from "./thumbnailing.js";
 
+import {fetchNotificationTokens, sendPushNotification} from "./pushNotification.js";
+
 initializeApp();
 
 /**
@@ -81,4 +83,33 @@ export const generateThumbnailHttp = onRequest(
       return;
     }
     res.json({success: true});
+  });
+
+export const sendNotificationToUser = onCall(
+  {region: "europe-west9"},
+  async (req) => {
+    const userId = req.data.userId;
+    const notificationContent = req.data.notificationContent; // Expected to include `title` and `body`
+
+    if (!userId || !notificationContent) {
+      throw new Error("Missing userId or notificationContent");
+    }
+
+    try {
+      const tokens = await fetchNotificationTokens(userId);
+      const response = await sendPushNotification(tokens, {
+        title: notificationContent.title,
+        body: notificationContent.body,
+      });
+      logger.info(`Notification sent to user: ${userId}`, response);
+      return {success: true, response};
+    } catch (error) {
+      if (error instanceof Error) {
+        logger.error(`Error sending notification to user ${userId}:`, error.message);
+        throw new Error(`Failed to send notification: ${error.message}`);
+      } else {
+        logger.error(`Unknown error sending notification to user ${userId}:`, error);
+        throw new Error("Failed to send notification: Unknown error");
+      }
+    }
   });

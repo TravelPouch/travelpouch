@@ -56,6 +56,21 @@ interface ProfileRepository {
       onFailure: (Exception) -> Unit
   )
 
+    /**
+     * Adds a notification token to the user's profile in the Firestore database.
+     *
+     * @param token The notification token to be added to the profile.
+     * @param user The user identifier to whom the token belongs.
+     * @param onSuccess A callback function that is invoked when the token is successfully added.
+     * @param onFailure A callback function that is invoked with an Exception if an error occurs during the operation.
+     */
+    fun addNotificationTokenToProfile(
+        token: String,
+        user: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    )
+    
   /**
    * This function removes a friend for the user profile, and remove the user profile from the given
    * friend profile.

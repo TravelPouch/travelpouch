@@ -180,6 +180,14 @@ fun ParticipantListScreen(
                                           .show()
                                     } else if (fsUid != null) {
                                       try {
+                                          notificationViewModel.sendNotificationToUser(
+                                              fsUid,
+                                                NotificationContent.InvitationNotification(
+                                                    profileViewModel.profile.value.name,
+                                                    selectedTravel!!.title,
+                                                    Role.PARTICIPANT)
+                                          )
+
                                         notificationViewModel.sendNotification(
                                             Notification(
                                                 notificationViewModel.getNewUid(),
