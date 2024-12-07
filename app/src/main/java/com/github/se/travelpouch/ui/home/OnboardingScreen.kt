@@ -1,7 +1,9 @@
 package com.github.se.travelpouch.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -44,9 +46,15 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
       modifier = Modifier.fillMaxSize().padding(16.dp).testTag("OnboardingScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.SpaceAround) {
+
+        // Add a progress bar at the top
+        ProgressIndicator(pageIndex, onboardingPages.size, Modifier.testTag("ProgressBar"))
+
+        // Display the content of the current page
         OnboardingPageContent(
             onboardingPages[pageIndex].apply {}, Modifier.testTag("OnboardingPageContent"))
 
+        // Add navigation buttons at the bottom
         Row(
             modifier = Modifier.fillMaxWidth().testTag("NavigationButtons"),
             horizontalArrangement = Arrangement.SpaceBetween) {
@@ -78,6 +86,7 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
       }
 }
 
+// Display the content of each onboarding page
 @Composable
 fun OnboardingPageContent(page: OnboardingPage, modifier: Modifier = Modifier) {
   Column(
@@ -101,6 +110,32 @@ fun OnboardingPageContent(page: OnboardingPage, modifier: Modifier = Modifier) {
             modifier = Modifier.testTag("OnboardingDescription"))
       }
 }
+
+// Progress indicator to show the current page in the onboarding process
+@Composable
+fun ProgressIndicator(currentPage: Int, totalPages: Int, modifier: Modifier = Modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically) {
+            for (i in 0 until totalPages) {
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(if (i == currentPage) 12.dp else 8.dp)
+                        .background(
+                            if (i == currentPage) androidx.compose.ui.graphics.Color.Blue
+                            else androidx.compose.ui.graphics.Color.Gray,
+                            shape = RoundedCornerShape(50))
+                )
+            }
+        }
+    }
+}
+
+
 
 // Data class to define each onboarding page
 data class OnboardingPage(val title: String, val description: String, val imageResId: Int)
