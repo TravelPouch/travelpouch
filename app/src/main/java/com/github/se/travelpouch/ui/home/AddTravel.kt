@@ -296,7 +296,8 @@ fun AddTravelScreen(
                         Log.d("AddTravelScreen", "Adding travel to ViewModel")
                         listTravelViewModel.addTravel(
                             travelContainer,
-                            eventViewModel.getNewDocumentReference(travelContainer.fsUid))
+                            eventViewModel.getNewDocumentReferenceForNewTravel(
+                                travelContainer.fsUid))
 
                         Toast.makeText(context, "Travel added successfully!", Toast.LENGTH_SHORT)
                             .show()

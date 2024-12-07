@@ -3,6 +3,8 @@ package com.github.se.travelpouch.model.activity
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.github.se.travelpouch.model.travels.Location
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -12,6 +14,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.fail
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -23,8 +26,11 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
@@ -113,16 +119,49 @@ class ActivityRepositoryUnitTest {
 
   @Test
   fun addActivity_shouldCallFirestoreCollection() {
-    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
 
-    // This test verifies that when we add a new event, the Firestore `collection()` method is
-    // called.
-    activityRepositoryFirestore.addActivity(activity, onSuccess = {}, onFailure = {})
+    val mockFirebaseFirestore: FirebaseFirestore = mock()
+    val mockCollectionReference: CollectionReference = mock()
+    val mockActivityDocumentReference: DocumentReference = mock()
+    val mockEventDocumentReference: DocumentReference = mock()
 
-    shadowOf(Looper.getMainLooper()).idle()
+    val mockVoidTask: Task<Void> = mock()
 
-    // Ensure Firestore collection method was called to reference the "events" collection
-    verify(mockDocumentReference).set(any())
+    whenever(mockFirebaseFirestore.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.document(anyOrNull()))
+        .thenReturn(mockActivityDocumentReference)
+    whenever(mockEventDocumentReference.id).thenReturn("qwertzuiopasdfghjklm")
+
+    whenever(mockFirebaseFirestore.runTransaction<Void>(anyOrNull())).thenReturn(mockVoidTask)
+    whenever(mockVoidTask.addOnSuccessListener(anyOrNull())).thenReturn(mockVoidTask)
+    whenever(mockVoidTask.addOnFailureListener(anyOrNull())).thenReturn(mockVoidTask)
+    whenever(mockVoidTask.isSuccessful).thenReturn(true)
+
+    var succeeded = false
+    var failed = false
+
+    val activityRepositoryFirebase = ActivityRepositoryFirebase(mockFirebaseFirestore)
+    activityRepositoryFirebase.addActivity(
+        activity, { succeeded = true }, { failed = true }, mockEventDocumentReference)
+
+    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Void>>()
+    verify(mockVoidTask).addOnSuccessListener(onSuccessListenerCaptor.capture())
+    onSuccessListenerCaptor.firstValue.onSuccess(mockVoidTask.result)
+
+    assert(succeeded)
+    assertFalse(failed)
+
+    //    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate
+    // success
+    //
+    //    // This test verifies that when we add a new event, the Firestore `collection()` method is
+    //    // called.
+    //    activityRepositoryFirestore.addActivity(activity, onSuccess = {}, onFailure = {})
+    //
+    //    shadowOf(Looper.getMainLooper()).idle()
+    //
+    //    // Ensure Firestore collection method was called to reference the "events" collection
+    //    verify(mockDocumentReference).set(any())
   }
 
   @Test

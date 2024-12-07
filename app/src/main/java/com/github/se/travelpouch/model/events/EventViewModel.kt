@@ -30,8 +30,12 @@ class EventViewModel @Inject constructor(private val repository: EventRepository
    *
    * @return (String) : returns a new unused unique identifier
    */
-  fun getNewDocumentReference(newTravelId: String): DocumentReference {
-    return repository.getNewDocumentReference(newTravelId)
+  fun getNewDocumentReferenceForNewTravel(travelId: String): DocumentReference {
+    return repository.getNewDocumentReferenceForNewTravel(travelId)
+  }
+
+  fun getNewDocumentReference(): DocumentReference {
+    return repository.getNewDocumentReference()
   }
 
   /** This function updates the list of events stored on firebase. */

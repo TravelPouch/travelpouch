@@ -92,7 +92,7 @@ class EventRepositoryUnitTest {
     whenever(mockEventCollectionReference.document(any())).thenReturn(mockEventDocumentReference)
     whenever(mockEventDocumentReference.id).thenReturn("qwertz")
 
-    val reference = eventRepositoryFirestore.getNewDocumentReference("qwertz")
+    val reference = eventRepositoryFirestore.getNewDocumentReferenceForNewTravel("qwertz")
     assert(reference == mockEventDocumentReference)
   }
 
@@ -146,5 +146,15 @@ class EventRepositoryUnitTest {
     parameters[0] = mockDocumentSnapshot
     val result = privateFunc.invoke(eventRepositoryFirestore, *parameters)
     assertThat(result, `is`(event))
+  }
+
+  @Test
+  fun getNewDocumentReference() {
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
+
+    whenever(mockDocumentReference.id).thenReturn("uid")
+    assert(mockDocumentReference == eventRepositoryFirestore.getNewDocumentReference())
   }
 }

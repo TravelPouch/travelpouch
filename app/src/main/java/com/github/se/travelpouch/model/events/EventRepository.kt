@@ -23,17 +23,22 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    *
    * @return (String) : an unused unique identifier
    */
-  override fun getNewDocumentReference(newTravelId: String): DocumentReference {
+  override fun getNewDocumentReferenceForNewTravel(travelId: String): DocumentReference {
     val newId =
         db.collection(FirebasePaths.TravelsSuperCollection)
-            .document(newTravelId)
+            .document(travelId)
             .collection(FirebasePaths.events)
             .document()
             .id
     return db.collection(FirebasePaths.TravelsSuperCollection)
-        .document(newTravelId)
+        .document(travelId)
         .collection(FirebasePaths.events)
         .document(newId)
+  }
+
+  override fun getNewDocumentReference(): DocumentReference {
+    val newId = db.collection(collectionPath).document().id
+    return db.collection(collectionPath).document(newId)
   }
 
   /**
@@ -63,7 +68,7 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
         .get()
         .addOnSuccessListener { result ->
           val events = result?.mapNotNull { documentToEvent(it) } ?: emptyList()
-          onSuccess(events)
+          onSuccess(events.sortedByDescending { it.date })
         }
         .addOnFailureListener { e ->
           Log.e("EventRepository", "Error getting documents", e)

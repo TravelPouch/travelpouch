@@ -40,8 +40,10 @@ class EventModelViewUnitTest {
   fun getNewUidTest() {
     val documentReference: DocumentReference = mock()
 
-    `when`(repository.getNewDocumentReference(anyOrNull())).thenReturn(documentReference)
+    `when`(repository.getNewDocumentReferenceForNewTravel(anyOrNull()))
+        .thenReturn(documentReference)
     assertThat(
-        eventViewModel.getNewDocumentReference("qwertzuiopasdfghjkly"), `is`(documentReference))
+        eventViewModel.getNewDocumentReferenceForNewTravel("qwertzuiopasdfghjkly"),
+        `is`(documentReference))
   }
 }

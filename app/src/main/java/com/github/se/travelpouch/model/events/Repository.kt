@@ -24,7 +24,9 @@ interface EventRepository {
    *
    * @return (String) : an unused unique identifier
    */
-  fun getNewDocumentReference(newTravelId: String): DocumentReference
+  fun getNewDocumentReferenceForNewTravel(travelId: String): DocumentReference
+
+  fun getNewDocumentReference(): DocumentReference
 
   //  /**
   //   * This function adds an event to the collection of events in Firebase.

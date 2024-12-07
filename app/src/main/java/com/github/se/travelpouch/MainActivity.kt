@@ -119,7 +119,9 @@ class MainActivity : ComponentActivity() {
               profileModelView)
         }
 
-        composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
+        composable(Screen.ADD_ACTIVITY) {
+          AddActivityScreen(navigationActions, activityModelView, eventViewModel = eventsViewModel)
+        }
         composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
         composable(Screen.ADD_TRAVEL) {
           AddTravelScreen(
@@ -157,7 +159,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.DOCUMENT_PREVIEW) {
           DocumentPreview(documentViewModel, navigationActions)
         }
-        composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
+        composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel, navigationActions) }
 
         composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
         composable(Screen.EDIT_PROFILE) {

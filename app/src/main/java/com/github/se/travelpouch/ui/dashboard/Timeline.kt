@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.ui.dashboard
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,10 +10,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.se.travelpouch.model.events.Event
 import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -67,9 +73,12 @@ data class LineParameters(val strokeWidth: Dp, val brush: Brush)
  *
  * @param eventsViewModel (EventViewModel) : the view model used to manage the events
  */
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimelineScreen(eventsViewModel: EventViewModel = hiltViewModel<EventViewModel>()) {
+fun TimelineScreen(
+    eventsViewModel: EventViewModel = hiltViewModel<EventViewModel>(),
+    navigationActions: NavigationActions
+) {
 
   LaunchedEffect(Unit) { eventsViewModel.getEvents() }
 
@@ -78,58 +87,73 @@ fun TimelineScreen(eventsViewModel: EventViewModel = hiltViewModel<EventViewMode
 
   Scaffold(
       modifier = Modifier.testTag("timelineScreen"),
-  ) {
-    if (events.value.isNotEmpty()) {
-      LazyColumn(
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("timelineColumn"),
-          contentPadding = PaddingValues(vertical = 16.dp),
-      ) {
-        val size = events.value.size
+      topBar = {
+        TopAppBar(
+            title = {
+              Text(
+                  "Your travel Milestone",
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.testTag("screenTitle"))
+            },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
+            })
+      }) { pd ->
+        if (events.value.isNotEmpty()) {
+          LazyColumn(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(horizontal = 16.dp)
+                      .padding(pd)
+                      .testTag("timelineColumn"),
+              contentPadding = PaddingValues(vertical = 16.dp),
+          ) {
+            val size = events.value.size
 
-        item {
+            items(size) { index ->
+              val color = mapEventTypeToColor(events.value[index].eventType)
+              val nextColor =
+                  if (index < size - 1) mapEventTypeToColor(events.value[index + 1].eventType)
+                  else null
+
+              TimelineNode(
+                  contentStartOffset =
+                      if (itemMoreRightOfScreen) {
+                        Paddings.SPACER_MORE_RIGHT.padding
+                      } else {
+                        Paddings.SPACER_LESS_RIGHT.padding
+                      },
+                  spacerBetweenNodes = Paddings.SPACER_BETWEEN_NODES.padding,
+                  circleParameters =
+                      CircleParametersDefaults.circleParameters(backgroundColor = color),
+                  lineParameters =
+                      if (nextColor != null)
+                          LineParametersDefaults.linearGradient(
+                              startColor = color, endColor = nextColor)
+                      else null) { modifier ->
+                    TimelineItem(events.value[index], modifier)
+                  }
+
+              itemMoreRightOfScreen = !itemMoreRightOfScreen
+            }
+          }
+        } else {
           Box(
               modifier = Modifier.fillMaxSize().padding(20.dp),
               contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Your travel Milestone",
+                    text = "No events",
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.testTag("screenTitle"))
+                    modifier = Modifier.testTag("loadingText"))
               }
         }
-        items(size) { index ->
-          val color = mapEventTypeToColor(events.value[index].eventType)
-          val nextColor =
-              if (index < size - 1) mapEventTypeToColor(events.value[index + 1].eventType) else null
-
-          TimelineNode(
-              contentStartOffset =
-                  if (itemMoreRightOfScreen) {
-                    Paddings.SPACER_MORE_RIGHT.padding
-                  } else {
-                    Paddings.SPACER_LESS_RIGHT.padding
-                  },
-              spacerBetweenNodes = Paddings.SPACER_BETWEEN_NODES.padding,
-              circleParameters = CircleParametersDefaults.circleParameters(backgroundColor = color),
-              lineParameters =
-                  if (nextColor != null)
-                      LineParametersDefaults.linearGradient(
-                          startColor = color, endColor = nextColor)
-                  else null) { modifier ->
-                TimelineItem(events.value[index], modifier)
-              }
-
-          itemMoreRightOfScreen = !itemMoreRightOfScreen
-        }
       }
-    } else {
-      Box(modifier = Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
-        Text(
-            text = "Loading...",
-            textAlign = TextAlign.Center,
-            modifier = Modifier.testTag("loadingText"))
-      }
-    }
-  }
 }
 
 /**

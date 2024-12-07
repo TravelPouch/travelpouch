@@ -3,6 +3,7 @@ package com.github.se.travelpouch.model.activity
 import android.content.Context
 import com.github.se.travelpouch.model.travels.Location
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -18,6 +19,7 @@ class ActivityModelViewUnitTest {
   private lateinit var repository: ActivityRepository
   private lateinit var activityViewModel: ActivityViewModel
   private lateinit var mockContext: Context
+  private lateinit var mockDocumentReference: DocumentReference
 
   val activity =
       Activity(
@@ -51,6 +53,7 @@ class ActivityModelViewUnitTest {
     repository = mock(ActivityRepository::class.java)
     activityViewModel = ActivityViewModel(repository)
     mockContext = mock(Context::class.java)
+    mockDocumentReference = mock()
   }
 
   @Test
@@ -61,8 +64,8 @@ class ActivityModelViewUnitTest {
 
   @Test
   fun addActivitiesTest() {
-    activityViewModel.addActivity(activity, mockContext)
-    verify(repository).addActivity(anyOrNull(), anyOrNull(), anyOrNull())
+    activityViewModel.addActivity(activity, mockContext, mockDocumentReference)
+    verify(repository).addActivity(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test

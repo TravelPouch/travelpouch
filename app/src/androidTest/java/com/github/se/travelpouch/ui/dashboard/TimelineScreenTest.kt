@@ -10,6 +10,7 @@ import com.github.se.travelpouch.model.events.Event
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
@@ -22,6 +23,7 @@ class TimelineScreenTest {
 
   private lateinit var mockEventRepository: EventRepository
   private lateinit var mockEventViewModel: EventViewModel
+  private lateinit var navigationActions: NavigationActions
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -47,18 +49,21 @@ class TimelineScreenTest {
   fun setUp() {
     mockEventRepository = mock(EventRepository::class.java)
     mockEventViewModel = EventViewModel(mockEventRepository)
-
+    navigationActions = mock()
     // `when`(mockEventViewModel.events.value).thenReturn(events_test)
 
   }
 
   @Test
   fun everythingDisplayed() {
-    composeTestRule.setContent { TimelineScreen(mockEventViewModel) }
+    composeTestRule.setContent { TimelineScreen(mockEventViewModel, navigationActions) }
 
     `when`(mockEventRepository.getEvents(any(), any())).then {
       it.getArgument<(List<Event>) -> Unit>(0)(events_test)
     }
+
+    composeTestRule.onNodeWithTag("screenTitle").assertTextEquals("Your travel Milestone")
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
 
     mockEventViewModel.getEvents()
 

@@ -97,7 +97,7 @@ class AddTravelScreenTest {
     // Mock the current route to be the add travel screen
     `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
     `when`(listTravelViewModel.getNewUid()).thenReturn("validMockUid12345678")
-    whenever(eventViewModel.getNewDocumentReference("validMockUid12345678"))
+    whenever(eventViewModel.getNewDocumentReferenceForNewTravel("validMockUid12345678"))
         .thenReturn(eventDocumentReference)
   }
 
