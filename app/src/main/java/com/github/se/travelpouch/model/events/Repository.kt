@@ -1,5 +1,7 @@
 package com.github.se.travelpouch.model.events
 
+import com.google.firebase.firestore.DocumentReference
+
 /**
  * An interface representing the event repository that is used to perform operations on Firebase. It
  * is used to retrieve events and store them.
@@ -22,18 +24,20 @@ interface EventRepository {
    *
    * @return (String) : an unused unique identifier
    */
-  fun getNewUid(): String
+  fun getNewDocumentReference(newTravelId: String): DocumentReference
 
-  /**
-   * This function adds an event to the collection of events in Firebase.
-   *
-   * @param event (Event) : the event we want to add on Firebase
-   * @param onSuccess (() -> Unit) : the function called when the event is correctly added to the
-   *   database
-   * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during the
-   *   adding an event to the database
-   */
-  fun addEvent(event: Event, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  //  /**
+  //   * This function adds an event to the collection of events in Firebase.
+  //   *
+  //   * @param event (Event) : the event we want to add on Firebase
+  //   * @param onSuccess (() -> Unit) : the function called when the event is correctly added to
+  // the
+  //   *   database
+  //   * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during
+  // the
+  //   *   adding an event to the database
+  //   */
+  //  fun addEvent(event: Event, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   /**
    * The initialisation function of the repository.

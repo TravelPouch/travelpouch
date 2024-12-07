@@ -2,12 +2,15 @@ package com.github.se.travelpouch.model.travels
 
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.events.Event
+import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileRepositoryConvert
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -122,13 +125,24 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
   override fun addTravel(
       travel: TravelContainer,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference
   ) {
     Log.d("TravelRepositoryFirestore", "addTravel")
 
     val profileDocumentReference =
         db.collection(FirebasePaths.ProfilesSuperCollection).document(currentUserUid)
     val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
+
+    val event =
+        Event(
+            eventDocumentReference.id,
+            EventType.START_OF_JOURNEY,
+            Timestamp.now(),
+            travel.title,
+            "Let's get started with ${travel.title}",
+            null,
+            null)
 
     db.runTransaction {
           val profile = it.get(profileDocumentReference)
@@ -137,6 +151,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
           travelList.add(travel.fsUid)
           it.update(profileDocumentReference, "userTravelList", travelList.toList())
           it.set(travelDocumentReference, travel.toMap())
+          it.set(eventDocumentReference, event)
         }
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { e ->

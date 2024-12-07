@@ -8,6 +8,7 @@ import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.model.travels.TravelRepository
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -48,10 +49,13 @@ class ListTravelViewModelTest {
           mapOf(Participant("SGzOL8yn0JmAVaTdvG9v12345678") to Role.OWNER),
           emptyList())
 
+  private lateinit var eventDocumentReference: DocumentReference
+
   @Before
   fun setUp() {
     travelRepository = mock(TravelRepository::class.java)
     listTravelViewModel = ListTravelViewModel(travelRepository)
+    eventDocumentReference = mock()
   }
 
   @Test
@@ -115,7 +119,7 @@ class ListTravelViewModelTest {
           null
         }
         .whenever(travelRepository)
-        .addTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .addTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     doAnswer { invocation ->
           val onSuccess = invocation.getArgument(0) as (List<TravelContainer>) -> Unit
@@ -125,7 +129,7 @@ class ListTravelViewModelTest {
         .whenever(travelRepository)
         .getTravels(anyOrNull(), anyOrNull())
 
-    listTravelViewModel.addTravel(travel)
+    listTravelViewModel.addTravel(travel, eventDocumentReference)
 
     assertThat(listTravelViewModel.travels.value, `is`(travelList))
   }
@@ -138,9 +142,9 @@ class ListTravelViewModelTest {
           null
         }
         .whenever(travelRepository)
-        .addTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .addTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
-    listTravelViewModel.addTravel(travel)
+    listTravelViewModel.addTravel(travel, eventDocumentReference)
 
     assertThat(listTravelViewModel.travels.value, `is`(emptyList()))
   }
@@ -261,14 +265,14 @@ class ListTravelViewModelTest {
           null
         }
         .whenever(travelRepository)
-        .addTravel(anyOrNull(), anyOrNull(), anyOrNull())
+        .addTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
       logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
 
-      listTravelViewModel.addTravel(travel)
+      listTravelViewModel.addTravel(travel, eventDocumentReference)
 
-      verify(travelRepository).addTravel(anyOrNull(), anyOrNull(), anyOrNull())
+      verify(travelRepository).addTravel(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("ListTravelViewModel", errorMessage, exception) }
     }
   }

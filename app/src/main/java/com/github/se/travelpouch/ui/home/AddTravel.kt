@@ -42,6 +42,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
@@ -68,7 +69,8 @@ fun AddTravelScreen(
     listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory),
-    profileModelView: ProfileModelView
+    profileModelView: ProfileModelView,
+    eventViewModel: EventViewModel
 ) {
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
@@ -292,7 +294,9 @@ fun AddTravelScreen(
                       try {
                         // Call the ViewModel method to add the travel data
                         Log.d("AddTravelScreen", "Adding travel to ViewModel")
-                        listTravelViewModel.addTravel(travelContainer)
+                        listTravelViewModel.addTravel(
+                            travelContainer,
+                            eventViewModel.getNewDocumentReference(travelContainer.fsUid))
 
                         Toast.makeText(context, "Travel added successfully!", Toast.LENGTH_SHORT)
                             .show()

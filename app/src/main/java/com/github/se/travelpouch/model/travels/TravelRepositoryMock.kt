@@ -2,6 +2,7 @@ package com.github.se.travelpouch.model.travels
 
 import com.github.se.travelpouch.di.travelCollection
 import com.github.se.travelpouch.model.profile.Profile
+import com.google.firebase.firestore.DocumentReference
 
 class TravelRepositoryMock : TravelRepository {
 
@@ -52,7 +53,8 @@ class TravelRepositoryMock : TravelRepository {
   override fun addTravel(
       travel: TravelContainer,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      documentReference: DocumentReference
   ) {
     travelCollection[travel.fsUid] = travel
     onSuccess()

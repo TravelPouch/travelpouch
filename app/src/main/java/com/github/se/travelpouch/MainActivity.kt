@@ -123,7 +123,10 @@ class MainActivity : ComponentActivity() {
         composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
         composable(Screen.ADD_TRAVEL) {
           AddTravelScreen(
-              listTravelViewModel, navigationActions, profileModelView = profileModelView)
+              listTravelViewModel,
+              navigationActions,
+              profileModelView = profileModelView,
+              eventViewModel = eventsViewModel)
         }
         composable(Screen.EDIT_TRAVEL_SETTINGS) {
           EditTravelSettingsScreen(

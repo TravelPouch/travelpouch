@@ -16,6 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +70,8 @@ data class LineParameters(val strokeWidth: Dp, val brush: Brush)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TimelineScreen(eventsViewModel: EventViewModel = hiltViewModel<EventViewModel>()) {
+
+  LaunchedEffect(Unit) { eventsViewModel.getEvents() }
 
   var itemMoreRightOfScreen = false
   val events = eventsViewModel.events.collectAsState()
@@ -168,6 +171,7 @@ fun mapEventTypeToColor(type: EventType): Color {
     EventType.NEW_DOCUMENT -> Color.Green.copy(alpha = 0.3f)
     EventType.START_OF_JOURNEY -> Color.Blue.copy(alpha = 0.3f)
     EventType.NEW_PARTICIPANT -> Color.Red.copy(alpha = 0.3f)
+    EventType.NEW_ACTIVITY -> Color.Yellow.copy(alpha = 0.3f)
   }
 }
 

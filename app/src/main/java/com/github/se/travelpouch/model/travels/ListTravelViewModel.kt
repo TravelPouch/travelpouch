@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.travelpouch.model.profile.Profile
+import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -128,7 +129,7 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    *
    * @param travel The Travel document to be added.
    */
-  fun addTravel(travel: TravelContainer) {
+  fun addTravel(travel: TravelContainer, eventDocumentReference: DocumentReference) {
     Log.d("ListTravelViewModel", "Adding travel")
     repository.addTravel(
         travel = travel,
@@ -136,7 +137,8 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
           Log.d("ListTravelViewModel", "Successfully added travel")
           getTravels()
         },
-        onFailure = { Log.e("ListTravelViewModel", "Failed to add travel", it) })
+        onFailure = { Log.e("ListTravelViewModel", "Failed to add travel", it) },
+        eventDocumentReference)
   }
 
   /**

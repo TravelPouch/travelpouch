@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.events
 
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +30,8 @@ class EventViewModel @Inject constructor(private val repository: EventRepository
    *
    * @return (String) : returns a new unused unique identifier
    */
-  fun getNewUid(): String {
-    return repository.getNewUid()
+  fun getNewDocumentReference(newTravelId: String): DocumentReference {
+    return repository.getNewDocumentReference(newTravelId)
   }
 
   /** This function updates the list of events stored on firebase. */
@@ -38,12 +39,12 @@ class EventViewModel @Inject constructor(private val repository: EventRepository
     repository.getEvents(onSuccess = { events_.value = it }, onFailure = {})
   }
 
-  /**
-   * This function adds a new event in Firebase
-   *
-   * @param event (Event) : a new event to add in Firebase
-   */
-  fun addEvent(event: Event) {
-    repository.addEvent(event = event, onSuccess = { getEvents() }, onFailure = {})
-  }
+  //  /**
+  //   * This function adds a new event in Firebase
+  //   *
+  //   * @param event (Event) : a new event to add in Firebase
+  //   */
+  //  fun addEvent(event: Event) {
+  //    repository.addEvent(event = event, onSuccess = { getEvents() }, onFailure = {})
+  //  }
 }

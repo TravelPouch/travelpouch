@@ -44,6 +44,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -172,6 +173,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     val travelDocumentMock: DocumentReference = mock()
     val profileDocumentMock: DocumentReference = mock()
+    val eventDocumentReference: DocumentReference = mock()
 
     val transaction: Transaction = mock()
     val task: Task<Void> = mock()
@@ -185,6 +187,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     whenever(travelCollectionMock.document(anyOrNull())).thenReturn(travelDocumentMock)
     whenever(profileCollectionMock.document(anyOrNull())).thenReturn(profileDocumentMock)
+    whenever(eventDocumentReference.id).thenReturn("qwertzuiopasdfghjkly")
 
     whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(task)
     whenever(task.isSuccessful).thenReturn(true)
@@ -194,7 +197,8 @@ class TravelRepositoryFirestoreUnitTest {
     var succeeded = false
     var failed = false
 
-    travelRepository.addTravel(travel, { succeeded = true }, { failed = true })
+    travelRepository.addTravel(
+        travel, { succeeded = true }, { failed = true }, eventDocumentReference)
 
     val profileDocumentSnapShot: DocumentSnapshot = mock()
     whenever(transaction.get(anyOrNull())).thenReturn(profileDocumentSnapShot)
@@ -206,7 +210,7 @@ class TravelRepositoryFirestoreUnitTest {
     verify(firestoreMock).runTransaction(transactionCaptor.capture())
     transactionCaptor.firstValue.apply(transaction)
 
-    verify(transaction).set(anyOrNull(), anyOrNull())
+    verify(transaction, times(2)).set(anyOrNull(), anyOrNull())
     verify(transaction).update(anyOrNull(), eq("userTravelList"), anyOrNull())
     verify(transaction).get(anyOrNull())
 
@@ -228,6 +232,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     val travelDocumentMock: DocumentReference = mock()
     val profileDocumentMock: DocumentReference = mock()
+    val eventDocumentReference: DocumentReference = mock()
 
     val transaction: Transaction = mock()
     val task: Task<Void> = mock()
@@ -240,6 +245,7 @@ class TravelRepositoryFirestoreUnitTest {
 
     whenever(travelCollectionMock.document(anyOrNull())).thenReturn(travelDocumentMock)
     whenever(profileCollectionMock.document(anyOrNull())).thenReturn(profileDocumentMock)
+    whenever(eventDocumentReference.id).thenReturn("qwertzuiopasdfghjkly")
 
     whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(task)
     whenever(task.isSuccessful).thenReturn(false)
@@ -250,7 +256,8 @@ class TravelRepositoryFirestoreUnitTest {
     var succeeded = false
     var failed = false
 
-    travelRepository.addTravel(travel, { succeeded = true }, { failed = true })
+    travelRepository.addTravel(
+        travel, { succeeded = true }, { failed = true }, eventDocumentReference)
 
     val onFailureListenerCaptor = argumentCaptor<OnFailureListener>()
     verify(task).addOnFailureListener(onFailureListenerCaptor.capture())

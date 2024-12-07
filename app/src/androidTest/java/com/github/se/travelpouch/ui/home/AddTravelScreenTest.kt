@@ -9,6 +9,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import com.github.se.travelpouch.model.events.EventRepository
+import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.location.LocationRepository
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.profile.Profile
@@ -20,6 +22,7 @@ import com.github.se.travelpouch.model.travels.TravelRepository
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +31,9 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.whenever
 
 class AddTravelScreenTest {
 
@@ -57,6 +62,10 @@ class AddTravelScreenTest {
   private lateinit var profileRepository: ProfileRepository
   private lateinit var profileModelView: ProfileModelView
 
+  private lateinit var eventRepository: EventRepository
+  private lateinit var eventViewModel: EventViewModel
+  private lateinit var eventDocumentReference: DocumentReference
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -77,6 +86,10 @@ class AddTravelScreenTest {
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView((profileRepository))
 
+    eventRepository = mock()
+    eventViewModel = EventViewModel(eventRepository)
+    eventDocumentReference = mock()
+
     listTravelViewModel = ListTravelViewModel(travelRepository)
     // Use a real LocationViewModel with a fake repository
     locationViewModel = LocationViewModel(FakeLocationRepository())
@@ -84,12 +97,18 @@ class AddTravelScreenTest {
     // Mock the current route to be the add travel screen
     `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
     `when`(listTravelViewModel.getNewUid()).thenReturn("validMockUid12345678")
+    whenever(eventViewModel.getNewDocumentReference("validMockUid12345678"))
+        .thenReturn(eventDocumentReference)
   }
 
   @Test
   fun displayAllComponents() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     composeTestRule.onNodeWithTag("addTravelScreen").assertIsDisplayed()
@@ -116,7 +135,8 @@ class AddTravelScreenTest {
           listTravelViewModel,
           navigationActions,
           locationViewModel,
-          profileModelView = profileModelView)
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // Input valid title and description
@@ -136,7 +156,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
-    verify(travelRepository, never()).addTravel(any(), any(), any())
+    verify(travelRepository, never()).addTravel(any(), any(), any(), anyOrNull())
   }
 
   @Test
@@ -146,7 +166,8 @@ class AddTravelScreenTest {
           listTravelViewModel,
           navigationActions,
           locationViewModel,
-          profileModelView = profileModelView)
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // Input valid title and description
@@ -162,7 +183,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
-    verify(travelRepository, never()).addTravel(any(), any(), any())
+    verify(travelRepository, never()).addTravel(any(), any(), any(), anyOrNull())
   }
 
   @Test
@@ -172,7 +193,8 @@ class AddTravelScreenTest {
           listTravelViewModel,
           navigationActions,
           locationViewModel,
-          profileModelView = profileModelView)
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // Input valid title and description
@@ -192,7 +214,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
-    verify(travelRepository, never()).addTravel(any(), any(), any())
+    verify(travelRepository, never()).addTravel(any(), any(), any(), anyOrNull())
   }
 
   @Test
@@ -202,7 +224,8 @@ class AddTravelScreenTest {
           listTravelViewModel,
           navigationActions,
           locationViewModel,
-          profileModelView = profileModelView)
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // Input valid title and description
@@ -222,7 +245,7 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is not called to add a travel
-    verify(travelRepository, never()).addTravel(any(), any(), any())
+    verify(travelRepository, never()).addTravel(any(), any(), any(), anyOrNull())
   }
 
   @Test
@@ -234,7 +257,8 @@ class AddTravelScreenTest {
           listTravelViewModel,
           navigationActions,
           locationViewModel,
-          profileModelView = profileModelView)
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     composeTestRule.waitForIdle() // Ensures inputs are registered
@@ -256,13 +280,17 @@ class AddTravelScreenTest {
     composeTestRule.onNodeWithTag("travelSaveButton").performScrollTo().performClick()
 
     // Verify that the repository method is called to add a travel
-    verify(travelRepository).addTravel(any(), any(), any())
+    verify(travelRepository).addTravel(any(), any(), any(), anyOrNull())
   }
 
   @Test
   fun backButtonNavigatesCorrectly() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // Click the go back button
@@ -275,7 +303,11 @@ class AddTravelScreenTest {
   @Test
   fun saveButtonNotEnabled() {
     composeTestRule.setContent {
-      AddTravelScreen(listTravelViewModel, navigationActions, profileModelView = profileModelView)
+      AddTravelScreen(
+          listTravelViewModel,
+          navigationActions,
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // Initially, the save button should be disabled
@@ -287,7 +319,7 @@ class AddTravelScreenTest {
     // Mock the repository's addTravel() method to throw an exception
     doThrow(RuntimeException("Mocked exception during travel saving"))
         .`when`(travelRepository)
-        .addTravel(any(), any(), any())
+        .addTravel(any(), any(), any(), anyOrNull())
 
     // Set up the content for the test
     composeTestRule.setContent {
@@ -295,7 +327,8 @@ class AddTravelScreenTest {
           listTravelViewModel,
           navigationActions,
           locationViewModel,
-          profileModelView = profileModelView)
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // Input valid travel details
@@ -320,7 +353,8 @@ class AddTravelScreenTest {
           listTravelViewModel,
           navigationActions,
           locationViewModel,
-          profileModelView = profileModelView)
+          profileModelView = profileModelView,
+          eventViewModel = eventViewModel)
     }
 
     // The startDate picker button should be displayed
