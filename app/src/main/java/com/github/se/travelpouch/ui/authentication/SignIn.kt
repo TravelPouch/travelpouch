@@ -70,6 +70,9 @@ fun SignInScreen(
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
   val methodChosen = rememberSaveable { mutableStateOf(false) }
+  val signInCompleted = rememberSaveable {
+    mutableStateOf(false)
+  } // this extra state is necessary to prevent token refresh errors
   val waitUntilProfileFetched = rememberSaveable { mutableStateOf(false) }
 
   val currentUser = auth.currentUser
@@ -79,6 +82,7 @@ fun SignInScreen(
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             methodChosen.value = false
+            signInCompleted.value = true // Mark sign-in as completed
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
             GlobalScope.launch {
@@ -94,6 +98,7 @@ fun SignInScreen(
           },
           onAuthError = {
             methodChosen.value = false
+            signInCompleted.value = false // Reset sign-in flag on error to allow retry
             isLoading.value = false
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
@@ -190,7 +195,10 @@ fun SignInScreen(
                   Text("Sign in with email and password")
                 }
           }
-          if (currentUser != null) {
+          if (currentUser != null &&
+              !signInCompleted
+                  .value) { // extra condition on sign-in completion to avoid unnecessary
+            // recompositions
             LaunchedEffect(Unit) {
               try {
                 isLoading.value = true
