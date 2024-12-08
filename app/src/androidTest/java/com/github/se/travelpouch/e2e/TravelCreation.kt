@@ -67,6 +67,14 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest2password")
         composeTestRule.onNodeWithText("Sign in").performClick()
 
+        // Skip onboarding
+        composeTestRule.waitUntil(timeoutMillis = 2000) {
+          composeTestRule.onNodeWithTag("OnboardingScreen", useUnmergedTree = true).isDisplayed()
+        }
+        composeTestRule.onNodeWithTag("SkipButton").performClick()
+
+
+
         // wait until we are in the travel list screen
         composeTestRule.waitUntil(timeoutMillis = 2000) {
           composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
