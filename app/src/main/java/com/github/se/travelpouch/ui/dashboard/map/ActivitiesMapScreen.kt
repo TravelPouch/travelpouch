@@ -264,7 +264,8 @@ fun LegDetailsContent(routeDetails: RouteDetails?, legIndex: Int, activities: Li
       title = startActivity?.title,
       distance = distance,
       duration = duration,
-      subtitle = endActivity?.title)
+      subtitle = endActivity?.title,
+      testTag = "Leg")
 }
 
 @Composable
@@ -276,7 +277,8 @@ fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: Activity
       title = "Your current Location",
       distance = distance,
       duration = duration,
-      subtitle = selectedActivity?.title)
+      subtitle = selectedActivity?.title,
+      testTag = "Gps")
 }
 
 @Composable
@@ -284,7 +286,8 @@ fun RouteDetailsContent(
     title: String?,
     distance: String,
     duration: String,
-    subtitle: String? = null
+    subtitle: String? = null,
+    testTag: String = ""
 ) {
   Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
     // Title Section
@@ -293,7 +296,7 @@ fun RouteDetailsContent(
           text = it,
           style = MaterialTheme.typography.headlineSmall,
           color = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.padding(bottom = 8.dp))
+          modifier = Modifier.padding(bottom = 8.dp).testTag("RouteDetailsTitle_$testTag"))
     }
 
     // Row for Divider and Details
@@ -303,8 +306,14 @@ fun RouteDetailsContent(
           modifier = Modifier.width(1.dp).height(60.dp))
       Spacer(modifier = Modifier.width(8.dp))
       Column {
-        DetailRow(icon = Icons.Default.LocationOn, text = "Distance: $distance")
-        DetailRow(icon = Icons.Default.AccessTime, text = "Duration: $duration")
+        DetailRow(
+            icon = Icons.Default.LocationOn,
+            text = "Distance: $distance",
+            testTag = "RouteDetailsDistance_$testTag")
+        DetailRow(
+            icon = Icons.Default.AccessTime,
+            text = "Duration: $duration",
+            testTag = "RouteDetailsDuration$testTag")
       }
     }
 
@@ -314,7 +323,7 @@ fun RouteDetailsContent(
           text = it,
           style = MaterialTheme.typography.headlineSmall,
           color = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.padding(top = 8.dp))
+          modifier = Modifier.padding(top = 8.dp).testTag("RouteDetailsSubtitle_$testTag"))
     }
   }
 }

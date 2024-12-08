@@ -17,6 +17,7 @@ import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
 import com.github.se.travelpouch.model.activity.map.Leg
 import com.github.se.travelpouch.model.activity.map.OverviewPolyline
 import com.github.se.travelpouch.model.activity.map.Route
+import com.github.se.travelpouch.model.activity.map.RouteDetails
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
@@ -206,6 +207,97 @@ class ActivitiesMapScreenTest {
         .onNodeWithTag("ActivityDescription")
         .assertExists()
         .assertTextEquals("Monthly team meeting to discuss project progress.")
+  }
+
+  @Test
+  fun testGpsDetailsContentDisplaysCorrectDetails() {
+    composeTestRule.setContent {
+      GpsDetailsContent(
+          gpsRouteDetails =
+              RouteDetails(
+                  origin = LatLng(48.8566, 2.3522), // Mock origin (e.g., Paris)
+                  destination = LatLng(49.8566, 2.3522), // Mock destination
+                  route = listOf(LatLng(48.8566, 2.3522), LatLng(49.8566, 2.3522)), // Mock route
+                  legsDistance = listOf("5 km"),
+                  legsDuration = listOf("10 mins"),
+                  legsRoute =
+                      listOf(
+                          listOf(
+                              LatLng(48.8566, 2.3522),
+                              LatLng(48.8570, 2.3530)) // Mock GPS to activity route
+                          )),
+          selectedActivity = listOfActivities[0] // Mock selected activity
+          )
+    }
+
+    // Verify title
+    composeTestRule
+        .onNodeWithTag("RouteDetailsTitle_Gps")
+        .assertExists()
+        .assertTextEquals("Your current Location")
+
+    // Verify distance
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDistance_Gps")
+        .assertExists()
+        .assertTextEquals("Distance: 5 km")
+
+    // Verify duration
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDurationGps")
+        .assertExists()
+        .assertTextEquals("Duration: 10 mins")
+
+    // Verify subtitle (Activity Title)
+    composeTestRule
+        .onNodeWithTag("RouteDetailsSubtitle_Gps")
+        .assertExists()
+        .assertTextEquals("Team Meeting")
+  }
+
+  @Test
+  fun testLegDetailsContentDisplaysCorrectDetails() {
+    composeTestRule.setContent {
+      LegDetailsContent(
+          routeDetails =
+              RouteDetails(
+                  origin = LatLng(48.8566, 2.3522), // Mock origin (Paris)
+                  destination = LatLng(49.8566, 2.3522), // Mock destination
+                  route = listOf(LatLng(48.8566, 2.3522), LatLng(49.8566, 2.3522)), // Mock route
+                  legsDistance = listOf("3.4 km", "5.2 km"),
+                  legsDuration = listOf("15 mins", "25 mins"),
+                  legsRoute =
+                      listOf(
+                          listOf(LatLng(48.8566, 2.3522), LatLng(48.8570, 2.3530)), // Mock leg 1
+                          listOf(LatLng(48.8570, 2.3530), LatLng(49.8566, 2.3522)) // Mock leg 2
+                          )),
+          legIndex = 0,
+          activities = listOfActivities)
+    }
+
+    // Verify title (start activity)
+    composeTestRule
+        .onNodeWithTag("RouteDetailsTitle_Leg")
+        .assertExists()
+        .assertTextEquals("Team Meeting")
+
+    // Verify distance
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDistance_Leg")
+        .assertExists()
+        .assertTextEquals("Distance: 3.4 km")
+
+    // Verify duration
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDurationLeg")
+        .assertExists()
+        .assertTextEquals("Duration: 15 mins")
+
+    // Verify subtitle (end activity)
+    composeTestRule
+        .onNodeWithTag("RouteDetailsSubtitle_Leg")
+        .assertExists()
+        .assertTextEquals("Client Presentation")
   }
 }
 
