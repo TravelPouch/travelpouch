@@ -230,8 +230,8 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
                       eventDocumentReference!!.id,
                       EventType.PARTICIPANT_REMOVED,
                       Timestamp.now(),
-                      "${currentAddedUserProfile.email} joined the travel.",
-                      "${currentAddedUserProfile.email} joined the travel.",
+                      "${currentAddedUserProfile.email} was removed from the travel.",
+                      "${currentAddedUserProfile.email} was removed from the travel.",
                       null,
                       null)
 
