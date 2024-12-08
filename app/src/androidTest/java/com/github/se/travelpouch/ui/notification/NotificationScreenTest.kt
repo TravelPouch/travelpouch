@@ -51,6 +51,7 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -236,6 +237,38 @@ class NotificationScreenTest {
 
     composeTestRule.onNodeWithText("ACCEPT").performClick()
     verify(profileRepository).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+  }
+
+  @Test
+  fun friendInvitationResponseIsHandledCorrectlyIfDeclined() {
+    val notification =
+        Notification(
+            "qwertzuiopasdfghjkly",
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "qwertzuiopasdfghjklyxcvbnm14",
+            null,
+            NotificationContent.FriendInvitationNotification("test@test.com"),
+            NotificationType.INVITATION,
+            sector = NotificationSector.PROFILE)
+
+    `when`(notificationRepository.fetchNotificationsForUser(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(List<Notification>) -> Unit>(1)(listOf(notification))
+    }
+
+    composeTestRule.setContent {
+      NotificationsScreen(
+          navigationActions = navigationActions,
+          notificationViewModel = notificationViewModel,
+          profileModelView = profileModelView,
+          listTravelViewModel = listTravelViewModel,
+          activityViewModel = activityViewModel,
+          documentViewModel = documentViewModel,
+          eventsViewModel = eventViewModel)
+    }
+
+    composeTestRule.onNodeWithText("DECLINE").performClick()
+    verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(notificationRepository).addNotification(anyOrNull())
   }
 
   // Chat-GPT was helpful in this test because he helped me understand how to separate the capture
