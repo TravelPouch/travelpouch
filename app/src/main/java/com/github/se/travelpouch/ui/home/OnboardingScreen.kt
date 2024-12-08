@@ -27,18 +27,23 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
       listOf(
           OnboardingPage(
               title = "Track Your Travels",
-              description = "Easily organize and keep track of your travel activities.",
-              imageResId = R.drawable.google_logo // Replace with your actual drawable resource
+              description =
+                  "Easily organize and keep track of your travel adventures all in one place",
+              imageResId =
+                  R.drawable.intro_illustration // Replace with your actual drawable resource
               ),
           OnboardingPage(
               title = "Manage Events",
-              description = "Stay updated with all your travel-related events.",
-              imageResId = R.drawable.google_logo // Replace with your actual drawable resource
+              description =
+                  "Never miss a moment. Manage and stay updated on all your travel plans and events",
+              imageResId =
+                  R.drawable.never_miss_a_moment // Replace with your actual drawable resource
               ),
           OnboardingPage(
               title = "Save Documents",
-              description = "Store important travel documents securely within the app.",
-              imageResId = R.drawable.google_logo // Replace with your actual drawable resource
+              description =
+                  "Securely store and access your essential travel documents anytime, anywhere.",
+              imageResId = R.drawable.secure_storage // Replace with your actual drawable resource
               ))
   var pageIndex by remember { mutableStateOf(0) }
 
@@ -70,6 +75,7 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
                     }
                 Button(onClick = { pageIndex++ }, modifier = Modifier.testTag("NextButton")) {
                   Text("Next")
+                  // TODO add a previous button
                 }
               } else {
                 Button(
@@ -91,13 +97,13 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
 fun OnboardingPageContent(page: OnboardingPage, modifier: Modifier = Modifier) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center,
+      verticalArrangement = Arrangement.Top,
       modifier = modifier.fillMaxWidth()) {
         Image(
             painter = painterResource(id = page.imageResId),
             contentDescription = null,
-            modifier = Modifier.size(200.dp).testTag("OnboardingImage"))
-        Spacer(modifier = Modifier.height(16.dp))
+            modifier = Modifier.size(300.dp).testTag("OnboardingImage").padding(top = 16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
             page.title,
             fontSize = 24.sp,
@@ -107,35 +113,33 @@ fun OnboardingPageContent(page: OnboardingPage, modifier: Modifier = Modifier) {
         Text(
             page.description,
             fontSize = 16.sp,
-            modifier = Modifier.testTag("OnboardingDescription"))
+            modifier = Modifier.testTag("OnboardingDescription"),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
       }
 }
 
 // Progress indicator to show the current page in the onboarding process
 @Composable
 fun ProgressIndicator(currentPage: Int, totalPages: Int, modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+  Box(
+      contentAlignment = Alignment.Center,
+      modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
-            for (i in 0 until totalPages) {
+              for (i in 0 until totalPages) {
                 Box(
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .size(if (i == currentPage) 12.dp else 8.dp)
-                        .background(
-                            if (i == currentPage) androidx.compose.ui.graphics.Color.Blue
-                            else androidx.compose.ui.graphics.Color.Gray,
-                            shape = RoundedCornerShape(50))
-                )
+                    modifier =
+                        Modifier.padding(horizontal = 4.dp)
+                            .size(if (i == currentPage) 12.dp else 8.dp)
+                            .background(
+                                if (i == currentPage) androidx.compose.ui.graphics.Color.Blue
+                                else androidx.compose.ui.graphics.Color.Gray,
+                                shape = RoundedCornerShape(50)))
+              }
             }
-        }
-    }
+      }
 }
-
-
 
 // Data class to define each onboarding page
 data class OnboardingPage(val title: String, val description: String, val imageResId: Int)
