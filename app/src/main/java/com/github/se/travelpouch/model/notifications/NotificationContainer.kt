@@ -15,6 +15,7 @@ import com.google.firebase.Timestamp
  * @property notificationType Type of the notification.
  * @property timestamp Timestamp of when the notification was created. Defaults to the current time.
  * @property status Status of the notification. Defaults to UNREAD.
+ * @property sector (NotificationSector) : The sector of the notification
  */
 data class Notification(
     val notificationUid: String, // Unique ID of the notification
@@ -77,6 +78,11 @@ enum class NotificationStatus {
   UNREAD
 }
 
+/**
+ * Enum class representing the sector of the notification. This generalises the notification concept
+ * by distinguishing notifications in relation with a travel (for example, adding a participant) and
+ * notifications in relation with profile (for example adding a friend)
+ */
 enum class NotificationSector {
   TRAVEL,
   PROFILE

@@ -177,62 +177,80 @@ fun handleInvitationResponse(
     context: android.content.Context,
     isAccepted: Boolean
 ) {
-  if (notification.sector == NotificationSector.TRAVEL) {
-    listTravelViewModel.getTravelById(
-        notification.travelUid!!,
-        { travel ->
-          val responseType =
-              if (isAccepted) NotificationType.ACCEPTED else NotificationType.DECLINED
-          val responseMessage = if (isAccepted) "ACCEPTED" else "DECLINED"
+  when (notification.sector) {
+    NotificationSector.TRAVEL -> {
+      listTravelViewModel.getTravelById(
+          notification.travelUid!!,
+          { travel ->
+            val responseType =
+                if (isAccepted) NotificationType.ACCEPTED else NotificationType.DECLINED
+            val responseMessage = if (isAccepted) "ACCEPTED" else "DECLINED"
 
-          val invitationResponse =
-              Notification(
-                  notification.notificationUid,
-                  profileViewModel.profile.value.fsUid,
-                  notification.senderUid,
-                  notification.travelUid,
-                  NotificationContent.InvitationResponseNotification(
-                      profileViewModel.profile.value.username, travel!!.title, isAccepted),
-                  responseType,
-                  sector = notification.sector)
+            val invitationResponse =
+                Notification(
+                    notification.notificationUid,
+                    profileViewModel.profile.value.fsUid,
+                    notification.senderUid,
+                    notification.travelUid,
+                    NotificationContent.InvitationResponseNotification(
+                        profileViewModel.profile.value.username, travel!!.title, isAccepted),
+                    responseType,
+                    sector = notification.sector)
 
-          notificationViewModel.sendNotification(invitationResponse)
-          if (isAccepted) {
-            listTravelViewModel.addUserToTravel(
-                profileViewModel.profile.value.email,
-                travel,
-                { updatedContainer ->
-                  listTravelViewModel.selectTravel(updatedContainer)
-                  Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
-                },
-                { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() })
-          }
-          Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
-        },
-        onFailure = { Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show() })
-  } else {
-    profileViewModel.addFriend(
-        notification.senderUid,
-        onSuccess = {
-          val responseType =
-              if (isAccepted) NotificationType.ACCEPTED else NotificationType.DECLINED
+            notificationViewModel.sendNotification(invitationResponse)
+            if (isAccepted) {
+              listTravelViewModel.addUserToTravel(
+                  profileViewModel.profile.value.email,
+                  travel,
+                  { updatedContainer ->
+                    listTravelViewModel.selectTravel(updatedContainer)
+                    Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
+                  },
+                  { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() })
+            }
+            Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
+          },
+          onFailure = {
+            Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
+          })
+    }
+    NotificationSector.PROFILE -> {
+      if (isAccepted) {
+        profileViewModel.addFriend(
+            notification.senderUid,
+            onSuccess = {
+              val invitationResponse =
+                  Notification(
+                      notification.notificationUid,
+                      profileViewModel.profile.value.fsUid,
+                      notification.senderUid,
+                      notification.travelUid,
+                      NotificationContent.FriendInvitationResponseNotification(
+                          profileViewModel.profile.value.email, true),
+                      NotificationType.ACCEPTED,
+                      sector = notification.sector)
 
-          val invitationResponse =
-              Notification(
-                  notification.notificationUid,
-                  profileViewModel.profile.value.fsUid,
-                  notification.senderUid,
-                  notification.travelUid,
-                  NotificationContent.FriendInvitationResponseNotification(
-                      profileViewModel.profile.value.email, isAccepted),
-                  responseType,
-                  sector = notification.sector)
+              notificationViewModel.sendNotification(invitationResponse)
 
-          notificationViewModel.sendNotification(invitationResponse)
+              Toast.makeText(context, "Friend added", Toast.LENGTH_LONG).show()
+            },
+            onFailure = { e -> Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show() })
+      } else {
+        val invitationResponse =
+            Notification(
+                notification.notificationUid,
+                profileViewModel.profile.value.fsUid,
+                notification.senderUid,
+                notification.travelUid,
+                NotificationContent.FriendInvitationResponseNotification(
+                    profileViewModel.profile.value.email, false),
+                NotificationType.DECLINED,
+                sector = notification.sector)
 
-          Toast.makeText(context, "Friend added", Toast.LENGTH_LONG).show()
-        },
-        onFailure = { e -> Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show() })
+        notificationViewModel.sendNotification(invitationResponse)
+        Toast.makeText(context, "Request declined", Toast.LENGTH_LONG).show()
+      }
+    }
   }
 }
 

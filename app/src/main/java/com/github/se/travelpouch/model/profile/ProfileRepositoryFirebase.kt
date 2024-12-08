@@ -206,6 +206,15 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .addOnFailureListener { onFailure(Exception("getting profile failed")) }
   }
 
+  /**
+   * This function sends to notification to add a friend
+   *
+   * @param fsUid (String) : The fsUid of the sender of the notification
+   * @param userProfile (Profile) : The profile of the sender
+   * @param onSuccess ((String) -> Unit) : The function to call when the notification was sent
+   * @param onFailure ((Exception) -> Unit) : The function to call when the notification failed to
+   *   be sent
+   */
   override fun addFriend(
       fsUid: String,
       userProfile: Profile,

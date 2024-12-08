@@ -37,10 +37,16 @@ sealed class NotificationContent {
     }
   }
 
+  /**
+   * The content of the notification sent when an invitation to be friend is sent
+   *
+   * @property userEmail (String) : The email of the sender of the notification
+   */
   data class FriendInvitationNotification(
       val userEmail: String,
   ) : NotificationContent() {
 
+    /** The content to display */
     override fun toDisplayString(): String {
       return "$userEmail wants to be your friend"
     }
@@ -125,8 +131,17 @@ sealed class NotificationContent {
     }
   }
 
+  /**
+   * The content of the notification sent when a response to a notification friend request that was
+   * received
+   *
+   * @property email (String) : The email of the sender of the email
+   * @property accepted (Boolean) : A boolean representing if the request was accepted or declined
+   */
   data class FriendInvitationResponseNotification(val email: String, val accepted: Boolean) :
       NotificationContent() {
+
+    /** The content to display */
     override fun toDisplayString(): String {
       return if (accepted) {
         "$email is now your friend."

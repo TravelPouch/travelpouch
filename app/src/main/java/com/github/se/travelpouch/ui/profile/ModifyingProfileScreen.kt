@@ -262,7 +262,7 @@ fun ModifyingProfileScreen(
                                           travelUid = null,
                                           content =
                                               NotificationContent.FriendInvitationNotification(
-                                                  profile.value.fsUid),
+                                                  profile.value.email),
                                           notificationType = NotificationType.INVITATION,
                                           status = NotificationStatus.UNREAD,
                                           sector = NotificationSector.PROFILE))
