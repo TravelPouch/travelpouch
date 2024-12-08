@@ -1,5 +1,7 @@
 package com.github.se.travelpouch.model.activity
 
+import com.google.firebase.firestore.DocumentReference
+
 interface ActivityRepository {
   /**
    * This function allows us to retrieve all the activities from Firebase.
@@ -27,7 +29,12 @@ interface ActivityRepository {
    * @param onFailure ((Exception) -> Unit) : the function to call when an error occurs during the
    *   adding of an activity to the database
    */
-  fun addActivity(activity: Activity, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun addActivity(
+      activity: Activity,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference
+  )
 
   /**
    * The initialisation function of the interface

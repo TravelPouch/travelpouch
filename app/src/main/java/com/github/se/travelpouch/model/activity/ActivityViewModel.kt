@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +44,7 @@ class ActivityViewModel @Inject constructor(val activityRepositoryFirebase: Acti
    *
    * @param activity (Activity) : the activity to add to the database
    */
-  fun addActivity(activity: Activity, context: Context) {
+  fun addActivity(activity: Activity, context: Context, eventDocumentReference: DocumentReference) {
     activityRepositoryFirebase.addActivity(
         activity,
         onSuccess = {
@@ -53,7 +54,8 @@ class ActivityViewModel @Inject constructor(val activityRepositoryFirebase: Acti
         onFailure = {
           Log.e(onFailureTag, "Failed to add an activity", it)
           Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
-        })
+        },
+        eventDocumentReference)
   }
 
   /**

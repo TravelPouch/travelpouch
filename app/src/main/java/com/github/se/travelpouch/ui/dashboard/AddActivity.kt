@@ -24,6 +24,7 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
@@ -42,7 +43,8 @@ import java.util.*
 fun AddActivityScreen(
     navigationActions: NavigationActions,
     activityModelView: ActivityViewModel,
-    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory),
+    eventViewModel: EventViewModel
 ) {
 
   var title by remember { mutableStateOf("") }
@@ -240,7 +242,8 @@ fun AddActivityScreen(
                                 finalDate,
                                 mapOf())
 
-                        activityModelView.addActivity(activity, context)
+                        activityModelView.addActivity(
+                            activity, context, eventViewModel.getNewDocumentReference())
 
                         navigationActions.navigateTo(Screen.SWIPER)
                       } catch (e: java.text.ParseException) {

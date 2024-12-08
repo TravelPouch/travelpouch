@@ -3,6 +3,7 @@ package com.github.se.travelpouch.model.events
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -22,8 +23,22 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
    *
    * @return (String) : an unused unique identifier
    */
-  override fun getNewUid(): String {
-    return db.collection(collectionPath).document().id
+  override fun getNewDocumentReferenceForNewTravel(travelId: String): DocumentReference {
+    val newId =
+        db.collection(FirebasePaths.TravelsSuperCollection)
+            .document(travelId)
+            .collection(FirebasePaths.events)
+            .document()
+            .id
+    return db.collection(FirebasePaths.TravelsSuperCollection)
+        .document(travelId)
+        .collection(FirebasePaths.events)
+        .document(newId)
+  }
+
+  override fun getNewDocumentReference(): DocumentReference {
+    val newId = db.collection(collectionPath).document().id
+    return db.collection(collectionPath).document(newId)
   }
 
   /**
@@ -53,7 +68,7 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
         .get()
         .addOnSuccessListener { result ->
           val events = result?.mapNotNull { documentToEvent(it) } ?: emptyList()
-          onSuccess(events)
+          onSuccess(events.sortedByDescending { it.date })
         }
         .addOnFailureListener { e ->
           Log.e("EventRepository", "Error getting documents", e)
@@ -61,19 +76,21 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
         }
   }
 
-  /**
-   * This function adds an event to the collection of events in Firebase.
-   *
-   * @param event (Event) : the event we want to add on Firebase
-   * @param onSuccess (() -> Unit) : the function called when the event is correctly added to the
-   *   database
-   * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during the
-   *   adding an event to the database
-   */
-  override fun addEvent(event: Event, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    performFirestoreOperation(
-        db.collection(collectionPath).document(event.uid).set(event), onSuccess, onFailure)
-  }
+  //  /**
+  //   * This function adds an event to the collection of events in Firebase.
+  //   *
+  //   * @param event (Event) : the event we want to add on Firebase
+  //   * @param onSuccess (() -> Unit) : the function called when the event is correctly added to
+  // the
+  //   *   database
+  //   * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during
+  // the
+  //   *   adding an event to the database
+  //   */
+  //  override fun addEvent(event: Event, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+  //    performFirestoreOperation(
+  //        db.collection(collectionPath).document(event.uid).set(event), onSuccess, onFailure)
+  //  }
 
   /**
    * This function is a helper function that safely performs a Firebase operation. A task has

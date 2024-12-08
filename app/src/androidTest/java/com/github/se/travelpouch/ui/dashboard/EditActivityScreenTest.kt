@@ -147,7 +147,7 @@ class EditActivityScreenTest {
 
     composeTestRule.onNodeWithTag("saveButton").performClick()
     verify(mockActivityRepositoryFirebase, never())
-        .addActivity(anyOrNull(), anyOrNull(), anyOrNull())
+        .updateActivity(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
