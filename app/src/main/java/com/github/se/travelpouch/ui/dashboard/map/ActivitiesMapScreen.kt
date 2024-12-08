@@ -211,45 +211,7 @@ fun ActivitiesMapScreen(
 }
 
 @Composable
-fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: Activity?) {
-  // Distance and duration details from GPS to the selected activity
-  val distance = gpsRouteDetails?.legsDistance?.firstOrNull() ?: "N/A"
-  val duration = gpsRouteDetails?.legsDuration?.firstOrNull() ?: "N/A"
-
-  Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-    Text(
-        text = "Your current Location",
-        style = MaterialTheme.typography.headlineSmall,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(bottom = 8.dp))
-
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-      Divider(
-          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-          modifier = Modifier.width(1.dp).height(60.dp) // Increased height for better alignment
-          )
-
-      Spacer(modifier = Modifier.width(8.dp))
-
-      Column {
-        DetailRow(icon = Icons.Default.LocationOn, text = "Distance: $distance")
-        DetailRow(icon = Icons.Default.AccessTime, text = "Duration: $duration")
-      }
-    }
-
-    // Display selected activity details
-    selectedActivity?.let {
-      Text(
-          text = it.title,
-          style = MaterialTheme.typography.headlineSmall,
-          color = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.padding(bottom = 8.dp))
-    }
-  }
-}
-
-@Composable
-fun ActivityDetailsContent(activity: Activity) {
+private fun ActivityDetailsContent(activity: Activity) {
   // Date formatter
   val dateFormatter = SimpleDateFormat("dd:MM:yy", Locale.getDefault())
   val formattedDate = dateFormatter.format(activity.date.toDate())
@@ -286,7 +248,77 @@ fun ActivityDetailsContent(activity: Activity) {
 }
 
 @Composable
-fun DetailRow(icon: ImageVector, text: String) {
+private fun LegDetailsContent(
+    routeDetails: RouteDetails?,
+    legIndex: Int,
+    activities: List<Activity>
+) {
+  val startActivity = activities.getOrNull(legIndex)
+  val endActivity = activities.getOrNull(legIndex + 1)
+  val distance = routeDetails?.legsDistance?.getOrNull(legIndex) ?: "N/A"
+  val duration = routeDetails?.legsDuration?.getOrNull(legIndex) ?: "N/A"
+
+  RouteDetailsContent(
+      title = startActivity?.title,
+      distance = distance,
+      duration = duration,
+      subtitle = endActivity?.title)
+}
+
+@Composable
+private fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: Activity?) {
+  val distance = gpsRouteDetails?.legsDistance?.firstOrNull() ?: "N/A"
+  val duration = gpsRouteDetails?.legsDuration?.firstOrNull() ?: "N/A"
+
+  RouteDetailsContent(
+      title = "Your current Location",
+      distance = distance,
+      duration = duration,
+      subtitle = selectedActivity?.title)
+}
+
+@Composable
+private fun RouteDetailsContent(
+    title: String?,
+    distance: String,
+    duration: String,
+    subtitle: String? = null
+) {
+  Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+    // Title Section
+    title?.let {
+      Text(
+          text = it,
+          style = MaterialTheme.typography.headlineSmall,
+          color = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.padding(bottom = 8.dp))
+    }
+
+    // Row for Divider and Details
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+      Divider(
+          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+          modifier = Modifier.width(1.dp).height(60.dp))
+      Spacer(modifier = Modifier.width(8.dp))
+      Column {
+        DetailRow(icon = Icons.Default.LocationOn, text = "Distance: $distance")
+        DetailRow(icon = Icons.Default.AccessTime, text = "Duration: $duration")
+      }
+    }
+
+    // Subtitle Section
+    subtitle?.let {
+      Text(
+          text = it,
+          style = MaterialTheme.typography.headlineSmall,
+          color = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.padding(top = 8.dp))
+    }
+  }
+}
+
+@Composable
+private fun DetailRow(icon: ImageVector, text: String) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
     Icon(
         imageVector = icon,
@@ -298,51 +330,6 @@ fun DetailRow(icon: ImageVector, text: String) {
         text = text,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onBackground)
-  }
-}
-
-@Composable
-fun LegDetailsContent(routeDetails: RouteDetails?, legIndex: Int, activities: List<Activity>) {
-  val startActivity = activities.getOrNull(legIndex)
-  val endActivity = activities.getOrNull(legIndex + 1)
-  val distance = routeDetails?.legsDistance?.getOrNull(legIndex) ?: "N/A"
-  val duration = routeDetails?.legsDuration?.getOrNull(legIndex) ?: "N/A"
-
-  Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-    // Start Activity Title
-    startActivity?.let {
-      Text(
-          text = it.title,
-          style = MaterialTheme.typography.headlineSmall,
-          color = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.padding(bottom = 8.dp))
-    }
-
-    // Row for Divider and Details
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-      // Vertical Divider
-      Divider(
-          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-          modifier = Modifier.width(1.dp).height(60.dp) // Increased height for better alignment
-          )
-
-      Spacer(modifier = Modifier.width(8.dp))
-
-      // Column for Distance and Duration
-      Column {
-        DetailRow(icon = Icons.Default.LocationOn, text = "Distance: $distance")
-        DetailRow(icon = Icons.Default.AccessTime, text = "Duration: $duration")
-      }
-    }
-
-    // End Activity Title
-    endActivity?.let {
-      Text(
-          text = it.title,
-          style = MaterialTheme.typography.headlineSmall,
-          color = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.padding(top = 8.dp))
-    }
   }
 }
 
