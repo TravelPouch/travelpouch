@@ -21,8 +21,9 @@ data class RouteDetails(
     val destination: LatLng, // Destination location
     val route: Path, // List of path for the entire route
     val legsRoute:
-        List<Path> // List of paths for each leg of the route. Each leg is a segment between
-    // waypoints
+        List<Path>, // List of paths for each leg of the route. Each leg is a segment between
+    val legsDistance: List<String>, // List of distances for each leg
+    val legsDuration: List<String> // List of durations for each leg
 ) {
   companion object {
     val EMPTY =
@@ -30,7 +31,9 @@ data class RouteDetails(
             origin = LatLng(0.0, 0.0),
             destination = LatLng(0.0, 0.0),
             route = emptyList(),
-            legsRoute = emptyList())
+            legsRoute = emptyList(),
+            legsDistance = emptyList(),
+            legsDuration = emptyList())
   }
 }
 
@@ -189,10 +192,17 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
 
         // Decode the polyline for each leg and add it to the legs list
         val legsPaths = route.legs.map { leg -> PolyUtil.decode(leg.overviewPolyline.points) }
+        val legsDistance = route.legs.map { leg -> leg.distanceText }
+        val legsDuration = route.legs.map { leg -> leg.durationText }
 
         // Create and return a RouteDetails object
         RouteDetails(
-            origin = origin, destination = destination, route = overviewPath, legsRoute = legsPaths)
+            origin = origin,
+            destination = destination,
+            route = overviewPath,
+            legsRoute = legsPaths,
+            legsDistance = legsDistance,
+            legsDuration = legsDuration)
       } else {
         Log.e("DirectionsHelper", "No routes found in directions response")
         null
