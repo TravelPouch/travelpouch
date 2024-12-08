@@ -2,12 +2,12 @@ package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -39,8 +39,9 @@ import com.github.se.travelpouch.model.events.Event
 import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import java.util.Calendar
-import java.util.GregorianCalendar
+import java.text.SimpleDateFormat
+import java.util.Locale
+import okhttp3.internal.format
 
 // credit to the website :
 // https://medium.com/proandroiddev/a-step-by-step-guide-to-building-a-timeline-component-with-jetpack-compose-358a596847cb
@@ -50,6 +51,8 @@ enum class Paddings(val padding: Dp) {
   SPACER_LESS_RIGHT(32.dp),
   SPACER_MORE_RIGHT(96.dp)
 }
+
+val format = SimpleDateFormat("dd/MM/yyyy 'at' hh:mm:ss a", Locale.getDefault())
 
 /**
  * A data class representing a circle
@@ -165,21 +168,17 @@ fun TimelineScreen(
 @Composable
 fun TimelineItem(event: Event, modifier: Modifier) {
   Card(
-      modifier = modifier.width(250.dp).height(100.dp).testTag("eventCard"),
+      modifier = modifier.testTag("eventCard"),
       colors = CardDefaults.cardColors(containerColor = mapEventTypeToColor(event.eventType))) {
-        Text(event.eventType.toString(), modifier = Modifier.testTag("eventType"))
-        Text(event.title, modifier = Modifier.testTag("eventTitle"))
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          Text(event.eventType.toString(), modifier = Modifier.testTag("eventType"))
+          Text(event.description, modifier = Modifier.testTag("eventTitle"))
 
-        val calendar = GregorianCalendar()
-        calendar.time = event.date.toDate()
-
-        Text(
-            "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
-          calendar.get(
-              Calendar.YEAR
-          )
-      }",
-            modifier = Modifier.testTag("eventDate"))
+          Text(format.format(event.date.toDate()), modifier = Modifier.testTag("eventDate"))
+        }
       }
 }
 

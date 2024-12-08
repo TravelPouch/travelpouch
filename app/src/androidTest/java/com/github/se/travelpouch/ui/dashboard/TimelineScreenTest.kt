@@ -84,9 +84,9 @@ class TimelineScreenTest {
     composeTestRule.onNodeWithTag("eventType").assertTextEquals("NEW_DOCUMENT")
 
     composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventTitle").assertTextEquals("eventTitle")
+    composeTestRule.onNodeWithTag("eventTitle").assertTextEquals("eventDescription")
 
     composeTestRule.onNodeWithTag("eventDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventDate").assertTextEquals("1/1/1970")
+    composeTestRule.onNodeWithTag("eventDate").assertTextEquals("01/01/1970 at 12:00:00 AM")
   }
 }
