@@ -72,6 +72,7 @@ class NotificationContainerInvalidDataTest(
         receiverUid = receiverUid,
         travelUid = travelUid,
         content = content,
-        notificationType = NotificationType.INVITATION)
+        notificationType = NotificationType.INVITATION,
+        sector = NotificationSector.TRAVEL)
   }
 }

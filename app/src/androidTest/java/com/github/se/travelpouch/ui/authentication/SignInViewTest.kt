@@ -116,7 +116,7 @@ class SignInViewTest {
     }
     // Temporary solution
     composeTestRule.waitForIdle()
-    //verify(mockNavigationActions).navigateTo(Screen.TRAVEL_LIST)
+    // verify(mockNavigationActions).navigateTo(Screen.TRAVEL_LIST)
   }
 
   @Test

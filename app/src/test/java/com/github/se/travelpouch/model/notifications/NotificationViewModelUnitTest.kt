@@ -53,6 +53,7 @@ class NotificationViewModelUnitTest {
   val content1 =
       NotificationContent.InvitationNotification("John Doe", "Trip to Paris", Role.PARTICIPANT)
   val notificationType1 = NotificationType.INVITATION
+  val sector: NotificationSector = NotificationSector.TRAVEL
 
   val notification1 =
       Notification(
@@ -61,7 +62,8 @@ class NotificationViewModelUnitTest {
           receiverUid = receiverUid,
           travelUid = travel1Uid,
           content = content1,
-          notificationType = notificationType1)
+          notificationType = notificationType1,
+          sector = sector)
 
   val senderUid2 = generateAutoUserId()
   val receiverUid2 = generateAutoUserId()
@@ -79,7 +81,8 @@ class NotificationViewModelUnitTest {
           receiverUid = receiverUid2,
           travelUid = travel2Uid,
           content = content2,
-          notificationType = notificationType2)
+          notificationType = notificationType2,
+          sector = sector)
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
@@ -125,7 +128,8 @@ class NotificationViewModelUnitTest {
             content =
                 NotificationContent.InvitationNotification(
                     "John Doe", "Trip to Paris", Role.PARTICIPANT),
-            notificationType = NotificationType.INVITATION)
+            notificationType = NotificationType.INVITATION,
+            sector = sector)
     notificationViewModel.sendNotification(notification)
     verify(notificationRepositoryFirestore, times(1)).addNotification(eq(notification))
   }
