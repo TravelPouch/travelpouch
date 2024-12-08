@@ -211,9 +211,9 @@ fun ActivitiesMapScreen(
 }
 
 @Composable
-private fun ActivityDetailsContent(activity: Activity) {
+fun ActivityDetailsContent(activity: Activity) {
   // Date formatter
-  val dateFormatter = SimpleDateFormat("dd:MM:yy", Locale.getDefault())
+  val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
   val formattedDate = dateFormatter.format(activity.date.toDate())
 
   // Time formatter
@@ -226,7 +226,7 @@ private fun ActivityDetailsContent(activity: Activity) {
         text = activity.title,
         style = MaterialTheme.typography.headlineSmall,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(bottom = 12.dp))
+        modifier = Modifier.padding(bottom = 12.dp).testTag("ActivityTitle"))
 
     // Divider
     Divider(
@@ -234,25 +234,27 @@ private fun ActivityDetailsContent(activity: Activity) {
         modifier = Modifier.padding(bottom = 12.dp))
 
     // Date Row
-    DetailRow(icon = Icons.Default.CalendarToday, text = formattedDate)
+    DetailRow(icon = Icons.Default.CalendarToday, text = formattedDate, testTag = "ActivityDate")
 
     // Time Row
-    DetailRow(icon = Icons.Default.AccessTime, text = formattedTime)
+    DetailRow(icon = Icons.Default.AccessTime, text = formattedTime, testTag = "ActivityTime")
 
     // Location Row
-    DetailRow(icon = Icons.Default.LocationOn, text = activity.location.name)
+    DetailRow(
+        icon = Icons.Default.LocationOn,
+        text = activity.location.name,
+        testTag = "ActivityLocation")
 
     // Description Row
-    DetailRow(icon = Icons.Default.Description, text = activity.description)
+    DetailRow(
+        icon = Icons.Default.Description,
+        text = activity.description,
+        testTag = "ActivityDescription")
   }
 }
 
 @Composable
-private fun LegDetailsContent(
-    routeDetails: RouteDetails?,
-    legIndex: Int,
-    activities: List<Activity>
-) {
+fun LegDetailsContent(routeDetails: RouteDetails?, legIndex: Int, activities: List<Activity>) {
   val startActivity = activities.getOrNull(legIndex)
   val endActivity = activities.getOrNull(legIndex + 1)
   val distance = routeDetails?.legsDistance?.getOrNull(legIndex) ?: "N/A"
@@ -266,7 +268,7 @@ private fun LegDetailsContent(
 }
 
 @Composable
-private fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: Activity?) {
+fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: Activity?) {
   val distance = gpsRouteDetails?.legsDistance?.firstOrNull() ?: "N/A"
   val duration = gpsRouteDetails?.legsDuration?.firstOrNull() ?: "N/A"
 
@@ -278,7 +280,7 @@ private fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: 
 }
 
 @Composable
-private fun RouteDetailsContent(
+fun RouteDetailsContent(
     title: String?,
     distance: String,
     duration: String,
@@ -318,18 +320,19 @@ private fun RouteDetailsContent(
 }
 
 @Composable
-private fun DetailRow(icon: ImageVector, text: String) {
+fun DetailRow(icon: ImageVector, text: String, testTag: String = "") {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
     Icon(
         imageVector = icon,
         contentDescription = null,
         tint = MaterialTheme.colorScheme.secondary,
-        modifier = Modifier.size(20.dp))
+        modifier = Modifier.size(20.dp).testTag("${testTag}_Icon"))
     Spacer(modifier = Modifier.width(8.dp))
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onBackground)
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = Modifier.testTag(testTag))
   }
 }
 
@@ -342,7 +345,7 @@ fun AddCurrentLocationMarker(currentLocation: LatLng?) {
         state = MarkerState(position = location),
         title = "You are here",
         snippet = "Current location",
-    )
+        tag = Modifier.testTag("CurrentLocationMarker"))
   }
 }
 
@@ -362,6 +365,7 @@ fun AddActivityMarkers(
         title = activity.title,
         snippet = dateFormat.format(activity.date.toDate()),
         icon = icon,
+        tag = Modifier.testTag("Marker_${index}"),
         onClick = {
           onActivitySelected(activity)
           true

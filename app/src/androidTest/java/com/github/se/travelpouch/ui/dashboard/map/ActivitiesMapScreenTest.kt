@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.dashboard.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -22,6 +23,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Timestamp
 import io.mockk.every
 import io.mockk.mockkStatic
+import java.text.SimpleDateFormat
+import java.util.Locale
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -51,21 +54,21 @@ class ActivitiesMapScreenTest {
               title = "Team Meeting",
               description = "Monthly team meeting to discuss project progress.",
               location = Location(48.8566, 2.3522, Timestamp.now(), "Paris"),
-              date = Timestamp.now(),
+              date = createTimestamp("20/12/2024 12:00"),
               documentsNeeded = mapOf("Agenda" to 1, "Meeting Notes" to 2)),
           Activity(
               uid = "2",
               title = "Client Presentation",
               description = "Presentation to showcase the project to the client.",
-              location = Location(40.0, -122.4194, Timestamp.now(), "Paris"),
-              date = Timestamp(Timestamp.now().seconds + 3600, Timestamp.now().nanoseconds),
+              location = Location(49.8566, 2.3522, Timestamp.now(), "Paris"),
+              date = createTimestamp("21/12/2024 13:00"),
               documentsNeeded = null),
           Activity(
               uid = "3",
               title = "Workshop",
               description = "Workshop on team building and skill development.",
-              location = Location(51.5074, -0.1278, Timestamp.now(), "London"),
-              date = Timestamp(Timestamp.now().seconds + 7200, Timestamp.now().nanoseconds),
+              location = Location(49.02, 2.5, Timestamp.now(), "Paris"),
+              date = createTimestamp("23/12/2024 14:00"),
               documentsNeeded = mapOf("Workshop Material" to 1)))
 
   private val mockLeg =
@@ -181,4 +184,33 @@ class ActivitiesMapScreenTest {
 
     verify(mockNavigationActions).goBack()
   }
+
+  @Test
+  fun testActivityDetailsContentDisplaysCorrectDetails() {
+    composeTestRule.setContent { ActivityDetailsContent(activity = listOfActivities[0]) }
+
+    // Verify title
+    composeTestRule.onNodeWithTag("ActivityTitle").assertExists().assertTextEquals("Team Meeting")
+
+    // Verify date (expected format: "20/12/2024")
+    composeTestRule.onNodeWithTag("ActivityDate").assertExists().assertTextEquals("20/12/2024")
+
+    // Verify time (expected format: "12:00")
+    composeTestRule.onNodeWithTag("ActivityTime").assertExists().assertTextEquals("12:00")
+
+    // Verify location
+    composeTestRule.onNodeWithTag("ActivityLocation").assertExists().assertTextEquals("Paris")
+
+    // Verify description
+    composeTestRule
+        .onNodeWithTag("ActivityDescription")
+        .assertExists()
+        .assertTextEquals("Monthly team meeting to discuss project progress.")
+  }
+}
+
+fun createTimestamp(dateString: String, format: String = "dd/MM/yyyy HH:mm"): Timestamp {
+  val dateFormat = SimpleDateFormat(format, Locale.getDefault())
+  val date = dateFormat.parse(dateString) ?: throw IllegalArgumentException("Invalid date format")
+  return Timestamp(date)
 }
