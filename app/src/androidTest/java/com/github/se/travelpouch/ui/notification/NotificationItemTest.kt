@@ -119,7 +119,12 @@ class NotificationItemTest {
 
     composeTestRule.setContent {
       InvitationButtons(
-          notification1, listTravelViewModel, profileModelView, notificationViewModel, context)
+          notification1,
+          listTravelViewModel,
+          profileModelView,
+          notificationViewModel,
+          context,
+          eventViewModel)
     }
 
     composeTestRule.onNodeWithTag("notification_item_buttons").assertIsDisplayed()
@@ -133,7 +138,12 @@ class NotificationItemTest {
 
     composeTestRule.setContent {
       AcceptButton(
-          notification1, listTravelViewModel, profileModelView, notificationViewModel, context)
+          notification1,
+          listTravelViewModel,
+          profileModelView,
+          notificationViewModel,
+          context,
+          eventViewModel)
     }
 
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertIsDisplayed()
@@ -148,7 +158,12 @@ class NotificationItemTest {
 
     composeTestRule.setContent {
       DeclineButton(
-          notification1, listTravelViewModel, profileModelView, notificationViewModel, context)
+          notification1,
+          listTravelViewModel,
+          profileModelView,
+          notificationViewModel,
+          context,
+          eventsViewModel = eventViewModel)
     }
 
     composeTestRule.onNodeWithTag("notification_item_decline_button").assertIsDisplayed()

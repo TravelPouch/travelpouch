@@ -280,7 +280,8 @@ class TravelRepositoryFirestoreUnitTest {
         TravelRepository.UpdateMode.FIELDS_UPDATE,
         null,
         { successCalled = true },
-        { fail("Should not call onFailure") })
+        { fail("Should not call onFailure") },
+        null)
 
     // Simulate task completion
     val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()
@@ -312,6 +313,9 @@ class TravelRepositoryFirestoreUnitTest {
 
     val travelDocumentReference: DocumentReference = mock()
     val profileDocumentReference: DocumentReference = mock()
+    val eventDocumentReference: DocumentReference = mock()
+
+    whenever(eventDocumentReference.id).thenReturn("qwertzuiopasdfghjklb")
 
     whenever(firestoreMock.collection(eq(FirebasePaths.TravelsSuperCollection)))
         .thenReturn(travelCollectionReference)
@@ -348,7 +352,8 @@ class TravelRepositoryFirestoreUnitTest {
         TravelRepository.UpdateMode.ADD_PARTICIPANT,
         friendProfile.fsUid,
         { succeeded = true },
-        { failed = true })
+        { failed = true },
+        eventDocumentReference = eventDocumentReference)
 
     val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Void>>()
     verify(task).addOnSuccessListener(onSuccessListenerCaptor.capture())
@@ -359,7 +364,7 @@ class TravelRepositoryFirestoreUnitTest {
     transactionCaptor.firstValue.apply(transactionMock)
 
     verify(transactionMock).update(anyOrNull(), eq("userTravelList"), anyOrNull())
-    verify(transactionMock).set(anyOrNull(), anyOrNull())
+    verify(transactionMock, times(2)).set(anyOrNull(), anyOrNull())
     verify(transactionMock).get(anyOrNull())
 
     assertTrue(succeeded)
@@ -400,7 +405,8 @@ class TravelRepositoryFirestoreUnitTest {
         TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
         "user",
         { succeeded = true },
-        { failed = true })
+        { failed = true },
+        mock())
 
     val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Void>>()
     verify(task).addOnSuccessListener(onSuccessListenerCaptor.capture())
@@ -424,7 +430,8 @@ class TravelRepositoryFirestoreUnitTest {
         TravelRepository.UpdateMode.FIELDS_UPDATE,
         null,
         { fail("Should not call onSuccess") },
-        { failureCalled = true })
+        { failureCalled = true },
+        null)
 
     // Simulate task completion
     val onCompleteListenerCaptor = argumentCaptor<OnCompleteListener<Void>>()

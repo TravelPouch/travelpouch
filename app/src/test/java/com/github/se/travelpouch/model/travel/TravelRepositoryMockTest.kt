@@ -76,7 +76,8 @@ class TravelRepositoryMockTest {
         TravelRepository.UpdateMode.FIELDS_UPDATE,
         null,
         { succeeded = true },
-        { failed = true })
+        { failed = true },
+        null)
     assert(succeeded)
     assertFalse(failed)
 

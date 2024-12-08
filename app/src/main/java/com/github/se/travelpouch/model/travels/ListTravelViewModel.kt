@@ -149,14 +149,16 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
   fun updateTravel(
       travel: TravelContainer,
       modeOfUpdate: TravelRepository.UpdateMode,
-      fsUidOfAddedParticipant: String?
+      fsUidOfAddedParticipant: String?,
+      eventDocumentReference: DocumentReference?
   ) {
     repository.updateTravel(
         travel = travel,
         modeOfUpdate = modeOfUpdate,
         fsUidOfAddedParticipant = fsUidOfAddedParticipant,
         onSuccess = { getTravels() },
-        onFailure = { Log.e("ListTravelViewModel", "Failed to update travel", it) })
+        onFailure = { Log.e("ListTravelViewModel", "Failed to update travel", it) },
+        eventDocumentReference)
   }
 
   /**
@@ -235,7 +237,8 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
       email: String,
       selectedTravel: TravelContainer,
       onSuccess: (TravelContainer) -> Unit,
-      onFailure: () -> Unit
+      onFailure: () -> Unit,
+      eventDocumentReference: DocumentReference
   ) {
     checkParticipantExists(
         email,
@@ -251,7 +254,11 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
               selectedTravel.copy(
                   allParticipants = newParticipantMap.toMap(),
                   listParticipant = newParticipantList.toList())
-          updateTravel(newTravel, TravelRepository.UpdateMode.ADD_PARTICIPANT, user.fsUid)
+          updateTravel(
+              newTravel,
+              TravelRepository.UpdateMode.ADD_PARTICIPANT,
+              user.fsUid,
+              eventDocumentReference)
           onSuccess(newTravel)
         },
         onFailure = { onFailure() })

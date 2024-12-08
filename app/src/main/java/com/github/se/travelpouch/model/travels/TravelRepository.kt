@@ -47,7 +47,8 @@ interface TravelRepository {
       modeOfUpdate: UpdateMode,
       fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference?
   )
 
   fun deleteTravelById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)

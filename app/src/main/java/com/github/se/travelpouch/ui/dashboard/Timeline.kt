@@ -195,7 +195,9 @@ fun mapEventTypeToColor(type: EventType): Color {
     EventType.NEW_DOCUMENT -> Color.Green.copy(alpha = 0.3f)
     EventType.START_OF_JOURNEY -> Color.Blue.copy(alpha = 0.3f)
     EventType.NEW_PARTICIPANT -> Color.Red.copy(alpha = 0.3f)
+    EventType.PARTICIPANT_REMOVED -> Color.Red.copy(alpha = 0.3f)
     EventType.NEW_ACTIVITY -> Color.Yellow.copy(alpha = 0.3f)
+    EventType.ACTIVITY_DELETED -> Color.Yellow.copy(alpha = 0.3f)
   }
 }
 

@@ -145,7 +145,11 @@ class MainActivity : ComponentActivity() {
 
         composable(Screen.PARTICIPANT_LIST) {
           ParticipantListScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+              listTravelViewModel,
+              navigationActions,
+              notificationViewModel,
+              profileModelView,
+              eventsViewModel)
         }
         composable(Screen.DOCUMENT_LIST) {
           DocumentListScreen(

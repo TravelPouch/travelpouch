@@ -172,7 +172,8 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
       modeOfUpdate: TravelRepository.UpdateMode,
       fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference?
   ) {
     Log.d("TravelRepositoryFirestore", "updateTravel")
     when (modeOfUpdate) {
@@ -183,6 +184,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
             onFailure)
       }
       TravelRepository.UpdateMode.ADD_PARTICIPANT -> {
+
         val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
         val addedUserDocumentReference =
             db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
@@ -191,11 +193,22 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
               val currentAddedUserProfile =
                   ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
 
+              val event =
+                  Event(
+                      eventDocumentReference!!.id,
+                      EventType.NEW_PARTICIPANT,
+                      Timestamp.now(),
+                      "${currentAddedUserProfile.email} joined the travel.",
+                      "${currentAddedUserProfile.email} joined the travel.",
+                      null,
+                      null)
+
               val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
               listTravelUpdated.add(travel.fsUid)
 
               it.set(travelDocumentReference, travel.toMap())
               it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+              it.set(eventDocumentReference, event)
             }
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
@@ -212,11 +225,22 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
               val currentAddedUserProfile =
                   ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
 
+              val event =
+                  Event(
+                      eventDocumentReference!!.id,
+                      EventType.PARTICIPANT_REMOVED,
+                      Timestamp.now(),
+                      "${currentAddedUserProfile.email} joined the travel.",
+                      "${currentAddedUserProfile.email} joined the travel.",
+                      null,
+                      null)
+
               val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
               listTravelUpdated.remove(travel.fsUid)
 
               it.set(travelDocumentReference, travel.toMap())
               it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+              it.set(eventDocumentReference, event)
             }
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->

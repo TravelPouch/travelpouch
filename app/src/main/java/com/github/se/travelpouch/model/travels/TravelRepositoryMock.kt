@@ -65,7 +65,8 @@ class TravelRepositoryMock : TravelRepository {
       modeOfUpdate: TravelRepository.UpdateMode,
       fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference?
   ) {
     travelCollection[travel.fsUid] = travel
     onSuccess()
