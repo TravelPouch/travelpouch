@@ -139,7 +139,7 @@ fun SignInWithPassword(
                       Log.w(TAG, "createUserWithEmail:failure", task.exception)
                       Toast.makeText(
                               context,
-                              "Signing in failed.",
+                              "Signup in failed.",
                               Toast.LENGTH_SHORT,
                           )
                           .show()

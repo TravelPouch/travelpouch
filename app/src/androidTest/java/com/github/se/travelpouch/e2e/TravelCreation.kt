@@ -61,19 +61,17 @@ class TravelCreation {
 
         composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign in").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign up").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest2@gmail.com")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest2password")
-        composeTestRule.onNodeWithText("Sign in").performClick()
+        composeTestRule.onNodeWithText("Sign up").performClick()
 
         // Skip onboarding
         composeTestRule.waitUntil(timeoutMillis = 2000) {
           composeTestRule.onNodeWithTag("OnboardingScreen", useUnmergedTree = true).isDisplayed()
         }
         composeTestRule.onNodeWithTag("SkipButton").performClick()
-
-
 
         // wait until we are in the travel list screen
         composeTestRule.waitUntil(timeoutMillis = 2000) {

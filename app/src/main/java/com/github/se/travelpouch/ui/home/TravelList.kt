@@ -305,10 +305,8 @@ fun TravelListScreen(
                                                 .graphicsLayer(
                                                     rotationZ = 90f) // Rotate arrow to point down
                                                 .offset(
-                                                    y =
-                                                        (-30)
-                                                            .dp) // Adjust position to align with
-                                                                 // FAB
+                                                    y = (-30).dp) // Adjust position to align with
+                                        // FAB
                                         )
                                   }
                                 }
