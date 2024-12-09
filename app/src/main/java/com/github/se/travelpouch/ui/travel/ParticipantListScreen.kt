@@ -5,10 +5,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -29,7 +26,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -172,49 +168,13 @@ fun ParticipantListScreen(
                               profileViewModel.getFsUidByEmail(
                                   addUserEmail.value,
                                   onSuccess = { fsUid ->
-                                    val isUserAlreadyAdded =
-                                        selectedTravel!!.allParticipants.keys.any {
-                                          it.fsUid == fsUid
-                                        }
-                                    if (fsUid == profileViewModel.profile.value.fsUid) {
-                                      Toast.makeText(
-                                              context,
-                                              "Error: You can't invite yourself",
-                                              Toast.LENGTH_SHORT)
-                                          .show()
-                                    } else if (isUserAlreadyAdded) {
-                                      Toast.makeText(
-                                              context,
-                                              "Error: User already added",
-                                              Toast.LENGTH_SHORT)
-                                          .show()
-                                    } else if (fsUid != null) {
-                                      try {
-                                        notificationViewModel.sendNotification(
-                                            Notification(
-                                                notificationViewModel.getNewUid(),
-                                                profileViewModel.profile.value.fsUid,
-                                                fsUid,
-                                                selectedTravel!!.fsUid,
-                                                NotificationContent.InvitationNotification(
-                                                    profileViewModel.profile.value.name,
-                                                    selectedTravel!!.title,
-                                                    Role.PARTICIPANT),
-                                                NotificationType.INVITATION))
-                                      } catch (e: Exception) {
-                                        Log.e(
-                                            "NotificationError",
-                                            "Failed to send notification: ${e.message}")
-                                      }
-                                      // Go back
-                                      setExpandedAddUserDialog(false)
-                                    } else {
-                                      Toast.makeText(
-                                              context,
-                                              "Error: User with email not found",
-                                              Toast.LENGTH_SHORT)
-                                          .show()
-                                    }
+                                    inviteUserToTravelViaFsuid(
+                                        selectedTravel,
+                                        fsUid,
+                                        profileViewModel,
+                                        context,
+                                        notificationViewModel,
+                                        setExpandedAddUserDialog)
                                   },
                                   onFailure = { e ->
                                     Log.e(
@@ -243,13 +203,10 @@ fun ParticipantListScreen(
           if (expandedFriendListDialog) {
             Dialog(onDismissRequest = { setExpandedFriendListDialog(false) }) {
               Box(
-                  Modifier
-                      .background(MaterialTheme.colorScheme.surface)
+                  Modifier.background(MaterialTheme.colorScheme.surface)
                       .testTag("friendListDialogBox")) {
                     Column(
-                        modifier =
-                            Modifier
-                                .padding(16.dp).testTag("friendListDialogColumn"),
+                        modifier = Modifier.padding(16.dp).testTag("friendListDialogColumn"),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top) {
                           Text(
@@ -269,16 +226,22 @@ fun ParticipantListScreen(
                                                     "Friend selected, gyat!",
                                                     Toast.LENGTH_SHORT)
                                                 .show()
+                                            inviteUserToTravelViaFsuid(
+                                                selectedTravel,
+                                                userProfile.value.friends[friend],
+                                                profileViewModel,
+                                                context,
+                                                notificationViewModel,
+                                                setExpandedAddUserDialog)
                                           }
                                           .testTag("friendCard"),
-                                    border = BorderStroke(1.dp, Color.Gray),
-                                  )
-                                  {
-                                    Column(modifier = Modifier.padding(16.dp)) {
-                                      Text(friend, fontWeight = FontWeight.Bold)
-                                      Text(friend)
-                                    }
-                                  }
+                                  border = BorderStroke(1.dp, Color.Gray),
+                              ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                  Text(friend, fontWeight = FontWeight.Bold)
+                                  Text(friend)
+                                }
+                              }
                             }
                           }
                         }
@@ -384,6 +347,40 @@ fun ParticipantListScreen(
             }
       }
     }
+  }
+}
+
+private fun inviteUserToTravelViaFsuid(
+    selectedTravel: TravelContainer?,
+    fsUid: String?,
+    profileViewModel: ProfileModelView,
+    context: Context,
+    notificationViewModel: NotificationViewModel,
+    setExpandedAddUserDialog: (Boolean) -> Unit
+) {
+  val isUserAlreadyAdded = selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
+  if (fsUid == profileViewModel.profile.value.fsUid) {
+    Toast.makeText(context, "Error: You can't invite yourself", Toast.LENGTH_SHORT).show()
+  } else if (isUserAlreadyAdded) {
+    Toast.makeText(context, "Error: User already added", Toast.LENGTH_SHORT).show()
+  } else if (fsUid != null) {
+    try {
+      notificationViewModel.sendNotification(
+          Notification(
+              notificationViewModel.getNewUid(),
+              profileViewModel.profile.value.fsUid,
+              fsUid,
+              selectedTravel!!.fsUid,
+              NotificationContent.InvitationNotification(
+                  profileViewModel.profile.value.name, selectedTravel!!.title, Role.PARTICIPANT),
+              NotificationType.INVITATION))
+    } catch (e: Exception) {
+      Log.e("NotificationError", "Failed to send notification: ${e.message}")
+    }
+    // Go back
+    setExpandedAddUserDialog(false)
+  } else {
+    Toast.makeText(context, "Error: User with email not found", Toast.LENGTH_SHORT).show()
   }
 }
 
