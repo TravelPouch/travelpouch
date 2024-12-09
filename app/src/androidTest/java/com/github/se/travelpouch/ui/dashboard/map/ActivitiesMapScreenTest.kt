@@ -2,6 +2,7 @@ package com.github.se.travelpouch.ui.dashboard.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -16,12 +17,15 @@ import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
 import com.github.se.travelpouch.model.activity.map.Leg
 import com.github.se.travelpouch.model.activity.map.OverviewPolyline
 import com.github.se.travelpouch.model.activity.map.Route
+import com.github.se.travelpouch.model.activity.map.RouteDetails
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Timestamp
 import io.mockk.every
 import io.mockk.mockkStatic
+import java.text.SimpleDateFormat
+import java.util.Locale
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -51,21 +55,21 @@ class ActivitiesMapScreenTest {
               title = "Team Meeting",
               description = "Monthly team meeting to discuss project progress.",
               location = Location(48.8566, 2.3522, Timestamp.now(), "Paris"),
-              date = Timestamp.now(),
+              date = createTimestamp("20/12/2024 12:00"),
               documentsNeeded = mapOf("Agenda" to 1, "Meeting Notes" to 2)),
           Activity(
               uid = "2",
               title = "Client Presentation",
               description = "Presentation to showcase the project to the client.",
-              location = Location(40.0, -122.4194, Timestamp.now(), "Paris"),
-              date = Timestamp(Timestamp.now().seconds + 3600, Timestamp.now().nanoseconds),
+              location = Location(49.8566, 2.3522, Timestamp.now(), "Paris"),
+              date = createTimestamp("21/12/2024 13:00"),
               documentsNeeded = null),
           Activity(
               uid = "3",
               title = "Workshop",
               description = "Workshop on team building and skill development.",
-              location = Location(51.5074, -0.1278, Timestamp.now(), "London"),
-              date = Timestamp(Timestamp.now().seconds + 7200, Timestamp.now().nanoseconds),
+              location = Location(49.02, 2.5, Timestamp.now(), "Paris"),
+              date = createTimestamp("23/12/2024 14:00"),
               documentsNeeded = mapOf("Workshop Material" to 1)))
 
   private val mockLeg =
@@ -146,9 +150,7 @@ class ActivitiesMapScreenTest {
 
     mockActivityModelView.getAllActivities()
 
-    composeTestRule.setContent {
-      ActivitiesMapScreen(mockActivityModelView, mockNavigationActions, mockkDirectionsViewModel)
-    }
+    composeTestRule.setContent { ActivitiesMapScreen(mockActivityModelView, mockNavigationActions) }
 
     composeTestRule.onNodeWithTag("Map").assertExists()
   }
@@ -159,9 +161,7 @@ class ActivitiesMapScreenTest {
     `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf())
     }
-    composeTestRule.setContent {
-      ActivitiesMapScreen(mockActivityModelView, mockNavigationActions, mockkDirectionsViewModel)
-    }
+    composeTestRule.setContent { ActivitiesMapScreen(mockActivityModelView, mockNavigationActions) }
 
     composeTestRule.onNodeWithTag("Map").assertExists()
   }
@@ -170,9 +170,7 @@ class ActivitiesMapScreenTest {
   fun testGoBackButton() {
     composeTestRule.setContent {
       ActivitiesMapScreen(
-          activityViewModel = mockActivityModelView,
-          navigationActions = mockNavigationActions,
-          directionsViewModel = mockkDirectionsViewModel)
+          activityViewModel = mockActivityModelView, navigationActions = mockNavigationActions)
     }
 
     composeTestRule.waitForIdle()
@@ -181,4 +179,124 @@ class ActivitiesMapScreenTest {
 
     verify(mockNavigationActions).goBack()
   }
+
+  @Test
+  fun testActivityDetailsContentDisplaysCorrectDetails() {
+    composeTestRule.setContent { ActivityDetailsContent(activity = listOfActivities[0]) }
+
+    // Verify title
+    composeTestRule.onNodeWithTag("ActivityTitle").assertExists().assertTextEquals("Team Meeting")
+
+    // Verify date (expected format: "20/12/2024")
+    composeTestRule.onNodeWithTag("ActivityDate").assertExists().assertTextEquals("20/12/2024")
+
+    // Verify time (expected format: "12:00")
+    composeTestRule.onNodeWithTag("ActivityTime").assertExists().assertTextEquals("12:00")
+
+    // Verify location
+    composeTestRule.onNodeWithTag("ActivityLocation").assertExists().assertTextEquals("Paris")
+
+    // Verify description
+    composeTestRule
+        .onNodeWithTag("ActivityDescription")
+        .assertExists()
+        .assertTextEquals("Monthly team meeting to discuss project progress.")
+  }
+
+  @Test
+  fun testGpsDetailsContentDisplaysCorrectDetails() {
+    composeTestRule.setContent {
+      GpsDetailsContent(
+          gpsRouteDetails =
+              RouteDetails(
+                  origin = LatLng(48.8566, 2.3522), // Mock origin (e.g., Paris)
+                  destination = LatLng(49.8566, 2.3522), // Mock destination
+                  route = listOf(LatLng(48.8566, 2.3522), LatLng(49.8566, 2.3522)), // Mock route
+                  legsDistance = listOf("5 km"),
+                  legsDuration = listOf("10 mins"),
+                  legsRoute =
+                      listOf(
+                          listOf(
+                              LatLng(48.8566, 2.3522),
+                              LatLng(48.8570, 2.3530)) // Mock GPS to activity route
+                          )),
+          selectedActivity = listOfActivities[0] // Mock selected activity
+          )
+    }
+
+    // Verify title
+    composeTestRule
+        .onNodeWithTag("RouteDetailsTitle_Gps")
+        .assertExists()
+        .assertTextEquals("Your current Location")
+
+    // Verify distance
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDistance_Gps")
+        .assertExists()
+        .assertTextEquals("Distance: 5 km")
+
+    // Verify duration
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDurationGps")
+        .assertExists()
+        .assertTextEquals("Duration: 10 mins")
+
+    // Verify subtitle (Activity Title)
+    composeTestRule
+        .onNodeWithTag("RouteDetailsSubtitle_Gps")
+        .assertExists()
+        .assertTextEquals("Team Meeting")
+  }
+
+  @Test
+  fun testLegDetailsContentDisplaysCorrectDetails() {
+    composeTestRule.setContent {
+      LegDetailsContent(
+          routeDetails =
+              RouteDetails(
+                  origin = LatLng(48.8566, 2.3522), // Mock origin (Paris)
+                  destination = LatLng(49.8566, 2.3522), // Mock destination
+                  route = listOf(LatLng(48.8566, 2.3522), LatLng(49.8566, 2.3522)), // Mock route
+                  legsDistance = listOf("3.4 km", "5.2 km"),
+                  legsDuration = listOf("15 mins", "25 mins"),
+                  legsRoute =
+                      listOf(
+                          listOf(LatLng(48.8566, 2.3522), LatLng(48.8570, 2.3530)), // Mock leg 1
+                          listOf(LatLng(48.8570, 2.3530), LatLng(49.8566, 2.3522)) // Mock leg 2
+                          )),
+          legIndex = 0,
+          activities = listOfActivities)
+    }
+
+    // Verify title (start activity)
+    composeTestRule
+        .onNodeWithTag("RouteDetailsTitle_Leg")
+        .assertExists()
+        .assertTextEquals("Team Meeting")
+
+    // Verify distance
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDistance_Leg")
+        .assertExists()
+        .assertTextEquals("Distance: 3.4 km")
+
+    // Verify duration
+    composeTestRule
+        .onNodeWithTag("RouteDetailsDurationLeg")
+        .assertExists()
+        .assertTextEquals("Duration: 15 mins")
+
+    // Verify subtitle (end activity)
+    composeTestRule
+        .onNodeWithTag("RouteDetailsSubtitle_Leg")
+        .assertExists()
+        .assertTextEquals("Client Presentation")
+  }
+}
+
+fun createTimestamp(dateString: String, format: String = "dd/MM/yyyy HH:mm"): Timestamp {
+  val dateFormat = SimpleDateFormat(format, Locale.getDefault())
+  val date = dateFormat.parse(dateString) ?: throw IllegalArgumentException("Invalid date format")
+  return Timestamp(date)
 }
