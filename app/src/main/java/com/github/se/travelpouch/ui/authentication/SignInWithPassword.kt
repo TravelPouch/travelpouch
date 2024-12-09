@@ -133,7 +133,6 @@ fun SignInWithPassword(
                       }
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-                      // navigationActions.navigateTo(Screen.TRAVEL_LIST)
                     },
                     onFailure = { task ->
                       methodChosen.value = false
@@ -146,7 +145,7 @@ fun SignInWithPassword(
                           .show()
                     })
               }) {
-                Text("Sign in")
+                Text("Sign up")
               }
 
           Spacer(Modifier.padding(5.dp))
@@ -166,13 +165,13 @@ fun SignInWithPassword(
                       Log.d("SignInScreen", "User logged in: ${user?.displayName}")
 
                       GlobalScope.launch {
-                        profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                        profileModelView.initAfterLogin {
+                          travelViewModel.initAfterLogin()
+                          waitUntilProfileFetched.value = true
+                        }
                       }
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-                      if (profileModelView.profile.value.needsOnboarding) {
-                        navigationActions.navigateTo(Screen.ONBOARDING)
-                      } else navigationActions.navigateTo(Screen.TRAVEL_LIST)
                     },
                     onFailure = { task ->
                       Log.w(TAG, "LoginWithEmailAndPassword:failure", task.exception)
