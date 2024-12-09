@@ -44,6 +44,11 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
               description =
                   "Securely store and access your essential travel documents anytime, anywhere.",
               imageResId = R.drawable.secure_storage // Replace with your actual drawable resource
+              ),
+          OnboardingPage(
+              title = "Your turn",
+              description = "Let's get you started by creating your first travel!",
+              imageResId = null // Replace with your actual drawable resource
               ))
   var pageIndex by remember { mutableStateOf(0) }
 
@@ -99,10 +104,12 @@ fun OnboardingPageContent(page: OnboardingPage, modifier: Modifier = Modifier) {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
       modifier = modifier.fillMaxWidth()) {
-        Image(
-            painter = painterResource(id = page.imageResId),
-            contentDescription = null,
-            modifier = Modifier.size(300.dp).testTag("OnboardingImage").padding(top = 16.dp))
+        if (page.imageResId != null) {
+          Image(
+              painter = painterResource(id = page.imageResId),
+              contentDescription = null,
+              modifier = Modifier.size(300.dp).testTag("OnboardingImage").padding(top = 16.dp))
+        }
         Spacer(modifier = Modifier.height(24.dp))
         Text(
             page.title,
@@ -142,4 +149,4 @@ fun ProgressIndicator(currentPage: Int, totalPages: Int, modifier: Modifier = Mo
 }
 
 // Data class to define each onboarding page
-data class OnboardingPage(val title: String, val description: String, val imageResId: Int)
+data class OnboardingPage(val title: String, val description: String, val imageResId: Int?)

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.StopCircle
@@ -254,13 +256,13 @@ fun TravelListScreen(
                           }
                         } else {
                           item {
-                            Row(
+                            Column(
                                 modifier =
                                     Modifier.fillParentMaxSize()
-                                        .padding(top = 32.dp, start = 16.dp, end = 0.dp)
+                                        .padding(top = 32.dp, start = 0.dp, end = 0.dp)
                                         .padding(pd),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.Top) {
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center) {
                                   AnimatedVisibility(visible = isLoading.value) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.testTag("loadingSpinner").size(100.dp),
@@ -271,14 +273,44 @@ fun TravelListScreen(
                                   }
 
                                   Spacer(modifier = Modifier.fillMaxWidth(0.1f))
-
                                   Text(
                                       modifier = Modifier.testTag("emptyTravelPrompt"),
-                                      text = "You have no travels yet.",
+                                      text = "Create your first travel!",
                                       style =
-                                          MaterialTheme.typography.bodyLarge.copy(
+                                          MaterialTheme.typography.headlineMedium.copy(
                                               fontWeight = FontWeight.Bold),
                                       color = MaterialTheme.colorScheme.onBackground)
+                                }
+                            // Indicator to create a travel for new users
+                            Box(
+                                modifier =
+                                    Modifier.fillMaxSize()
+                                        .padding(bottom = 16.dp, end = 16.dp)
+                                        .offset(
+                                            y = (-60).dp), // Adjust padding to avoid overlap with
+                                // FAB
+                                contentAlignment = Alignment.BottomEnd // Align to the bottom right
+                                ) {
+                                  Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Create New Travel",
+                                        style =
+                                            MaterialTheme.typography.bodySmall.copy(
+                                                fontWeight = FontWeight.Bold))
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        contentDescription = "Indicator Arrow",
+                                        modifier =
+                                            Modifier.size(40.dp)
+                                                .graphicsLayer(
+                                                    rotationZ = 90f) // Rotate arrow to point down
+                                                .offset(
+                                                    y =
+                                                        (-30)
+                                                            .dp) // Adjust position to align with
+                                                                 // FAB
+                                        )
+                                  }
                                 }
                           }
                         }
