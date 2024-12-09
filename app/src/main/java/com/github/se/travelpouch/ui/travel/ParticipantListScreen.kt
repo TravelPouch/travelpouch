@@ -5,7 +5,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +18,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,6 +28,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -77,6 +85,8 @@ fun ParticipantListScreen(
   val (selectedParticipant, setSelectedParticipant) =
       remember { mutableStateOf<Map.Entry<fsUid, Profile>?>(null) }
   val (expandedAddUserDialog, setExpandedAddUserDialog) = remember { mutableStateOf(false) }
+  val (expandedFriendListDialog, setExpandedFriendListDialog) = remember { mutableStateOf(false) }
+  val userProfile = profileViewModel.profile.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("participantListScreen"),
@@ -219,105 +229,57 @@ fun ParticipantListScreen(
                             modifier = Modifier.testTag("addUserButton")) {
                               Text("Add User")
                             }
+                        Button(
+                            onClick = {
+                              // Show friend list dialog
+                              setExpandedFriendListDialog(true)
+                            },
+                            modifier = Modifier.testTag("addViaFriendListButton")) {
+                              Text("Add via Friend List")
+                            }
                       }
                 }
           }
-        }
-
-        selectedParticipant?.let { participant ->
-          if (expanded) {
-            Dialog(onDismissRequest = { setExpanded(false) }) {
+          if (expandedFriendListDialog) {
+            Dialog(onDismissRequest = { setExpandedFriendListDialog(false) }) {
               Box(
-                  Modifier.fillMaxWidth(1f)
-                      .height(250.dp)
+                  Modifier
                       .background(MaterialTheme.colorScheme.surface)
-                      .testTag("participantDialogBox")) {
-                    Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
-                      Row(
-                          modifier = Modifier.testTag("participantDialogRow"),
-                          verticalAlignment = Alignment.CenterVertically,
-                          horizontalArrangement = Arrangement.SpaceBetween) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Localized description",
-                                modifier = Modifier.padding(5.dp).testTag("participantDialogIcon"))
-                            TruncatedText(
-                                text = participant.value.name,
-                                fontWeight = FontWeight.Bold,
-                                maxLength = 25,
-                                modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
-                          }
-                      TruncatedText(
-                          text = participant.value.email,
-                          maxLength = 30,
-                          fontWeight = FontWeight.Bold,
-                          modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
-
-                      RoleEntryDialog(
-                          selectedTravel = selectedTravel,
-                          participant = participant,
-                          changeRoleAction = setExpandedRoleDialog,
-                          removeParticipantAction = {
-                            if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
-                                Role.OWNER) {
-                              if (selectedTravel!!
-                                  .allParticipants
-                                  .values
-                                  .count({ it == Role.OWNER }) == 1) {
-                                Toast.makeText(
-                                        context,
-                                        "You're trying to remove the owner of the travel. Please name another owner before removing.",
-                                        Toast.LENGTH_LONG)
-                                    .show()
-                                setExpanded(false)
-                                return@RoleEntryDialog
-                              }
-                            }
-                            val participantMap = selectedTravel!!.allParticipants.toMutableMap()
-                            participantMap.remove(Participant(participant.key))
-                            val participantList = selectedTravel!!.listParticipant.toMutableList()
-                            participantList.remove(participant.key)
-                            val updatedContainer =
-                                selectedTravel!!.copy(
-                                    allParticipants = participantMap.toMap(),
-                                    listParticipant = participantList)
-                            listTravelViewModel.updateTravel(
-                                updatedContainer,
-                                TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
-                                participant.key)
-                            listTravelViewModel.selectTravel(updatedContainer)
-                            listTravelViewModel.fetchAllParticipantsInfo()
-                            setExpanded(false)
-                            Toast.makeText(context, "Participant removed", Toast.LENGTH_LONG).show()
-                          })
-                    }
-                  }
-            }
-          }
-
-          if (expandedRoleDialog) {
-            Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
-              Box(
-                  Modifier.fillMaxWidth(1f)
-                      .height(250.dp)
-                      .background(MaterialTheme.colorScheme.surface)
-                      .testTag("roleDialogBox")) {
+                      .testTag("friendListDialogBox")) {
                     Column(
                         modifier =
-                            Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
+                            Modifier
+                                .padding(16.dp).testTag("friendListDialogColumn"),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center) {
-                          ChangeRoleDialog(selectedTravel, participant) { newRole ->
-                            handleRoleChange(
-                                context,
-                                selectedTravel,
-                                participant,
-                                newRole,
-                                listTravelViewModel,
-                                notificationViewModel,
-                                profileViewModel,
-                                setExpandedRoleDialog,
-                                setExpanded)
+                        verticalArrangement = Arrangement.Top) {
+                          Text(
+                              "Select a Friend",
+                              fontWeight = FontWeight.Bold,
+                              modifier = Modifier.padding(8.dp).testTag("friendListDialogTitle"))
+                          LazyColumn {
+                            items(userProfile.value.friends.keys.toList()) { friend ->
+                              Card(
+                                  modifier =
+                                      Modifier.fillMaxWidth()
+                                          .padding(8.dp)
+                                          .clickable {
+                                            // Handle friend selection
+                                            Toast.makeText(
+                                                    context,
+                                                    "Friend selected, gyat!",
+                                                    Toast.LENGTH_SHORT)
+                                                .show()
+                                          }
+                                          .testTag("friendCard"),
+                                    border = BorderStroke(1.dp, Color.Gray),
+                                  )
+                                  {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                      Text(friend, fontWeight = FontWeight.Bold)
+                                      Text(friend)
+                                    }
+                                  }
+                            }
                           }
                         }
                   }
@@ -325,6 +287,104 @@ fun ParticipantListScreen(
           }
         }
       }
+
+  selectedParticipant?.let { participant ->
+    if (expanded) {
+      Dialog(onDismissRequest = { setExpanded(false) }) {
+        Box(
+            Modifier.fillMaxWidth(1f)
+                .height(250.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .testTag("participantDialogBox")) {
+              Column(modifier = Modifier.padding(8.dp).testTag("participantDialogColumn")) {
+                Row(
+                    modifier = Modifier.testTag("participantDialogRow"),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                      Icon(
+                          imageVector = Icons.Default.Person,
+                          contentDescription = "Localized description",
+                          modifier = Modifier.padding(5.dp).testTag("participantDialogIcon"))
+                      TruncatedText(
+                          text = participant.value.name,
+                          fontWeight = FontWeight.Bold,
+                          maxLength = 25,
+                          modifier = Modifier.padding(5.dp).testTag("participantDialogName"))
+                    }
+                TruncatedText(
+                    text = participant.value.email,
+                    maxLength = 30,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(5.dp).testTag("participantDialogEmail"))
+
+                RoleEntryDialog(
+                    selectedTravel = selectedTravel,
+                    participant = participant,
+                    changeRoleAction = setExpandedRoleDialog,
+                    removeParticipantAction = {
+                      if (selectedTravel!!.allParticipants[Participant(participant.key)] ==
+                          Role.OWNER) {
+                        if (selectedTravel!!.allParticipants.values.count({ it == Role.OWNER }) ==
+                            1) {
+                          Toast.makeText(
+                                  context,
+                                  "You're trying to remove the owner of the travel. Please name another owner before removing.",
+                                  Toast.LENGTH_LONG)
+                              .show()
+                          setExpanded(false)
+                          return@RoleEntryDialog
+                        }
+                      }
+                      val participantMap = selectedTravel!!.allParticipants.toMutableMap()
+                      participantMap.remove(Participant(participant.key))
+                      val participantList = selectedTravel!!.listParticipant.toMutableList()
+                      participantList.remove(participant.key)
+                      val updatedContainer =
+                          selectedTravel!!.copy(
+                              allParticipants = participantMap.toMap(),
+                              listParticipant = participantList)
+                      listTravelViewModel.updateTravel(
+                          updatedContainer,
+                          TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
+                          participant.key)
+                      listTravelViewModel.selectTravel(updatedContainer)
+                      listTravelViewModel.fetchAllParticipantsInfo()
+                      setExpanded(false)
+                      Toast.makeText(context, "Participant removed", Toast.LENGTH_LONG).show()
+                    })
+              }
+            }
+      }
+    }
+
+    if (expandedRoleDialog) {
+      Dialog(onDismissRequest = { setExpandedRoleDialog(false) }) {
+        Box(
+            Modifier.fillMaxWidth(1f)
+                .height(250.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .testTag("roleDialogBox")) {
+              Column(
+                  modifier = Modifier.fillMaxSize().padding(16.dp).testTag("roleDialogColumn"),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.Center) {
+                    ChangeRoleDialog(selectedTravel, participant) { newRole ->
+                      handleRoleChange(
+                          context,
+                          selectedTravel,
+                          participant,
+                          newRole,
+                          listTravelViewModel,
+                          notificationViewModel,
+                          profileViewModel,
+                          setExpandedRoleDialog,
+                          setExpanded)
+                    }
+                  }
+            }
+      }
+    }
+  }
 }
 
 fun handleRoleChange(
