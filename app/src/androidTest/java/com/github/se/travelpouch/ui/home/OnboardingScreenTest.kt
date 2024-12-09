@@ -114,7 +114,8 @@ class OnboardingScreenTest {
     composeTestRule.setContent {
       OnboardingScreen(navigationActions = navigationActions, profileModelView = profileModelView)
     }
-    // Press the next button twice to get through the onboarding
+    // Press the next button thrice to get through the onboarding
+    composeTestRule.onNodeWithTag("NextButton").performClick()
     composeTestRule.onNodeWithTag("NextButton").performClick()
     composeTestRule.onNodeWithTag("NextButton").performClick()
 
