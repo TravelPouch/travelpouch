@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.travelpouch.BuildConfig
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
@@ -50,7 +51,6 @@ import com.github.se.travelpouch.model.activity.map.RouteDetails
 import com.github.se.travelpouch.model.gps.GPSViewModel
 import com.github.se.travelpouch.permissions.LocationPermissionComposable
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.ButtCap
@@ -68,8 +68,10 @@ import java.util.Locale
 import kotlinx.coroutines.launch
 
 /**
- * Composable function that displays a map screen showing all activities. The activities are marked
- * on the map and the initial camera position is determined based on the first activity's location.
+ * Displays a map screen showing activities and their details.
+ *
+ * It shows a Google Map with markers for activities, paths between them, and a dynamic bottom sheet
+ * to show detailed information for selected activities or routes and GPS location.
  *
  * @param activityViewModel The ViewModel containing the list of activities.
  * @param navigationActions Navigation actions for managing app navigation.
@@ -78,8 +80,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActivitiesMapScreen(
     activityViewModel: ActivityViewModel,
-    navigationActions: NavigationActions,
-    directionsViewModel: DirectionsViewModel // TODO : remove this
+    navigationActions: NavigationActions
 ) {
 
   // Collect the list of activities from the ViewModel
@@ -104,6 +105,14 @@ fun ActivitiesMapScreen(
   val cameraPositionState = rememberCameraPositionState {
     position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
   }
+
+  // Create a ViewModel for fetching directions between activities
+  val directionsViewModel: DirectionsViewModel =
+      viewModel(
+          factory =
+              DirectionsViewModel.provideFactory(
+                  BuildConfig.MAPS_API_KEY) // Inject the API key for the DirectionsViewModel
+          )
 
   // Collect the path points from the DirectionsViewModel
   val activitiesRouteDetails by directionsViewModel.activitiesRouteDetails.collectAsState()
@@ -168,7 +177,6 @@ fun ActivitiesMapScreen(
                 AddActivityMarkers(
                     activities = validActivities,
                     dateFormat = dateFormat,
-                    selectedActivity = selectedActivity,
                     onActivitySelected = {
                       selectedActivity = it
 
@@ -210,6 +218,17 @@ fun ActivitiesMapScreen(
       }
 }
 
+// -------------------------------------------------
+// Helper Functions for Displaying Information in Bottom Sheet
+// -------------------------------------------------
+
+/**
+ * Displays detailed information about an activity, including:
+ * - Title, date, and time.
+ * - Location name and description.
+ *
+ * @param activity The activity to display.
+ */
 @Composable
 fun ActivityDetailsContent(activity: Activity) {
   // Date formatter
@@ -253,6 +272,14 @@ fun ActivityDetailsContent(activity: Activity) {
   }
 }
 
+/**
+ * Displays details for a specific route leg between two activities. Shows the starting activity,
+ * distance, duration, and the ending activity as a subtitle.
+ *
+ * @param routeDetails Route details containing distances and durations.
+ * @param legIndex Index of the route leg to display.
+ * @param activities List of activities to determine start and end points.
+ */
 @Composable
 fun LegDetailsContent(routeDetails: RouteDetails?, legIndex: Int, activities: List<Activity>) {
   val startActivity = activities.getOrNull(legIndex)
@@ -268,6 +295,13 @@ fun LegDetailsContent(routeDetails: RouteDetails?, legIndex: Int, activities: Li
       testTag = "Leg")
 }
 
+/**
+ * Displays route details between the user's current location and a selected activity. Shows the
+ * distance, duration, and the selected activity as a subtitle.
+ *
+ * @param gpsRouteDetails Route details from the user's GPS location to the activity.
+ * @param selectedActivity The activity to which the route is displayed.
+ */
 @Composable
 fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: Activity?) {
   val distance = gpsRouteDetails?.legsDistance?.firstOrNull() ?: "N/A"
@@ -281,6 +315,16 @@ fun GpsDetailsContent(gpsRouteDetails: RouteDetails?, selectedActivity: Activity
       testTag = "Gps")
 }
 
+/**
+ * Displays route details in a formatted layout. Includes the title, distance, duration, and an
+ * optional subtitle.
+ *
+ * @param title Title of the route (e.g., starting point).
+ * @param distance The distance of the route leg.
+ * @param duration The duration of the route leg.
+ * @param subtitle Optional subtitle (e.g., destination point).
+ * @param testTag A tag used for testing the composable.
+ */
 @Composable
 fun RouteDetailsContent(
     title: String?,
@@ -328,6 +372,14 @@ fun RouteDetailsContent(
   }
 }
 
+/**
+ * Displays a row with an icon and a text label. Useful for showing detailed information with an
+ * accompanying visual indicator.
+ *
+ * @param icon The icon to display on the left.
+ * @param text The text content to display.
+ * @param testTag A tag for identifying the composable during testing.
+ */
 @Composable
 fun DetailRow(icon: ImageVector, text: String, testTag: String = "") {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
@@ -345,6 +397,16 @@ fun DetailRow(icon: ImageVector, text: String, testTag: String = "") {
   }
 }
 
+// -------------------------------------------------
+// Helper functions for drawing paths and markers
+// -------------------------------------------------
+
+/**
+ * Adds a marker to the map representing the user's current location. The marker is displayed only
+ * if the location is available.
+ *
+ * @param currentLocation The user's current location as a LatLng object.
+ */
 @Composable
 fun AddCurrentLocationMarker(currentLocation: LatLng?) {
   Log.d("ActivitiesMapScreen", "Adding current location marker")
@@ -358,11 +420,20 @@ fun AddCurrentLocationMarker(currentLocation: LatLng?) {
   }
 }
 
+/**
+ * Adds markers for a list of activities on the map. Each marker is placed at the activity's
+ * location, with a unique icon and title. Clicking a marker triggers a callback with the selected
+ * activity.
+ *
+ * @param activities List of activities to display as markers.
+ * @param dateFormat Formatter for displaying the activity date in the marker snippet.
+ * @param onActivitySelected Callback triggered when a marker is clicked, providing the selected
+ *   activity.
+ */
 @Composable
 fun AddActivityMarkers(
     activities: List<Activity>,
     dateFormat: SimpleDateFormat,
-    selectedActivity: Activity?,
     onActivitySelected: (Activity) -> Unit
 ) {
   Log.d("ActivitiesMapScreen", "Adding activity markers")
@@ -382,6 +453,15 @@ fun AddActivityMarkers(
   }
 }
 
+/**
+ * Draws paths on the map between activities using polylines. Each path segment is styled with a
+ * gradient color and can be clicked to select a specific route.
+ *
+ * @param activitiesRouteDetails The route details containing path points between activities.
+ * @param selectedRouteIndex The index of the currently selected route, which is highlighted.
+ * @param onRouteSelected Callback triggered when a route segment is clicked, providing the index of
+ *   the selected route.
+ */
 @Composable
 fun DrawActivitiesPaths(
     activitiesRouteDetails: RouteDetails?,
@@ -424,6 +504,13 @@ fun DrawActivitiesPaths(
   }
 }
 
+/**
+ * Draws a path on the map from the user's current GPS location to a selected activity. The path is
+ * represented as a polyline and is clickable to trigger a callback.
+ *
+ * @param gpsRouteDetails The route details containing the path points from GPS to the activity.
+ * @param onRouteSelected Callback invoked when the path is clicked.
+ */
 @Composable
 fun DrawGpsToActivityPath(gpsRouteDetails: RouteDetails?, onRouteSelected: () -> Unit) {
   Log.d("ActivitiesMapScreen", "Drawing GPS to activity path")
@@ -437,7 +524,20 @@ fun DrawGpsToActivityPath(gpsRouteDetails: RouteDetails?, onRouteSelected: () ->
   }
 }
 
-// Helper function to generate a consistent gradient color
+// -------------------------------------------------
+// Helper Functions for Map Customization
+// -------------------------------------------------
+
+/**
+ * Generates a gradient color for a specific segment of a path. Interpolates between a start and end
+ * color based on the segment's index in the total path.
+ *
+ * @param index The index of the current segment in the path.
+ * @param totalSegments The total number of segments in the path.
+ * @param colorStart The starting color of the gradient (default: soft blue).
+ * @param colorEnd The ending color of the gradient (default: soft purple).
+ * @return The calculated gradient color for the given segment.
+ */
 fun getGradientColor(
     index: Int,
     totalSegments: Int,

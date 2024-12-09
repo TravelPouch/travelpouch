@@ -150,9 +150,7 @@ class ActivitiesMapScreenTest {
 
     mockActivityModelView.getAllActivities()
 
-    composeTestRule.setContent {
-      ActivitiesMapScreen(mockActivityModelView, mockNavigationActions, mockkDirectionsViewModel)
-    }
+    composeTestRule.setContent { ActivitiesMapScreen(mockActivityModelView, mockNavigationActions) }
 
     composeTestRule.onNodeWithTag("Map").assertExists()
   }
@@ -163,9 +161,7 @@ class ActivitiesMapScreenTest {
     `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf())
     }
-    composeTestRule.setContent {
-      ActivitiesMapScreen(mockActivityModelView, mockNavigationActions, mockkDirectionsViewModel)
-    }
+    composeTestRule.setContent { ActivitiesMapScreen(mockActivityModelView, mockNavigationActions) }
 
     composeTestRule.onNodeWithTag("Map").assertExists()
   }
@@ -174,9 +170,7 @@ class ActivitiesMapScreenTest {
   fun testGoBackButton() {
     composeTestRule.setContent {
       ActivitiesMapScreen(
-          activityViewModel = mockActivityModelView,
-          navigationActions = mockNavigationActions,
-          directionsViewModel = mockkDirectionsViewModel)
+          activityViewModel = mockActivityModelView, navigationActions = mockNavigationActions)
     }
 
     composeTestRule.waitForIdle()
