@@ -174,8 +174,7 @@ fun ParticipantListScreen(
                                         fsUid,
                                         profileViewModel,
                                         context,
-                                        notificationViewModel,
-                                        setExpandedAddUserDialog)
+                                        notificationViewModel)
                                     // Go back
                                     setExpandedAddUserDialog(false)
                                   },
@@ -234,8 +233,7 @@ fun ParticipantListScreen(
                                                 userProfile.value.friends[friend],
                                                 profileViewModel,
                                                 context,
-                                                notificationViewModel,
-                                                setExpandedAddUserDialog)
+                                                notificationViewModel)
                                             // Go back
                                             setExpandedAddUserDialog(false)
                                             setExpandedFriendListDialog(false)
@@ -362,7 +360,6 @@ private fun inviteUserToTravelViaFsuid(
     profileViewModel: ProfileModelView,
     context: Context,
     notificationViewModel: NotificationViewModel,
-    setExpandedAddUserDialog: (Boolean) -> Unit
 ) {
   val isUserAlreadyAdded = selectedTravel!!.allParticipants.keys.any { it.fsUid == fsUid }
   if (fsUid == profileViewModel.profile.value.fsUid) {
@@ -381,6 +378,7 @@ private fun inviteUserToTravelViaFsuid(
                   profileViewModel.profile.value.name, selectedTravel!!.title, Role.PARTICIPANT),
               notificationType = NotificationType.INVITATION,
               sector = NotificationSector.TRAVEL))
+      Toast.makeText(context, "Invitation sent", Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
       Log.e("NotificationError", "Failed to send notification: ${e.message}")
     }
