@@ -266,6 +266,8 @@ fun ModifyingProfileScreen(
                                           notificationType = NotificationType.INVITATION,
                                           status = NotificationStatus.UNREAD,
                                           sector = NotificationSector.PROFILE))
+
+                                  openDialog = false
                                 },
                                 onFailure = { e ->
                                   Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
