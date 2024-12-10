@@ -79,24 +79,19 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
   }
 
   fun sendNotificationToUser(userId: String, notificationContent: NotificationContent) {
-    val data = mapOf(
+    val data = hashMapOf(
       "userId" to userId,
-      "notificationContent" to mapOf(
-        "title" to "Travel Pouch",
-        "body" to notificationContent.toDisplayString()
-      )
+      "message" to notificationContent.toDisplayString(),
     )
 
-    //functions.useEmulator("10.0.2.2", 5001) // Use Android emulator's local address
-
     functions
-      .getHttpsCallable("sendNotificationToUser")
+      .getHttpsCallable("sendNotification")
       .call(data)
       .addOnSuccessListener { result ->
         Log.d("Notification", "Success: ${result.data}")
       }
       .addOnFailureListener { e ->
-        Log.e("Notification", "Error sending notification", e)
+        Log.e("Notification", "Error: ${e.message}")
       }
   }
 }

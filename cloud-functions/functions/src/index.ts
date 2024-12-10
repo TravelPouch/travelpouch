@@ -85,31 +85,27 @@ export const generateThumbnailHttp = onRequest(
     res.json({success: true});
   });
 
-export const sendNotificationToUser = onCall(
+
+export const sendNotification = onCall(
   {region: "europe-west9"},
   async (req) => {
-    const userId = req.data.userId;
-    const notificationContent = req.data.notificationContent; // Expected to include `title` and `body`
-
-    if (!userId || !notificationContent) {
-      throw new Error("Missing userId or notificationContent");
+    if (!req.data.userId || !req.data.message) {
+      throw new HttpsError("invalid-argument", "Missing parameters: userId or message");
     }
-
     try {
+      const userId = req.data.userId;
+      const message = req.data.message;
+
       const tokens = await fetchNotificationTokens(userId);
-      const response = await sendPushNotification(tokens, {
-        title: notificationContent.title,
-        body: notificationContent.body,
-      });
-      logger.info(`Notification sent to user: ${userId}`, response);
-      return {success: true, response};
-    } catch (error) {
-      if (error instanceof Error) {
-        logger.error(`Error sending notification to user ${userId}:`, error.message);
-        throw new Error(`Failed to send notification: ${error.message}`);
-      } else {
-        logger.error(`Unknown error sending notification to user ${userId}:`, error);
-        throw new Error("Failed to send notification: Unknown error");
+      if (tokens.length === 0) {
+        logger.warn(`No notification tokens found for user: ${userId}`);
+        return {success: false, message: "No tokens found"};
       }
+
+      await sendPushNotification(tokens, message);
+      return {success: true, message: "Notification sent successfully"};
+    } catch (err) {
+      logger.error("Error sending notification", err);
+      throw new HttpsError("internal", "Error sending notification");
     }
   });

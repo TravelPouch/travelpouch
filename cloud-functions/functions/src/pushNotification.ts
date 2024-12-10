@@ -1,7 +1,6 @@
 import {getFirestore} from "firebase-admin/firestore";
-import {getMessaging} from "firebase-admin/messaging"; // Correct import
-import * as admin from "firebase-admin";
-import {logger} from "firebase-functions";
+import {getMessaging} from "firebase-admin/messaging";
+import * as logger from "firebase-functions/logger";
 
 /**
  * Fetches notification tokens for a specific user.
@@ -21,32 +20,52 @@ export async function fetchNotificationTokens(userId: string): Promise<string[]>
 }
 
 /**
- * Sends a notification to a list of FCM tokens.
- * @param {string[]} tokens List of FCM tokens to send the notification to.
- * @param {object} payload The notification payload.
- * @return {Promise<admin.messaging.BatchResponse>} The response from FCM.
+ * Send push notification using Firebase Cloud Messaging (FCM) to multiple tokens.
+ *
+ * @param {string[]} tokens - Array of FCM tokens.
+ * @param {string} message - Notification message payload.
+ * @return {Promise<void>} - Resolves when the notification is sent.
+ * @throws Will throw an error if sending notification fails.
  */
-export async function sendPushNotification(tokens: string[], payload: object): Promise<admin.messaging.BatchResponse> {
+export async function sendPushNotification(tokens: string[], message: string): Promise<void> {
   if (tokens.length === 0) {
-    logger.warn("No tokens provided for sending the notification");
-    return Promise.reject(new Error("No tokens available"));
+    logger.warn("No tokens provided for push notification.");
+    return;
   }
 
+  const messaging = getMessaging();
+
+  // Construct the MulticastMessage payload
+  const multicastMessage = {
+    data: {
+      title: "New Notification",
+      body: message,
+    },
+    tokens,
+  };
+
   try {
-    // Use getMessaging() instead of admin.messaging()
-    const messaging = getMessaging(); // Correct usage
-    const response = await messaging.sendMulticast({
-      tokens,
-      notification: payload as admin.messaging.NotificationMessagePayload,
-    });
-    return response;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error("Error sending notification", error);
-      throw new Error(`Failed to send notification: ${error.message}`);
-    } else {
-      logger.error("Unknown error", error);
-      throw new Error("Failed to send notification: Unknown error");
+    // Send the multicast message
+    const response = await messaging.sendMulticast(multicastMessage);
+
+    logger.debug(`Successfully sent notification: ${response.successCount} successful, ${response.failureCount} failed.`);
+
+    // Handle failed tokens
+    if (response.failureCount > 0) {
+      const failedTokens: string[] = [];
+      response.responses.forEach((res, index) => {
+        if (!res.success) {
+          failedTokens.push(tokens[index]);
+        }
+      });
+
+      logger.warn("Failed tokens:", failedTokens);
+
+      // Optionally: Remove invalid tokens from Firestore
+      // Implement token cleanup logic if required
     }
+  } catch (err) {
+    logger.error("Error sending multicast notification", err);
+    throw new Error("Error sending push notification");
   }
 }
