@@ -61,18 +61,20 @@ class ProfileRepositoryTest {
           "qwertzuiopasdfghjklyxcvbnm12",
           "usernameTest",
           "email@test.ch",
-          emptyList(),
+          emptyMap(),
           "nameTest",
-          emptyList())
+          emptyList(),
+          true)
 
   val newProfile =
       Profile(
           "qwertzuiopasdfghjklyxcvbnm12",
           "usernameTest",
           "email@test.ch",
-          listOf("test@test.ch"),
+          mapOf("test@test.ch" to "qwertzuiopasdfghjklyxcvbnm12"),
           "nameTest",
-          emptyList())
+          emptyList(),
+          true)
 
   val function: (Profile) -> Unit = {}
 
@@ -99,6 +101,7 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshot.getString("username")).thenReturn("usernameTest")
     `when`(mockDocumentSnapshot.get("userTravelList")).thenReturn(emptyList<String>())
     `when`(mockDocumentSnapshot.get("friends")).thenReturn(null)
+    `when`(mockDocumentSnapshot.getBoolean("needsOnboarding")).thenReturn(true)
 
     `when`(mockDocumentSnapshotError.id).thenReturn("qwertzuiopasdfghjklyxcvbnm12")
     `when`(mockDocumentSnapshotError.getString("email")).thenReturn(null)
@@ -391,7 +394,7 @@ class ProfileRepositoryTest {
             "qwertzuiopasdfghjklyxcvbnm12",
             "usernameTest",
             "email@test.ch",
-            emptyList(),
+            emptyMap(),
             "nameTest",
             emptyList())
 
@@ -400,7 +403,7 @@ class ProfileRepositoryTest {
             "qwertzuiopasdfghjklyxcvbnm13",
             "usernameTestFriend",
             "email_friend@test.ch",
-            emptyList(),
+            emptyMap(),
             "nameTestFriend",
             emptyList())
 
@@ -485,12 +488,197 @@ class ProfileRepositoryTest {
   fun updatingFriendListTest() {
     val privateFunc =
         profileRepositoryFirestore.javaClass.getDeclaredMethod(
-            "updatingFriendList", Profile::class.java, String::class.java)
+            "updatingFriendList", Profile::class.java, String::class.java, String::class.java)
     privateFunc.isAccessible = true
-    val parameters = arrayOfNulls<Any>(2)
+    val parameters = arrayOfNulls<Any>(3)
     parameters[0] = profile
     parameters[1] = "test@test.ch"
+    parameters[2] = "qwertzuiopasdfghjklyxcvbnm12"
     val result = privateFunc.invoke(profileRepositoryFirestore, *parameters)
     assertThat(result, `is`(newProfile))
+  }
+
+  @Test
+  fun removingFriendSucceedingWorks() {
+    val userProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "usernameTest",
+            "email@test.ch",
+            emptyMap(),
+            "nameTest",
+            emptyList())
+
+    val friendProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "usernameTestFriend",
+            "emailfriend@test.ch",
+            emptyMap(),
+            "nameTestFriend",
+            emptyList())
+
+    val mockDatabase: FirebaseFirestore = mock()
+    val mockCollectionReference: CollectionReference = mock()
+    val mockDocumentReference: DocumentReference = mock()
+    val mockTaskDocumentSnapshot: Task<DocumentSnapshot> = mock()
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+    val mockTransaction: Task<Void> = mock()
+
+    whenever(mockDatabase.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockDatabase.runTransaction<Void>(anyOrNull())).thenReturn(mockTransaction)
+    whenever(mockCollectionReference.document(anyOrNull())).thenReturn(mockDocumentReference)
+    whenever(mockDocumentReference.get()).thenReturn(mockTaskDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.result).thenReturn(mockDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.isSuccessful).thenReturn(true)
+    whenever(mockTaskDocumentSnapshot.addOnSuccessListener(anyOrNull()))
+        .thenReturn(mockTaskDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.addOnFailureListener(anyOrNull()))
+        .thenReturn(mockTaskDocumentSnapshot)
+
+    whenever(mockDocumentSnapshot.id).thenReturn(friendProfile.fsUid)
+    whenever(mockDocumentSnapshot.getString("name")).thenReturn(friendProfile.name)
+    whenever(mockDocumentSnapshot.getString("username")).thenReturn(friendProfile.username)
+    whenever(mockDocumentSnapshot.getString("email")).thenReturn(friendProfile.email)
+    whenever(mockDocumentSnapshot.get("friends")).thenReturn(friendProfile.friends)
+    whenever(mockDocumentSnapshot.get("userTravelList")).thenReturn(friendProfile.userTravelList)
+
+    whenever(mockTransaction.isSuccessful).thenReturn(true)
+    whenever(mockTransaction.addOnSuccessListener(anyOrNull())).thenReturn(mockTransaction)
+    whenever(mockTransaction.addOnFailureListener(anyOrNull())).thenReturn(mockTransaction)
+
+    var succeeded = false
+    var failed = false
+    val profileRepository = ProfileRepositoryFirebase(mockDatabase)
+    profileRepository.removeFriend(
+        friendProfile.fsUid, userProfile, { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor1 = argumentCaptor<OnSuccessListener<DocumentSnapshot>>()
+    verify(mockTaskDocumentSnapshot).addOnSuccessListener(onCompleteListenerCaptor1.capture())
+    onCompleteListenerCaptor1.firstValue.onSuccess(mockDocumentSnapshot)
+
+    val onCompleteListenerCaptor2 = argumentCaptor<OnSuccessListener<Void>>()
+    verify(mockTransaction).addOnSuccessListener(onCompleteListenerCaptor2.capture())
+    onCompleteListenerCaptor2.firstValue.onSuccess(null)
+
+    assert(succeeded)
+    assertFalse(failed)
+  }
+
+  @Test
+  fun removingFriendFailsWhenTransactionFails() {
+    val userProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "usernameTest",
+            "email@test.ch",
+            emptyMap(),
+            "nameTest",
+            emptyList())
+
+    val friendProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "usernameTestFriend",
+            "emailfriend@test.ch",
+            emptyMap(),
+            "nameTestFriend",
+            emptyList())
+
+    val mockDatabase: FirebaseFirestore = mock()
+    val mockCollectionReference: CollectionReference = mock()
+    val mockDocumentReference: DocumentReference = mock()
+    val mockTaskDocumentSnapshot: Task<DocumentSnapshot> = mock()
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+    val mockTransaction: Task<Void> = mock()
+
+    whenever(mockDatabase.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockDatabase.runTransaction<Void>(anyOrNull())).thenReturn(mockTransaction)
+    whenever(mockCollectionReference.document(anyOrNull())).thenReturn(mockDocumentReference)
+    whenever(mockDocumentReference.get()).thenReturn(mockTaskDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.result).thenReturn(mockDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.isSuccessful).thenReturn(true)
+    whenever(mockTaskDocumentSnapshot.addOnSuccessListener(anyOrNull()))
+        .thenReturn(mockTaskDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.addOnFailureListener(anyOrNull()))
+        .thenReturn(mockTaskDocumentSnapshot)
+
+    whenever(mockDocumentSnapshot.id).thenReturn(friendProfile.fsUid)
+    whenever(mockDocumentSnapshot.getString("name")).thenReturn(friendProfile.name)
+    whenever(mockDocumentSnapshot.getString("username")).thenReturn(friendProfile.username)
+    whenever(mockDocumentSnapshot.getString("email")).thenReturn(friendProfile.email)
+    whenever(mockDocumentSnapshot.get("friends")).thenReturn(friendProfile.friends)
+    whenever(mockDocumentSnapshot.get("userTravelList")).thenReturn(friendProfile.userTravelList)
+
+    whenever(mockTransaction.isSuccessful).thenReturn(false)
+    whenever(mockTransaction.addOnSuccessListener(anyOrNull())).thenReturn(mockTransaction)
+    whenever(mockTransaction.addOnFailureListener(anyOrNull())).thenReturn(mockTransaction)
+
+    var succeeded = false
+    var failed = false
+    val profileRepository = ProfileRepositoryFirebase(mockDatabase)
+    profileRepository.removeFriend(
+        friendProfile.fsUid, userProfile, { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor1 = argumentCaptor<OnSuccessListener<DocumentSnapshot>>()
+    verify(mockTaskDocumentSnapshot).addOnSuccessListener(onCompleteListenerCaptor1.capture())
+    onCompleteListenerCaptor1.firstValue.onSuccess(mockDocumentSnapshot)
+
+    val onCompleteListenerCaptor2 = argumentCaptor<OnFailureListener>()
+    verify(mockTransaction).addOnFailureListener(onCompleteListenerCaptor2.capture())
+    onCompleteListenerCaptor2.firstValue.onFailure(Exception("failed"))
+
+    assert(failed)
+    assertFalse(succeeded)
+  }
+
+  @Test
+  fun removingFriendFailsWhenFirstLayerTaskFails() {
+    val userProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm12",
+            "usernameTest",
+            "email@test.ch",
+            emptyMap(),
+            "nameTest",
+            emptyList())
+
+    val friendProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "usernameTestFriend",
+            "emailfriend@test.ch",
+            emptyMap(),
+            "nameTestFriend",
+            emptyList())
+
+    val mockDatabase: FirebaseFirestore = mock()
+    val mockCollectionReference: CollectionReference = mock()
+    val mockDocumentReference: DocumentReference = mock()
+    val mockTaskDocumentSnapshot: Task<DocumentSnapshot> = mock()
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+
+    whenever(mockDatabase.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.document(anyOrNull())).thenReturn(mockDocumentReference)
+    whenever(mockDocumentReference.get()).thenReturn(mockTaskDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.result).thenReturn(mockDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.isSuccessful).thenReturn(false)
+    whenever(mockTaskDocumentSnapshot.addOnSuccessListener(anyOrNull()))
+        .thenReturn(mockTaskDocumentSnapshot)
+    whenever(mockTaskDocumentSnapshot.addOnFailureListener(anyOrNull()))
+        .thenReturn(mockTaskDocumentSnapshot)
+
+    var succeeded = false
+    var failed = false
+    val profileRepository = ProfileRepositoryFirebase(mockDatabase)
+    profileRepository.removeFriend(
+        friendProfile.fsUid, userProfile, { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor1 = argumentCaptor<OnFailureListener>()
+    verify(mockTaskDocumentSnapshot).addOnFailureListener(onCompleteListenerCaptor1.capture())
+    onCompleteListenerCaptor1.firstValue.onFailure(Exception("failed"))
+
+    assert(failed)
+    assertFalse(succeeded)
   }
 }

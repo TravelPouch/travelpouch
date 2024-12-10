@@ -125,9 +125,10 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             fsUid = uid,
             username = email.substringBefore("@"),
             email = email,
-            friends = emptyList(),
+            friends = emptyMap(),
             name = email.substringBefore("@"),
-            emptyList())
+            emptyList(),
+            needsOnboarding = true)
 
     documentReference = db.collection(collectionPath).document(uid)
     performFirestoreOperation(
@@ -201,13 +202,13 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             if (friendProfile == ErrorProfile.errorProfile) {
               onFailure(Exception("user corrupted"))
             } else {
-              val userProfileUpdated = updatingFriendList(userProfile, friendProfile.email)
+              val userProfileUpdated =
+                  updatingFriendList(userProfile, friendProfile.email, friendProfile.fsUid)
+              val friendProfileUpdated =
+                  updatingFriendList(friendProfile, userProfile.email, userProfile.fsUid)
               db.runTransaction { t ->
                     t.update(documentReference!!, "friends", userProfileUpdated.friends)
-                    t.update(
-                        friendsDocumentReference!!,
-                        "friends",
-                        updatingFriendList(friendProfile, userProfile.email).friends)
+                    t.update(friendsDocumentReference!!, "friends", friendProfileUpdated.friends)
                   }
                   .addOnSuccessListener { onSuccess(userProfileUpdated) }
                   .addOnFailureListener { onFailure(Exception("failed to add user as friend")) }
@@ -217,8 +218,58 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .addOnFailureListener { onFailure(Exception("getting friend profile failed")) }
   }
 
-  private fun updatingFriendList(profile: Profile, email: String): Profile {
-    return profile.copy(friends = profile.friends + email)
+  /**
+   * This function removes a friend for the user profile, and remove the user profile from the given
+   * friend profile.
+   *
+   * @param friendFsUid (String) : the fsUid of the friend we want to remove from our friend list
+   * @param userProfile (Profile) : the profile of the current user
+   * @param onSuccess ((Profile) -> Unit) : The function to apply when removing the friend is
+   *   successful
+   * @param onFailure ((Exception) -> Unit) : The function to call when an error occurred
+   */
+  override fun removeFriend(
+      friendFsUid: String,
+      userProfile: Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(collectionPath)
+        .document(friendFsUid)
+        .get()
+        .addOnSuccessListener {
+          val friendProfile = ProfileRepositoryConvert.documentToProfile(it)
+          if (friendProfile == ErrorProfile.errorProfile) {
+            Log.e("DeleteFriend", "The profile you try to delete is corrupted")
+            onFailure(Exception("The profile you try to delete is corrupted"))
+          } else {
+            val userProfileUpdated =
+                userProfile.copy(friends = userProfile.friends - friendProfile.email)
+            val friendProfileUpdated =
+                friendProfile.copy(friends = friendProfile.friends - userProfile.email)
+
+            db.runTransaction { t ->
+                  t.update(it.reference, "friends", friendProfileUpdated.friends)
+                  t.update(documentReference!!, "friends", userProfileUpdated.friends)
+                }
+                .addOnSuccessListener {
+                  Log.d("DeleteFriend", "Friend deleted")
+                  onSuccess(userProfileUpdated)
+                }
+                .addOnFailureListener {
+                  Log.e("DeleteFriend", "An error occurred updating user profile")
+                  onFailure(Exception("An error occurred updating your profile"))
+                }
+          }
+        }
+        .addOnFailureListener {
+          Log.e("DeleteFriend", "An error occurred getting the profile of your friend")
+          onFailure(Exception("An error occurred getting the profile of your friend"))
+        }
+  }
+
+  private fun updatingFriendList(profile: Profile, email: String, fsUid: String): Profile {
+    return profile.copy(friends = profile.friends + Pair(email, fsUid))
   }
 
   /**
@@ -262,9 +313,10 @@ class ProfileRepositoryConvert {
         val uid = document.id
         val username = document.getString("username")
         val email = document.getString("email")
-        val friends = document.get("friends") as? List<String>
+        val friends = document.get("friends") as? Map<String, String>
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
+        val needsOnboarding = document.getBoolean("needsOnboarding") ?: true
 
         Log.d(
             "ProfileRepository",
@@ -274,9 +326,10 @@ class ProfileRepositoryConvert {
             fsUid = uid,
             username = username!!,
             email = email!!,
-            friends = friends ?: emptyList(),
+            friends = friends ?: emptyMap(),
             name = name!!,
-            userTravelList = userTravelList ?: emptyList())
+            userTravelList = userTravelList ?: emptyList(),
+            needsOnboarding = needsOnboarding)
       } catch (e: Exception) {
         Log.e("ProfileRepository", "Error converting document to Profile", e)
         ErrorProfile.errorProfile

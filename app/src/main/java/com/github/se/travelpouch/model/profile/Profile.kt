@@ -18,9 +18,10 @@ data class Profile(
     val fsUid: String,
     val username: String,
     val email: String,
-    val friends: List<String>,
+    val friends: Map<String, String>,
     val name: String,
-    var userTravelList: List<String>
+    var userTravelList: List<String>,
+    var needsOnboarding: Boolean = true
 ) {
   init {
     require(fsUid.isNotBlank() && isValidUserUid(fsUid)) { "Invalid fsUid" }
@@ -37,7 +38,7 @@ object ErrorProfile {
           "000errorerrorerrorerrorerror",
           "error",
           "error@error.ch",
-          emptyList(),
+          emptyMap(),
           "error",
           emptyList())
 }

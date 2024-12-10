@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -30,7 +31,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "test@swent.ch",
           username = "test",
-          friends = listOf("email@email.com"),
+          friends = mapOf("email@email.com" to "uid1"),
           name = "name",
           userTravelList = emptyList())
 
@@ -39,7 +40,7 @@ class ProfileEditTest {
           fsUid = "qwertzuiopasdfghjklyxcvbnm12",
           email = "newtest@test.ch",
           username = "newUsername",
-          friends = emptyList(),
+          friends = mapOf("email@email.com" to "uid1"),
           name = "newName",
           userTravelList = emptyList())
 
@@ -119,5 +120,30 @@ class ProfileEditTest {
     composeTestRule.onNodeWithTag("addingFriendButton").performClick()
 
     verify(profileRepository).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+  }
+
+  @Test
+  fun verifiesRemovingFriendWorks() {
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(profile)
+    }
+    profileModelView.getProfile()
+
+    composeTestRule.setContent { ModifyingProfileScreen(navigationActions, profileModelView) }
+
+    composeTestRule.onNodeWithTag("friendCard0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friendCard0").performClick()
+
+    composeTestRule.onNodeWithTag("boxDeletingFriend").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("DeletingFriendTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("deletingFriendButton").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("deletingFriendButton").performClick()
+
+    composeTestRule.onNodeWithTag("boxDeletingFriend").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("DeletingFriendTitle").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("deletingFriendButton").assertIsNotDisplayed()
+
+    verify(profileRepository).removeFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }

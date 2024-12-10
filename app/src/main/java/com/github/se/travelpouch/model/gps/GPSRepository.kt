@@ -24,7 +24,7 @@ class GPSRepository(private val fusedLocationClient: FusedLocationProviderClient
 
   companion object {
     private const val LOCATION_UPDATE_INTERVAL = 10000L // 10 seconds
-    private const val LOCATION_FASTEST_INTERVAL = 2000L // 2 seconds
+    private const val LOCATION_FASTEST_INTERVAL = 5000L // 5 seconds
     private const val TAG = "GPSRepository"
   }
 
