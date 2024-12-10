@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
+import com.github.se.travelpouch.model.notifications.NotificationSector
 import com.github.se.travelpouch.model.notifications.NotificationType
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
@@ -422,7 +423,8 @@ fun handleRoleChange(
                 participant.key,
                 selectedTravel.fsUid,
                 NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
-                NotificationType.ROLE_UPDATE))
+                NotificationType.ROLE_UPDATE,
+                sector = NotificationSector.TRAVEL))
       }
       val participantMap = selectedTravel.allParticipants.toMutableMap()
       participantMap[Participant(participant.key)] = newRole
