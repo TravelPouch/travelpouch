@@ -176,6 +176,8 @@ fun ParticipantListScreen(
                                         context,
                                         notificationViewModel,
                                         setExpandedAddUserDialog)
+                                    // Go back
+                                    setExpandedAddUserDialog(false)
                                   },
                                   onFailure = { e ->
                                     Log.e(
@@ -234,6 +236,9 @@ fun ParticipantListScreen(
                                                 context,
                                                 notificationViewModel,
                                                 setExpandedAddUserDialog)
+                                            // Go back
+                                            setExpandedAddUserDialog(false)
+                                            setExpandedFriendListDialog(false)
                                           }
                                           .testTag("friendCard"),
                                   border = BorderStroke(1.dp, Color.Gray),
@@ -374,12 +379,11 @@ private fun inviteUserToTravelViaFsuid(
               selectedTravel!!.fsUid,
               NotificationContent.InvitationNotification(
                   profileViewModel.profile.value.name, selectedTravel!!.title, Role.PARTICIPANT),
-              NotificationType.INVITATION))
+              notificationType = NotificationType.INVITATION,
+              sector = NotificationSector.TRAVEL))
     } catch (e: Exception) {
       Log.e("NotificationError", "Failed to send notification: ${e.message}")
     }
-    // Go back
-    setExpandedAddUserDialog(false)
   } else {
     Toast.makeText(context, "Error: User with email not found", Toast.LENGTH_SHORT).show()
   }

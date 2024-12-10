@@ -561,7 +561,6 @@ class ParticipantListScreenTest {
     doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    // verify(notificationRepository, never()).addNotification(anyOrNull())
   }
 
   @Test
