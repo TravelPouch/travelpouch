@@ -218,6 +218,56 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         .addOnFailureListener { onFailure(Exception("getting friend profile failed")) }
   }
 
+  /**
+   * This function removes a friend for the user profile, and remove the user profile from the given
+   * friend profile.
+   *
+   * @param friendFsUid (String) : the fsUid of the friend we want to remove from our friend list
+   * @param userProfile (Profile) : the profile of the current user
+   * @param onSuccess ((Profile) -> Unit) : The function to apply when removing the friend is
+   *   successful
+   * @param onFailure ((Exception) -> Unit) : The function to call when an error occurred
+   */
+  override fun removeFriend(
+      friendFsUid: String,
+      userProfile: Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection(collectionPath)
+        .document(friendFsUid)
+        .get()
+        .addOnSuccessListener {
+          val friendProfile = ProfileRepositoryConvert.documentToProfile(it)
+          if (friendProfile == ErrorProfile.errorProfile) {
+            Log.e("DeleteFriend", "The profile you try to delete is corrupted")
+            onFailure(Exception("The profile you try to delete is corrupted"))
+          } else {
+            val userProfileUpdated =
+                userProfile.copy(friends = userProfile.friends - friendProfile.email)
+            val friendProfileUpdated =
+                friendProfile.copy(friends = friendProfile.friends - userProfile.email)
+
+            db.runTransaction { t ->
+                  t.update(it.reference, "friends", friendProfileUpdated.friends)
+                  t.update(documentReference!!, "friends", userProfileUpdated.friends)
+                }
+                .addOnSuccessListener {
+                  Log.d("DeleteFriend", "Friend deleted")
+                  onSuccess(userProfileUpdated)
+                }
+                .addOnFailureListener {
+                  Log.e("DeleteFriend", "An error occurred updating user profile")
+                  onFailure(Exception("An error occurred updating your profile"))
+                }
+          }
+        }
+        .addOnFailureListener {
+          Log.e("DeleteFriend", "An error occurred getting the profile of your friend")
+          onFailure(Exception("An error occurred getting the profile of your friend"))
+        }
+  }
+
   private fun updatingFriendList(profile: Profile, email: String, fsUid: String): Profile {
     return profile.copy(friends = profile.friends + Pair(email, fsUid))
   }
