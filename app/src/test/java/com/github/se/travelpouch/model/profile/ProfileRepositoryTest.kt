@@ -422,6 +422,7 @@ class ProfileRepositoryTest {
     `when`(mockDocumentSnapshotFriend.get("userTravelList"))
         .thenReturn(friendProfile.userTravelList)
     `when`(mockDocumentSnapshotFriend.get("friends")).thenReturn(friendProfile.friends)
+    `when`(mockDocumentSnapshotFriend.exists()).thenReturn(true)
 
     val firestoreMock: FirebaseFirestore = mock()
     val profileRepository: ProfileRepositoryFirebase = ProfileRepositoryFirebase(firestoreMock)
@@ -432,19 +433,18 @@ class ProfileRepositoryTest {
 
     val collectionReference: CollectionReference = mock()
     val query: Query = mock()
-    val taskFirstLayerMock: Task<QuerySnapshot> = mock()
+    val taskFirstLayerMock: Task<DocumentSnapshot> = mock()
     val taskSecondLayerMock: Task<Void> = mock()
     val querySnapshot: QuerySnapshot = mock()
 
     whenever(firestoreMock.collection(anyOrNull())).thenReturn(collectionReference)
-    whenever(collectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(query)
-    whenever(query.get()).thenReturn(taskFirstLayerMock)
+    whenever(collectionReference.document(anyOrNull())).thenReturn(mockDocumentReferenceFriend)
+    whenever(mockDocumentReferenceFriend.get()).thenReturn(taskFirstLayerMock)
     whenever(taskFirstLayerMock.addOnSuccessListener(anyOrNull())).thenReturn(taskFirstLayerMock)
     whenever(taskFirstLayerMock.addOnFailureListener(anyOrNull())).thenReturn(taskFirstLayerMock)
 
     whenever(taskFirstLayerMock.isSuccessful).thenReturn(true)
-    whenever(taskFirstLayerMock.result).thenReturn(querySnapshot)
-    whenever(querySnapshot.documents).thenReturn(listOf(mockDocumentSnapshotFriend))
+    whenever(taskFirstLayerMock.result).thenReturn(mockDocumentSnapshotFriend)
     whenever(mockDocumentSnapshotFriend.reference).thenReturn(mockDocumentReferenceFriend)
 
     whenever(firestoreMock.runTransaction<Void>(anyOrNull())).thenReturn(taskSecondLayerMock)
@@ -456,7 +456,7 @@ class ProfileRepositoryTest {
     var failed = false
 
     profileRepository.addFriend(
-        friendProfile.email,
+        friendProfile.fsUid,
         userProfile,
         {
           userProfile = it
@@ -464,9 +464,9 @@ class ProfileRepositoryTest {
         },
         { failed = true })
 
-    val onCompleteListenerCaptor1 = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    val onCompleteListenerCaptor1 = argumentCaptor<OnSuccessListener<DocumentSnapshot>>()
     verify(taskFirstLayerMock).addOnSuccessListener(onCompleteListenerCaptor1.capture())
-    onCompleteListenerCaptor1.firstValue.onSuccess(querySnapshot)
+    onCompleteListenerCaptor1.firstValue.onSuccess(mockDocumentSnapshotFriend)
 
     val transactionCaptor = argumentCaptor<Transaction.Function<Void>>()
     verify(firestoreMock).runTransaction(transactionCaptor.capture())
@@ -563,6 +563,93 @@ class ProfileRepositoryTest {
 
     assert(succeeded)
     assertFalse(failed)
+  }
+
+  @Test
+  fun sendFriendNotificationWorks() {
+    var friendProfile =
+        Profile(
+            "qwertzuiopasdfghjklyxcvbnm13",
+            "usernameTestFriend",
+            "email_friend@test.ch",
+            emptyMap(),
+            "nameTestFriend",
+            emptyList())
+
+    val mockFirebase: FirebaseFirestore = mock()
+    val mockCollectionReference: CollectionReference = mock()
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+
+    val mockProfileRepository = ProfileRepositoryFirebase(mockFirebase)
+    whenever(mockFirebase.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    whenever(mockQuery.get()).thenReturn(mockTask)
+
+    whenever(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask)
+    whenever(mockTask.addOnFailureListener(anyOrNull())).thenReturn(mockTask)
+
+    whenever(mockQuerySnapshot.isEmpty).thenReturn(false)
+    whenever(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
+
+    whenever(mockTask.isSuccessful).thenReturn(true)
+    whenever(mockTask.result).thenReturn(mockQuerySnapshot)
+
+    `when`(mockDocumentSnapshot.id).thenReturn(friendProfile.fsUid)
+    `when`(mockDocumentSnapshot.getString("email")).thenReturn(friendProfile.email)
+    `when`(mockDocumentSnapshot.getString("name")).thenReturn(friendProfile.name)
+    `when`(mockDocumentSnapshot.getString("username")).thenReturn(friendProfile.username)
+    `when`(mockDocumentSnapshot.get("userTravelList")).thenReturn(friendProfile.userTravelList)
+    `when`(mockDocumentSnapshot.get("friends")).thenReturn(friendProfile.friends)
+
+    var succeeded = false
+    var failed = false
+    mockProfileRepository.sendFriendNotification(
+        friendProfile.email, { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor2 = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(mockTask).addOnSuccessListener(onCompleteListenerCaptor2.capture())
+    onCompleteListenerCaptor2.firstValue.onSuccess(mockQuerySnapshot)
+
+    assert(succeeded)
+    assertFalse(failed)
+  }
+
+  @Test
+  fun sendFriendNotificationFailsForFailedTask() {
+    val mockFirebase: FirebaseFirestore = mock()
+    val mockCollectionReference: CollectionReference = mock()
+    val mockQuery: Query = mock()
+    val mockTask: Task<QuerySnapshot> = mock()
+    val mockQuerySnapshot: QuerySnapshot = mock()
+    val mockDocumentSnapshot: DocumentSnapshot = mock()
+
+    val mockProfileRepository = ProfileRepositoryFirebase(mockFirebase)
+    whenever(mockFirebase.collection(anyOrNull())).thenReturn(mockCollectionReference)
+    whenever(mockCollectionReference.whereEqualTo(eq("email"), anyOrNull())).thenReturn(mockQuery)
+    whenever(mockQuery.get()).thenReturn(mockTask)
+
+    whenever(mockTask.addOnSuccessListener(anyOrNull())).thenReturn(mockTask)
+    whenever(mockTask.addOnFailureListener(anyOrNull())).thenReturn(mockTask)
+
+    whenever(mockQuerySnapshot.isEmpty).thenReturn(false)
+    whenever(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
+
+    whenever(mockTask.isSuccessful).thenReturn(false)
+
+    var succeeded = false
+    var failed = false
+    mockProfileRepository.sendFriendNotification(
+        "someemail@random.com", { succeeded = true }, { failed = true })
+
+    val onCompleteListenerCaptor2 = argumentCaptor<OnFailureListener>()
+    verify(mockTask).addOnFailureListener(onCompleteListenerCaptor2.capture())
+    onCompleteListenerCaptor2.firstValue.onFailure(Exception("message"))
+
+    assert(failed)
+    assertFalse(succeeded)
   }
 
   @Test
