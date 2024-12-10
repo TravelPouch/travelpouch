@@ -135,17 +135,32 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
       val notificationUid = document.id
       val senderUid = document.getString("senderUid")!!
       val receiverUid = document.getString("receiverUid")!!
-      val travelUid = document.getString("travelUid")!!
       val contentData = document["content"] as Map<*, *>
       val notificationType = NotificationType.valueOf(document.getString("notificationType")!!)
+      val notificationSector = NotificationSector.valueOf(document.getString("sector")!!)
+
+      val travelUid =
+          when (notificationSector) {
+            NotificationSector.TRAVEL -> document.getString("travelUid")!!
+            NotificationSector.PROFILE -> null
+          }
+
       val content =
           when (notificationType) {
             NotificationType.INVITATION -> {
-              val inviterName = contentData["inviterName"] as? String ?: "Unknown Inviter"
-              val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
-              val role = contentData["role"] as? String ?: "PARTICIPANT"
-              NotificationContent.InvitationNotification(
-                  inviterName, travelTitle, Role.valueOf(role))
+              when (notificationSector) {
+                NotificationSector.TRAVEL -> {
+                  val inviterName = contentData["inviterName"] as? String ?: "Unknown Inviter"
+                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+                  val role = contentData["role"] as? String ?: "PARTICIPANT"
+                  NotificationContent.InvitationNotification(
+                      inviterName, travelTitle, Role.valueOf(role))
+                }
+                NotificationSector.PROFILE -> {
+                  val inviterEmail = contentData["userEmail"] as? String ?: "Unknown Inviter"
+                  NotificationContent.FriendInvitationNotification(userEmail = inviterEmail)
+                }
+              }
             }
             NotificationType.ROLE_UPDATE -> {
               val travelTitle = contentData["travelTitle"] as? String ?: "No Title"
@@ -153,14 +168,30 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
               NotificationContent.RoleChangeNotification(travelTitle, Role.valueOf(role))
             }
             NotificationType.ACCEPTED -> {
-              val userName = contentData["userName"] as? String ?: "Unknown User"
-              val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
-              NotificationContent.InvitationResponseNotification(userName, travelTitle, true)
+              when (notificationSector) {
+                NotificationSector.TRAVEL -> {
+                  val userName = contentData["userName"] as? String ?: "Unknown User"
+                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+                  NotificationContent.InvitationResponseNotification(userName, travelTitle, true)
+                }
+                NotificationSector.PROFILE -> {
+                  val email = contentData["email"] as? String ?: "Unknown User"
+                  NotificationContent.FriendInvitationResponseNotification(email, true)
+                }
+              }
             }
             NotificationType.DECLINED -> {
-              val userName = contentData["userName"] as? String ?: "Unknown User"
-              val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
-              NotificationContent.InvitationResponseNotification(userName, travelTitle, false)
+              when (notificationSector) {
+                NotificationSector.TRAVEL -> {
+                  val userName = contentData["userName"] as? String ?: "Unknown User"
+                  val travelTitle = contentData["travelTitle"] as? String ?: "No Travel Title"
+                  NotificationContent.InvitationResponseNotification(userName, travelTitle, false)
+                }
+                NotificationSector.PROFILE -> {
+                  val email = contentData["email"] as? String ?: "Unknown User"
+                  NotificationContent.FriendInvitationResponseNotification(email, false)
+                }
+              }
             }
           }
       val timestamp = document.getTimestamp("timestamp")!!
@@ -174,7 +205,8 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
           content,
           notificationType,
           timestamp,
-          status)
+          status,
+          notificationSector)
     } catch (e: Exception) {
       Log.e("NotificationRepository", "Error converting document to Notification", e)
       null

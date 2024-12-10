@@ -70,14 +70,14 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
   /**
    * This function allows us to add a friend to a user.
    *
-   * @param email (String) : The email of the friend to add
+   * @param fsUid (String) : The uid of the friend to add
    * @param onSuccess (() -> Unit) : The function to call when the adding of a friend is successful
    * @param onFailure ((Exception) -> Unit) : The function to call when the adding of a friend
    *   failed
    */
-  fun addFriend(email: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+  fun addFriend(fsUid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     repository.addFriend(
-        email = email,
+        fsUid = fsUid,
         userProfile = profile_.value,
         onSuccess = {
           Log.d("Friend added", "Friend addded")
@@ -104,6 +104,22 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
             _isTokenUpdated.value = true // Mark the token as updated for this session
         }
     }
+
+  /**
+   * This function sends to notification to add a friend
+   *
+   * @param email (String) : The email of the sender of the notification
+   * @param onSuccess ((String) -> Unit) : The function to call when the notification was sent
+   * @param onFailure ((Exception) -> Unit) : The function to call when the notification failed to
+   *   be sent
+   */
+  fun sendFriendNotification(
+      email: String,
+      onSuccess: (String) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    repository.sendFriendNotification(email, onSuccess, onFailure)
+  }
 
   /**
    * This function removes a friend for the user profile, and remove the user profile from the given

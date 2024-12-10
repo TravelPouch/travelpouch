@@ -43,14 +43,14 @@ interface ProfileRepository {
   /**
    * This function allows us to add a friend to a user.
    *
-   * @param email (String) : The email of the friend to add
+   * @param fsUid (String) : The fsUid of the friend to add
    * @param userProfile (Profile) : The profile of the user currently of the app
    * @param onSuccess (() -> Unit) : The function to call when the adding of a friend is successful
    * @param onFailure ((Exception) -> Unit) : The function to call when the adding of a friend
    *   failed
    */
   fun addFriend(
-      email: String,
+      fsUid: String,
       userProfile: Profile,
       onSuccess: (Profile) -> Unit,
       onFailure: (Exception) -> Unit
@@ -71,6 +71,20 @@ interface ProfileRepository {
         onFailure: (Exception) -> Unit
     )
     
+  /**
+   * This function sends to notification to add a friend
+   *
+   * @param email (String) : The email of the sender of the notification
+   * @param onSuccess ((String) -> Unit) : The function to call when the notification was sent
+   * @param onFailure ((Exception) -> Unit) : The function to call when the notification failed to
+   *   be sent
+   */
+  fun sendFriendNotification(
+      email: String,
+      onSuccess: (String) -> Unit,
+      onFailure: (Exception) -> Unit
+  )
+
   /**
    * This function removes a friend for the user profile, and remove the user profile from the given
    * friend profile.
