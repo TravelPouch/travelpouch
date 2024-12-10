@@ -3,7 +3,7 @@ package com.github.se.travelpouch.model.documents
 import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
@@ -42,15 +42,15 @@ class DocumentViewModelTest {
 
   private lateinit var documentContainer: DocumentContainer
   private lateinit var documentReference: DocumentReference
-  private lateinit var fileDownloader: FileDownloader
+  private lateinit var documentsManager: DocumentsManager
   private lateinit var document: NewDocumentContainer
   private lateinit var selectedTravel: TravelContainer
 
   @Before
   fun setUp() {
     documentRepository = mock(DocumentRepository::class.java)
-    fileDownloader = mock(FileDownloader::class.java)
-    documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
+    documentsManager = mock(DocumentsManager::class.java)
+    documentViewModel = DocumentViewModel(documentRepository, documentsManager)
     documentReference = mock(DocumentReference::class.java)
 
     documentContainer =
@@ -212,7 +212,7 @@ class DocumentViewModelTest {
 
   @Test
   fun assertUploadFileAnyInvalid() {
-    val documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
+    val documentViewModel = DocumentViewModel(documentRepository, documentsManager)
     val mockInputStream = mock(InputStream::class.java)
 
     assert(
@@ -267,6 +267,6 @@ class DocumentViewModelTest {
     `when`(documentReference.id).thenReturn("1")
     documentViewModel.selectDocument(documentContainer)
     documentViewModel.storeSelectedDocument(documentFile)
-    verify(fileDownloader).downloadFile(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(documentsManager).downloadFile(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }

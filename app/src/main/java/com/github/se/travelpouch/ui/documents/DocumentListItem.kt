@@ -27,12 +27,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.github.se.travelpouch.R
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
-
-const val THUMBNAIL_WIDTH = 150
 
 /**
  * Composable function for displaying a document item.
@@ -47,10 +46,10 @@ fun DocumentListItem(
 ) {
   var thumbnailUri by remember { mutableStateOf("") }
   LaunchedEffect(documentContainer) {
-    documentViewModel.getDocumentThumbnail(documentContainer, THUMBNAIL_WIDTH)
+    documentViewModel.getDocumentThumbnail(documentContainer, R.integer.thumbnail_documents_list_width)
   }
   thumbnailUri =
-      documentViewModel.thumbnailUrls["${documentContainer.ref.id}-thumb-$THUMBNAIL_WIDTH"] ?: ""
+      documentViewModel.thumbnailUrls["${documentContainer.ref.id}-thumb-${R.integer.thumbnail_documents_list_width}"] ?: ""
 
   Card(
       modifier =

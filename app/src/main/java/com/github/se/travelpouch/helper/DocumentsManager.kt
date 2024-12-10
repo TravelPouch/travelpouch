@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 /** Helper class to download files from Firbase storage to local files */
-open class FileDownloader(
+open class DocumentsManager(
     private val contentResolver: ContentResolver,
     private val storage: FirebaseStorage,
     private val dataStore: DataStore<Preferences>

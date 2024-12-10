@@ -26,7 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.never
 
 @RunWith(MockitoJUnitRunner::class)
-class FileDownloaderTest {
+class DocumentsManagerTest {
 
   private lateinit var contentResolver: ContentResolver
   private lateinit var mockDocumentFile: DocumentFile
@@ -47,11 +47,11 @@ class FileDownloaderTest {
 
   @Test
   fun assertUnableToCreateFile() {
-    val fileDownloader = FileDownloader(contentResolver, mockFirebaseStorage)
+    val documentsManager = DocumentsManager(contentResolver, mockFirebaseStorage)
     val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     device.executeShellCommand("logcat -c")
     `when`(mockDestinationFolder.createFile(any(), any())).thenReturn(null)
-    fileDownloader.downloadFile(
+    documentsManager.downloadFile(
         "image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
     verify(mockFirebaseStorage, never()).reference
     val logs = device.executeShellCommand("logcat -d")
@@ -83,7 +83,7 @@ class FileDownloaderTest {
       taskSnapshot.await()
       taskSnapshot.result
 
-      FileDownloader(contentResolver, storage)
+      DocumentsManager(contentResolver, storage)
           .downloadFile("image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
           .join()
     }

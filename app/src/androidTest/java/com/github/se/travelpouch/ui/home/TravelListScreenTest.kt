@@ -9,7 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -62,7 +62,7 @@ class TravelListScreenTest {
   private lateinit var eventViewModel: EventViewModel
   private lateinit var eventRepository: EventRepository
 
-  @Mock private lateinit var mockFileDownloader: FileDownloader
+  @Mock private lateinit var mockDocumentsManager: DocumentsManager
 
   @Before
   fun setUp() {
@@ -71,7 +71,7 @@ class TravelListScreenTest {
     activityRepository = mock(ActivityRepository::class.java)
     documentRepository = mock(DocumentRepository::class.java)
     eventRepository = mock(EventRepository::class.java)
-    mockFileDownloader = mock()
+    mockDocumentsManager = mock()
 
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView((profileRepository))
@@ -79,7 +79,7 @@ class TravelListScreenTest {
     listTravelViewModel = ListTravelViewModel(travelRepository)
     activityViewModel = ActivityViewModel(activityRepository)
     eventViewModel = EventViewModel(eventRepository)
-    documentViewModel = DocumentViewModel(documentRepository, mockFileDownloader)
+    documentViewModel = DocumentViewModel(documentRepository, mockDocumentsManager)
 
     // Mock the repository methods
     val participant = Participant(fsUid = TravelContainerMock.generateAutoUserId())

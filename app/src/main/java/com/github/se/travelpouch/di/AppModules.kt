@@ -5,7 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityRepositoryFirebase
 import com.github.se.travelpouch.model.authentication.AuthenticationService
@@ -103,8 +103,8 @@ object AppModule {
       @ApplicationContext context: Context,
       storage: FirebaseStorage,
       dataStore: DataStore<Preferences>
-  ): FileDownloader {
-    return FileDownloader(context.contentResolver, storage, dataStore)
+  ): DocumentsManager {
+    return DocumentsManager(context.contentResolver, storage, dataStore)
   }
 
   @Provides

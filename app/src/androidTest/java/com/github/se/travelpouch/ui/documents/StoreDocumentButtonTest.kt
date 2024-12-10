@@ -11,7 +11,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.app.ActivityOptionsCompat
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.documents.StoreDocumentButton
@@ -49,8 +49,8 @@ class StoreDocumentButtonTest {
   @Before
   fun setup() {
     val repository = mock(DocumentRepository::class.java)
-    val fileDownloader = mock(FileDownloader::class.java)
-    documentViewModel = spy(DocumentViewModel(repository, fileDownloader))
+    val documentsManager = mock(DocumentsManager::class.java)
+    documentViewModel = spy(DocumentViewModel(repository, documentsManager))
   }
 
   @Test

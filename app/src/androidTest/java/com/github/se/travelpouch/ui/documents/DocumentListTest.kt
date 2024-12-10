@@ -15,7 +15,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -38,7 +38,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.spy
-import org.mockito.kotlin.times
 
 class DocumentListTest {
   @Composable
@@ -61,7 +60,7 @@ class DocumentListTest {
   private lateinit var mockDocumentViewModel: DocumentViewModel
   private lateinit var mockDocumentReference: DocumentReference
   private lateinit var mockListTravelViewModel: ListTravelViewModel
-  private lateinit var mockFileDownloader: FileDownloader
+  private lateinit var mockDocumentsManager: DocumentsManager
   private lateinit var list_documents: List<DocumentContainer>
   private lateinit var travelContainer: TravelContainer
 
@@ -109,10 +108,10 @@ class DocumentListTest {
             participants,
             emptyList())
     navigationActions = mock(NavigationActions::class.java)
-    mockFileDownloader = mock(FileDownloader::class.java)
+    mockDocumentsManager = mock(DocumentsManager::class.java)
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
-    val documentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
+    val documentViewModel = DocumentViewModel(mockDocumentRepository, mockDocumentsManager)
     mockDocumentViewModel = spy(documentViewModel)
   }
 

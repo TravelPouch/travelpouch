@@ -2,7 +2,6 @@ package com.github.se.travelpouch.model.documents
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,13 +11,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.travels.TravelContainer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import javax.inject.Inject
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -36,14 +34,14 @@ import kotlinx.coroutines.launch
  * ViewModel for managing documents and related operations.
  *
  * @property repository The repository used for accessing documents data.
- * @property fileDownloader The file downloader to use when downloading files
+ * @property documentsManager The file downloader to use when downloading files
  */
 @HiltViewModel
 open class DocumentViewModel
 @Inject
 constructor(
-    private val repository: DocumentRepository,
-    private val fileDownloader: FileDownloader,
+  private val repository: DocumentRepository,
+  private val documentsManager: DocumentsManager,
   private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
@@ -87,7 +85,7 @@ constructor(
            throw IllegalArgumentException("Some required fields are empty. Abort download")
     }
 
-    val result = fileDownloader.downloadFile(mimeType, title, ref, documentFile)
+    val result = documentsManager.downloadFile(mimeType, title, ref, documentFile)
     result.invokeOnCompletion {
       if (it != null) {
         Log.e("DocumentViewModel", "Failed to download document", it)

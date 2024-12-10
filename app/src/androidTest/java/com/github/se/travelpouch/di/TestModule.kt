@@ -3,7 +3,7 @@ package com.github.se.travelpouch.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityRepositoryFirebase
 import com.github.se.travelpouch.model.authentication.AuthenticationService
@@ -112,8 +112,8 @@ object TestModule {
       @ApplicationContext context: Context,
       storage: FirebaseStorage,
       dataStore: DataStore<Preferences>
-  ): FileDownloader {
-    return FileDownloader(context.contentResolver, storage, dataStore)
+  ): DocumentsManager {
+    return DocumentsManager(context.contentResolver, storage, dataStore)
   }
 
   @Provides

@@ -1,12 +1,11 @@
 package com.github.se.travelpouch.ui.notification
 
-import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import com.github.se.travelpouch.helper.FileDownloader
+import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -51,7 +50,7 @@ class NotificationItemTest {
   @Mock private lateinit var activityViewModel: ActivityViewModel
   @Mock private lateinit var documentRepository: DocumentRepository
   @Mock private lateinit var documentViewModel: DocumentViewModel
-  @Mock private lateinit var fileDownloader: FileDownloader
+  @Mock private lateinit var documentsManager: DocumentsManager
   @Mock private lateinit var eventRepository: EventRepository
   @Mock private lateinit var eventViewModel: EventViewModel
 
@@ -82,14 +81,14 @@ class NotificationItemTest {
     activityRepository = mock(ActivityRepository::class.java)
     documentRepository = mock(DocumentRepository::class.java)
     eventRepository = mock(EventRepository::class.java)
-    fileDownloader = mock(FileDownloader::class.java)
+    documentsManager = mock(DocumentsManager::class.java)
 
     navigationActions = mock(NavigationActions::class.java)
     notificationViewModel = NotificationViewModel(notificationRepository)
     profileModelView = ProfileModelView(profileRepository)
     listTravelViewModel = ListTravelViewModel(travelRepository)
     activityViewModel = ActivityViewModel(activityRepository)
-    documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
+    documentViewModel = DocumentViewModel(documentRepository, documentsManager)
     eventViewModel = EventViewModel(eventRepository)
   }
 
