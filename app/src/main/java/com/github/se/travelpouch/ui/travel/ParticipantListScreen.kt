@@ -213,6 +213,12 @@ fun ParticipantListScreen(
                               "Select a Friend",
                               fontWeight = FontWeight.Bold,
                               modifier = Modifier.padding(8.dp).testTag("friendListDialogTitle"))
+                          if (userProfile.value.friends.isEmpty()) {
+                            Text(
+                                "No friends to choose from...",
+                                fontWeight = FontWeight.Light,
+                                modifier = Modifier.testTag("noFriendsDialogText"))
+                          }
                           LazyColumn {
                             items(userProfile.value.friends.keys.toList()) { friend ->
                               Card(
@@ -220,12 +226,6 @@ fun ParticipantListScreen(
                                       Modifier.fillMaxWidth()
                                           .padding(8.dp)
                                           .clickable {
-                                            // Handle friend selection
-                                            Toast.makeText(
-                                                    context,
-                                                    "Friend selected, gyat!",
-                                                    Toast.LENGTH_SHORT)
-                                                .show()
                                             inviteUserToTravelViaFsuid(
                                                 selectedTravel,
                                                 userProfile.value.friends[friend],
