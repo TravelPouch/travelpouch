@@ -223,7 +223,8 @@ fun handleInvitationResponse(
                     listTravelViewModel.selectTravel(updatedContainer)
                     Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
                   },
-                  { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() })
+                  { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() },
+                  eventsViewModel.getNewDocumentReferenceForNewTravel(travel.fsUid))
             }
             Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
           },
@@ -265,7 +266,7 @@ fun handleInvitationResponse(
                 sector = notification.sector)
 
         notificationViewModel.sendNotification(invitationResponse)
-        
+
         Toast.makeText(context, "Request declined", Toast.LENGTH_LONG).show()
       }
     }
