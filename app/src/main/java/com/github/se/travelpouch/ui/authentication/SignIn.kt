@@ -70,6 +70,10 @@ fun SignInScreen(
   val context = LocalContext.current
   val isLoading: MutableState<Boolean> = isLoading
   val methodChosen = rememberSaveable { mutableStateOf(false) }
+  val signInCompleted = rememberSaveable {
+    mutableStateOf(false)
+  } // this extra state is necessary to prevent token refresh errors
+  val waitUntilProfileFetched = rememberSaveable { mutableStateOf(false) }
 
   val currentUser = auth.currentUser
 
@@ -78,24 +82,41 @@ fun SignInScreen(
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             methodChosen.value = false
+            signInCompleted.value = true // Mark sign-in as completed
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
             GlobalScope.launch {
-              profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+              profileModelView.initAfterLogin {
+                travelViewModel.initAfterLogin()
+                waitUntilProfileFetched.value = true
+              }
               isLoading.value = false
             }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(Screen.TRAVEL_LIST)
+            // navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
             methodChosen.value = false
+            signInCompleted.value = false // Reset sign-in flag on error to allow retry
             isLoading.value = false
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
           })
 
   val token = stringResource(R.string.default_web_client_id)
+
+  // Navigate to the next screen after the profile is fetched
+  LaunchedEffect(waitUntilProfileFetched.value) {
+    if (waitUntilProfileFetched.value) {
+      if (profileModelView.profile.value.needsOnboarding) {
+        Toast.makeText(context, "Welcome to TravelPouch!", Toast.LENGTH_LONG).show()
+        navigationActions.navigateTo(Screen.ONBOARDING)
+      } else {
+        navigationActions.navigateTo(Screen.TRAVEL_LIST)
+      }
+    }
+  }
 
   // The main container for the screen
   Scaffold(
@@ -174,7 +195,10 @@ fun SignInScreen(
                   Text("Sign in with email and password")
                 }
           }
-          if (currentUser != null) {
+          if (currentUser != null &&
+              !signInCompleted
+                  .value) { // extra condition on sign-in completion to avoid unnecessary
+            // recompositions
             LaunchedEffect(Unit) {
               try {
                 isLoading.value = true
@@ -187,9 +211,12 @@ fun SignInScreen(
                     "User already signed in: ${currentUser.displayName}, Token: $token")
 
                 GlobalScope.launch {
-                  profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                  profileModelView.initAfterLogin {
+                    travelViewModel.initAfterLogin()
+                    waitUntilProfileFetched.value = true
+                  }
                 }
-                navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                // navigationActions.navigateTo(Screen.TRAVEL_LIST)
                 isLoading.value = false
               } catch (refreshError: Exception) {
                 Log.e(

@@ -153,7 +153,9 @@ fun SignInWithPassword(
                       }
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-                      navigationActions.navigateTo(Screen.TRAVEL_LIST)
+                      if (profileModelView.profile.value.needsOnboarding) {
+                        navigationActions.navigateTo(Screen.ONBOARDING)
+                      } else navigationActions.navigateTo(Screen.TRAVEL_LIST)
                     },
                     onFailure = { task ->
                       Log.w(TAG, "LoginWithEmailAndPassword:failure", task.exception)

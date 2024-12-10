@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,8 +25,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.Card
@@ -74,6 +77,12 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
+import com.github.se.travelpouch.ui.theme.logoutIconDark
+import com.github.se.travelpouch.ui.theme.logoutIconLight
+import com.github.se.travelpouch.ui.theme.logoutRedDark
+import com.github.se.travelpouch.ui.theme.logoutRedLight
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.util.Locale
 import kotlinx.coroutines.launch
 
@@ -122,7 +131,7 @@ fun TravelListScreen(
   val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
   val scope = rememberCoroutineScope()
   val configuration = LocalConfiguration.current
-
+  val darkTheme = isSystemInDarkTheme()
   ModalNavigationDrawer(
       drawerContent = {
         Box(
@@ -168,6 +177,27 @@ fun TravelListScreen(
                     Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                         .testTag("item${item.textId}"))
           }
+
+          // logout button
+          val tint = if (darkTheme) logoutIconDark else logoutIconLight
+          val textColor = if (darkTheme) logoutRedDark else logoutRedLight
+
+          NavigationDrawerItem(
+              icon = {
+                Icon(
+                    Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "logout icon",
+                    tint = tint)
+              },
+              label = { Text("Log out", color = textColor) },
+              selected = false,
+              onClick = {
+                scope.launch { drawerState.close() }
+                Firebase.auth.signOut() // actual sign out
+                navigationActions.navigateTo(Screen.AUTH)
+              },
+              modifier =
+                  Modifier.padding(NavigationDrawerItemDefaults.ItemPadding).testTag("itemLogout"))
         }
       },
       drawerState = drawerState,

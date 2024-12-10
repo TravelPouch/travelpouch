@@ -34,6 +34,7 @@ import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
 import com.github.se.travelpouch.ui.home.AddTravelScreen
 import com.github.se.travelpouch.ui.home.StorageDashboard
+import com.github.se.travelpouch.ui.home.OnboardingScreen
 import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
@@ -158,7 +159,7 @@ class MainActivity : ComponentActivity() {
 
         composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
         composable(Screen.EDIT_PROFILE) {
-          ModifyingProfileScreen(navigationActions, profileModelView)
+          ModifyingProfileScreen(navigationActions, profileModelView, notificationViewModel)
         }
 
         composable(Screen.SIGN_IN_PASSWORD) {
@@ -175,8 +176,9 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               eventsViewModel)
         }
-
+        
         composable(Screen.STORAGE) { StorageDashboard(navigationActions) }
+        composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
       }
     }
   }

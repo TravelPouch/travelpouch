@@ -127,7 +127,8 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             email = email,
             friends = emptyMap(),
             name = email.substringBefore("@"),
-            emptyList())
+            emptyList(),
+            needsOnboarding = true)
 
     documentReference = db.collection(collectionPath).document(uid)
     performFirestoreOperation(
@@ -181,13 +182,11 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
         db.collection(collectionPath).document(documentPath).set(newProfile), onSuccess, onFailure)
   }
 
-  override fun addFriend(
+  override fun sendFriendNotification(
       email: String,
-      userProfile: Profile,
-      onSuccess: (Profile) -> Unit,
+      onSuccess: (String) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    var friendsDocumentReference: DocumentReference? = null
     db.collection(collectionPath)
         .whereEqualTo("email", email)
         .get()
@@ -196,6 +195,40 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
             onFailure(Exception("user not found"))
           } else {
             val document = it.documents[0]
+            val friendProfile = ProfileRepositoryConvert.documentToProfile(document)
+            if (friendProfile == ErrorProfile.errorProfile) {
+              onFailure(Exception("user corrupted"))
+            } else {
+              onSuccess(document.id)
+            }
+          }
+        }
+        .addOnFailureListener { onFailure(Exception("getting profile failed")) }
+  }
+
+  /**
+   * This function sends to notification to add a friend
+   *
+   * @param fsUid (String) : The fsUid of the sender of the notification
+   * @param userProfile (Profile) : The profile of the sender
+   * @param onSuccess ((String) -> Unit) : The function to call when the notification was sent
+   * @param onFailure ((Exception) -> Unit) : The function to call when the notification failed to
+   *   be sent
+   */
+  override fun addFriend(
+      fsUid: String,
+      userProfile: Profile,
+      onSuccess: (Profile) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    var friendsDocumentReference: DocumentReference? = null
+    db.collection(collectionPath)
+        .document(fsUid)
+        .get()
+        .addOnSuccessListener { document ->
+          if (!document.exists()) {
+            onFailure(Exception("user not found"))
+          } else {
             friendsDocumentReference = document.reference
             val friendProfile = ProfileRepositoryConvert.documentToProfile(document)
             if (friendProfile == ErrorProfile.errorProfile) {
@@ -315,6 +348,7 @@ class ProfileRepositoryConvert {
         val friends = document.get("friends") as? Map<String, String>
         val userTravelList = document.get("listoftravellinked") as? List<String>
         val name = document.getString("name")
+        val needsOnboarding = document.getBoolean("needsOnboarding") ?: true
 
         Log.d(
             "ProfileRepository",
@@ -326,7 +360,8 @@ class ProfileRepositoryConvert {
             email = email!!,
             friends = friends ?: emptyMap(),
             name = name!!,
-            userTravelList = userTravelList ?: emptyList())
+            userTravelList = userTravelList ?: emptyList(),
+            needsOnboarding = needsOnboarding)
       } catch (e: Exception) {
         Log.e("ProfileRepository", "Error converting document to Profile", e)
         ErrorProfile.errorProfile
