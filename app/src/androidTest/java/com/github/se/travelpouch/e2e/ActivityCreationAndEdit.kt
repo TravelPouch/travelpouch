@@ -199,7 +199,9 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithText("epic activity").performClick()
         composeTestRule.onNodeWithTag("EditActivityScreen").assertIsDisplayed()
         composeTestRule.onNodeWithTag("titleField").assert(hasText("epic activity"))
-        composeTestRule.onNodeWithTag("descriptionField").assert(hasText("this is an epic activity"))
+        composeTestRule
+            .onNodeWithTag("descriptionField")
+            .assert(hasText("this is an epic activity"))
         composeTestRule.onNodeWithTag("dateField").assert(hasText("01/02/2024"))
         composeTestRule.onNodeWithTag("locationField").assert(hasText("La Paz, Bolivia"))
 
@@ -207,7 +209,9 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithTag("titleField").performTextInput("more epic activity")
 
         composeTestRule.onNodeWithTag("descriptionField").performTextClearance()
-        composeTestRule.onNodeWithTag("descriptionField").performTextInput("this is a more epic activity")
+        composeTestRule
+            .onNodeWithTag("descriptionField")
+            .performTextInput("this is a more epic activity")
 
         composeTestRule.onNodeWithTag("dateField").performTextClearance()
         composeTestRule.onNodeWithTag("dateField").performTextInput("02022024")
@@ -218,6 +222,5 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithText("more epic activity").assert(hasText("more epic activity"))
         composeTestRule.onNodeWithText("more epic activity").assert(hasText("2/2/2024"))
         composeTestRule.onNodeWithText("more epic activity").assert(hasText("La Paz, Bolivia"))
-
       }
 }
