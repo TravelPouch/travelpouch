@@ -117,4 +117,24 @@ class NotificationContentUnitTest {
       assert(true)
     }
   }
+
+  @Test
+  fun assertFriendInvitationDisplaysCorrectly() {
+    val notificationContentBis = NotificationContent.FriendInvitationNotification("email")
+    val string = notificationContentBis.toDisplayString()
+    assert(string == "email wants to be your friend")
+  }
+
+  @Test
+  fun assertFriendInvitationResponseDisplaysCorrectly() {
+    val notificationContentBis =
+        NotificationContent.FriendInvitationResponseNotification("email", true)
+    val string = notificationContentBis.toDisplayString()
+    assert(string == "email is now your friend.")
+
+    val notificationContentBis2 =
+        NotificationContent.FriendInvitationResponseNotification("email", false)
+    val string2 = notificationContentBis2.toDisplayString()
+    assert(string2 == "email has declined your friend invitation.")
+  }
 }
