@@ -667,7 +667,7 @@ class ParticipantListScreenTest {
         .assertTextContains("Select a Friend")
     composeTestRule
         .onNodeWithTag("noFriendsDialogText", useUnmergedTree = true)
-        .assertTextContains("No friends to choose from...")
+        .assertTextContains("No friends to choose from")
   }
 
   @Test
@@ -683,7 +683,7 @@ class ParticipantListScreenTest {
               userTravelList = listOf("00000000000000000000"),
               email = "email@email.org",
               username = "username",
-              friends = mapOf("rizzler@ohio.skibidi" to "abcdefghijklmnopqrstuvwxyz12")))
+              friends = mapOf("example@mail.com" to "abcdefghijklmnopqrstuvwxyz12")))
     }
     profileModelView.getProfile()
 
@@ -717,7 +717,7 @@ class ParticipantListScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
     doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
     composeTestRule.onNodeWithTag("friendCard").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("friendCard").assertTextContains("rizzler@ohio.skibidi")
+    composeTestRule.onNodeWithTag("friendCard").assertTextContains("example@mail.com")
     composeTestRule.onNodeWithTag("friendCard").performClick()
     verify(notificationRepository).addNotification(anyOrNull())
   }

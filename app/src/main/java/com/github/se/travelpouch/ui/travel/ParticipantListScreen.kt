@@ -217,7 +217,7 @@ fun ParticipantListScreen(
                               modifier = Modifier.padding(8.dp).testTag("friendListDialogTitle"))
                           if (userProfile.value.friends.isEmpty()) {
                             Text(
-                                "No friends to choose from...",
+                                "No friends to choose from",
                                 fontWeight = FontWeight.Light,
                                 modifier = Modifier.testTag("noFriendsDialogText"))
                           }
@@ -354,6 +354,15 @@ fun ParticipantListScreen(
   }
 }
 
+/**
+ * Invites a user to the selected travel using their fsUid.
+ *
+ * @param selectedTravel The currently selected travel container.
+ * @param fsUid The fsUid of the user to be invited.
+ * @param profileViewModel The ProfileModelView instance.
+ * @param context The context in which the function is called.
+ * @param notificationViewModel The NotificationViewModel instance.
+ */
 private fun inviteUserToTravelViaFsuid(
     selectedTravel: TravelContainer?,
     fsUid: String?,
