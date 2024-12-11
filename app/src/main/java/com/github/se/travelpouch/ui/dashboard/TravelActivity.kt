@@ -94,15 +94,35 @@ fun TravelActivitiesScreen(
                           .padding(horizontal = 16.dp)
                           .testTag("activityColumn")) {
                     if (listOfActivities.value.isEmpty()) {
-                      item {
-                        Text(
-                            text = "No activities planned for this trip",
-                            style =
-                                MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.testTag("emptyTravel"))
-                      }
+                        item(
+                            key = "empty_travel",  // You can provide a key if necessary
+                            contentType = "textItem" // Optional, can be useful for dynamic lists
+                        ) {
+                            // Centering text in the LazyItemScope
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize() // Fill the available space
+                                    .padding(16.dp) // Optional padding, adjust as needed
+                            ) {
+                                Text(
+                                    text = "No activities planned", // Add newline
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                                Text(
+                                    text = "for this trip",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.align(Alignment.Center).padding(top = 42.dp)
+                                )
+                            }
+                        }
+
                     } else {
                       items(listOfActivities.value.size) { idx ->
                         ActivityItem(

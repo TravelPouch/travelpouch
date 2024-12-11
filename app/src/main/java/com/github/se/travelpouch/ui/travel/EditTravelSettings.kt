@@ -234,7 +234,7 @@ fun EditTravelSettingsScreen(
             OutlinedTextField(
                 value = titleText.value,
                 onValueChange = { keystroke -> titleText.value = keystroke },
-                modifier = Modifier.testTag("inputTravelTitle").fillMaxWidth(1f),
+                modifier = Modifier.testTag("inputTravelTitle").fillMaxWidth(1f).padding(horizontal = 12.dp),
                 label = { Text("Title") },
                 placeholder = { Text("Name the Travel") },
                 shape = RoundedCornerShape(6.dp),
@@ -242,7 +242,7 @@ fun EditTravelSettingsScreen(
             OutlinedTextField(
                 value = descriptionText.value,
                 onValueChange = { keystroke -> descriptionText.value = keystroke },
-                modifier = Modifier.testTag("inputTravelDescription").fillMaxWidth(1f),
+                modifier = Modifier.testTag("inputTravelDescription").fillMaxWidth(1f).padding(horizontal = 12.dp),
                 label = { Text("Description") },
                 placeholder = { Text("Describe the Travel") },
                 shape = RoundedCornerShape(6.dp))
@@ -257,7 +257,7 @@ fun EditTravelSettingsScreen(
                   },
                   label = { Text("Location") },
                   placeholder = { Text("Enter an Address or Location") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
+                  modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp).testTag("inputTravelLocation"))
 
               // Dropdown for location suggestions
               DropdownMenu(
@@ -307,7 +307,7 @@ fun EditTravelSettingsScreen(
                 onValueChange = { keystroke -> startTime.value = keystroke }, // Allow manual input
                 label = { Text("Start Date") },
                 placeholder = { Text("DD/MM/YYYY") },
-                modifier = Modifier.testTag("inputTravelStartTime").fillMaxWidth(1f),
+                modifier = Modifier.testTag("inputTravelStartTime").fillMaxWidth(1f).padding(horizontal = 12.dp),
                 shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
@@ -330,7 +330,7 @@ fun EditTravelSettingsScreen(
                 }, // Allow manual input
                 label = { Text("End Date") },
                 placeholder = { Text("DD/MM/YYYY") },
-                modifier = Modifier.testTag("inputTravelEndTime").fillMaxWidth(1f),
+                modifier = Modifier.testTag("inputTravelEndTime").fillMaxWidth(1f).padding(horizontal = 12.dp),
                 shape = RoundedCornerShape(6.dp),
                 trailingIcon = {
                   IconButton(
