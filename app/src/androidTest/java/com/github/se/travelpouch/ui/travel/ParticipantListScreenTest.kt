@@ -690,7 +690,8 @@ class ParticipantListScreenTest {
         .`when`(profileRepository)
         .getFsUidByEmail(any(), any(), any())
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any(),
+        anyOrNull())
     doThrow(RuntimeException("Impossible Exception"))
         .`when`(notificationRepository)
         .addNotification(anyOrNull())
@@ -710,7 +711,7 @@ class ParticipantListScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, eventViewModel)
     }
     composeTestRule.onNodeWithTag("addUserFab").performClick()
     composeTestRule.onNodeWithTag("addViaFriendListButton").performClick()
@@ -743,7 +744,7 @@ class ParticipantListScreenTest {
 
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, eventViewModel)
     }
     composeTestRule.onNodeWithTag("addUserFab").performClick()
     composeTestRule.onNodeWithTag("addViaFriendListButton").performClick()
@@ -769,7 +770,7 @@ class ParticipantListScreenTest {
         .`when`(profileRepository)
         .getFsUidByEmail(any(), any(), any())
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("friendCard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("friendCard").assertTextContains("example@mail.com")
     composeTestRule.onNodeWithTag("friendCard").performClick()
