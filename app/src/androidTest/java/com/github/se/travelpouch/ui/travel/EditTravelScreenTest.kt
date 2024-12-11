@@ -176,7 +176,7 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").assertTextContains("Delete")
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
-    verify(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    verify(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
   }
 
   fun pressALotOfButtons() {
@@ -227,7 +227,8 @@ class EditTravelSettingsScreenTest {
     composeTestRule.onNodeWithTag("travelDeleteButton").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("travelDeleteButton").assertTextContains("Delete")
     composeTestRule.onNodeWithTag("travelSaveButton").performClick()
-    verify(travelRepository, atLeastOnce()).updateTravel(any(), any(), anyOrNull(), any(), any())
+    verify(travelRepository, atLeastOnce())
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
   }
 
   @Test

@@ -13,11 +13,14 @@ import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.events.EventRepository
+import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.location.LocationRepository
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -26,12 +29,15 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.never
+import org.mockito.kotlin.whenever
 
 class AddActivityScreenTest {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityModelView: ActivityViewModel
   private lateinit var navigationActions: NavigationActions
   private lateinit var mockLocationViewModel: LocationViewModel
+  private lateinit var eventRepository: EventRepository
+  private lateinit var eventViewModel: EventViewModel
 
   class FakeLocationRepository : LocationRepository {
 
@@ -67,13 +73,17 @@ class AddActivityScreenTest {
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
     mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
     mockLocationViewModel = LocationViewModel(FakeLocationRepository())
+    eventRepository = mock()
+    eventViewModel = EventViewModel(eventRepository)
 
     `when`(mockActivityModelView.getNewUid()).thenReturn("uid")
   }
 
   @Test
   fun everythingIsDisplayed() {
-    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, eventViewModel = eventViewModel)
+    }
 
     composeTestRule.onNodeWithTag("AddActivityScreen").isDisplayed()
     composeTestRule.onNodeWithTag("titleField").isDisplayed()
@@ -101,7 +111,9 @@ class AddActivityScreenTest {
 
   @Test
   fun doesNotSaveWhenFieldsAreEmpty() {
-    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, eventViewModel = eventViewModel)
+    }
 
     completeAllFields(composeTestRule)
     // todo: add a test for location. Not now because location defined later.
@@ -110,34 +122,43 @@ class AddActivityScreenTest {
     composeTestRule.onNodeWithTag("titleField").performTextClearance()
     composeTestRule.onNodeWithTag("saveButton").performClick()
     verify(mockActivityRepositoryFirebase, never())
-        .addActivity(anyOrNull(), anyOrNull(), anyOrNull())
+        .addActivity(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     // verify no saving when blank description
     completeAllFields(composeTestRule)
     composeTestRule.onNodeWithTag("descriptionField").performTextClearance()
     composeTestRule.onNodeWithTag("saveButton").performClick()
     verify(mockActivityRepositoryFirebase, never())
-        .addActivity(anyOrNull(), anyOrNull(), anyOrNull())
+        .addActivity(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     // verify no saving when blank date
     completeAllFields(composeTestRule)
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("saveButton").performClick()
     verify(mockActivityRepositoryFirebase, never())
-        .addActivity(anyOrNull(), anyOrNull(), anyOrNull())
+        .addActivity(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
   fun doesSaveWhenFieldsAreFull() {
-    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, eventViewModel = eventViewModel)
+    }
     completeAllFields(composeTestRule)
+
+    whenever(eventViewModel.getNewDocumentReference())
+        .thenReturn(mock(DocumentReference::class.java))
+
     composeTestRule.onNodeWithTag("saveButton").performClick()
-    verify(mockActivityRepositoryFirebase).addActivity(anyOrNull(), anyOrNull(), anyOrNull())
+    verify(mockActivityRepositoryFirebase)
+        .addActivity(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
   fun dateFormattingWorksCorrectly() {
-    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, eventViewModel = eventViewModel)
+    }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("00000000")
     val result =
@@ -147,19 +168,23 @@ class AddActivityScreenTest {
 
   @Test
   fun doesNotSaveWhenDateIsWrong() {
-    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, eventViewModel = eventViewModel)
+    }
     completeAllFields(composeTestRule)
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("00000000")
 
     composeTestRule.onNodeWithTag("saveButton").performClick()
     verify(mockActivityRepositoryFirebase, never())
-        .addActivity(anyOrNull(), anyOrNull(), anyOrNull())
+        .addActivity(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
   fun noCharacterAllowedInDateField() {
-    composeTestRule.setContent { AddActivityScreen(navigationActions, mockActivityModelView) }
+    composeTestRule.setContent {
+      AddActivityScreen(navigationActions, mockActivityModelView, eventViewModel = eventViewModel)
+    }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("mdkdk")
     var result =
@@ -178,7 +203,11 @@ class AddActivityScreenTest {
   @Test
   fun limitOfEightCharactersInDateField() {
     composeTestRule.setContent {
-      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+      AddActivityScreen(
+          navigationActions,
+          mockActivityModelView,
+          mockLocationViewModel,
+          eventViewModel = eventViewModel)
     }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("01234567")
@@ -192,7 +221,11 @@ class AddActivityScreenTest {
   fun locationDropdownAppearsAndSelectionWorks() {
     val testQuery = "Paris"
     composeTestRule.setContent {
-      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+      AddActivityScreen(
+          navigationActions,
+          mockActivityModelView,
+          mockLocationViewModel,
+          eventViewModel = eventViewModel)
     }
 
     // Type in the location field
@@ -219,7 +252,11 @@ class AddActivityScreenTest {
     // TimePickerDialog.
 
     composeTestRule.setContent {
-      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+      AddActivityScreen(
+          navigationActions,
+          mockActivityModelView,
+          mockLocationViewModel,
+          eventViewModel = eventViewModel)
     }
 
     // The time field should be displayed
@@ -232,7 +269,11 @@ class AddActivityScreenTest {
   fun datePickerDialogOpensOnClick() {
 
     composeTestRule.setContent {
-      AddActivityScreen(navigationActions, mockActivityModelView, mockLocationViewModel)
+      AddActivityScreen(
+          navigationActions,
+          mockActivityModelView,
+          mockLocationViewModel,
+          eventViewModel = eventViewModel)
     }
 
     // The date field should be displayed

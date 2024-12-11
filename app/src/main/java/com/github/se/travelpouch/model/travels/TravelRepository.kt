@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.travels
 
 import com.github.se.travelpouch.model.profile.Profile
+import com.google.firebase.firestore.DocumentReference
 
 interface TravelRepository {
 
@@ -34,14 +35,20 @@ interface TravelRepository {
       onFailure: (Exception) -> Unit
   )
 
-  fun addTravel(travel: TravelContainer, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun addTravel(
+      travel: TravelContainer,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference
+  )
 
   fun updateTravel(
       travel: TravelContainer,
       modeOfUpdate: UpdateMode,
       fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference?
   )
 
   fun deleteTravelById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)

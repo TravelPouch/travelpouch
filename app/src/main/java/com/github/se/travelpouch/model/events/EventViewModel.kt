@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.events
 
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,25 +26,28 @@ class EventViewModel @Inject constructor(private val repository: EventRepository
   }
 
   /**
-   * This function returns a new unused unique identifier.
+   * This function returns an unused unique document reference for a new event when we don't know to
+   * which travel the event will be added.
    *
-   * @return (String) : returns a new unused unique identifier
+   * @param travelId (String) : The travel id to which we have to link the event
+   * @return (DocumentReference) : The document reference to the new event
    */
-  fun getNewUid(): String {
-    return repository.getNewUid()
+  fun getNewDocumentReferenceForNewTravel(travelId: String): DocumentReference {
+    return repository.getNewDocumentReferenceForNewTravel(travelId)
+  }
+
+  /**
+   * This function returns an unused unique document reference for a new event when the travel id
+   * has being set.
+   *
+   * @return (DocumentReference) : The document reference to the new event
+   */
+  fun getNewDocumentReference(): DocumentReference {
+    return repository.getNewDocumentReference()
   }
 
   /** This function updates the list of events stored on firebase. */
   fun getEvents() {
     repository.getEvents(onSuccess = { events_.value = it }, onFailure = {})
-  }
-
-  /**
-   * This function adds a new event in Firebase
-   *
-   * @param event (Event) : a new event to add in Firebase
-   */
-  fun addEvent(event: Event) {
-    repository.addEvent(event = event, onSuccess = { getEvents() }, onFailure = {})
   }
 }

@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.notifications.Notification
 import com.github.se.travelpouch.model.notifications.NotificationContent
 import com.github.se.travelpouch.model.notifications.NotificationSector
@@ -67,7 +68,8 @@ fun ParticipantListScreen(
     listTravelViewModel: ListTravelViewModel,
     navigationActions: NavigationActions,
     notificationViewModel: NotificationViewModel,
-    profileViewModel: ProfileModelView
+    profileViewModel: ProfileModelView,
+    eventViewModel: EventViewModel
 ) {
   val context = LocalContext.current
   val selectedTravel by listTravelViewModel.selectedTravel.collectAsState()
@@ -286,7 +288,8 @@ fun ParticipantListScreen(
                             listTravelViewModel.updateTravel(
                                 updatedContainer,
                                 TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
-                                participant.key)
+                                participant.key,
+                                eventViewModel.getNewDocumentReference())
                             listTravelViewModel.selectTravel(updatedContainer)
                             listTravelViewModel.fetchAllParticipantsInfo()
                             setExpanded(false)
@@ -374,7 +377,7 @@ fun handleRoleChange(
       participantMap[Participant(participant.key)] = newRole
       val updatedContainer = selectedTravel.copy(allParticipants = participantMap.toMap())
       listTravelViewModel.updateTravel(
-          updatedContainer, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
+          updatedContainer, TravelRepository.UpdateMode.FIELDS_UPDATE, null, null)
       listTravelViewModel.selectTravel(updatedContainer)
       setExpandedRoleDialog(false)
       setExpanded(false)
