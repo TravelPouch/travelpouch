@@ -5,6 +5,7 @@ import android.app.Instrumentation
 import android.content.Intent
 import android.icu.util.GregorianCalendar
 import android.net.Uri
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -30,6 +31,7 @@ import dagger.hilt.android.testing.UninstallModules
 import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -47,7 +49,10 @@ class DocumentUpload {
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @OptIn(ExperimentalTestApi::class)
+  @get:Rule(order = 1)
+  val composeTestRule =
+      createAndroidComposeRule<MainActivity>(effectContext = Dispatchers.Main.immediate)
 
   @get:Rule(order = 2) val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
@@ -129,9 +134,8 @@ class DocumentUpload {
       firestore.collection("userslist").document(uid).delete().await()
       auth.signOut()
       firestore.terminate().await()
+      file.delete()
     }
-
-    file.delete()
   }
 
   @Test
