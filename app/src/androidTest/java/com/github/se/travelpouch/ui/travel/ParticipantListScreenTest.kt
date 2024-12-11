@@ -35,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -608,7 +609,6 @@ class ParticipantListScreenTest {
         .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    // verify(notificationRepository, never()).addNotification(anyOrNull())
   }
 
   @Test
@@ -669,7 +669,111 @@ class ParticipantListScreenTest {
         .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+    verify(notificationRepository).addNotification(anyOrNull())
 
+    // throw impossible exception
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = "qwertzuiopasdfghjklyxcvbnm12",
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = emptyMap())
+          // Call the onSuccess callback with the custom UserInfo
+
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any(),
+        anyOrNull())
+    doThrow(RuntimeException("Impossible Exception"))
+        .`when`(notificationRepository)
+        .addNotification(anyOrNull())
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+    val randomEmail2 = "random.email@example.org"
+    composeTestRule.onNodeWithTag("addUserEmailField").performScrollTo()
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed().assertTextContains("")
+    composeTestRule.onNodeWithTag("addUserEmailField").performTextClearance()
+    composeTestRule.onNodeWithTag("addUserEmailField").performTextInput(randomEmail2)
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    composeTestRule.waitForIdle()
+  }
+
+  @Test
+  fun addFriendMenuWithNoFriends() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, eventViewModel)
+    }
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+    composeTestRule.onNodeWithTag("addViaFriendListButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("friendListDialogBox", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("friendListDialogTitle", useUnmergedTree = true)
+        .assertTextContains("Select a Friend")
+    composeTestRule
+        .onNodeWithTag("noFriendsDialogText", useUnmergedTree = true)
+        .assertTextContains("No friends to choose from")
+  }
+
+  @Test
+  fun addFriendMenuWithFriend() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(
+          Profile(
+              fsUid = "abcdefghijklmnopqrstuvwxyz13",
+              name = "Custom User",
+              userTravelList = listOf("00000000000000000000"),
+              email = "email@email.org",
+              username = "username",
+              friends = mapOf("example@mail.com" to "abcdefghijklmnopqrstuvwxyz12")))
+    }
+    profileModelView.getProfile()
+
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel, navigationActions, notificationViewModel, profileModelView, eventViewModel)
+    }
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+    composeTestRule.onNodeWithTag("addViaFriendListButton").performClick()
+    composeTestRule.onNodeWithTag("friendListDialogBox", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("friendListDialogTitle", useUnmergedTree = true)
+        .assertTextContains("Select a Friend")
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = "qwertzuiopasdfghjklyxcvbnm12",
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = emptyMap())
+          // Call the onSuccess callback with the custom UserInfo
+
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
+    composeTestRule.onNodeWithTag("friendCard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friendCard").assertTextContains("example@mail.com")
+    composeTestRule.onNodeWithTag("friendCard").performClick()
     verify(notificationRepository).addNotification(anyOrNull())
   }
 
