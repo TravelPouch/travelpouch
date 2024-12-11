@@ -20,26 +20,21 @@ interface EventRepository {
   fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit)
 
   /**
-   * This function returns an unused unique identifier for a new event.
+   * This function returns an unused unique document reference for a new event when we don't know to
+   * which travel the event will be added.
    *
-   * @return (String) : an unused unique identifier
+   * @param travelId (String) : The travel id to which we have to link the event
+   * @return (DocumentReference) : The document reference to the new event
    */
   fun getNewDocumentReferenceForNewTravel(travelId: String): DocumentReference
 
+  /**
+   * This function returns an unused unique document reference for a new event when the travel id
+   * has being set.
+   *
+   * @return (DocumentReference) : The document reference to the new event
+   */
   fun getNewDocumentReference(): DocumentReference
-
-  //  /**
-  //   * This function adds an event to the collection of events in Firebase.
-  //   *
-  //   * @param event (Event) : the event we want to add on Firebase
-  //   * @param onSuccess (() -> Unit) : the function called when the event is correctly added to
-  // the
-  //   *   database
-  //   * @param onFailure ((Exception) -> Unit) : the function called when an error occurs during
-  // the
-  //   *   adding an event to the database
-  //   */
-  //  fun addEvent(event: Event, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   /**
    * The initialisation function of the repository.

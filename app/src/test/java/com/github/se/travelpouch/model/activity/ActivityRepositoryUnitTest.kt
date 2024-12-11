@@ -150,18 +150,6 @@ class ActivityRepositoryUnitTest {
 
     assert(succeeded)
     assertFalse(failed)
-
-    //    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate
-    // success
-    //
-    //    // This test verifies that when we add a new event, the Firestore `collection()` method is
-    //    // called.
-    //    activityRepositoryFirestore.addActivity(activity, onSuccess = {}, onFailure = {})
-    //
-    //    shadowOf(Looper.getMainLooper()).idle()
-    //
-    //    // Ensure Firestore collection method was called to reference the "events" collection
-    //    verify(mockDocumentReference).set(any())
   }
 
   @Test

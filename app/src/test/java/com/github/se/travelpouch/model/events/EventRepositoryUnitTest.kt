@@ -121,21 +121,6 @@ class EventRepositoryUnitTest {
     verify(timeout(100)) { (mockToDoQuerySnapshot).documents }
   }
 
-  //  @Test
-  //  fun addEvent_shouldCallFirestoreCollection() {
-  //    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate
-  // success
-  //
-  //    // This test verifies that when we add a new event, the Firestore `collection()` method is
-  //    // called.
-  //    eventRepositoryFirestore.addEvent(event, onSuccess = {}, onFailure = {})
-  //
-  //    shadowOf(Looper.getMainLooper()).idle()
-  //
-  //    // Ensure Firestore collection method was called to reference the "events" collection
-  //    verify(mockDocumentReference).set(any())
-  //  }
-
   @Test
   fun documentToEvent() {
     val privateFunc =
