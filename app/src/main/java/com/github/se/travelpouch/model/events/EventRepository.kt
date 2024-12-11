@@ -97,19 +97,15 @@ class EventRepositoryFirebase(private val db: FirebaseFirestore) : EventReposito
       val title = document.getString("title")
       val description = document.getString("description")
       val date = document.getTimestamp("date")
-      val documents = document.get("listUploadedDocuments") as? Map<String, Int>
       val eventTypeString = document.getString("eventType")
       val eventType = EventType.valueOf(eventTypeString!!)
-      val uidParticipant = document.getString("uidParticipant")
 
       Event(
           uid = uid,
           title = title!!,
           description = description!!,
           date = date!!,
-          eventType = eventType,
-          uidParticipant = uidParticipant,
-          listUploadedDocuments = documents)
+          eventType = eventType)
     } catch (e: Exception) {
       Log.e("EventRepository", "Error converting document to Event", e)
       null
