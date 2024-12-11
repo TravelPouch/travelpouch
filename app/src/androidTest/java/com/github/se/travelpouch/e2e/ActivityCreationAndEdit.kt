@@ -194,5 +194,30 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithText("epic activity").assert(hasText("epic activity"))
         composeTestRule.onNodeWithText("epic activity").assert(hasText("1/2/2024"))
         composeTestRule.onNodeWithText("epic activity").assert(hasText("La Paz, Bolivia"))
+
+        // edit the activity
+        composeTestRule.onNodeWithText("epic activity").performClick()
+        composeTestRule.onNodeWithTag("EditActivityScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("titleField").assert(hasText("epic activity"))
+        composeTestRule.onNodeWithTag("descriptionField").assert(hasText("this is an epic activity"))
+        composeTestRule.onNodeWithTag("dateField").assert(hasText("01/02/2024"))
+        composeTestRule.onNodeWithTag("locationField").assert(hasText("La Paz, Bolivia"))
+
+        composeTestRule.onNodeWithTag("titleField").performTextClearance()
+        composeTestRule.onNodeWithTag("titleField").performTextInput("more epic activity")
+
+        composeTestRule.onNodeWithTag("descriptionField").performTextClearance()
+        composeTestRule.onNodeWithTag("descriptionField").performTextInput("this is a more epic activity")
+
+        composeTestRule.onNodeWithTag("dateField").performTextClearance()
+        composeTestRule.onNodeWithTag("dateField").performTextInput("02022024")
+        // save the new info
+        composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+        // check the activity is displayed
+        composeTestRule.onNodeWithText("more epic activity").assertIsDisplayed()
+        composeTestRule.onNodeWithText("more epic activity").assert(hasText("more epic activity"))
+        composeTestRule.onNodeWithText("more epic activity").assert(hasText("2/2/2024"))
+        composeTestRule.onNodeWithText("more epic activity").assert(hasText("La Paz, Bolivia"))
+
       }
 }
