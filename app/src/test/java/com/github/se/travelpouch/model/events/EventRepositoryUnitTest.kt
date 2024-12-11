@@ -1,6 +1,5 @@
 package com.github.se.travelpouch.model.events
 
-import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -22,10 +21,11 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows.shadowOf
 
 @RunWith(RobolectricTestRunner::class)
 class EventRepositoryUnitTest {
@@ -34,18 +34,15 @@ class EventRepositoryUnitTest {
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
   @Mock private lateinit var mockToDoQuerySnapshot: QuerySnapshot
+  @Mock private lateinit var mockTravelDocumentCollectionReference: CollectionReference
+  @Mock private lateinit var mockTravelDocumentReference: DocumentReference
+  @Mock private lateinit var mockEventCollectionReference: CollectionReference
+  @Mock private lateinit var mockEventDocumentSnapshot: DocumentSnapshot
+  @Mock private lateinit var mockEventDocumentReference: DocumentReference
 
   private lateinit var eventRepositoryFirestore: EventRepositoryFirebase
 
-  val event =
-      Event(
-          "1",
-          EventType.NEW_DOCUMENT,
-          Timestamp(0, 0),
-          "eventTitle",
-          "eventDescription",
-          null,
-          null)
+  val event = Event("1", EventType.NEW_ACTIVITY, Timestamp(0, 0), "eventTitle", "eventDescription")
 
   @Before
   fun setUp() {
@@ -60,16 +57,10 @@ class EventRepositoryUnitTest {
     mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
 
     `when`(mockDocumentSnapshot.id).thenReturn("1")
-    `when`(mockDocumentSnapshot.getString("eventType")).thenReturn("NEW_DOCUMENT")
+    `when`(mockDocumentSnapshot.getString("eventType")).thenReturn("NEW_ACTIVITY")
     `when`(mockDocumentSnapshot.getString("title")).thenReturn("eventTitle")
     `when`(mockDocumentSnapshot.getString("description")).thenReturn("eventDescription")
     `when`(mockDocumentSnapshot.getTimestamp("date")).thenReturn(Timestamp(0, 0))
-    `when`(mockDocumentSnapshot.get("uidParticipant")).thenReturn(null)
-    `when`(mockDocumentSnapshot.get("listUploadedDocuments")).thenReturn(null)
-
-    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
-    `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
   }
 
   @Test
@@ -81,13 +72,27 @@ class EventRepositoryUnitTest {
 
   @Test
   fun getNewUid() {
-    `when`(mockDocumentReference.id).thenReturn("1")
-    val uid = eventRepositoryFirestore.getNewUid()
-    assert(uid == "1")
+    whenever(mockFirestore.collection(anyOrNull()))
+        .thenReturn(mockTravelDocumentCollectionReference)
+    whenever(mockTravelDocumentCollectionReference.document(anyOrNull()))
+        .thenReturn(mockTravelDocumentReference)
+    whenever(mockTravelDocumentReference.collection(anyOrNull()))
+        .thenReturn(mockEventCollectionReference)
+    whenever(mockEventCollectionReference.document()).thenReturn(mockEventDocumentReference)
+    whenever(mockEventCollectionReference.document(any())).thenReturn(mockEventDocumentReference)
+    whenever(mockEventDocumentReference.id).thenReturn("qwertz")
+
+    val reference = eventRepositoryFirestore.getNewDocumentReferenceForNewTravel("qwertz")
+    assert(reference == mockEventDocumentReference)
   }
 
   @Test
   fun getEvents_callsDocuments() {
+
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
+
     // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockToDoQuerySnapshot))
 
@@ -107,20 +112,6 @@ class EventRepositoryUnitTest {
   }
 
   @Test
-  fun addEvent_shouldCallFirestoreCollection() {
-    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
-
-    // This test verifies that when we add a new event, the Firestore `collection()` method is
-    // called.
-    eventRepositoryFirestore.addEvent(event, onSuccess = {}, onFailure = {})
-
-    shadowOf(Looper.getMainLooper()).idle()
-
-    // Ensure Firestore collection method was called to reference the "events" collection
-    verify(mockDocumentReference).set(any())
-  }
-
-  @Test
   fun documentToEvent() {
     val privateFunc =
         eventRepositoryFirestore.javaClass.getDeclaredMethod(
@@ -130,5 +121,15 @@ class EventRepositoryUnitTest {
     parameters[0] = mockDocumentSnapshot
     val result = privateFunc.invoke(eventRepositoryFirestore, *parameters)
     assertThat(result, `is`(event))
+  }
+
+  @Test
+  fun getNewDocumentReference() {
+    `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
+
+    whenever(mockDocumentReference.id).thenReturn("uid")
+    assert(mockDocumentReference == eventRepositoryFirestore.getNewDocumentReference())
   }
 }

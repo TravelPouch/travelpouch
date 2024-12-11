@@ -2,12 +2,15 @@ package com.github.se.travelpouch.model.travels
 
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.events.Event
+import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.profile.Profile
 import com.github.se.travelpouch.model.profile.ProfileRepositoryConvert
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -118,17 +121,28 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    * @param travel The travel document to add.
    * @param onSuccess The callback to call if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
+   * @param eventDocumentReference (DocumentReference) : The newly created event document reference
+   *   to allow completion of the event at the creation of a travel
    */
   override fun addTravel(
       travel: TravelContainer,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference
   ) {
     Log.d("TravelRepositoryFirestore", "addTravel")
 
     val profileDocumentReference =
         db.collection(FirebasePaths.ProfilesSuperCollection).document(currentUserUid)
     val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
+
+    val event =
+        Event(
+            eventDocumentReference.id,
+            EventType.START_OF_JOURNEY,
+            Timestamp.now(),
+            travel.title,
+            "Let's get started with ${travel.title}")
 
     db.runTransaction {
           val profile = it.get(profileDocumentReference)
@@ -137,6 +151,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
           travelList.add(travel.fsUid)
           it.update(profileDocumentReference, "userTravelList", travelList.toList())
           it.set(travelDocumentReference, travel.toMap())
+          it.set(eventDocumentReference, event)
         }
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { e ->
@@ -151,13 +166,21 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    * @param travel The travel document to update.
    * @param onSuccess The callback to call if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
+   * @param modeOfUpdate (TravelRepository.UpdateMode) : The mode of update of the travel (only
+   *   changing the fields, adding a participant or removing a participant)
+   * @param fsUidOfAddedParticipant (String?) The fsUid of the participant to be added or removed.
+   *   It is null if we only update the fields of the travels
+   * @param eventDocumentReference (DocumentReference?) : The newly created event document reference
+   *   to allow completion of the event at the update of a travel. It is null if we only update the
+   *   fields of the travel
    */
   override fun updateTravel(
       travel: TravelContainer,
       modeOfUpdate: TravelRepository.UpdateMode,
       fsUidOfAddedParticipant: String?,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference?
   ) {
     Log.d("TravelRepositoryFirestore", "updateTravel")
     when (modeOfUpdate) {
@@ -168,6 +191,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
             onFailure)
       }
       TravelRepository.UpdateMode.ADD_PARTICIPANT -> {
+
         val travelDocumentReference = db.collection(collectionPath).document(travel.fsUid)
         val addedUserDocumentReference =
             db.collection(userCollectionPath).document(fsUidOfAddedParticipant!!)
@@ -176,11 +200,20 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
               val currentAddedUserProfile =
                   ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
 
+              val event =
+                  Event(
+                      eventDocumentReference!!.id,
+                      EventType.NEW_PARTICIPANT,
+                      Timestamp.now(),
+                      "${currentAddedUserProfile.email} joined the travel.",
+                      "${currentAddedUserProfile.email} joined the travel.")
+
               val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
               listTravelUpdated.add(travel.fsUid)
 
               it.set(travelDocumentReference, travel.toMap())
               it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+              it.set(eventDocumentReference, event)
             }
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
@@ -197,11 +230,20 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
               val currentAddedUserProfile =
                   ProfileRepositoryConvert.documentToProfile(it.get(addedUserDocumentReference))
 
+              val event =
+                  Event(
+                      eventDocumentReference!!.id,
+                      EventType.PARTICIPANT_REMOVED,
+                      Timestamp.now(),
+                      "${currentAddedUserProfile.email} was removed from the travel.",
+                      "${currentAddedUserProfile.email} was removed from the travel.")
+
               val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
               listTravelUpdated.remove(travel.fsUid)
 
               it.set(travelDocumentReference, travel.toMap())
               it.update(addedUserDocumentReference, "userTravelList", listTravelUpdated.toList())
+              it.set(eventDocumentReference, event)
             }
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
