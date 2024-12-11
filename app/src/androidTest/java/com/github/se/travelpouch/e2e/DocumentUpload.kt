@@ -127,6 +127,7 @@ class DocumentUpload {
           .forEach { it.reference.delete().await() }
       firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
+      auth.signOut()
       firestore.terminate().await()
     }
 
