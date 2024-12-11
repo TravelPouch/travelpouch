@@ -1,27 +1,37 @@
-package com.github.se.travelpouch.e2e
+package com.github.se.travelpouch.e2e.documents
 
+import android.app.Activity
+import android.app.Instrumentation
+import android.content.Intent
 import android.icu.util.GregorianCalendar
-import androidx.compose.ui.test.assert
+import android.net.Uri
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDisplayed
-import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
+import androidx.test.espresso.intent.Intents.intending
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -30,24 +40,31 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+private const val DEFAULT_TIMEOUT = 10000L
+
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
-class ActivityCreationAndEdit {
-
-  private val DEFAULT_TIMEOUT = 10000L
+class DocumentUpload {
+  lateinit var file: File
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @OptIn(ExperimentalTestApi::class)
+  @get:Rule(order = 1)
+  val composeTestRule =
+      createAndroidComposeRule<MainActivity>(effectContext = Dispatchers.Main.immediate)
+
+  @get:Rule(order = 2) val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
   @Inject lateinit var firestore: FirebaseFirestore
+  @Inject lateinit var storage: FirebaseStorage
   @Inject lateinit var auth: FirebaseAuth
 
   @Before
   fun setUp() {
     hiltRule.inject()
 
-    // seed DB with existing trave @Inject lateinit var auth: FirebaseAuthl and user
+    // seed the db
     runBlocking {
       val uid =
           auth.createUserWithEmailAndPassword("example@example.com", "password").await().user!!.uid
@@ -90,6 +107,13 @@ class ActivityCreationAndEdit {
 
       auth.signOut()
     }
+
+    file = File.createTempFile("mountain", ".png")
+    getInstrumentation()
+        .context
+        .resources
+        .openRawResource(com.github.se.travelpouch.test.R.drawable.mountain)
+        .use { file.outputStream().use { output -> it.copyTo(output) } }
   }
 
   @After
@@ -101,21 +125,27 @@ class ActivityCreationAndEdit {
       auth.currentUser!!.delete().await()
 
       firestore
-          .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/activities")
+          .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents")
           .get()
           .await()
           .documents
-          .forEach { it.reference.delete().await() } // delete all activities
+          .forEach { it.reference.delete().await() }
       firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
       auth.signOut()
       firestore.terminate().await()
+      file.delete()
     }
   }
 
   @Test
-  fun verifyUserFlowForTravelCreation() =
-      runTest(timeout = 300.seconds) {
+  fun userFlowForDocumentUpload() =
+      runTest(timeout = 30.seconds) {
+        // mock the file picker
+        intending(hasAction(Intent.ACTION_OPEN_DOCUMENT))
+            .respondWith(
+                Instrumentation.ActivityResult(
+                    Activity.RESULT_OK, Intent().setData(Uri.fromFile(file))))
 
         // assert that login screen is displayed
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
@@ -140,87 +170,51 @@ class ActivityCreationAndEdit {
         }
         composeTestRule.onNodeWithTag("SkipButton").performClick()
 
-        // wait until we are in the travel list screen
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
-          composeTestRule.onNodeWithText("Test", useUnmergedTree = true).isDisplayed()
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+          composeTestRule
+              .onNodeWithText("Description of the test travel", useUnmergedTree = true)
+              .isDisplayed()
         }
 
         composeTestRule.onNodeWithText("Test").assertIsDisplayed()
         composeTestRule.onNodeWithTag("travelListItem").performClick()
 
-        // assert that there are no activities at the moment
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("emptyTravel", useUnmergedTree = true).isDisplayed()
         }
 
-        // add an activity button
-        composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed().performClick()
-        // add activity screen
-        composeTestRule.onNodeWithTag("AddActivityScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("travelActivitiesScreen").performTouchInput { swipeLeft() }
 
-        // fill in the activity fields
-        composeTestRule.onNodeWithTag("titleField").performTextClearance()
-        composeTestRule.onNodeWithTag("titleField").performTextInput("epic activity")
-
-        composeTestRule.onNodeWithTag("descriptionField").performTextClearance()
-        composeTestRule
-            .onNodeWithTag("descriptionField")
-            .performTextInput("this is an epic activity")
-
-        composeTestRule.onNodeWithTag("dateField").performTextClearance()
-        composeTestRule.onNodeWithTag("dateField").performTextInput("01022024")
-
-        composeTestRule.onNodeWithTag("timeField").performTextClearance()
-        composeTestRule.onNodeWithTag("timeField").performTextInput("15:24")
-
-        composeTestRule.onNodeWithTag("inputTravelLocation").performTextClearance()
-        composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
-
-        // wait to have La paz displayed
-        composeTestRule.waitUntil(timeoutMillis = 4000) {
-          composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
-        }
-
-        composeTestRule.onNodeWithText("La Paz, Bolivia").performClick()
-        // save it
-        composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
-        // there is an activity
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
-          composeTestRule.onNodeWithTag("emptyTravel", useUnmergedTree = true).isNotDisplayed()
+          composeTestRule
+              .onNodeWithTag("calendarScreenColumn", useUnmergedTree = true)
+              .isDisplayed()
         }
-        // check the activity is displayed
-        composeTestRule.onNodeWithText("epic activity").assertIsDisplayed()
-        composeTestRule.onNodeWithText("epic activity").assert(hasText("epic activity"))
-        composeTestRule.onNodeWithText("epic activity").assert(hasText("1/2/2024"))
-        composeTestRule.onNodeWithText("epic activity").assert(hasText("La Paz, Bolivia"))
 
-        // edit the activity
-        composeTestRule.onNodeWithText("epic activity").performClick()
-        composeTestRule.onNodeWithTag("EditActivityScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("titleField").assert(hasText("epic activity"))
-        composeTestRule
-            .onNodeWithTag("descriptionField")
-            .assert(hasText("this is an epic activity"))
-        composeTestRule.onNodeWithTag("dateField").assert(hasText("01/02/2024"))
-        composeTestRule.onNodeWithTag("locationField").assert(hasText("La Paz, Bolivia"))
+        composeTestRule.onNodeWithTag("calendarScreenColumn").performTouchInput { swipeLeft() }
 
-        composeTestRule.onNodeWithTag("titleField").performTextClearance()
-        composeTestRule.onNodeWithTag("titleField").performTextInput("more epic activity")
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+          composeTestRule.onNodeWithTag("documentListScreen", useUnmergedTree = true).isDisplayed()
+        }
 
-        composeTestRule.onNodeWithTag("descriptionField").performTextClearance()
-        composeTestRule
-            .onNodeWithTag("descriptionField")
-            .performTextInput("this is a more epic activity")
+        composeTestRule.onNodeWithTag("plusButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("plusButton").performClick()
 
-        composeTestRule.onNodeWithTag("dateField").performTextClearance()
-        composeTestRule.onNodeWithTag("dateField").performTextInput("02022024")
-        // save the new info
-        composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
-        // check the activity is displayed
-        composeTestRule.onNodeWithText("more epic activity").assertIsDisplayed()
-        composeTestRule.onNodeWithText("more epic activity").assert(hasText("more epic activity"))
-        composeTestRule.onNodeWithText("more epic activity").assert(hasText("2/2/2024"))
-        composeTestRule.onNodeWithText("more epic activity").assert(hasText("La Paz, Bolivia"))
+        composeTestRule.waitUntil(timeoutMillis = 200) {
+          composeTestRule.onNodeWithTag("dropDownButton", useUnmergedTree = true).isDisplayed()
+        }
+
+        composeTestRule.onNodeWithTag("importLocalFileButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("scanCamButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("importLocalFileButton").performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+          composeTestRule.onNodeWithTag("documentListItem", useUnmergedTree = true).isDisplayed()
+        }
+        composeTestRule.onNodeWithTag("documentListItem").performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+          composeTestRule.onNodeWithTag("document").isDisplayed()
+        }
       }
 }

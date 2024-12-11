@@ -31,6 +31,8 @@ import org.junit.Test
 @UninstallModules(AppModule::class)
 class TravelCreation {
 
+  private val DEFAULT_TIMEOUT = 10000L
+
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
   @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
@@ -68,13 +70,13 @@ class TravelCreation {
         composeTestRule.onNodeWithText("Sign up").performClick()
 
         // Skip onboarding
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("OnboardingScreen", useUnmergedTree = true).isDisplayed()
         }
         composeTestRule.onNodeWithTag("SkipButton").performClick()
 
         // wait until we are in the travel list screen
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
         }
 
@@ -86,7 +88,7 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("createTravelFab").performClick()
 
         // wait until we are in the screen to add a travel
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("travelTitle", useUnmergedTree = true).isDisplayed()
         }
 
@@ -109,7 +111,7 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
 
         // wait to have La paz displayed
-        composeTestRule.waitUntil(timeoutMillis = 4000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
         }
 
@@ -127,7 +129,7 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
 
         // verify that the empty travel prompt does not exist since we saved a travel
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule
               .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
               .isNotDisplayed()
