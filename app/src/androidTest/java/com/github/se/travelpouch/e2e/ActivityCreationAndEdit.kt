@@ -108,6 +108,7 @@ class ActivityCreationAndEdit {
           .forEach { it.reference.delete().await() } // delete all activities
       firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
+      auth.signOut()
       firestore.terminate().await()
     }
   }
@@ -141,7 +142,7 @@ class ActivityCreationAndEdit {
 
         // wait until we are in the travel list screen
         composeTestRule.waitUntil(timeoutMillis = 2000) {
-          composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
+          composeTestRule.onNodeWithText("Test", useUnmergedTree = true).isDisplayed()
         }
 
         composeTestRule.onNodeWithText("Test").assertIsDisplayed()
@@ -155,8 +156,8 @@ class ActivityCreationAndEdit {
         // add an activity button
         composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed().performClick()
         // add activity screen
-        composeTestRule.onNodeWithTag("addTravelScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("activityTitle").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("AddActivityScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("travelTitle").assertIsDisplayed()
 
         // fill in the activity fields
         composeTestRule.onNodeWithTag("titleField").performTextClearance()
@@ -191,7 +192,7 @@ class ActivityCreationAndEdit {
         // check the activity is displayed
         composeTestRule.onNodeWithText("epic activity").assertIsDisplayed()
         composeTestRule.onNodeWithText("epic activity").assert(hasText("epic activity"))
-        composeTestRule.onNodeWithText("epic activity").assert(hasText("01/02/2024"))
+        composeTestRule.onNodeWithText("epic activity").assert(hasText("1/2/2024"))
         composeTestRule.onNodeWithText("epic activity").assert(hasText("La Paz, Bolivia"))
       }
 }
