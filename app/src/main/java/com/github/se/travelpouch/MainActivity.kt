@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.activity.ActivityViewModel
-import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
@@ -82,12 +81,6 @@ class MainActivity : ComponentActivity() {
         viewModel(factory = CalendarViewModel.Factory(activityModelView))
     val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
 
-    val directionsViewModel: DirectionsViewModel =
-        viewModel(
-            factory =
-                DirectionsViewModel.provideFactory(
-                    BuildConfig.MAPS_API_KEY) // Inject the API key for the DirectionsViewModel
-            )
     NavHost(navController = navController, startDestination = Route.DEFAULT) {
       navigation(
           startDestination = Screen.AUTH,
@@ -135,7 +128,7 @@ class MainActivity : ComponentActivity() {
         }
 
         composable(Screen.ACTIVITIES_MAP) {
-          ActivitiesMapScreen(activityModelView, navigationActions, directionsViewModel)
+          ActivitiesMapScreen(activityModelView, navigationActions)
         }
 
         composable(Screen.PARTICIPANT_LIST) {

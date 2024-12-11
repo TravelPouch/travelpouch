@@ -36,6 +36,6 @@ The footer makes references to issues.
 <type>/<descrption>
 ```
 
-The type is chosen in the following list : feature, fix, hotfix, docs, refactor
+The type is chosen in the following list : feature, fix, hotfix, docs, refactor, test
 
 The description should be descriptive. It is in kebab case.
