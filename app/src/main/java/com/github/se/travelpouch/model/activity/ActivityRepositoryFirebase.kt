@@ -2,9 +2,12 @@ package com.github.se.travelpouch.model.activity
 
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.events.Event
+import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.travels.Location
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -108,14 +111,33 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
    *   the database
    * @param onFailure ((Exception) -> Unit) : the function to call when an error occurs during the
    *   adding of an activity to the database
+   * @param eventDocumentReference (DocumentReference) : The newly created event document reference
+   *   to allow completion of the event at the creation of an activity
    */
   override fun addActivity(
       activity: Activity,
       onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
+      eventDocumentReference: DocumentReference
   ) {
-    performFirestoreOperation(
-        db.collection(collectionPath).document(activity.uid).set(activity), onSuccess, onFailure)
+    val activityDocumentReference = db.collection(collectionPath).document(activity.uid)
+    val event =
+        Event(
+            eventDocumentReference.id,
+            EventType.NEW_ACTIVITY,
+            Timestamp.now(),
+            activity.title,
+            "'${activity.title}' was added")
+
+    db.runTransaction {
+          it.set(activityDocumentReference, activity)
+          it.set(eventDocumentReference, event)
+        }
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { e ->
+          Log.e("ActivityRepositoryFirestore", "Error adding an activity", e)
+          onFailure(e)
+        }
   }
 
   /**
