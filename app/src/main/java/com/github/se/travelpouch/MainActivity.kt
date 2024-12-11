@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity() {
 
         composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
         composable(Screen.EDIT_PROFILE) {
-          ModifyingProfileScreen(navigationActions, profileModelView)
+          ModifyingProfileScreen(navigationActions, profileModelView, notificationViewModel)
         }
 
         composable(Screen.SIGN_IN_PASSWORD) {
