@@ -121,6 +121,8 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    * @param travel The travel document to add.
    * @param onSuccess The callback to call if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
+   *     @param eventDocumentReference (DocumentReference) : The newly created event document
+   *       reference to allow completion of the event at the creation of a travel
    */
   override fun addTravel(
       travel: TravelContainer,
@@ -166,6 +168,13 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
    * @param travel The travel document to update.
    * @param onSuccess The callback to call if the operation is successful.
    * @param onFailure The callback to call if the operation fails.
+   * @param modeOfUpdate (TravelRepository.UpdateMode) : The mode of update of the travel (only
+   *   changing the fields, adding a participant or removing a participant)
+   * @param fsUidOfAddedParticipant (String?) The fsUid of the participant to be added or removed.
+   *   It is null if we only update the fields of the travels
+   *     @param eventDocumentReference (DocumentReference?) : The newly created event document
+   *       reference to allow completion of the event at the update of a travel. It is null if we
+   *       only update the fields of the travel
    */
   override fun updateTravel(
       travel: TravelContainer,

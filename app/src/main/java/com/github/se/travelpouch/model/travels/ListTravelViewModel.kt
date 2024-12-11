@@ -128,6 +128,8 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    * Adds a Travel document.
    *
    * @param travel The Travel document to be added.
+   *     @param eventDocumentReference (DocumentReference) : The newly created event document
+   *       reference to allow completion of the event at the creation of a travel
    */
   fun addTravel(travel: TravelContainer, eventDocumentReference: DocumentReference) {
     Log.d("ListTravelViewModel", "Adding travel")
@@ -145,6 +147,13 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    * Updates a Travel document.
    *
    * @param travel The Travel document to be updated.
+   * @param modeOfUpdate (TravelRepository.UpdateMode) : The mode of update of the travel (only
+   *   changing the fields, adding a participant or removing a participant)
+   * @param fsUidOfAddedParticipant (String?) The fsUid of the participant to be added or removed.
+   *   It is null if we only update the fields of the travels
+   *     @param eventDocumentReference (DocumentReference?) : The newly created event document
+   *       reference to allow completion of the event at the update of a travel. It is null if we
+   *       only update the fields of the travel
    */
   fun updateTravel(
       travel: TravelContainer,
@@ -232,6 +241,8 @@ open class ListTravelViewModel @Inject constructor(private val repository: Trave
    * @param onSuccess A callback function to be invoked with the updated travel document upon
    *   successful addition.
    * @param onFailure A callback function to be invoked if the addition fails.
+   *     @param eventDocumentReference (DocumentReference) : The newly created event document
+   *       reference to allow completion of the event at the addition of a user to a travel
    */
   fun addUserToTravel(
       email: String,

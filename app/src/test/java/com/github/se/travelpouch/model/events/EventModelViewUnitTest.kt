@@ -30,12 +30,6 @@ class EventModelViewUnitTest {
     verify(repository).getEvents(anyOrNull(), anyOrNull())
   }
 
-  //  @Test
-  //  fun addEventTest() {
-  //    eventViewModel.addEvent(event)
-  //    verify(repository).addEvent(anyOrNull(), anyOrNull(), anyOrNull())
-  //  }
-
   @Test
   fun getNewUidTest() {
     val documentReference: DocumentReference = mock()

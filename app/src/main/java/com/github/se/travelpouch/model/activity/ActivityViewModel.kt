@@ -43,6 +43,10 @@ class ActivityViewModel @Inject constructor(val activityRepositoryFirebase: Acti
    * This function adds an activity to the database
    *
    * @param activity (Activity) : the activity to add to the database
+   * @param context (Context) : The context of the UI to be able to display toast in case of success
+   *   or failure of the function
+   *     @param eventDocumentReference (DocumentReference) : The newly created event document
+   *       reference to allow completion of the event at the creation of an activity
    */
   fun addActivity(activity: Activity, context: Context, eventDocumentReference: DocumentReference) {
     activityRepositoryFirebase.addActivity(

@@ -62,6 +62,9 @@ import com.google.firebase.Timestamp
  * @param listTravelViewModel: The ViewModel that manages the list of travels in the app.
  * @param navigationActions: The navigation actions to handle navigation within the app.
  * @param locationViewModel: The ViewModel that manages the location search functionality.
+ * @param profileModelView (ProfileViewModel) : The ViewModel that manages the profile of the
+ *   current user
+ * @param eventViewModel (EventViewModel) : The ViewModel that manages the events of the travel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

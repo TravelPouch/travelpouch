@@ -111,6 +111,8 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
    *   the database
    * @param onFailure ((Exception) -> Unit) : the function to call when an error occurs during the
    *   adding of an activity to the database
+   *     @param eventDocumentReference (DocumentReference) : The newly created event document
+   *       reference to allow completion of the event at the creation of an activity
    */
   override fun addActivity(
       activity: Activity,
