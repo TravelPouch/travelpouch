@@ -3,7 +3,6 @@ package com.github.se.travelpouch.e2e
 import android.icu.util.GregorianCalendar
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isNotDisplayed
@@ -35,7 +34,6 @@ import org.junit.Test
 @UninstallModules(AppModule::class)
 class ActivityCreationAndEdit {
 
-
   private val DEFAULT_TIMEOUT = 10000L
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
@@ -52,47 +50,46 @@ class ActivityCreationAndEdit {
     // seed DB with existing trave @Inject lateinit var auth: FirebaseAuthl and user
     runBlocking {
       val uid =
-        auth.createUserWithEmailAndPassword("example@example.com", "password").await().user!!.uid
+          auth.createUserWithEmailAndPassword("example@example.com", "password").await().user!!.uid
 
       firestore
-        .collection("allTravels")
-        .document("w2HGCwaJ4KgcXJ5nVxkF")
-        .set(
-          mapOf(
-            "allAttachments" to emptyMap<String, String>(),
-            "allParticipants" to mapOf(uid to "OWNER"),
-            "description" to "Description of the test travel",
-            "endTime" to Timestamp(GregorianCalendar(2025, 8, 24).time),
-            "fsUid" to "w2HGCwaJ4KgcXJ5nVxkF",
-            "listParticipant" to listOf(uid),
-            "location" to
-                    mapOf(
-                      "insertTime" to Timestamp.now(),
-                      "latitude" to 44.9305652,
-                      "longitude" to 5.7630211,
-                      "name" to
+          .collection("allTravels")
+          .document("w2HGCwaJ4KgcXJ5nVxkF")
+          .set(
+              mapOf(
+                  "allAttachments" to emptyMap<String, String>(),
+                  "allParticipants" to mapOf(uid to "OWNER"),
+                  "description" to "Description of the test travel",
+                  "endTime" to Timestamp(GregorianCalendar(2025, 8, 24).time),
+                  "fsUid" to "w2HGCwaJ4KgcXJ5nVxkF",
+                  "listParticipant" to listOf(uid),
+                  "location" to
+                      mapOf(
+                          "insertTime" to Timestamp.now(),
+                          "latitude" to 44.9305652,
+                          "longitude" to 5.7630211,
+                          "name" to
                               "trou, câble, Susville, Grenoble, Isère, Auvergne-Rhône-Alpes, France métropolitaine, 38350, France"),
-            "startTime" to Timestamp(GregorianCalendar(2025, 8, 23).time),
-            "title" to "Test"))
-        .await()
+                  "startTime" to Timestamp(GregorianCalendar(2025, 8, 23).time),
+                  "title" to "Test"))
+          .await()
 
       firestore
-        .collection("userslist")
-        .document(uid)
-        .set(
-          mapOf(
-            "email" to "example.example.com",
-            "friends" to emptyList<String>(),
-            "fsUid" to uid,
-            "name" to "Example",
-            "username" to "example",
-            "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
-            "needsOnboarding" to true))
-        .await()
+          .collection("userslist")
+          .document(uid)
+          .set(
+              mapOf(
+                  "email" to "example.example.com",
+                  "friends" to emptyList<String>(),
+                  "fsUid" to uid,
+                  "name" to "Example",
+                  "username" to "example",
+                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
+                  "needsOnboarding" to true))
+          .await()
 
       auth.signOut()
     }
-
   }
 
   @After
@@ -104,11 +101,11 @@ class ActivityCreationAndEdit {
       auth.currentUser!!.delete().await()
 
       firestore
-        .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/activities")
-        .get()
-        .await()
-        .documents
-        .forEach { it.reference.delete().await() } // delete all activities
+          .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/activities")
+          .get()
+          .await()
+          .documents
+          .forEach { it.reference.delete().await() } // delete all activities
       firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
       firestore.terminate().await()
@@ -166,7 +163,9 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithTag("titleField").performTextInput("epic activity")
 
         composeTestRule.onNodeWithTag("descriptionField").performTextClearance()
-        composeTestRule.onNodeWithTag("descriptionField").performTextInput("this is an epic activity")
+        composeTestRule
+            .onNodeWithTag("descriptionField")
+            .performTextInput("this is an epic activity")
 
         composeTestRule.onNodeWithTag("dateField").performTextClearance()
         composeTestRule.onNodeWithTag("dateField").performTextInput("01022024")
@@ -194,6 +193,5 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithText("epic activity").assert(hasText("epic activity"))
         composeTestRule.onNodeWithText("epic activity").assert(hasText("01/02/2024"))
         composeTestRule.onNodeWithText("epic activity").assert(hasText("La Paz, Bolivia"))
-
       }
 }
