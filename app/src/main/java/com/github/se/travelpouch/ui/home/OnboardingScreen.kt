@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -28,14 +29,14 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
           OnboardingPage(
               title = "Track Your Travels",
               description =
-                  "Easily organize and keep track of your travel adventures all in one place",
+                  "Easily organize and keep track of your travel adventures all in one place.",
               imageResId =
                   R.drawable.intro_illustration // Replace with your actual drawable resource
               ),
           OnboardingPage(
               title = "Manage Events",
               description =
-                  "Never miss a moment. Manage and stay updated on all your travel plans and events",
+                  "Never miss a moment. Manage and stay updated on all your travel plans and events.",
               imageResId =
                   R.drawable.never_miss_a_moment // Replace with your actual drawable resource
               ),
@@ -97,7 +98,12 @@ fun OnboardingScreen(navigationActions: NavigationActions, profileModelView: Pro
       }
 }
 
-// Display the content of each onboarding page
+/**
+ * Composable function to display the content of an onboarding page.
+ *
+ * @param page The onboarding page to be displayed.
+ * @param modifier The modifier to be applied to the content.
+ */
 @Composable
 fun OnboardingPageContent(page: OnboardingPage, modifier: Modifier = Modifier) {
   Column(
@@ -125,7 +131,13 @@ fun OnboardingPageContent(page: OnboardingPage, modifier: Modifier = Modifier) {
       }
 }
 
-// Progress indicator to show the current page in the onboarding process
+/**
+ * Composable function to display a progress indicator for onboarding pages.
+ *
+ * @param currentPage The index of the current onboarding page.
+ * @param totalPages The total number of onboarding pages.
+ * @param modifier The modifier to be applied to the progress indicator.
+ */
 @Composable
 fun ProgressIndicator(currentPage: Int, totalPages: Int, modifier: Modifier = Modifier) {
   Box(
@@ -140,13 +152,19 @@ fun ProgressIndicator(currentPage: Int, totalPages: Int, modifier: Modifier = Mo
                         Modifier.padding(horizontal = 4.dp)
                             .size(if (i == currentPage) 12.dp else 8.dp)
                             .background(
-                                if (i == currentPage) androidx.compose.ui.graphics.Color.Blue
-                                else androidx.compose.ui.graphics.Color.Gray,
+                                if (i == currentPage) Color.Blue else Color.Gray,
                                 shape = RoundedCornerShape(50)))
               }
             }
       }
 }
 
-// Data class to define each onboarding page
+/**
+ * Data class to hold the content of each onboarding page.
+ *
+ * @param title The title of the onboarding page.
+ * @param description The description of the onboarding page.
+ * @param imageResId The resource ID of the image to be displayed on the onboarding page. Set to
+ *   null if no image is to be displayed.
+ */
 data class OnboardingPage(val title: String, val description: String, val imageResId: Int?)
