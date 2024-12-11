@@ -1,6 +1,8 @@
 package com.github.se.travelpouch.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityRepositoryFirebase
@@ -108,9 +110,10 @@ object TestModule {
   @Singleton
   fun provideFileDownloader(
       @ApplicationContext context: Context,
-      storage: FirebaseStorage
+      storage: FirebaseStorage,
+      dataStore: DataStore<Preferences>
   ): FileDownloader {
-    return FileDownloader(context.contentResolver, storage)
+    return FileDownloader(context.contentResolver, storage, dataStore)
   }
 
   @Provides
