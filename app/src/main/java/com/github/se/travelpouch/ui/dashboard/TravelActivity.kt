@@ -102,7 +102,7 @@ fun TravelActivitiesScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize() // Fill the available space
-                                    .padding(16.dp) // Optional padding, adjust as needed
+                                    .padding(16.dp).testTag("emptyTravelBox") // Optional padding, adjust as needed
                             ) {
                                 Text(
                                     text = "No activities planned", // Add newline
@@ -110,7 +110,7 @@ fun TravelActivitiesScreen(
                                         fontWeight = FontWeight.Bold
                                     ),
                                     color = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier.align(Alignment.Center)
+                                    modifier = Modifier.align(Alignment.Center).testTag("emptyTravel1")
                                 )
                                 Text(
                                     text = "for this trip",
@@ -118,7 +118,7 @@ fun TravelActivitiesScreen(
                                         fontWeight = FontWeight.Bold
                                     ),
                                     color = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier.align(Alignment.Center).padding(top = 42.dp)
+                                    modifier = Modifier.align(Alignment.Center).padding(top = 42.dp).testTag("emptyTravel2")
                                 )
                             }
                         }
