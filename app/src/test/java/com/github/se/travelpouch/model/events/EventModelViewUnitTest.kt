@@ -16,7 +16,7 @@ class EventModelViewUnitTest {
   private lateinit var repository: EventRepository
   private lateinit var eventViewModel: EventViewModel
 
-  val event = Event("1", EventType.NEW_DOCUMENT, Timestamp(0, 0), "it", "it", null, null)
+  val event = Event("1", EventType.NEW_ACTIVITY, Timestamp(0, 0), "it", "it")
 
   @Before
   fun setUp() {

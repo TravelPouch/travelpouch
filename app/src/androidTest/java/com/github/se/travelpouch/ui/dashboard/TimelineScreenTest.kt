@@ -33,17 +33,10 @@ class TimelineScreenTest {
    */
   val events_test =
       listOf(
-          Event(
-              "1",
-              EventType.NEW_DOCUMENT,
-              Timestamp(0, 0),
-              "eventTitle",
-              "eventDescription",
-              null,
-              null),
-          Event("2", EventType.START_OF_JOURNEY, Timestamp(0, 0), "it", "it", null, null),
-          Event("3", EventType.NEW_PARTICIPANT, Timestamp(0, 0), "it", "it", null, null),
-          Event("3", EventType.OTHER_EVENT, Timestamp(0, 0), "it", "it", null, null))
+          Event("1", EventType.NEW_ACTIVITY, Timestamp(0, 0), "eventTitle", "eventDescription"),
+          Event("2", EventType.START_OF_JOURNEY, Timestamp(0, 0), "it", "it"),
+          Event("3", EventType.NEW_PARTICIPANT, Timestamp(0, 0), "it", "it"),
+          Event("3", EventType.PARTICIPANT_REMOVED, Timestamp(0, 0), "it", "it"))
 
   @Before
   fun setUp() {
@@ -81,7 +74,7 @@ class TimelineScreenTest {
     composeTestRule.setContent { TimelineItem(events_test[0], Modifier) }
 
     composeTestRule.onNodeWithTag("eventType").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventType").assertTextEquals("NEW_DOCUMENT")
+    composeTestRule.onNodeWithTag("eventType").assertTextEquals("NEW_ACTIVITY")
 
     composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventTitle").assertTextEquals("eventDescription")

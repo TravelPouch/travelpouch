@@ -42,15 +42,7 @@ class EventRepositoryUnitTest {
 
   private lateinit var eventRepositoryFirestore: EventRepositoryFirebase
 
-  val event =
-      Event(
-          "1",
-          EventType.NEW_DOCUMENT,
-          Timestamp(0, 0),
-          "eventTitle",
-          "eventDescription",
-          null,
-          null)
+  val event = Event("1", EventType.NEW_ACTIVITY, Timestamp(0, 0), "eventTitle", "eventDescription")
 
   @Before
   fun setUp() {
@@ -65,12 +57,10 @@ class EventRepositoryUnitTest {
     mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
 
     `when`(mockDocumentSnapshot.id).thenReturn("1")
-    `when`(mockDocumentSnapshot.getString("eventType")).thenReturn("NEW_DOCUMENT")
+    `when`(mockDocumentSnapshot.getString("eventType")).thenReturn("NEW_ACTIVITY")
     `when`(mockDocumentSnapshot.getString("title")).thenReturn("eventTitle")
     `when`(mockDocumentSnapshot.getString("description")).thenReturn("eventDescription")
     `when`(mockDocumentSnapshot.getTimestamp("date")).thenReturn(Timestamp(0, 0))
-    `when`(mockDocumentSnapshot.get("uidParticipant")).thenReturn(null)
-    `when`(mockDocumentSnapshot.get("listUploadedDocuments")).thenReturn(null)
   }
 
   @Test

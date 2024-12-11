@@ -127,9 +127,7 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
             EventType.NEW_ACTIVITY,
             Timestamp.now(),
             activity.title,
-            "'${activity.title}' was added",
-            null,
-            null)
+            "'${activity.title}' was added")
 
     db.runTransaction {
           it.set(activityDocumentReference, activity)

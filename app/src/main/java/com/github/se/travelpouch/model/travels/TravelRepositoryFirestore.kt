@@ -142,9 +142,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
             EventType.START_OF_JOURNEY,
             Timestamp.now(),
             travel.title,
-            "Let's get started with ${travel.title}",
-            null,
-            null)
+            "Let's get started with ${travel.title}")
 
     db.runTransaction {
           val profile = it.get(profileDocumentReference)
@@ -208,9 +206,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
                       EventType.NEW_PARTICIPANT,
                       Timestamp.now(),
                       "${currentAddedUserProfile.email} joined the travel.",
-                      "${currentAddedUserProfile.email} joined the travel.",
-                      null,
-                      null)
+                      "${currentAddedUserProfile.email} joined the travel.")
 
               val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
               listTravelUpdated.add(travel.fsUid)
@@ -240,9 +236,7 @@ class TravelRepositoryFirestore(private val db: FirebaseFirestore) : TravelRepos
                       EventType.PARTICIPANT_REMOVED,
                       Timestamp.now(),
                       "${currentAddedUserProfile.email} was removed from the travel.",
-                      "${currentAddedUserProfile.email} was removed from the travel.",
-                      null,
-                      null)
+                      "${currentAddedUserProfile.email} was removed from the travel.")
 
               val listTravelUpdated = currentAddedUserProfile.userTravelList.toMutableList()
               listTravelUpdated.remove(travel.fsUid)
