@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +40,14 @@ import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -58,14 +66,19 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
 
   val selectedActivity = activityViewModel.selectedActivity.collectAsState()
 
+    val zoneId = ZoneId.of("Europe/Paris")
+    val timeHour = ZonedDateTime.ofInstant(selectedActivity.value!!.date.toDate().toInstant(), zoneId)
+
   var title by remember { mutableStateOf(selectedActivity.value!!.title) }
   var description by remember { mutableStateOf(selectedActivity.value!!.description) }
   var location by remember { mutableStateOf(selectedActivity.value!!.location.name) }
-  var date by remember {
+    val time = timeHour.format(DateTimeFormatter.ofPattern("HH:mm"))
+    var timeText by remember { mutableStateOf(time) }
+    var date by remember {
     mutableStateOf(convertDateToString(selectedActivity.value!!.date.toDate()))
   }
 
-  val dateTimeUtils = DateTimeUtils("dd/MM/yyyy")
+    val dateTimeUtils = DateTimeUtils("dd/MM/yyyy HH:mm")
 
   Scaffold(
       modifier = Modifier.testTag("EditActivityScreen"),
@@ -141,6 +154,30 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                         }
                   })
 
+            OutlinedTextField(
+                value = timeText,
+                onValueChange = { timeText = it }, // Allow manual input
+                label = { Text("Time") },
+                placeholder = { Text("HH:mm") },
+                modifier = Modifier.fillMaxWidth().testTag("timeField"),
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            // Assuming you have a dateTimeUtils.showTimePicker() function that updates the timeText
+                            dateTimeUtils.showTimePicker(context) { selectedDate ->
+                                timeText = selectedDate // Update timeText based on selected time
+                            }
+                        },
+                        modifier = Modifier.testTag("timePickerButton")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.AccessTime,
+                            contentDescription = "Select Time"
+                        )
+                    }
+                }
+            )
+
               Button(
                   enabled =
                       location.isNotBlank() &&
@@ -158,7 +195,8 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                           // cases)
                         }
 
-                    val finalDate = dateTimeUtils.convertStringToTimestamp(formattedDateText)
+                      val finalDate =
+                          dateTimeUtils.convertStringToTimestamp("$formattedDateText $timeText")
 
                     if (finalDate == null) {
                       Log.e("EditActivityScreen", "Invalid date or format")
