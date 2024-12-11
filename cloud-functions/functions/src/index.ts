@@ -9,6 +9,8 @@ import {
 import {storeFile} from "./storage.js";
 import {generateThumbnailForDocument} from "./thumbnailing.js";
 
+import {fetchNotificationTokens, sendPushNotification} from "./pushNotification.js";
+
 initializeApp();
 
 /**
@@ -81,4 +83,29 @@ export const generateThumbnailHttp = onRequest(
       return;
     }
     res.json({success: true});
+  });
+
+
+export const sendNotification = onCall(
+  {region: "europe-west9"},
+  async (req) => {
+    if (!req.data.userId || !req.data.message) {
+      throw new HttpsError("invalid-argument", "Missing parameters: userId or message");
+    }
+    try {
+      const userId = req.data.userId;
+      const message = req.data.message;
+
+      const tokens = await fetchNotificationTokens(userId);
+      if (tokens.length === 0) {
+        logger.warn(`No notification tokens found for user: ${userId}`);
+        return {success: false, message: "No tokens found"};
+      }
+
+      await sendPushNotification(tokens, message);
+      return {success: true, message: "Notification sent successfully"};
+    } catch (err) {
+      logger.error("Error sending notification", err);
+      throw new HttpsError("internal", "Error sending notification");
+    }
   });
