@@ -155,7 +155,7 @@ class DocumentUpload {
 
         composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign in").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign up").assertIsDisplayed()
         composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("emailField").performTextInput("example@example.com")

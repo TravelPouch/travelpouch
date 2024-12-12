@@ -93,7 +93,6 @@ fun SignInScreen(
             }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-            // navigationActions.navigateTo(Screen.TRAVEL_LIST)
           },
           onAuthError = {
             methodChosen.value = false

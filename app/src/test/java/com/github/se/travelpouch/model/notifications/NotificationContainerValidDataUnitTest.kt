@@ -25,7 +25,8 @@ class NotificationContainerLastCaseTest {
               receiverUid = receiverUid,
               travelUid = travelUid,
               content = content,
-              notificationType = NotificationType.INVITATION)
+              notificationType = NotificationType.INVITATION,
+              sector = NotificationSector.TRAVEL)
       assertEquals(notificationUid, myBeautifulNotification.notificationUid)
       assertEquals(senderUid, myBeautifulNotification.senderUid)
       assertEquals(receiverUid, myBeautifulNotification.receiverUid)
@@ -53,7 +54,8 @@ class NotificationContainerLastCaseTest {
             receiverUid = receiverUid,
             travelUid = travelUid,
             content = content,
-            notificationType = NotificationType.INVITATION)
+            notificationType = NotificationType.INVITATION,
+            sector = NotificationSector.TRAVEL)
 
     val map = notification.toMap()
 
@@ -116,6 +118,7 @@ class NotificationContainerLastCaseTest {
     val notificationType = NotificationType.INVITATION
     val timestamp = Timestamp.now()
     val status = NotificationStatus.UNREAD
+    val sector = NotificationSector.TRAVEL
 
     val notification =
         Notification(
@@ -126,7 +129,8 @@ class NotificationContainerLastCaseTest {
             content = content,
             notificationType = notificationType,
             timestamp = timestamp,
-            status = status)
+            status = status,
+            sector = sector)
 
     val expectedMap =
         mapOf(
@@ -137,7 +141,8 @@ class NotificationContainerLastCaseTest {
             "content" to content,
             "notificationType" to notificationType,
             "timestamp" to timestamp,
-            "status" to status)
+            "status" to status,
+            "sector" to sector)
 
     assertEquals(expectedMap, notification.toMap())
   }

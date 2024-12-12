@@ -385,7 +385,7 @@ fun EditTravelSettingsScreen(
                             allParticipants = selectedTravel!!.allParticipants,
                             listParticipant = selectedTravel!!.listParticipant)
                     listTravelViewModel.updateTravel(
-                        newTravel, TravelRepository.UpdateMode.FIELDS_UPDATE, null)
+                        newTravel, TravelRepository.UpdateMode.FIELDS_UPDATE, null, null)
                     Toast.makeText(context, "Save clicked", Toast.LENGTH_SHORT).show()
                   } catch (e: ParseException) {
                     Toast.makeText(context, "Error: due date invalid", Toast.LENGTH_SHORT).show()
