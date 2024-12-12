@@ -11,9 +11,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.app.ActivityOptionsCompat
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.ui.documents.StoreDocumentButton
 import org.junit.Before
 import org.junit.Rule

@@ -5,13 +5,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.github.se.travelpouch.helper.DocumentsManager
+import com.github.se.travelpouch.R
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityRepositoryFirebase
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.authentication.FirebaseAuthenticationService
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentRepositoryFirestore
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventRepositoryFirebase
 import com.github.se.travelpouch.model.notifications.NotificationRepository
@@ -104,7 +105,11 @@ object AppModule {
       storage: FirebaseStorage,
       dataStore: DataStore<Preferences>
   ): DocumentsManager {
-    return DocumentsManager(context.contentResolver, storage, dataStore)
+    return DocumentsManager(
+        context.contentResolver,
+        storage,
+        dataStore,
+        context.getDir(context.getString(R.string.thumbs_dir_name), Context.MODE_PRIVATE))
   }
 
   @Provides

@@ -5,12 +5,12 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.documents.DocumentVisibility
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference

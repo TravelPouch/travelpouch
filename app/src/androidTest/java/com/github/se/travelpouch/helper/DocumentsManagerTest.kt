@@ -7,6 +7,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -51,7 +52,7 @@ class DocumentsManagerTest {
     val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     device.executeShellCommand("logcat -c")
     `when`(mockDestinationFolder.createFile(any(), any())).thenReturn(null)
-    documentsManager.downloadFile(
+    documentsManager.getDocument(
         "image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
     verify(mockFirebaseStorage, never()).reference
     val logs = device.executeShellCommand("logcat -d")
@@ -84,7 +85,7 @@ class DocumentsManagerTest {
       taskSnapshot.result
 
       DocumentsManager(contentResolver, storage)
-          .downloadFile("image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
+          .getDocument("image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
           .join()
     }
     val downloadedData = Files.readAllBytes(tempFile.toPath())

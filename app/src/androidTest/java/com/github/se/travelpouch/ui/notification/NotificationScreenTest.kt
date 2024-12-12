@@ -9,11 +9,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.notifications.Notification

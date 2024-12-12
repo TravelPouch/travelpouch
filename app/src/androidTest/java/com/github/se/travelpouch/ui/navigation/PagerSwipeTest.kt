@@ -11,12 +11,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.TravelRepository
 import org.junit.Before

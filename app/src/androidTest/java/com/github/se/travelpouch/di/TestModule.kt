@@ -3,13 +3,13 @@ package com.github.se.travelpouch.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityRepositoryFirebase
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.authentication.FirebaseAuthenticationService
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentRepositoryFirestore
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventRepositoryFirebase
 import com.github.se.travelpouch.model.notifications.NotificationRepository

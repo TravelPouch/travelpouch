@@ -1,14 +1,16 @@
-package com.github.se.travelpouch.helper
+package com.github.se.travelpouch.model.documents
 
 import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import com.google.firebase.storage.FirebaseStorage
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -22,26 +24,30 @@ import kotlinx.coroutines.tasks.await
 open class DocumentsManager(
     private val contentResolver: ContentResolver,
     private val storage: FirebaseStorage,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val thumbsDirectory: File
 ) {
+  private val tag = DocumentsManager::class.java.simpleName
+
   /**
-   * Download a file described by source and store it in the folder pointed by destinationFolder.
+   * Return a Uri pointing to the file in the local storage.The file is firstly downloaded from
+   * Firebase storage if not already present.
    *
    * @param sourceMimeType The mimeType of the source file
    * @param sourceTitle The title of the source file
    * @param sourceRef The reference of the source file
    * @param destinationFolder A pointer to the folder in which to store the file
    */
-  fun downloadFile(
+  fun getDocument(
       sourceMimeType: String,
       sourceTitle: String,
       sourceRef: String,
       destinationFolder: DocumentFile
   ): Deferred<Uri> {
     return CoroutineScope(Dispatchers.IO).async {
-      val existingFile = fileInCacheOrNull(sourceRef)
+      val existingFile = documentInCacheOrNull(sourceRef)
       if (existingFile != null) {
-        Log.d("FileDownloader", "File already downloaded as $existingFile")
+        Log.d(tag, "File already downloaded as $existingFile")
         return@async existingFile
       }
 
@@ -52,7 +58,7 @@ open class DocumentsManager(
         throw Exception("Failed to create document file in specified directory")
       }
 
-      Log.d("FileDownloader", "Downloading file to ${file.uri}")
+      Log.d(tag, "Downloading file to ${file.uri}")
 
       val storageRef = storage.reference
       val documentRef = storageRef.child(sourceRef)
@@ -61,21 +67,28 @@ open class DocumentsManager(
         taskSnapshot.stream.use { it.copyTo(outputStream) }
       }
           ?: run {
-            Log.e("FileDownloader", "Failed to open output stream for URI: ${file.uri}")
+            Log.e(tag, "Failed to open output stream for URI: ${file.uri}")
             throw Exception("Failed to open output stream for URI: ${file.uri}")
           }
-      addRefToCache(sourceRef, file.uri.toString())
+      addDocumentRefToCache(sourceRef, file.uri.toString())
       return@async file.uri
     }
   }
 
-  private suspend fun fileInCacheOrNull(sourceRef: String): Uri? {
+  /**
+   * Return a Uri pointing to the file in the local storage if it is already present.
+   *
+   * @param sourceRef The reference of the source file
+   * @return The Uri pointing to the file in the local storage or null if the file is not present.
+   */
+  private suspend fun documentInCacheOrNull(sourceRef: String): Uri? {
     val documentUid = stringPreferencesKey(sourceRef)
     val pathFlow: Flow<String?> = dataStore.data.map { preferences -> preferences[documentUid] }
     return try {
       pathFlow.first()?.let {
-        Uri.parse(it).takeIf { val afd = contentResolver.openAssetFileDescriptor(it, "r")
-        afd?.close()
+        Uri.parse(it).takeIf {
+          val afd = contentResolver.openAssetFileDescriptor(it, "r")
+          afd?.close()
           afd != null
         }
       }
@@ -84,8 +97,34 @@ open class DocumentsManager(
     }
   }
 
-  private suspend fun addRefToCache(sourceRef: String, path: String) {
+  /** Add an entry in the cache. */
+  private suspend fun addDocumentRefToCache(sourceRef: String, path: String) {
     val documentUid = stringPreferencesKey(sourceRef)
     dataStore.edit { preferences -> preferences[documentUid] = path }
+  }
+
+  /**
+   * Return a Uri pointing to the thumbnail in the local storage. The thumbnail is firstly
+   * downloaded from Firebase storage if not already present.
+   *
+   * @param sourceRef The reference of the source file
+   * @param size The width of the thumbnail
+   */
+  fun getThumbnail(sourceRef: String, size: Int): Deferred<Uri> {
+    return CoroutineScope(Dispatchers.IO).async {
+      val file = File(thumbsDirectory, "$sourceRef-$size")
+      if (file.exists()) {
+        Log.d(tag, "Thumbnail already downloaded as ${file.toUri()}")
+        return@async file.toUri()
+      }
+
+      Log.d(tag, "Downloading thumbnail to ${file.toUri()}")
+
+      val storageRef = storage.reference
+      val thumbRef = storageRef.child("$sourceRef-thumb-$size")
+      val taskSnapshot = thumbRef.stream.await()
+      file.outputStream().use { taskSnapshot.stream.copyTo(it) }
+      return@async file.toUri()
+    }
   }
 }

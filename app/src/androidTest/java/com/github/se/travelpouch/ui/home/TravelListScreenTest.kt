@@ -9,11 +9,11 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView

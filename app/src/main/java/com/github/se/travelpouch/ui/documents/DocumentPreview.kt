@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.ui.documents
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,8 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +35,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
@@ -47,9 +43,6 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.rizzi.bouquet.ResourceType
 import com.rizzi.bouquet.VerticalPDFReader
 import com.rizzi.bouquet.rememberVerticalPdfReaderState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 /**
@@ -64,22 +57,24 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
       documentViewModel.selectedDocument.collectAsState().value!!
   val uri = documentViewModel.documentUri.value
   val context = LocalContext.current
-  val openDirectoryLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) {
-    if (it != null) {
-      val flagsPermission: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-      try {
-        context.contentResolver.takePersistableUriPermission(it, flagsPermission)
-      } catch (e: Exception) {
-        Toast.makeText(context, "Failed to access directory", Toast.LENGTH_SHORT).show()
-        return@rememberLauncherForActivityResult
+  val openDirectoryLauncher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) {
+        if (it != null) {
+          val flagsPermission: Int =
+              Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+          try {
+            context.contentResolver.takePersistableUriPermission(it, flagsPermission)
+          } catch (e: Exception) {
+            Toast.makeText(context, "Failed to access directory", Toast.LENGTH_SHORT).show()
+            return@rememberLauncherForActivityResult
+          }
+          val documentFile = DocumentFile.fromTreeUri(context, it)
+          if (documentFile != null) {
+            documentViewModel.setSaveDocumentFolder(it)
+            documentViewModel.getSelectedDocument(documentFile)
+          }
+        }
       }
-      val documentFile = DocumentFile.fromTreeUri(context, it)
-      if (documentFile != null) {
-        documentViewModel.setSaveDocumentFolder(it)
-        documentViewModel.getSelectedDocument(documentFile)
-      }
-    }
-  }
   LaunchedEffect(documentContainer) {
     val documentFileUri = documentViewModel.getSaveDocumentFolder().await()
     if (documentFileUri == null) {
@@ -89,7 +84,8 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
     val documentFile = DocumentFile.fromTreeUri(context, documentFileUri)
     if (documentFile != null) {
       documentViewModel.getSelectedDocument(documentFile)
-    }}
+    }
+  }
 
   Scaffold(
       modifier = Modifier.testTag("documentPreviewScreen"),
@@ -140,7 +136,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
                   modifier = Modifier.fillMaxSize().background(color = Color.Gray))
             } else {
               Image(
-                painter = rememberAsyncImagePainter(uri),
+                  painter = rememberAsyncImagePainter(uri),
                   contentDescription = null,
                   contentScale = ContentScale.Fit,
                   modifier = Modifier.fillMaxSize().testTag("document"))

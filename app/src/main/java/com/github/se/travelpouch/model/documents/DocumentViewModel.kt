@@ -11,7 +11,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.travels.TravelContainer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.ByteArrayOutputStream
@@ -40,9 +39,9 @@ import kotlinx.coroutines.launch
 open class DocumentViewModel
 @Inject
 constructor(
-  private val repository: DocumentRepository,
-  private val documentsManager: DocumentsManager,
-  private val dataStore: DataStore<Preferences>
+    private val repository: DocumentRepository,
+    private val documentsManager: DocumentsManager,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
   private val _isLoading = MutableStateFlow(false)
@@ -52,11 +51,12 @@ constructor(
   private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
   var selectedDocument: StateFlow<DocumentContainer?> = _selectedDocument.asStateFlow()
   private val _documentUri = mutableStateOf<Uri?>(null)
-  val documentUri: State<Uri?> get() = _documentUri
+  val documentUri: State<Uri?>
+    get() = _documentUri
 
-  private val _thumbnailUrls = mutableStateMapOf<String, String>()
-  val thumbnailUrls: Map<String, String>
-    get() = _thumbnailUrls
+  private val _thumbnailUris = mutableStateMapOf<String, Uri>()
+  val thumbnailUris: Map<String, Uri>
+    get() = _thumbnailUris
 
   fun setIdTravel(travelId: String) {
     repository.setIdTravel({ getDocuments() }, travelId)
@@ -82,15 +82,14 @@ constructor(
     val ref = selectedDocument.value?.ref?.id
 
     if (mimeType == null || title == null || ref == null) {
-           throw IllegalArgumentException("Some required fields are empty. Abort download")
+      throw IllegalArgumentException("Some required fields are empty. Abort download")
     }
 
-    val result = documentsManager.downloadFile(mimeType, title, ref, documentFile)
+    val result = documentsManager.getDocument(mimeType, title, ref, documentFile)
     result.invokeOnCompletion {
       if (it != null) {
         Log.e("DocumentViewModel", "Failed to download document", it)
-      }
-      else {
+      } else {
         _documentUri.value = result.getCompleted()
         Log.d("DocumentViewModel", "Document retrieved as ${result.getCompleted()}")
       }
@@ -119,29 +118,38 @@ constructor(
       if (uri == null) {
         return@launch
       }
-      dataStore.edit { preferences ->
-        preferences[SAVE_DOCUMENT_FOLDER] = uri.toString()
-      }
+      dataStore.edit { preferences -> preferences[SAVE_DOCUMENT_FOLDER] = uri.toString() }
     }
   }
 
   fun getSaveDocumentFolder(): Deferred<Uri?> {
     return CoroutineScope(Dispatchers.Default).async {
-      dataStore.data.map { parameters ->
-        parameters[SAVE_DOCUMENT_FOLDER]
-      }.first()?.let { Uri.parse(it) }
+      dataStore.data
+          .map { parameters -> parameters[SAVE_DOCUMENT_FOLDER] }
+          .first()
+          ?.let { Uri.parse(it) }
     }
   }
 
+  /**
+   * If not already present, put the uri of a thumbnail of certain width in the active cache.
+   *
+   * @param document The document to get the thumbnail for.
+   * @param width The width of the requested thumbnail.
+   */
+  @OptIn(ExperimentalCoroutinesApi::class)
   fun getDocumentThumbnail(document: DocumentContainer, width: Int = 300) {
-    if (_thumbnailUrls.containsKey("${document.ref.id}-thumb-$width")) {
+    if (_thumbnailUris.containsKey("${document.ref.id}-$width")) {
       return
     }
-    repository.getThumbnailUrl(
-        document,
-        width,
-        onSuccess = { _thumbnailUrls["${document.ref.id}-thumb-$width"] = it },
-        onFailure = { Log.e("DocumentsViewModel", "Failed to get thumbnail uri", it) })
+    val deferredUri = documentsManager.getThumbnail(document.ref.id, width)
+    deferredUri.invokeOnCompletion {
+      if (it != null) {
+        Log.e("DocumentsViewModel", "Failed to get thumbnail", it)
+      } else {
+        _thumbnailUris["${document.ref.id}-$width"] = deferredUri.getCompleted()
+      }
+    }
   }
 
   fun uploadDocument(travelId: String, bytes: ByteArray, format: DocumentFileFormat) {

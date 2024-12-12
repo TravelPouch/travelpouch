@@ -15,12 +15,12 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.documents.DocumentVisibility
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant

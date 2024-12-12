@@ -51,7 +51,6 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 /**
  * A composable function that displays the sign-in screen.

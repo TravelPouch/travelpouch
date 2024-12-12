@@ -3,7 +3,6 @@ package com.github.se.travelpouch.model.documents
 import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
-import com.github.se.travelpouch.helper.DocumentsManager
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
@@ -267,6 +266,6 @@ class DocumentViewModelTest {
     `when`(documentReference.id).thenReturn("1")
     documentViewModel.selectDocument(documentContainer)
     documentViewModel.storeSelectedDocument(documentFile)
-    verify(documentsManager).downloadFile(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    verify(documentsManager).getDocument(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }
