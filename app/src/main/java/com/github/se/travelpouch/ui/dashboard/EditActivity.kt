@@ -3,9 +3,11 @@ package com.github.se.travelpouch.ui.dashboard
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,7 +17,10 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -34,9 +39,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.core.text.isDigitsOnly
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.location.LocationViewModel
+import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
@@ -60,7 +68,7 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel) {
+fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel, locationViewModel: LocationViewModel) {
 
   val context = LocalContext.current
 
@@ -71,12 +79,19 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
 
   var title by remember { mutableStateOf(selectedActivity.value!!.title) }
   var description by remember { mutableStateOf(selectedActivity.value!!.description) }
-  var location by remember { mutableStateOf(selectedActivity.value!!.location.name) }
     val time = timeHour.format(DateTimeFormatter.ofPattern("HH:mm"))
     var timeText by remember { mutableStateOf(time) }
     var date by remember {
     mutableStateOf(convertDateToString(selectedActivity.value!!.date.toDate()))
   }
+    var selectedLocation by remember { mutableStateOf(selectedActivity.value!!.location) }
+    val locationQuery = remember {
+        mutableStateOf(selectedActivity.value!!.location.name)
+    } // Use mutable state for location query
+    // locationViewModel.setQuery(selectedTravel!!.location.name)
+    var showDropdown by remember { mutableStateOf(false) }
+    val locationSuggestions by
+    locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
     val dateTimeUtils = DateTimeUtils("dd/MM/yyyy HH:mm")
 
@@ -116,13 +131,6 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   enabled = true,
                   label = { Text("Description") },
                   modifier = Modifier.fillMaxWidth().testTag("descriptionField"))
-
-              OutlinedTextField(
-                  value = location,
-                  onValueChange = {},
-                  enabled = true,
-                  label = { Text("Location") },
-                  modifier = Modifier.fillMaxWidth().testTag("locationField"))
 
               // Date Input
               OutlinedTextField(
@@ -178,9 +186,64 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                 }
             )
 
+            Box(modifier =Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = locationQuery.value,
+                    onValueChange = {
+                        locationQuery.value = it
+                        locationViewModel.setQuery(it)
+                        showDropdown = true
+                    },
+                    label = { Text("Location") },
+                    placeholder = { Text("Enter an Address or Location") },
+                    modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
+
+                // Dropdown for location suggestions
+                DropdownMenu(
+                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                    onDismissRequest = { showDropdown = false },
+                    properties = PopupProperties(focusable = false),
+                    modifier =
+                    Modifier.fillMaxWidth(1f)
+                        .heightIn(max = 200.dp)
+                        .testTag("locationDropdownMenu")) {
+                    locationSuggestions.filterNotNull().take(3).forEach { location ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text =
+                                    location.name.take(30) +
+                                            if (location.name.length > 30) "..." else "",
+                                    maxLines = 1,
+                                    modifier = Modifier.testTag("suggestionText_${location.name}"))
+                            },
+                            onClick = {
+                                locationViewModel.setQuery(location.name)
+                                selectedLocation = location // Store the selected location object
+                                locationQuery.value =
+                                    location
+                                        .name // Update location query with the selected location name
+                                showDropdown = false // Close dropdown on selection
+                            },
+                            modifier =
+                            Modifier.padding(8.dp)
+                                .testTag("suggestion_${location.name}") // Tag each suggestion
+                        )
+                        HorizontalDivider() // Separate items with a divider
+                    }
+
+                    if (locationSuggestions.size > 3) {
+                        DropdownMenuItem(
+                            text = { Text("More...") },
+                            onClick = { /* Optionally show more results */},
+                            modifier = Modifier.padding(8.dp).testTag("moreSuggestions"))
+                    }
+                }
+            }
+
               Button(
                   enabled =
-                      location.isNotBlank() &&
+                      selectedLocation.name.isNotBlank() &&
                           title.isNotBlank() &&
                           description.isNotBlank() &&
                           date.isNotBlank(),
@@ -197,6 +260,25 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
 
                       val finalDate =
                           dateTimeUtils.convertStringToTimestamp("$formattedDateText $timeText")
+                      val newLocation: Location
+                      try {
+                          newLocation =
+                              Location(
+                                  latitude = selectedLocation.latitude,
+                                  longitude = selectedLocation.longitude,
+                                  name = selectedLocation.name,
+                                  insertTime = Timestamp.now())
+                      } catch (e: NumberFormatException) {
+                          Toast.makeText(
+                              context,
+                              "Error: latitude and longitude must be numbers",
+                              Toast.LENGTH_SHORT)
+                              .show()
+                          return@Button
+                      } catch (e: IllegalArgumentException) {
+                          Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                          return@Button
+                      }
 
                     if (finalDate == null) {
                       Log.e("EditActivityScreen", "Invalid date or format")
@@ -216,7 +298,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                                 selectedActivity.value!!.uid,
                                 title,
                                 description,
-                                selectedActivity.value!!.location,
+                                newLocation,
                                 finalDate,
                                 mapOf())
 
