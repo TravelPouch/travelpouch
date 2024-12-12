@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,14 +30,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.location.LocationViewModel
+import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.ui.fields.DateTimeInputField
+import com.github.se.travelpouch.ui.fields.LocationInputField
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -52,20 +59,32 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel) {
+fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel, locationViewModel: LocationViewModel) {
 
   val context = LocalContext.current
 
   val selectedActivity = activityViewModel.selectedActivity.collectAsState()
 
+    val zoneId = ZoneId.systemDefault()
+    val timeHour = ZonedDateTime.ofInstant(selectedActivity.value!!.date.toDate().toInstant(), zoneId)
+
   var title by remember { mutableStateOf(selectedActivity.value!!.title) }
   var description by remember { mutableStateOf(selectedActivity.value!!.description) }
-  var location by remember { mutableStateOf(selectedActivity.value!!.location.name) }
-  var date by remember {
+    val time = timeHour.format(DateTimeFormatter.ofPattern("HH:mm"))
+    var timeText by remember { mutableStateOf(time) }
+    var date by remember {
     mutableStateOf(convertDateToString(selectedActivity.value!!.date.toDate()))
   }
+    var selectedLocation by remember { mutableStateOf(selectedActivity.value!!.location) }
+    val locationQuery = remember {
+        mutableStateOf(selectedActivity.value!!.location.name)
+    } // Use mutable state for location query
+    // locationViewModel.setQuery(selectedTravel!!.location.name)
+    var showDropdown by remember { mutableStateOf(false) }
+    val locationSuggestions by
+    locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-  val dateTimeUtils = DateTimeUtils("dd/MM/yyyy")
+    val dateTimeUtils = DateTimeUtils("dd/MM/yyyy HH:mm")
 
   Scaffold(
       modifier = Modifier.testTag("EditActivityScreen"),
@@ -104,46 +123,56 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   label = { Text("Description") },
                   modifier = Modifier.fillMaxWidth().testTag("descriptionField"))
 
-              OutlinedTextField(
-                  value = location,
-                  onValueChange = {},
-                  enabled = true,
-                  label = { Text("Location") },
-                  modifier = Modifier.fillMaxWidth().testTag("locationField"))
-
-              // Date Input
-              OutlinedTextField(
-                  value = date,
-                  onValueChange = {
-                    if (it.isDigitsOnly() && it.length <= 8) {
-                      date = it
+            // Date Input
+            DateTimeInputField(
+                value = date,
+                onValueChange = { newDate ->
+                    if (newDate.isDigitsOnly() && newDate.length <= 8) { // Validate date format
+                        date = newDate
                     }
-                  },
-                  enabled = true,
-                  label = { Text("Date") },
-                  placeholder = { Text("DD/MM/YYYY") },
-                  visualTransformation = DateVisualTransformation(),
-                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                  modifier = Modifier.fillMaxWidth().testTag("dateField"),
-                  trailingIcon = {
-                    IconButton(
-                        onClick = {
-                          dateTimeUtils.showDatePicker(context) { selectedDate ->
-                            date =
-                                selectedDate.replace(
-                                    "/", "") // Use the DatePickerDialog to select a date
-                          }
-                        },
-                        modifier = Modifier.testTag("datePickerButton")) {
-                          Icon(
-                              imageVector = Icons.Default.DateRange,
-                              contentDescription = "Select Date")
-                        }
-                  })
+                },
+                label = "Date",
+                placeholder = "DD/MM/YYYY",
+                visualTransformation = DateVisualTransformation(),
+                keyboardType = KeyboardType.Number,
+                onDatePickerClick = {
+                    dateTimeUtils.showDatePicker(context) { selectedDate ->
+                        date = selectedDate.replace("/", "") // Set the selected date
+                    }
+                },
+                onTimePickerClick = { /* Empty, not needed for date */ },
+                isTime = false // Specify this is a date picker
+            )
+
+            // Time Input
+            DateTimeInputField(
+                value = timeText,
+                onValueChange = { timeText = it },
+                label = "Time",
+                placeholder = "HH:mm",
+                visualTransformation = VisualTransformation.None,
+                keyboardType = KeyboardType.Number,
+                onDatePickerClick = { /* Empty, not needed for time */ },
+                onTimePickerClick = {
+                    dateTimeUtils.showTimePicker(context) { selectedTime ->
+                        timeText = selectedTime // Set the selected time
+                    }
+                },
+                isTime = true // Specify this is a time picker
+            )
+
+            LocationInputField(
+                locationQuery = locationQuery,
+                locationSuggestions = locationSuggestions,
+                showDropdown = showDropdown,
+                setShowDropdown = { showDropdown = it },
+                locationViewModel = locationViewModel,
+                setSelectedLocation = { selectedLocation = it }
+            )
 
               Button(
                   enabled =
-                      location.isNotBlank() &&
+                      selectedLocation.name.isNotBlank() &&
                           title.isNotBlank() &&
                           description.isNotBlank() &&
                           date.isNotBlank(),
@@ -158,7 +187,27 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                           // cases)
                         }
 
-                    val finalDate = dateTimeUtils.convertStringToTimestamp(formattedDateText)
+                      val finalDate =
+                          dateTimeUtils.convertStringToTimestamp("$formattedDateText $timeText")
+                      val newLocation: Location
+                      try {
+                          newLocation =
+                              Location(
+                                  latitude = selectedLocation.latitude,
+                                  longitude = selectedLocation.longitude,
+                                  name = selectedLocation.name,
+                                  insertTime = Timestamp.now())
+                      } catch (e: NumberFormatException) {
+                          Toast.makeText(
+                              context,
+                              "Error: latitude and longitude must be numbers",
+                              Toast.LENGTH_SHORT)
+                              .show()
+                          return@Button
+                      } catch (e: IllegalArgumentException) {
+                          Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                          return@Button
+                      }
 
                     if (finalDate == null) {
                       Log.e("EditActivityScreen", "Invalid date or format")
@@ -178,7 +227,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                                 selectedActivity.value!!.uid,
                                 title,
                                 description,
-                                selectedActivity.value!!.location,
+                                newLocation,
                                 finalDate,
                                 mapOf())
 

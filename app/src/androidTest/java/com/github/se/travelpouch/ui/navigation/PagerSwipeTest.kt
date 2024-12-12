@@ -93,7 +93,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeRight() }
@@ -102,7 +103,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeLeft() }
@@ -112,7 +114,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Calendar")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeLeft() }
@@ -122,7 +125,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Documents")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeLeft() }
@@ -132,7 +136,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Documents")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeRight() }
@@ -142,7 +147,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Calendar")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeRight() }
@@ -151,7 +157,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
   }
 
@@ -172,7 +179,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithText("Calendar").performClick()
@@ -195,7 +203,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
   }
 }
