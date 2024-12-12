@@ -198,12 +198,12 @@ class ActivityCreationAndEdit {
         // edit the activity
         composeTestRule.onNodeWithText("epic activity").performClick()
         composeTestRule.onNodeWithTag("EditActivityScreen").assertIsDisplayed()
-        //        composeTestRule.onNodeWithTag("titleField").assert(hasText("epic activity"))
-        //        composeTestRule
-        //            .onNodeWithTag("descriptionField")
-        //            .assert(hasText("this is an epic activity"))
-        //        composeTestRule.onNodeWithTag("dateField").assert(hasText("01/02/2024"))
-        //        composeTestRule.onNodeWithTag("locationField").assert(hasText("La Paz, Bolivia"))
+                composeTestRule.onNodeWithTag("titleField").assert(hasText("epic activity"))
+                composeTestRule
+                    .onNodeWithTag("descriptionField")
+                    .assert(hasText("this is an epic activity"))
+                composeTestRule.onNodeWithTag("dateField").assert(hasText("01/02/2024"))
+                composeTestRule.onNodeWithTag("inputTravelLocation").assert(hasText("La Paz, Bolivia"))
 
         composeTestRule.onNodeWithTag("titleField").performTextClearance()
         composeTestRule.onNodeWithTag("titleField").performTextInput("more epic activity")
