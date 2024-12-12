@@ -24,7 +24,6 @@ import com.github.se.travelpouch.di.AppModule
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
@@ -57,7 +56,6 @@ class DocumentUpload {
   @get:Rule(order = 2) val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
   @Inject lateinit var firestore: FirebaseFirestore
-  @Inject lateinit var storage: FirebaseStorage
   @Inject lateinit var auth: FirebaseAuth
 
   @Before
@@ -100,7 +98,7 @@ class DocumentUpload {
           .document(uid)
           .set(
               mapOf(
-                  "email" to "example.example2.com",
+                  "email" to "example2@example.com",
                   "friends" to emptyList<String>(),
                   "fsUid" to uid,
                   "name" to "Example",
@@ -124,7 +122,7 @@ class DocumentUpload {
   fun tearDown() {
     runBlocking {
       auth.signOut()
-      auth.signInWithEmailAndPassword("example2@example.com", "password").await()
+      auth.signInWithEmailAndPassword("example2@example.com", "password2").await()
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
 
