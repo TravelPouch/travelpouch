@@ -67,7 +67,11 @@ class DocumentUpload {
     // seed the db
     runBlocking {
       val uid =
-          auth.createUserWithEmailAndPassword("example2@example.com", "password").await().user!!.uid
+          auth
+              .createUserWithEmailAndPassword("example2@example.com", "password2")
+              .await()
+              .user!!
+              .uid
 
       firestore
           .collection("allTravels")
@@ -96,7 +100,7 @@ class DocumentUpload {
           .document(uid)
           .set(
               mapOf(
-                  "email" to "example.example.com",
+                  "email" to "example.example2.com",
                   "friends" to emptyList<String>(),
                   "fsUid" to uid,
                   "name" to "Example",
@@ -161,7 +165,7 @@ class DocumentUpload {
         composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("emailField").performTextInput("example2@example.com")
-        composeTestRule.onNodeWithTag("passwordField").performTextInput("password")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("password2")
         composeTestRule.onNodeWithText("Log in").performClick()
 
         // Skip onboarding
@@ -181,7 +185,7 @@ class DocumentUpload {
 
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("emptyTravel1", useUnmergedTree = true).isDisplayed()
-            composeTestRule.onNodeWithTag("emptyTravel2", useUnmergedTree = true).isDisplayed()
+          composeTestRule.onNodeWithTag("emptyTravel2", useUnmergedTree = true).isDisplayed()
         }
 
         composeTestRule.onNodeWithTag("travelActivitiesScreen").performTouchInput { swipeLeft() }

@@ -59,32 +59,36 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditActivity(navigationActions: NavigationActions, activityViewModel: ActivityViewModel, locationViewModel: LocationViewModel) {
+fun EditActivity(
+    navigationActions: NavigationActions,
+    activityViewModel: ActivityViewModel,
+    locationViewModel: LocationViewModel
+) {
 
   val context = LocalContext.current
 
   val selectedActivity = activityViewModel.selectedActivity.collectAsState()
 
-    val zoneId = ZoneId.systemDefault()
-    val timeHour = ZonedDateTime.ofInstant(selectedActivity.value!!.date.toDate().toInstant(), zoneId)
+  val zoneId = ZoneId.systemDefault()
+  val timeHour = ZonedDateTime.ofInstant(selectedActivity.value!!.date.toDate().toInstant(), zoneId)
 
   var title by remember { mutableStateOf(selectedActivity.value!!.title) }
   var description by remember { mutableStateOf(selectedActivity.value!!.description) }
-    val time = timeHour.format(DateTimeFormatter.ofPattern("HH:mm"))
-    var timeText by remember { mutableStateOf(time) }
-    var date by remember {
+  val time = timeHour.format(DateTimeFormatter.ofPattern("HH:mm"))
+  var timeText by remember { mutableStateOf(time) }
+  var date by remember {
     mutableStateOf(convertDateToString(selectedActivity.value!!.date.toDate()))
   }
-    var selectedLocation by remember { mutableStateOf(selectedActivity.value!!.location) }
-    val locationQuery = remember {
-        mutableStateOf(selectedActivity.value!!.location.name)
-    } // Use mutable state for location query
-    // locationViewModel.setQuery(selectedTravel!!.location.name)
-    var showDropdown by remember { mutableStateOf(false) }
-    val locationSuggestions by
-    locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+  var selectedLocation by remember { mutableStateOf(selectedActivity.value!!.location) }
+  val locationQuery = remember {
+    mutableStateOf(selectedActivity.value!!.location.name)
+  } // Use mutable state for location query
+  // locationViewModel.setQuery(selectedTravel!!.location.name)
+  var showDropdown by remember { mutableStateOf(false) }
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-    val dateTimeUtils = DateTimeUtils("dd/MM/yyyy HH:mm")
+  val dateTimeUtils = DateTimeUtils("dd/MM/yyyy HH:mm")
 
   Scaffold(
       modifier = Modifier.testTag("EditActivityScreen"),
@@ -123,52 +127,51 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   label = { Text("Description") },
                   modifier = Modifier.fillMaxWidth().testTag("descriptionField"))
 
-            // Date Input
-            DateTimeInputField(
-                value = date,
-                onValueChange = { newDate ->
+              // Date Input
+              DateTimeInputField(
+                  value = date,
+                  onValueChange = { newDate ->
                     if (newDate.isDigitsOnly() && newDate.length <= 8) { // Validate date format
-                        date = newDate
+                      date = newDate
                     }
-                },
-                label = "Date",
-                placeholder = "DD/MM/YYYY",
-                visualTransformation = DateVisualTransformation(),
-                keyboardType = KeyboardType.Number,
-                onDatePickerClick = {
+                  },
+                  label = "Date",
+                  placeholder = "DD/MM/YYYY",
+                  visualTransformation = DateVisualTransformation(),
+                  keyboardType = KeyboardType.Number,
+                  onDatePickerClick = {
                     dateTimeUtils.showDatePicker(context) { selectedDate ->
-                        date = selectedDate.replace("/", "") // Set the selected date
+                      date = selectedDate.replace("/", "") // Set the selected date
                     }
-                },
-                onTimePickerClick = { /* Empty, not needed for date */ },
-                isTime = false // Specify this is a date picker
-            )
+                  },
+                  onTimePickerClick = { /* Empty, not needed for date */},
+                  isTime = false // Specify this is a date picker
+                  )
 
-            // Time Input
-            DateTimeInputField(
-                value = timeText,
-                onValueChange = { timeText = it },
-                label = "Time",
-                placeholder = "HH:mm",
-                visualTransformation = VisualTransformation.None,
-                keyboardType = KeyboardType.Number,
-                onDatePickerClick = { /* Empty, not needed for time */ },
-                onTimePickerClick = {
+              // Time Input
+              DateTimeInputField(
+                  value = timeText,
+                  onValueChange = { timeText = it },
+                  label = "Time",
+                  placeholder = "HH:mm",
+                  visualTransformation = VisualTransformation.None,
+                  keyboardType = KeyboardType.Number,
+                  onDatePickerClick = { /* Empty, not needed for time */},
+                  onTimePickerClick = {
                     dateTimeUtils.showTimePicker(context) { selectedTime ->
-                        timeText = selectedTime // Set the selected time
+                      timeText = selectedTime // Set the selected time
                     }
-                },
-                isTime = true // Specify this is a time picker
-            )
+                  },
+                  isTime = true // Specify this is a time picker
+                  )
 
-            LocationInputField(
-                locationQuery = locationQuery,
-                locationSuggestions = locationSuggestions,
-                showDropdown = showDropdown,
-                setShowDropdown = { showDropdown = it },
-                locationViewModel = locationViewModel,
-                setSelectedLocation = { selectedLocation = it }
-            )
+              LocationInputField(
+                  locationQuery = locationQuery,
+                  locationSuggestions = locationSuggestions,
+                  showDropdown = showDropdown,
+                  setShowDropdown = { showDropdown = it },
+                  locationViewModel = locationViewModel,
+                  setSelectedLocation = { selectedLocation = it })
 
               Button(
                   enabled =
@@ -187,27 +190,27 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                           // cases)
                         }
 
-                      val finalDate =
-                          dateTimeUtils.convertStringToTimestamp("$formattedDateText $timeText")
-                      val newLocation: Location
-                      try {
-                          newLocation =
-                              Location(
-                                  latitude = selectedLocation.latitude,
-                                  longitude = selectedLocation.longitude,
-                                  name = selectedLocation.name,
-                                  insertTime = Timestamp.now())
-                      } catch (e: NumberFormatException) {
-                          Toast.makeText(
+                    val finalDate =
+                        dateTimeUtils.convertStringToTimestamp("$formattedDateText $timeText")
+                    val newLocation: Location
+                    try {
+                      newLocation =
+                          Location(
+                              latitude = selectedLocation.latitude,
+                              longitude = selectedLocation.longitude,
+                              name = selectedLocation.name,
+                              insertTime = Timestamp.now())
+                    } catch (e: NumberFormatException) {
+                      Toast.makeText(
                               context,
                               "Error: latitude and longitude must be numbers",
                               Toast.LENGTH_SHORT)
-                              .show()
-                          return@Button
-                      } catch (e: IllegalArgumentException) {
-                          Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                          return@Button
-                      }
+                          .show()
+                      return@Button
+                    } catch (e: IllegalArgumentException) {
+                      Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                      return@Button
+                    }
 
                     if (finalDate == null) {
                       Log.e("EditActivityScreen", "Invalid date or format")

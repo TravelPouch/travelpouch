@@ -59,7 +59,9 @@ class EditActivityScreenTest {
 
   @Test
   fun everythingIsDisplayed() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
 
     composeTestRule.onNodeWithTag("EditActivityScreen").isDisplayed()
     composeTestRule.onNodeWithTag("titleField").isDisplayed()
@@ -81,7 +83,10 @@ class EditActivityScreenTest {
         composeTestRule.onNodeWithTag("descriptionField").fetchSemanticsNode().config[EditableText]
     assert(result.text == activity.description)
     result =
-        composeTestRule.onNodeWithTag("inputTravelLocation").fetchSemanticsNode().config[EditableText]
+        composeTestRule
+            .onNodeWithTag("inputTravelLocation")
+            .fetchSemanticsNode()
+            .config[EditableText]
     assert(result.text == activity.location.name)
     result = composeTestRule.onNodeWithTag("dateField").fetchSemanticsNode().config[EditableText]
     assert(result.text == "01/01/1970")
@@ -89,14 +94,18 @@ class EditActivityScreenTest {
 
   @Test
   fun deletesCallsDeleteById() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
     composeTestRule.onNodeWithTag("deleteButton").performClick()
     verify(mockActivityRepositoryFirebase).deleteActivityById(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
   fun verifiesDisplayWorksAndModificationPlusSaving() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView,locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
 
     VerifyFieldsAreCorrect(composeTestRule)
 
@@ -114,7 +123,10 @@ class EditActivityScreenTest {
         composeTestRule.onNodeWithTag("descriptionField").fetchSemanticsNode().config[EditableText]
     assert(result.text == "newDescription")
     result =
-        composeTestRule.onNodeWithTag("inputTravelLocation").fetchSemanticsNode().config[EditableText]
+        composeTestRule
+            .onNodeWithTag("inputTravelLocation")
+            .fetchSemanticsNode()
+            .config[EditableText]
     assert(result.text == "location")
     result = composeTestRule.onNodeWithTag("dateField").fetchSemanticsNode().config[EditableText]
     assert(result.text == "23/06/2025")
@@ -125,7 +137,9 @@ class EditActivityScreenTest {
 
   @Test
   fun dateFormattingWorksCorrectly() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("00000000")
     val result =
@@ -135,7 +149,9 @@ class EditActivityScreenTest {
 
   @Test
   fun savesWhenFieldsAreCorrect() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
     VerifyFieldsAreCorrect(composeTestRule)
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("23122024")
@@ -146,7 +162,9 @@ class EditActivityScreenTest {
 
   @Test
   fun doesNotSaveWhenDateIsWrong() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
     VerifyFieldsAreCorrect(composeTestRule)
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("00000000")
@@ -158,7 +176,9 @@ class EditActivityScreenTest {
 
   @Test
   fun noCharacterAllowedInDateField() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("mdkdk")
     var result =
@@ -176,7 +196,9 @@ class EditActivityScreenTest {
 
   @Test
   fun limitOfEightCharactersInDateField() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
     composeTestRule.onNodeWithTag("dateField").performTextClearance()
     composeTestRule.onNodeWithTag("dateField").performTextInput("01234567")
     composeTestRule.onNodeWithTag("dateField").performTextInput("8")
@@ -187,7 +209,9 @@ class EditActivityScreenTest {
 
   @Test
   fun datePickerDialogOpensOnClick() {
-    composeTestRule.setContent { EditActivity(navigationActions, mockActivityModelView, locationViewModel) }
+    composeTestRule.setContent {
+      EditActivity(navigationActions, mockActivityModelView, locationViewModel)
+    }
 
     // The date field should be displayed
     composeTestRule.onNodeWithTag("datePickerButton").assertIsDisplayed()

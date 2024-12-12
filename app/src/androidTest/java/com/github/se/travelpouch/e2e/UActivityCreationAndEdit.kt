@@ -50,7 +50,7 @@ class ActivityCreationAndEdit {
     // seed DB with existing trave @Inject lateinit var auth: FirebaseAuthl and user
     runBlocking {
       val uid =
-          auth.createUserWithEmailAndPassword("example@example.com", "password").await().user!!.uid
+          auth.createUserWithEmailAndPassword("example3@example.com", "password").await().user!!.uid
 
       firestore
           .collection("allTravels")
@@ -79,7 +79,7 @@ class ActivityCreationAndEdit {
           .document(uid)
           .set(
               mapOf(
-                  "email" to "example.example.com",
+                  "email" to "example3@example.com",
                   "friends" to emptyList<String>(),
                   "fsUid" to uid,
                   "name" to "Example",
@@ -96,7 +96,7 @@ class ActivityCreationAndEdit {
   fun tearDown() {
     runBlocking {
       auth.signOut()
-      auth.signInWithEmailAndPassword("example@example.com", "password").await()
+      auth.signInWithEmailAndPassword("example3@example.com", "password").await()
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
 
@@ -130,7 +130,7 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithText("Sign up").assertIsDisplayed()
         composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("emailField").performTextInput("example@example.com")
+        composeTestRule.onNodeWithTag("emailField").performTextInput("example3@example.com")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("password")
         composeTestRule.onNodeWithText("Log in").performClick()
 
