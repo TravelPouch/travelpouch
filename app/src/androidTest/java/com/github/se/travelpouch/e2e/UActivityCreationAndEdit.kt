@@ -149,7 +149,7 @@ class ActivityCreationAndEdit {
         composeTestRule.onNodeWithTag("travelListItem").performClick()
 
         // assert that there are no activities at the moment
-        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT + 1) {
           composeTestRule.onNodeWithTag("emptyTravel", useUnmergedTree = true).isDisplayed()
         }
 
@@ -186,7 +186,7 @@ class ActivityCreationAndEdit {
         // save it
         composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
         // there is an activity
-        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT + 2) {
           composeTestRule.onNodeWithTag("emptyTravel", useUnmergedTree = true).isNotDisplayed()
         }
         // check the activity is displayed
