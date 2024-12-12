@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.ui.location
+package com.github.se.travelpouch.ui.fields
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

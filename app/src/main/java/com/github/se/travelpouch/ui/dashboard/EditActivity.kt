@@ -3,11 +3,9 @@ package com.github.se.travelpouch.ui.dashboard
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,10 +15,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -38,25 +33,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import androidx.core.text.isDigitsOnly
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
-import com.github.se.travelpouch.ui.location.locationInputField
+import com.github.se.travelpouch.ui.fields.DateTimeInputField
+import com.github.se.travelpouch.ui.fields.locationInputField
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -133,58 +126,42 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                   label = { Text("Description") },
                   modifier = Modifier.fillMaxWidth().testTag("descriptionField"))
 
-              // Date Input
-              OutlinedTextField(
-                  value = date,
-                  onValueChange = {
-                    if (it.isDigitsOnly() && it.length <= 8) {
-                      date = it
+            // Date Input
+            DateTimeInputField(
+                value = date,
+                onValueChange = { newDate ->
+                    if (newDate.isDigitsOnly() && newDate.length <= 8) { // Validate date format
+                        date = newDate
                     }
-                  },
-                  enabled = true,
-                  label = { Text("Date") },
-                  placeholder = { Text("DD/MM/YYYY") },
-                  visualTransformation = DateVisualTransformation(),
-                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                  modifier = Modifier.fillMaxWidth().testTag("dateField"),
-                  trailingIcon = {
-                    IconButton(
-                        onClick = {
-                          dateTimeUtils.showDatePicker(context) { selectedDate ->
-                            date =
-                                selectedDate.replace(
-                                    "/", "") // Use the DatePickerDialog to select a date
-                          }
-                        },
-                        modifier = Modifier.testTag("datePickerButton")) {
-                          Icon(
-                              imageVector = Icons.Default.DateRange,
-                              contentDescription = "Select Date")
-                        }
-                  })
+                },
+                label = "Date",
+                placeholder = "DD/MM/YYYY",
+                visualTransformation = DateVisualTransformation(),
+                keyboardType = KeyboardType.Number,
+                onDatePickerClick = {
+                    dateTimeUtils.showDatePicker(context) { selectedDate ->
+                        date = selectedDate.replace("/", "") // Set the selected date
+                    }
+                },
+                onTimePickerClick = { /* Empty, not needed for date */ },
+                isTime = false // Specify this is a date picker
+            )
 
-            OutlinedTextField(
+            // Time Input
+            DateTimeInputField(
                 value = timeText,
-                onValueChange = { timeText = it }, // Allow manual input
-                label = { Text("Time") },
-                placeholder = { Text("HH:mm") },
-                modifier = Modifier.fillMaxWidth().testTag("timeField"),
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            // Assuming you have a dateTimeUtils.showTimePicker() function that updates the timeText
-                            dateTimeUtils.showTimePicker(context) { selectedDate ->
-                                timeText = selectedDate // Update timeText based on selected time
-                            }
-                        },
-                        modifier = Modifier.testTag("timePickerButton")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.AccessTime,
-                            contentDescription = "Select Time"
-                        )
+                onValueChange = { timeText = it },
+                label = "Time",
+                placeholder = "HH:mm",
+                visualTransformation = VisualTransformation.None,
+                keyboardType = KeyboardType.Number,
+                onDatePickerClick = { /* Empty, not needed for time */ },
+                onTimePickerClick = {
+                    dateTimeUtils.showTimePicker(context) { selectedTime ->
+                        timeText = selectedTime // Set the selected time
                     }
-                }
+                },
+                isTime = true // Specify this is a time picker
             )
 
             locationInputField(
