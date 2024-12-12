@@ -1,4 +1,4 @@
-package com.github.se.travelpouch.e2e.documents
+package com.github.se.travelpouch.e2e
 
 import android.app.Activity
 import android.app.Instrumentation
@@ -67,18 +67,18 @@ class DocumentUpload {
     // seed the db
     runBlocking {
       val uid =
-          auth.createUserWithEmailAndPassword("example@example.com", "password").await().user!!.uid
+          auth.createUserWithEmailAndPassword("example2@example.com", "password").await().user!!.uid
 
       firestore
           .collection("allTravels")
-          .document("w2HGCwaJ4KgcXJ5nVxkF")
+          .document("skibidiJ4KgcXJ5nVxkF")
           .set(
               mapOf(
                   "allAttachments" to emptyMap<String, String>(),
                   "allParticipants" to mapOf(uid to "OWNER"),
                   "description" to "Description of the test travel",
                   "endTime" to Timestamp(GregorianCalendar(2025, 8, 24).time),
-                  "fsUid" to "w2HGCwaJ4KgcXJ5nVxkF",
+                  "fsUid" to "skibidiJ4KgcXJ5nVxkF",
                   "listParticipant" to listOf(uid),
                   "location" to
                       mapOf(
@@ -101,7 +101,7 @@ class DocumentUpload {
                   "fsUid" to uid,
                   "name" to "Example",
                   "username" to "example",
-                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
+                  "userTravelList" to listOf("skibidiJ4KgcXJ5nVxkF"),
                   "needsOnboarding" to true))
           .await()
 
@@ -120,17 +120,17 @@ class DocumentUpload {
   fun tearDown() {
     runBlocking {
       auth.signOut()
-      auth.signInWithEmailAndPassword("example@example.com", "password").await()
+      auth.signInWithEmailAndPassword("example2@example.com", "password").await()
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
 
       firestore
-          .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents")
+          .collection("allTravels/skibidiJ4KgcXJ5nVxkF/documents")
           .get()
           .await()
           .documents
           .forEach { it.reference.delete().await() }
-      firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
+      firestore.collection("allTravels").document("skibidiJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
       auth.signOut()
       firestore.terminate().await()
@@ -160,7 +160,7 @@ class DocumentUpload {
         composeTestRule.onNodeWithText("Sign up").assertIsDisplayed()
         composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("emailField").performTextInput("example@example.com")
+        composeTestRule.onNodeWithTag("emailField").performTextInput("example2@example.com")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("password")
         composeTestRule.onNodeWithText("Log in").performClick()
 
