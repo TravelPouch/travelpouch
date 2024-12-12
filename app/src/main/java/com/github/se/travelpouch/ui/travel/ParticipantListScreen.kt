@@ -315,7 +315,8 @@ fun ParticipantListScreen(
                       listTravelViewModel.updateTravel(
                           updatedContainer,
                           TravelRepository.UpdateMode.REMOVE_PARTICIPANT,
-                          participant.key, eventViewModel.getNewDocumentReference())
+                          participant.key,
+                          eventViewModel.getNewDocumentReference())
                       listTravelViewModel.selectTravel(updatedContainer)
                       listTravelViewModel.fetchAllParticipantsInfo()
                       setExpanded(false)

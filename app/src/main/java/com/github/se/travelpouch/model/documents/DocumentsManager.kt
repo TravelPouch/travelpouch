@@ -97,7 +97,12 @@ open class DocumentsManager(
     }
   }
 
-  /** Add an entry in the cache. */
+  /**
+   * Add an entry in the cache.
+   *
+   * @param sourceRef The reference of the source file
+   * @param path The path of the file in the local storage
+   */
   private suspend fun addDocumentRefToCache(sourceRef: String, path: String) {
     val documentUid = stringPreferencesKey(sourceRef)
     dataStore.edit { preferences -> preferences[documentUid] = path }
