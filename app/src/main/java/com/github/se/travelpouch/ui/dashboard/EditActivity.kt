@@ -45,6 +45,7 @@ import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.ui.location.locationInputField
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
@@ -186,60 +187,14 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                 }
             )
 
-            Box(modifier =Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = locationQuery.value,
-                    onValueChange = {
-                        locationQuery.value = it
-                        locationViewModel.setQuery(it)
-                        showDropdown = true
-                    },
-                    label = { Text("Location") },
-                    placeholder = { Text("Enter an Address or Location") },
-                    modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
-
-                // Dropdown for location suggestions
-                DropdownMenu(
-                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                    onDismissRequest = { showDropdown = false },
-                    properties = PopupProperties(focusable = false),
-                    modifier =
-                    Modifier.fillMaxWidth(1f)
-                        .heightIn(max = 200.dp)
-                        .testTag("locationDropdownMenu")) {
-                    locationSuggestions.filterNotNull().take(3).forEach { location ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text =
-                                    location.name.take(30) +
-                                            if (location.name.length > 30) "..." else "",
-                                    maxLines = 1,
-                                    modifier = Modifier.testTag("suggestionText_${location.name}"))
-                            },
-                            onClick = {
-                                locationViewModel.setQuery(location.name)
-                                selectedLocation = location // Store the selected location object
-                                locationQuery.value =
-                                    location
-                                        .name // Update location query with the selected location name
-                                showDropdown = false // Close dropdown on selection
-                            },
-                            modifier =
-                            Modifier.padding(8.dp)
-                                .testTag("suggestion_${location.name}") // Tag each suggestion
-                        )
-                        HorizontalDivider() // Separate items with a divider
-                    }
-
-                    if (locationSuggestions.size > 3) {
-                        DropdownMenuItem(
-                            text = { Text("More...") },
-                            onClick = { /* Optionally show more results */},
-                            modifier = Modifier.padding(8.dp).testTag("moreSuggestions"))
-                    }
-                }
-            }
+            locationInputField(
+                locationQuery = locationQuery,
+                locationSuggestions = locationSuggestions,
+                showDropdown = showDropdown,
+                setShowDropdown = { showDropdown = it },
+                locationViewModel = locationViewModel,
+                setSelectedLocation = { selectedLocation = it }
+            )
 
               Button(
                   enabled =

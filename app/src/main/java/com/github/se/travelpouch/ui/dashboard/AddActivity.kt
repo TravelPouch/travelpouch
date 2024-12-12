@@ -27,6 +27,7 @@ import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
+import com.github.se.travelpouch.ui.location.locationInputField
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
@@ -52,7 +53,12 @@ fun AddActivityScreen(
   var dateText by remember { mutableStateOf("") }
   var timeText by remember { mutableStateOf("") }
 
-  val locationQuery by locationViewModel.query.collectAsState()
+    val locationQuery = remember { mutableStateOf("") }
+    val queryFromViewModel by locationViewModel.query.collectAsState()
+
+    LaunchedEffect(queryFromViewModel) {
+        locationQuery.value = queryFromViewModel
+    }
   var showDropdown by remember { mutableStateOf(false) }
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
@@ -150,59 +156,13 @@ fun AddActivityScreen(
                         }
                   })
 
-              // Location Input with dropdown (Optional)
-              Box(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = locationQuery,
-                    onValueChange = {
-                      locationViewModel.setQuery(it)
-                      showDropdown = true // Show dropdown when user starts typing
-                    },
-                    label = {
-                      Text(
-                          "Location (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    },
-                    placeholder = {
-                      Text(
-                          "Enter an Address or Location",
-                          color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    },
-                    modifier = Modifier.fillMaxWidth().testTag("inputTravelLocation"))
-
-                // Dropdown to show location suggestions
-                DropdownMenu(
-                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                    onDismissRequest = { showDropdown = false },
-                    properties = PopupProperties(focusable = false),
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)) {
-                      locationSuggestions.filterNotNull().take(3).forEach { location ->
-                        DropdownMenuItem(
-                            text = {
-                              Text(
-                                  text =
-                                      location.name.take(30) +
-                                          if (location.name.length > 30) "..." else "",
-                                  maxLines = 1 // Ensure name doesn't overflow
-                                  )
-                            },
-                            onClick = {
-                              locationViewModel.setQuery(location.name)
-                              selectedLocation = location // Store the selected location object
-                              showDropdown = false // Close dropdown on selection
-                            },
-                            modifier =
-                                Modifier.padding(8.dp).testTag("suggestion_${location.name}"))
-                        HorizontalDivider() // Separate items with a divider
-                      }
-
-                      if (locationSuggestions.size > 3) {
-                        DropdownMenuItem(
-                            text = { Text("More...") },
-                            onClick = { /* Optionally show more results */},
-                            modifier = Modifier.padding(8.dp).testTag("moreSuggestions"))
-                      }
-                    }
-              }
+              locationInputField(
+                    locationQuery = locationQuery,
+                    locationSuggestions = locationSuggestions,
+                    showDropdown = showDropdown,
+                    locationViewModel = locationViewModel,
+                    setSelectedLocation = { selectedLocation = it },
+                    setShowDropdown = { showDropdown = it })
 
               Button(
                   enabled = title.isNotBlank() && description.isNotBlank() && dateText.isNotBlank(),
