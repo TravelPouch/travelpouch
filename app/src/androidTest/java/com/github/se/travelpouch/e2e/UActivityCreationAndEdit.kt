@@ -150,7 +150,7 @@ class ActivityCreationAndEdit {
 
         // assert that there are no activities at the moment
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT + 1) {
-          composeTestRule.onNodeWithTag("emptyTravel", useUnmergedTree = true).isDisplayed()
+          composeTestRule.onNodeWithTag("emptyTravelBox", useUnmergedTree = true).isDisplayed()
         }
 
         // add an activity button
