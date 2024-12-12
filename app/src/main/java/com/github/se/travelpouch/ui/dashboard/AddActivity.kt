@@ -5,12 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,7 +25,7 @@ import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.fields.DateTimeInputField
-import com.github.se.travelpouch.ui.fields.locationInputField
+import com.github.se.travelpouch.ui.fields.LocationInputField
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
@@ -144,7 +141,7 @@ fun AddActivityScreen(
                 isTime = true // Specify this is a time picker
             )
 
-              locationInputField(
+              LocationInputField(
                     locationQuery = locationQuery,
                     locationSuggestions = locationSuggestions,
                     showDropdown = showDropdown,

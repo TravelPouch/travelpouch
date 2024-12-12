@@ -8,12 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -41,7 +38,7 @@ import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.fields.DateTimeInputField
-import com.github.se.travelpouch.ui.fields.locationInputField
+import com.github.se.travelpouch.ui.fields.LocationInputField
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.utils.DateTimeUtils
@@ -68,7 +65,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
 
   val selectedActivity = activityViewModel.selectedActivity.collectAsState()
 
-    val zoneId = ZoneId.of("Europe/Paris")
+    val zoneId = ZoneId.systemDefault()
     val timeHour = ZonedDateTime.ofInstant(selectedActivity.value!!.date.toDate().toInstant(), zoneId)
 
   var title by remember { mutableStateOf(selectedActivity.value!!.title) }
@@ -164,7 +161,7 @@ fun EditActivity(navigationActions: NavigationActions, activityViewModel: Activi
                 isTime = true // Specify this is a time picker
             )
 
-            locationInputField(
+            LocationInputField(
                 locationQuery = locationQuery,
                 locationSuggestions = locationSuggestions,
                 showDropdown = showDropdown,

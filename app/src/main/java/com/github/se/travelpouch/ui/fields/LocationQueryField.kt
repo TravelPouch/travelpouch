@@ -19,7 +19,7 @@ import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.travels.Location
 
 @Composable
-fun locationInputField(
+fun LocationInputField(
     locationViewModel: LocationViewModel,
     locationSuggestions: List<Location?>,
     locationQuery: MutableState<String>, // To control the input text
