@@ -145,6 +145,11 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
+    composeTestRule.onNodeWithTag("travelActivitiesScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("Documents").performClick()
+
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeRight() }
 
     composeTestRule.onNodeWithTag("calenmdarScreen").assertIsDisplayed()
