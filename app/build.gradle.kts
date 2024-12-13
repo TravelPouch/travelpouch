@@ -169,6 +169,9 @@ sonar {
         property("sonar.androidLint.reportPaths", "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml")
         // Paths to JaCoCo XML coverage report files.
         property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
+        // Exclude the dependency injections from the coverage report
+        property("sonar.coverage.exclusions", "**/di/AppModules.kt, ")
     }
 }
 
@@ -193,6 +196,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.testing)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.datastore.preferences)
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)

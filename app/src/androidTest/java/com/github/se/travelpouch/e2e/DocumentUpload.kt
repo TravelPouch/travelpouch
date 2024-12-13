@@ -44,7 +44,7 @@ private const val DEFAULT_TIMEOUT = 10000L
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
 class DocumentUpload {
-  lateinit var file: File
+  private lateinit var file: File
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
@@ -110,12 +110,11 @@ class DocumentUpload {
       auth.signOut()
     }
 
+    val context = getInstrumentation().context
     file = File.createTempFile("mountain", ".png")
-    getInstrumentation()
-        .context
-        .resources
-        .openRawResource(com.github.se.travelpouch.test.R.drawable.mountain)
-        .use { file.outputStream().use { output -> it.copyTo(output) } }
+    context.resources.openRawResource(com.github.se.travelpouch.test.R.drawable.mountain).use {
+      file.outputStream().use { output -> it.copyTo(output) }
+    }
   }
 
   @After
@@ -148,6 +147,9 @@ class DocumentUpload {
             .respondWith(
                 Instrumentation.ActivityResult(
                     Activity.RESULT_OK, Intent().setData(Uri.fromFile(file))))
+        intending(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
+            .respondWith(
+                Instrumentation.ActivityResult(Activity.RESULT_OK, Intent().setData(Uri.EMPTY)))
 
         // assert that login screen is displayed
         composeTestRule.onNodeWithTag("appLogo").assertIsDisplayed()
@@ -214,10 +216,27 @@ class DocumentUpload {
         composeTestRule.waitUntil(timeoutMillis = 5000) {
           composeTestRule.onNodeWithTag("documentListItem", useUnmergedTree = true).isDisplayed()
         }
+
+        val newDocumentRefId =
+            firestore
+                .collection("allTravels/skibidiJ4KgcXJ5nVxkF/documents")
+                .get()
+                .await()
+                .documents
+                .first()
+                .reference
+                .id
+
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+          composeTestRule
+              .onNodeWithTag("thumbnail-$newDocumentRefId", useUnmergedTree = true)
+              .isDisplayed()
+        }
+        composeTestRule.onNodeWithTag("documentListItem").assertIsDisplayed()
         composeTestRule.onNodeWithTag("documentListItem").performClick()
 
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-          composeTestRule.onNodeWithTag("document").isDisplayed()
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+          composeTestRule.onNodeWithTag("documentPreviewScreen").isDisplayed()
         }
       }
 }

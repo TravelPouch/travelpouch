@@ -2,4 +2,5 @@
     <string name="app_name">TravelPouch</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="default_web_client_id">957707141132-2v8jj506iqnt0rjl5gbs23ldbbpg4s93.apps.googleusercontent.com</string>
+    <string name="thumbs_dir_name">thumbs</string>
 </resources>

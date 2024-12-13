@@ -2,48 +2,61 @@ package com.github.se.travelpouch.model.documents
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
-import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.travels.TravelContainer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 /**
  * ViewModel for managing documents and related operations.
  *
  * @property repository The repository used for accessing documents data.
- * @property fileDownloader The file downloader to use when downloading files
+ * @property documentsManager The file downloader to use when downloading files
  */
 @HiltViewModel
 open class DocumentViewModel
 @Inject
 constructor(
     private val repository: DocumentRepository,
-    private val fileDownloader: FileDownloader
+    private val documentsManager: DocumentsManager,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
+
   private val _isLoading = MutableStateFlow(false)
   val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
   private val _documents = MutableStateFlow<List<DocumentContainer>>(emptyList())
   val documents: StateFlow<List<DocumentContainer>> = _documents.asStateFlow()
   private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
   var selectedDocument: StateFlow<DocumentContainer?> = _selectedDocument.asStateFlow()
-  private val _saveDocumentFolder = MutableStateFlow<Uri>(Uri.EMPTY)
-  val saveDocumentFolder: StateFlow<Uri> = _saveDocumentFolder.asStateFlow()
-  private val _downloadUrls = mutableStateMapOf<String, String>()
-  val downloadUrls: Map<String, String>
-    get() = _downloadUrls
+  private val _documentUri = mutableStateOf<Uri?>(null)
+  open val documentUri: State<Uri?>
+    get() = _documentUri
 
-  private val _thumbnailUrls = mutableStateMapOf<String, String>()
-  val thumbnailUrls: Map<String, String>
-    get() = _thumbnailUrls
+  private val _thumbnailUris = mutableStateMapOf<String, Uri>()
+  val thumbnailUris: Map<String, Uri>
+    get() = _thumbnailUris
 
   fun setIdTravel(travelId: String) {
     repository.setIdTravel({ getDocuments() }, travelId)
@@ -61,19 +74,26 @@ constructor(
    *
    * @param documentFile The folder in which to create the file
    */
-  fun storeSelectedDocument(documentFile: DocumentFile): Job {
+  @OptIn(ExperimentalCoroutinesApi::class)
+  fun getSelectedDocument(documentFile: DocumentFile) {
+    _documentUri.value = null
     val mimeType = selectedDocument.value?.fileFormat?.mimeType
     val title = selectedDocument.value?.title
     val ref = selectedDocument.value?.ref?.id
 
     if (mimeType == null || title == null || ref == null) {
-      return Job().apply {
-        completeExceptionally(
-            IllegalArgumentException("Some required fields are empty. Abort download"))
-      }
+      throw IllegalArgumentException("Some required fields are empty. Abort download")
     }
 
-    return fileDownloader.downloadFile(mimeType, title, ref, documentFile)
+    val result = documentsManager.getDocument(mimeType, title, ref, documentFile)
+    result.invokeOnCompletion {
+      if (it != null) {
+        Log.e("DocumentViewModel", "Failed to download document", it)
+      } else {
+        _documentUri.value = result.getCompleted()
+        Log.d("DocumentViewModel", "Document retrieved as ${result.getCompleted()}")
+      }
+    }
   }
 
   /**
@@ -93,29 +113,43 @@ constructor(
     _selectedDocument.value = document
   }
 
-  fun setSaveDocumentFolder(uri: Uri) {
-    _saveDocumentFolder.value = uri
-  }
-
-  fun getDownloadUrl(document: DocumentContainer) {
-    if (_downloadUrls.containsKey(document.ref.id)) {
-      return
+  fun setSaveDocumentFolder(uri: Uri?): Job {
+    return CoroutineScope(Dispatchers.Default).launch {
+      if (uri == null) {
+        return@launch
+      }
+      dataStore.edit { preferences -> preferences[SAVE_DOCUMENT_FOLDER] = uri.toString() }
     }
-    repository.getDownloadUrl(
-        document,
-        onSuccess = { _downloadUrls[document.ref.id] = it },
-        onFailure = { Log.e("DocumentsViewModel", "Failed to get thumbnail uri", it) })
   }
 
+  fun getSaveDocumentFolder(): Deferred<Uri?> {
+    return CoroutineScope(Dispatchers.Default).async {
+      dataStore.data
+          .map { parameters -> parameters[SAVE_DOCUMENT_FOLDER] }
+          .first()
+          ?.let { Uri.parse(it) }
+    }
+  }
+
+  /**
+   * If not already present, put the uri of a thumbnail of certain width in the active cache.
+   *
+   * @param document The document to get the thumbnail for.
+   * @param width The width of the requested thumbnail.
+   */
+  @OptIn(ExperimentalCoroutinesApi::class)
   fun getDocumentThumbnail(document: DocumentContainer, width: Int = 300) {
-    if (_thumbnailUrls.containsKey("${document.ref.id}-thumb-$width")) {
+    if (_thumbnailUris.containsKey("${document.ref.id}-$width")) {
       return
     }
-    repository.getThumbnailUrl(
-        document,
-        width,
-        onSuccess = { _thumbnailUrls["${document.ref.id}-thumb-$width"] = it },
-        onFailure = { Log.e("DocumentsViewModel", "Failed to get thumbnail uri", it) })
+    val deferredUri = documentsManager.getThumbnail(document.travelRef.id, document.ref.id, width)
+    deferredUri.invokeOnCompletion {
+      if (it != null) {
+        Log.e("DocumentsViewModel", "Failed to get thumbnail", it)
+      } else {
+        _thumbnailUris["${document.ref.id}-$width"] = deferredUri.getCompleted()
+      }
+    }
   }
 
   fun uploadDocument(travelId: String, bytes: ByteArray, format: DocumentFileFormat) {
@@ -161,5 +195,9 @@ constructor(
     val bytes: ByteArray = byteArrayOutputStream.toByteArray()
 
     uploadDocument(travelId, bytes, format)
+  }
+
+  companion object {
+    private val SAVE_DOCUMENT_FOLDER = stringPreferencesKey("save_document_folder")
   }
 }
