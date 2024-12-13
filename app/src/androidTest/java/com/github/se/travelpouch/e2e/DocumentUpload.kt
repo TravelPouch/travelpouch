@@ -41,6 +41,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.Duration.Companion.seconds
 
 private const val DEFAULT_TIMEOUT = 10000L
 
@@ -138,7 +139,7 @@ class DocumentUpload {
 
   @Test
   fun userFlowForDocumentUpload() =
-      runTest(timeout = 30.minutes) {
+      runTest(timeout = 30.seconds) {
         // mock the file picker
         intending(hasAction(Intent.ACTION_OPEN_DOCUMENT))
             .respondWith(
