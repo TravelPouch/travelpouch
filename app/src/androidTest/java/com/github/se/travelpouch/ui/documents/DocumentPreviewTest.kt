@@ -2,8 +2,10 @@ package com.github.se.travelpouch.ui.documents
 
 import android.content.Context
 import android.provider.DocumentsContract
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.core.net.toUri
@@ -32,6 +34,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.spy
+import java.io.File
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -44,6 +48,7 @@ class DocumentPreviewTest {
   private lateinit var mockDocumentsManager: DocumentsManager
   private lateinit var document: DocumentContainer
   private lateinit var mockDataStore: DataStore<Preferences>
+  private lateinit var file: File
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -58,7 +63,7 @@ class DocumentPreviewTest {
             mockDocumentReference,
             mockDocumentReference,
             "title",
-            DocumentFileFormat.PDF,
+            DocumentFileFormat.PNG,
             0,
             "email",
             mockDocumentReference,
@@ -69,19 +74,25 @@ class DocumentPreviewTest {
     mockDocumentsManager = mock(DocumentsManager::class.java)
     mockDataStore = mock()
     val context = getInstrumentation().context
-    val file = context.getDir("documentPreviewTest", Context.MODE_PRIVATE)
+    val folder = context.getDir("documentPreviewTest", Context.MODE_PRIVATE)
     `when`(mockDataStore.data)
         .thenReturn(
             flowOf(
                 preferencesOf(
                     stringPreferencesKey("save_document_folder") to
                         DocumentsContract.buildTreeDocumentUri(
-                                "com.github.se.travelpouch", file.toUri().path!!)
+                                "com.github.se.travelpouch", folder.toUri().path!!)
                             .toString())))
     mockDocumentViewModel =
-        DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
+        spy(DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore))
 
     mockDocumentViewModel.selectDocument(document)
+    file = File.createTempFile("mountain", ".png")
+    context.resources.openRawResource(com.github.se.travelpouch.test.R.drawable.mountain).use {
+      file.outputStream().use { output -> it.copyTo(output) }
+    }
+    `when`(mockDocumentViewModel.documentUri).thenReturn(mutableStateOf(file.toUri()))
+
   }
 
   @After
@@ -90,6 +101,7 @@ class DocumentPreviewTest {
 
     val cacheDir = getInstrumentation().context.getDir("documentPreviewTest", Context.MODE_PRIVATE)
     cacheDir.deleteRecursively()
+    file.delete()
   }
 
   @Test
@@ -105,5 +117,8 @@ class DocumentPreviewTest {
     composeTestRule
         .onNodeWithTag("documentTitle", useUnmergedTree = true)
         .assertTextContains("Document ID: ref_id")
+    composeTestRule.waitUntil(1000) {
+      composeTestRule.onNodeWithTag("document").isDisplayed()
+    }
   }
 }

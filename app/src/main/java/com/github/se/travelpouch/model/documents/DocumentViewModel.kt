@@ -51,7 +51,7 @@ constructor(
   private val _selectedDocument = MutableStateFlow<DocumentContainer?>(null)
   var selectedDocument: StateFlow<DocumentContainer?> = _selectedDocument.asStateFlow()
   private val _documentUri = mutableStateOf<Uri?>(null)
-  val documentUri: State<Uri?>
+  open val documentUri: State<Uri?>
     get() = _documentUri
 
   private val _thumbnailUris = mutableStateMapOf<String, Uri>()
