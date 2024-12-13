@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -187,8 +188,8 @@ class DocumentViewModelTest {
   }
 
   @Test
-  fun setSaveDocumentFolder_notNullUri() {
-    documentViewModel.setSaveDocumentFolder(Uri.EMPTY)
+  fun setSaveDocumentFolder_notNullUri() = runBlocking {
+    documentViewModel.setSaveDocumentFolder(Uri.EMPTY).join()
     org.mockito.kotlin.verifyBlocking(dataStore) {
       edit(argumentCaptor<suspend (Preferences) -> Unit>().capture())
     }
