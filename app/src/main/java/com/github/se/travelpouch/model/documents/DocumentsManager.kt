@@ -95,7 +95,7 @@ open class DocumentsManager(
           afd != null
         }
       }
-    } catch (_: NoSuchElementException) {
+    } catch (_: Exception) {
       null
     }
   }
