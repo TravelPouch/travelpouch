@@ -8,12 +8,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import com.github.se.travelpouch.model.home.StorageDashboardViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.times
 
 class StorageDashboardTests {
   @Composable
@@ -44,7 +44,7 @@ class StorageDashboardTests {
   fun everythingIsDisplayed() {
     composeTestRule.setContent {
       withActivityResultRegistry(mock(ActivityResultRegistry::class.java)) {
-        StorageDashboard(navigationActions)
+        StorageDashboard(storageDashboardViewModel = StorageDashboardViewModel(), navigationActions)
       }
     }
 

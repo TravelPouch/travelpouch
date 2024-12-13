@@ -20,6 +20,7 @@ import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.home.StorageDashboardViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
@@ -82,6 +83,7 @@ class MainActivity : ComponentActivity() {
     val calendarViewModel: CalendarViewModel =
         viewModel(factory = CalendarViewModel.Factory(activityModelView))
     val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+    val storageDashboardViewModel = viewModel<StorageDashboardViewModel>()
 
     val directionsViewModel: DirectionsViewModel =
         viewModel(
@@ -177,7 +179,7 @@ class MainActivity : ComponentActivity() {
               eventsViewModel)
         }
         
-        composable(Screen.STORAGE) { StorageDashboard(navigationActions) }
+        composable(Screen.STORAGE) { StorageDashboard(storageDashboardViewModel, navigationActions) }
         composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
       }
     }
