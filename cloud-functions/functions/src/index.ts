@@ -109,3 +109,30 @@ export const sendNotification = onCall(
       throw new HttpsError("internal", "Error sending notification");
     }
   });
+
+export const sendNotificationHttp = onRequest(
+  {region: "europe-west9"},
+  async (req, res) => {
+    if (!req.body.userId || !req.body.message) {
+      res.status(400).json({success: false, message: "Missing parameters"});
+      return;
+    }
+    try {
+      const userId = req.body.userId;
+      const message = req.body.message;
+
+      const tokens = await fetchNotificationTokens(userId);
+      if (tokens.length === 0) {
+        logger.warn(`No notification tokens found for user: ${userId}`);
+        res.status(400).json({success: false, message: "No tokens found"});
+        return;
+      }
+
+      await sendPushNotification(tokens, message);
+    } catch (err) {
+      logger.error("Error sending notification", err);
+      res.status(500).json({error: "internal", message: "Error sending notification"});
+      return;
+    }
+    res.json({success: true});
+  });

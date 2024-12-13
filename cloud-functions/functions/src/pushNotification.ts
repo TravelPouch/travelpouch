@@ -37,16 +37,18 @@ export async function sendPushNotification(tokens: string[], message: string): P
 
   // Construct the MulticastMessage payload
   const multicastMessage = {
-    data: {
-      title: "New Notification",
-      body: message,
+    notification: {
+      title: message,
+      body: "This is a notification message",
     },
     tokens,
   };
 
+  logger.debug("Multicast message: ", multicastMessage);
+
   try {
     // Send the multicast message
-    const response = await messaging.sendMulticast(multicastMessage);
+    const response = await messaging.sendEachForMulticast(multicastMessage);
 
     logger.debug(`Successfully sent notification: ${response.successCount} successful, ${response.failureCount} failed.`);
 
@@ -55,6 +57,7 @@ export async function sendPushNotification(tokens: string[], message: string): P
       const failedTokens: string[] = [];
       response.responses.forEach((res, index) => {
         if (!res.success) {
+          logger.warn(`Failed to send notification to token: ${tokens[index]} because ${res.error?.message ?? "unknown reason"}`);
           failedTokens.push(tokens[index]);
         }
       });
