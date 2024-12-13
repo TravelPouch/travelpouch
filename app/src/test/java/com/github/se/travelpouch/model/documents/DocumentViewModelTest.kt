@@ -3,7 +3,6 @@ package com.github.se.travelpouch.model.documents
 import android.net.Uri
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.github.se.travelpouch.model.travels.Location
@@ -12,13 +11,10 @@ import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -41,7 +37,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowLog
-import java.lang.Thread.sleep
 
 @RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
@@ -188,13 +183,15 @@ class DocumentViewModelTest {
   @Test
   fun setSaveDocumentFolder_nullUri() = runTest {
     whenever(dataStore.edit { any() }).thenAnswer { fail() }
-      documentViewModel.setSaveDocumentFolder(null)
-    }
+    documentViewModel.setSaveDocumentFolder(null)
+  }
 
   @Test
-  fun setSaveDocumentFolder_notNullUri() = runTest {
+  fun setSaveDocumentFolder_notNullUri() {
     documentViewModel.setSaveDocumentFolder(Uri.EMPTY)
-    org.mockito.kotlin.verify(dataStore, times(1)).edit(argumentCaptor<suspend (Preferences) -> Unit>().capture())
+    org.mockito.kotlin.verifyBlocking(dataStore) {
+      edit(argumentCaptor<suspend (Preferences) -> Unit>().capture())
+    }
   }
 
   @Test

@@ -27,6 +27,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import java.io.File
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
 import org.junit.Before
@@ -35,7 +36,6 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.spy
-import java.io.File
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -92,7 +92,6 @@ class DocumentPreviewTest {
       file.outputStream().use { output -> it.copyTo(output) }
     }
     `when`(mockDocumentViewModel.documentUri).thenReturn(mutableStateOf(file.toUri()))
-
   }
 
   @After
@@ -117,8 +116,6 @@ class DocumentPreviewTest {
     composeTestRule
         .onNodeWithTag("documentTitle", useUnmergedTree = true)
         .assertTextContains("Document ID: ref_id")
-    composeTestRule.waitUntil(1000) {
-      composeTestRule.onNodeWithTag("document").isDisplayed()
-    }
+    composeTestRule.waitUntil(1000) { composeTestRule.onNodeWithTag("document").isDisplayed() }
   }
 }
