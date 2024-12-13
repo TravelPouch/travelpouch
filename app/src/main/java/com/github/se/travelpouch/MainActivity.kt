@@ -19,6 +19,7 @@ import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
+import com.github.se.travelpouch.model.home.StorageDashboardViewModel
 import com.github.se.travelpouch.model.location.LocationViewModel
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.ProfileModelView
@@ -33,6 +34,7 @@ import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
 import com.github.se.travelpouch.ui.home.AddTravelScreen
 import com.github.se.travelpouch.ui.home.OnboardingScreen
+import com.github.se.travelpouch.ui.home.StorageDashboard
 import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
@@ -80,6 +82,7 @@ class MainActivity : ComponentActivity() {
     val calendarViewModel: CalendarViewModel =
         viewModel(factory = CalendarViewModel.Factory(activityModelView))
     val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+    val storageDashboardViewModel = viewModel<StorageDashboardViewModel>()
 
     NavHost(navController = navController, startDestination = Route.DEFAULT) {
       navigation(
@@ -178,6 +181,10 @@ class MainActivity : ComponentActivity() {
               activityModelView,
               documentViewModel,
               eventsViewModel)
+        }
+
+        composable(Screen.STORAGE) {
+          StorageDashboard(storageDashboardViewModel, navigationActions)
         }
         composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
       }
