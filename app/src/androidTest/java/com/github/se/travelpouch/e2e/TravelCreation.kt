@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -36,6 +37,7 @@ class TravelCreation {
   @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   @Inject lateinit var firestore: FirebaseFirestore
+  @Inject lateinit var auth: FirebaseAuth
 
   @Before
   fun setUp() {
@@ -44,7 +46,11 @@ class TravelCreation {
 
   @After
   fun tearDown() {
-    runBlocking { firestore.terminate().await() }
+    runBlocking { firestore.terminate().await()
+      auth.signOut()
+      auth.signInWithEmailAndPassword("travelpouchtest2@gmail.com", "travelpouchtest2password").await()
+      val uid = auth.currentUser!!.uid
+      auth.currentUser!!.delete().await()}
   }
 
   @Test

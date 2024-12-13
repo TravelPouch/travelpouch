@@ -5,6 +5,8 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -90,7 +92,7 @@ class NotificationItemTest {
     profileModelView = ProfileModelView(profileRepository)
     listTravelViewModel = ListTravelViewModel(travelRepository)
     activityViewModel = ActivityViewModel(activityRepository)
-    documentViewModel = DocumentViewModel(documentRepository, documentsManager)
+    documentViewModel = DocumentViewModel(documentRepository, documentsManager, mock())
     eventViewModel = EventViewModel(eventRepository)
   }
 

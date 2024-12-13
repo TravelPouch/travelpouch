@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -63,6 +65,7 @@ class TravelListScreenTest {
   private lateinit var eventRepository: EventRepository
 
   @Mock private lateinit var mockDocumentsManager: DocumentsManager
+  @Mock private lateinit var mockDataStore: DataStore<Preferences>
 
   @Before
   fun setUp() {
@@ -72,6 +75,7 @@ class TravelListScreenTest {
     documentRepository = mock(DocumentRepository::class.java)
     eventRepository = mock(EventRepository::class.java)
     mockDocumentsManager = mock()
+    mockDataStore = mock()
 
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView((profileRepository))
@@ -79,7 +83,7 @@ class TravelListScreenTest {
     listTravelViewModel = ListTravelViewModel(travelRepository)
     activityViewModel = ActivityViewModel(activityRepository)
     eventViewModel = EventViewModel(eventRepository)
-    documentViewModel = DocumentViewModel(documentRepository, mockDocumentsManager)
+    documentViewModel = DocumentViewModel(documentRepository, mockDocumentsManager, mockDataStore)
 
     // Mock the repository methods
     val participant = Participant(fsUid = TravelContainerMock.generateAutoUserId())

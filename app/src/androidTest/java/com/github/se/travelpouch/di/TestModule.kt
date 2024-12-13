@@ -2,7 +2,10 @@ package com.github.se.travelpouch.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
+import com.github.se.travelpouch.R
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityRepositoryFirebase
 import com.github.se.travelpouch.model.authentication.AuthenticationService
@@ -113,7 +116,12 @@ object TestModule {
       storage: FirebaseStorage,
       dataStore: DataStore<Preferences>
   ): DocumentsManager {
-    return DocumentsManager(context.contentResolver, storage, dataStore)
+    return DocumentsManager(
+      context.contentResolver,
+      storage,
+      dataStore,
+      context.getDir(context.getString(R.string.thumbs_dir_name), Context.MODE_PRIVATE)
+    )
   }
 
   @Provides
@@ -132,5 +140,12 @@ object TestModule {
   @Singleton
   fun provideTravelRepository(db: FirebaseFirestore): TravelRepository {
     return TravelRepositoryFirestore(db)
+  }
+
+  @Provides
+  @Singleton
+  fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+    return PreferenceDataStoreFactory.create(
+      produceFile = { context.preferencesDataStoreFile("documents") })
   }
 }

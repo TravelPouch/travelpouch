@@ -11,6 +11,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
@@ -33,6 +35,7 @@ class PagerSwipeTest {
   private lateinit var mockTravelRepository: TravelRepository
   private lateinit var mockDocumentRepository: DocumentRepository
   private lateinit var mockDocumentsManager: DocumentsManager
+  private lateinit var mockDataStore: DataStore<Preferences>
 
   private lateinit var activityViewModel: ActivityViewModel
   private lateinit var calendarViewModel: CalendarViewModel
@@ -46,10 +49,11 @@ class PagerSwipeTest {
     mockTravelRepository = mock()
     mockDocumentRepository = mock()
     mockDocumentsManager = mock()
+    mockDataStore = mock()
 
     activityViewModel = ActivityViewModel(mockActivityRepository)
     calendarViewModel = CalendarViewModel(activityViewModel)
-    documentViewModel = DocumentViewModel(mockDocumentRepository, mockDocumentsManager)
+    documentViewModel = DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
     listTravelViewModel = ListTravelViewModel(mockTravelRepository)
   }
 
