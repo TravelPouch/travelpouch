@@ -87,13 +87,7 @@ fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navig
   LaunchedEffect(Unit) {
     delay(1500)
     if (storageStats == null) {
-      storageDashboardViewModel.setStorageStats(
-        StorageDashboardStats(
-          storageLimit = 500 * 1024L * 1024L,
-          storageUsed = 400 * 1024L * 1024L,
-          storageReclaimable = 50 * 1024L * 1024L,
-        )
-      )
+      storageDashboardViewModel.updateStorageStats()
     }
   }
 
@@ -133,7 +127,7 @@ fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navig
             }
             Card(onClick = {
               storageLimitDialogOpened.value = true
-            }) {
+            }, modifier = Modifier.testTag("storageLimitCard")) {
               AnimatedVisibility(!isLoading, enter = fadeIn(), exit = fadeOut()) {
                 Row(modifier = Modifier.padding(8f.dp)) { Text("Storage limit: ${storageStats?.storageLimitToString() ?: "..."}") }
               }
@@ -156,7 +150,8 @@ fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navig
                 "Storage usage by travel",
                 fontSize = 5.em,
                 fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Start)
+                textAlign = TextAlign.Start,
+                modifier = Modifier.testTag("storageUsageByTravelTitle"))
             }
           }
         }
@@ -320,7 +315,7 @@ fun StorageLimitDialog(onDismissRequest: () -> Unit = {}, currentLimit: Long, on
       Column(modifier = Modifier.padding(10.dp).fillMaxSize()) {
         Text("Set storage limit", Modifier.align(Alignment.CenterHorizontally), fontWeight = FontWeight.Bold, fontSize = 5.em)
         Spacer(Modifier.height(20.dp))
-        Text("Current limit: ${formatStorageUnit(currentLimit)}")
+        Text("Current limit: ${formatStorageUnit(currentLimit)}", modifier = Modifier.testTag("storageLimitDialogCurrentLimitText"))
         Spacer(Modifier.height(10.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
           TextField(

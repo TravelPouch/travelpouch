@@ -80,6 +80,6 @@ class TimelineScreenTest {
     composeTestRule.onNodeWithTag("eventTitle").assertTextEquals("eventDescription")
 
     composeTestRule.onNodeWithTag("eventDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventDate").assertTextEquals("01/01/1970 at 12:00:00 AM")
+    composeTestRule.onNodeWithTag("eventDate").assertTextEquals("01/01/1970 at 01:00:00 AM")
   }
 }

@@ -63,18 +63,29 @@ data class StorageDashboardStats(
   }
 }
 
-@HiltViewModel
-open class StorageDashboardViewModel
+@HiltViewModel open
+class StorageDashboardViewModel
 @Inject
 
 constructor() : ViewModel() {
   private val _isLoading = MutableStateFlow(true)
-  val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+  open val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
   private val _storageStats = MutableStateFlow<StorageDashboardStats?>(null)
-  val storageStats: StateFlow<StorageDashboardStats?> = _storageStats.asStateFlow()
+  open val storageStats: StateFlow<StorageDashboardStats?> = _storageStats.asStateFlow()
 
-  fun setStorageStats(storageStats: StorageDashboardStats?) {
+  open fun setStorageStats(storageStats: StorageDashboardStats?) {
     _storageStats.value = storageStats
     _isLoading.value = false
+  }
+
+  // Temporary function to update storage stats
+  fun updateStorageStats() {
+    setStorageStats(
+      StorageDashboardStats(
+        storageLimit = 500 * 1024L * 1024L,
+        storageUsed = 400 * 1024L * 1024L,
+        storageReclaimable = 50 * 1024L * 1024L,
+      )
+    )
   }
 }
