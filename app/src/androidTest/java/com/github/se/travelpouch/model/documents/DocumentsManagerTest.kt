@@ -56,7 +56,7 @@ class DocumentsManagerTest {
 
     `when`(mockDataStore.data).thenReturn(flowOf(preferencesOf()))
     val documentsManager =
-        DocumentsManager(contentResolver, mockFirebaseStorage, mockDataStore, mock())
+        DocumentsManager(contentResolver, mockFirebaseStorage, mock(), mockDataStore, mock())
     `when`(mockDestinationFolder.createFile(ArgumentMatchers.any(), ArgumentMatchers.any()))
         .thenReturn(null)
     documentsManager
@@ -95,7 +95,7 @@ class DocumentsManagerTest {
       taskSnapshot.await()
       taskSnapshot.result
 
-      DocumentsManager(contentResolver, storage, mockDataStore, mock())
+      DocumentsManager(contentResolver, storage, mock(), mockDataStore, mock())
           .getDocument("image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
           .join()
     }

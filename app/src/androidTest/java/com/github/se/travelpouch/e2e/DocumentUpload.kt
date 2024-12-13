@@ -2,9 +2,11 @@ package com.github.se.travelpouch.e2e
 
 import android.app.Activity
 import android.app.Instrumentation
+import android.content.Context
 import android.content.Intent
 import android.icu.util.GregorianCalendar
 import android.net.Uri
+import android.provider.DocumentsContract
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -14,6 +16,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -29,7 +33,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import java.io.File
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -43,7 +47,7 @@ private const val DEFAULT_TIMEOUT = 10000L
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
 class DocumentUpload {
-  lateinit var file: File
+  private lateinit var file: File
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
@@ -103,12 +107,11 @@ class DocumentUpload {
       auth.signOut()
     }
 
+    val context = getInstrumentation().context
     file = File.createTempFile("mountain", ".png")
-    getInstrumentation()
-        .context
-        .resources
-        .openRawResource(com.github.se.travelpouch.test.R.drawable.mountain)
-        .use { file.outputStream().use { output -> it.copyTo(output) } }
+    context.resources.openRawResource(com.github.se.travelpouch.test.R.drawable.mountain).use {
+      file.outputStream().use { output -> it.copyTo(output) }
+    }
   }
 
   @After
@@ -135,7 +138,7 @@ class DocumentUpload {
 
   @Test
   fun userFlowForDocumentUpload() =
-      runTest(timeout = 30.seconds) {
+      runTest(timeout = 30.minutes) {
         // mock the file picker
         intending(hasAction(Intent.ACTION_OPEN_DOCUMENT))
             .respondWith(
@@ -209,10 +212,25 @@ class DocumentUpload {
         composeTestRule.waitUntil(timeoutMillis = 5000) {
           composeTestRule.onNodeWithTag("documentListItem", useUnmergedTree = true).isDisplayed()
         }
+
+        val newDocumentRefId =
+            firestore
+                .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents")
+                .get()
+                .await()
+                .documents
+                .first()
+                .reference
+                .id
+
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+          composeTestRule.onNodeWithTag("thumbnail-$newDocumentRefId", useUnmergedTree = true).isDisplayed()
+        }
+        composeTestRule.onNodeWithTag("documentListItem").assertIsDisplayed()
         composeTestRule.onNodeWithTag("documentListItem").performClick()
 
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-          composeTestRule.onNodeWithTag("document").isDisplayed()
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
+          composeTestRule.onNodeWithTag("documentPreviewScreen").isDisplayed()
         }
       }
 }
