@@ -123,7 +123,8 @@ fun DocumentListScreen(
             documentViewModel.uploadFile(
                 context.contentResolver.openInputStream(uri),
                 selectedTravel.value,
-                MimeTypeMap.getSingleton().getMimeTypeFromExtension(uri.toFile().extension))
+                MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(uri.path?.substringAfterLast(".") ?: ""))
         else Log.d("DocumentList", "No file selected")
       }
 
