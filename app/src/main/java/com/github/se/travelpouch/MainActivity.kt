@@ -115,7 +115,9 @@ class MainActivity : ComponentActivity() {
         composable(Screen.ADD_ACTIVITY) {
           AddActivityScreen(navigationActions, activityModelView, eventViewModel = eventsViewModel)
         }
-        composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView, locationViewModel) }
+        composable(Screen.EDIT_ACTIVITY) {
+          EditActivity(navigationActions, activityModelView, locationViewModel)
+        }
         composable(Screen.ADD_TRAVEL) {
           AddTravelScreen(
               listTravelViewModel,

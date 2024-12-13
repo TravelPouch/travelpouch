@@ -47,15 +47,13 @@ fun AddActivityScreen(
 
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
-    var dateText by remember { mutableStateOf("") }
-    var timeText by remember { mutableStateOf("") }
+  var dateText by remember { mutableStateOf("") }
+  var timeText by remember { mutableStateOf("") }
 
-    val locationQuery = remember { mutableStateOf("") }
-    val queryFromViewModel by locationViewModel.query.collectAsState()
+  val locationQuery = remember { mutableStateOf("") }
+  val queryFromViewModel by locationViewModel.query.collectAsState()
 
-    LaunchedEffect(queryFromViewModel) {
-        locationQuery.value = queryFromViewModel
-    }
+  LaunchedEffect(queryFromViewModel) { locationQuery.value = queryFromViewModel }
   var showDropdown by remember { mutableStateOf(false) }
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
@@ -103,51 +101,51 @@ fun AddActivityScreen(
                   placeholder = { Text("Description") },
                   modifier = Modifier.testTag("descriptionField").fillMaxWidth())
 
-            // Date input
-            DateTimeInputField(
-                value = dateText,
-                onValueChange = { newDate ->
+              // Date input
+              DateTimeInputField(
+                  value = dateText,
+                  onValueChange = { newDate ->
                     if (newDate.isDigitsOnly() && newDate.length <= 8) { // Validate date format
-                        dateText = newDate
+                      dateText = newDate
                     }
-                },
-                label = "Date",
-                placeholder = "DD/MM/YYYY",
-                visualTransformation = DateVisualTransformation(),
-                keyboardType = KeyboardType.Number,
-                onDatePickerClick = {
+                  },
+                  label = "Date",
+                  placeholder = "DD/MM/YYYY",
+                  visualTransformation = DateVisualTransformation(),
+                  keyboardType = KeyboardType.Number,
+                  onDatePickerClick = {
                     dateTimeUtils.showDatePicker(context) { selectedDate ->
-                        dateText = selectedDate.replace("/", "") // Set the selected date
+                      dateText = selectedDate.replace("/", "") // Set the selected date
                     }
-                },
-                onTimePickerClick = { /* Empty, not needed for date */ },
-                isTime = false // Specify this is a date picker
-            )
+                  },
+                  onTimePickerClick = { /* Empty, not needed for date */},
+                  isTime = false // Specify this is a date picker
+                  )
 
-            // Time input
-            DateTimeInputField(
-                value = timeText,
-                onValueChange = { timeText = it },
-                label = "Time",
-                placeholder = "HH:mm",
-                visualTransformation = VisualTransformation.None,
-                keyboardType = KeyboardType.Number,
-                onDatePickerClick = { /* Empty, not needed for time */ },
-                onTimePickerClick = {
+              // Time input
+              DateTimeInputField(
+                  value = timeText,
+                  onValueChange = { timeText = it },
+                  label = "Time",
+                  placeholder = "HH:mm",
+                  visualTransformation = VisualTransformation.None,
+                  keyboardType = KeyboardType.Number,
+                  onDatePickerClick = { /* Empty, not needed for time */},
+                  onTimePickerClick = {
                     dateTimeUtils.showTimePicker(context) { selectedTime ->
-                        timeText = selectedTime // Set the selected time
+                      timeText = selectedTime // Set the selected time
                     }
-                },
-                isTime = true // Specify this is a time picker
-            )
+                  },
+                  isTime = true // Specify this is a time picker
+                  )
 
               LocationInputField(
-                    locationQuery = locationQuery,
-                    locationSuggestions = locationSuggestions,
-                    showDropdown = showDropdown,
-                    locationViewModel = locationViewModel,
-                    setSelectedLocation = { selectedLocation = it },
-                    setShowDropdown = { showDropdown = it })
+                  locationQuery = locationQuery,
+                  locationSuggestions = locationSuggestions,
+                  showDropdown = showDropdown,
+                  locationViewModel = locationViewModel,
+                  setSelectedLocation = { selectedLocation = it },
+                  setShowDropdown = { showDropdown = it })
 
               Button(
                   enabled = title.isNotBlank() && description.isNotBlank() && dateText.isNotBlank(),

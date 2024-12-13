@@ -1,20 +1,26 @@
 package com.github.se.travelpouch.model.documents
 
-import android.net.Uri
 import android.util.Log
-import androidx.documentfile.provider.DocumentFile
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
 import com.github.se.travelpouch.model.travels.TravelContainer
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,12 +50,14 @@ class DocumentViewModelTest {
   private lateinit var documentsManager: DocumentsManager
   private lateinit var document: NewDocumentContainer
   private lateinit var selectedTravel: TravelContainer
+  private lateinit var dataStore: DataStore<Preferences>
 
   @Before
   fun setUp() {
     documentRepository = mock(DocumentRepository::class.java)
     documentsManager = mock(DocumentsManager::class.java)
-    documentViewModel = DocumentViewModel(documentRepository, documentsManager, mock())
+    dataStore = mock()
+    documentViewModel = DocumentViewModel(documentRepository, documentsManager, dataStore)
     documentReference = mock(DocumentReference::class.java)
 
     documentContainer =

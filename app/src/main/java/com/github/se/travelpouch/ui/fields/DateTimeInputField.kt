@@ -27,31 +27,28 @@ fun DateTimeInputField(
     onTimePickerClick: () -> Unit,
     isTime: Boolean = false // Flag to distinguish between date and time
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        enabled = true,
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        visualTransformation = visualTransformation,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        modifier = Modifier.fillMaxWidth().testTag("${label.toLowerCase()}Field"),
-        trailingIcon = {
-            IconButton(
-                onClick = {
-                    if (isTime) {
-                        onTimePickerClick() // Show time picker
-                    } else {
-                        onDatePickerClick() // Show date picker
-                    }
-                },
-                modifier = Modifier.testTag("${label.toLowerCase()}PickerButton")
-            ) {
-                Icon(
-                    imageVector = if (isTime) Icons.Filled.AccessTime else Icons.Default.DateRange,
-                    contentDescription = "Select $label"
-                )
+  OutlinedTextField(
+      value = value,
+      onValueChange = onValueChange,
+      enabled = true,
+      label = { Text(label) },
+      placeholder = { Text(placeholder) },
+      visualTransformation = visualTransformation,
+      keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+      modifier = Modifier.fillMaxWidth().testTag("${label.toLowerCase()}Field"),
+      trailingIcon = {
+        IconButton(
+            onClick = {
+              if (isTime) {
+                onTimePickerClick() // Show time picker
+              } else {
+                onDatePickerClick() // Show date picker
+              }
+            },
+            modifier = Modifier.testTag("${label.toLowerCase()}PickerButton")) {
+              Icon(
+                  imageVector = if (isTime) Icons.Filled.AccessTime else Icons.Default.DateRange,
+                  contentDescription = "Select $label")
             }
-        }
-    )
+      })
 }

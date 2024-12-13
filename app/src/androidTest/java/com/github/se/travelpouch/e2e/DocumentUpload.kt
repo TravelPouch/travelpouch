@@ -2,11 +2,9 @@ package com.github.se.travelpouch.e2e
 
 import android.app.Activity
 import android.app.Instrumentation
-import android.content.Context
 import android.content.Intent
 import android.icu.util.GregorianCalendar
 import android.net.Uri
-import android.provider.DocumentsContract
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -16,8 +14,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
-import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -33,7 +29,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import java.io.File
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -41,7 +37,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.Duration.Companion.seconds
 
 private const val DEFAULT_TIMEOUT = 10000L
 
@@ -183,7 +178,7 @@ class DocumentUpload {
 
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("emptyTravel1", useUnmergedTree = true).isDisplayed()
-            composeTestRule.onNodeWithTag("emptyTravel2", useUnmergedTree = true).isDisplayed()
+          composeTestRule.onNodeWithTag("emptyTravel2", useUnmergedTree = true).isDisplayed()
         }
 
         composeTestRule.onNodeWithTag("travelActivitiesScreen").performTouchInput { swipeLeft() }
@@ -226,7 +221,9 @@ class DocumentUpload {
                 .id
 
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
-          composeTestRule.onNodeWithTag("thumbnail-$newDocumentRefId", useUnmergedTree = true).isDisplayed()
+          composeTestRule
+              .onNodeWithTag("thumbnail-$newDocumentRefId", useUnmergedTree = true)
+              .isDisplayed()
         }
         composeTestRule.onNodeWithTag("documentListItem").assertIsDisplayed()
         composeTestRule.onNodeWithTag("documentListItem").performClick()
