@@ -18,12 +18,6 @@ interface DocumentRepository {
 
   fun deleteDocumentById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
-  fun getDownloadUrl(
-      document: DocumentContainer,
-      onSuccess: (String) -> Unit,
-      onFailure: (Exception) -> Unit
-  )
-
   fun uploadDocument(
       travelId: String,
       bytes: ByteArray,
@@ -100,25 +94,6 @@ class DocumentRepositoryFirestore(
         }
       }
     }
-  }
-
-  /**
-   * Fetches the download URL of a document from the Firestore database.
-   *
-   * @param document The document to fetch the download URL for.
-   * @param onSuccess Callback function to be called when the download URL is fetched successfully.
-   * @param onFailure Callback function to be called when an error occurs.
-   */
-  override fun getDownloadUrl(
-      document: DocumentContainer,
-      onSuccess: (String) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    storage
-        .getReference(document.ref.id)
-        .downloadUrl
-        .addOnSuccessListener { uri -> onSuccess(uri.toString()) }
-        .addOnFailureListener(onFailure)
   }
 
   override fun uploadDocument(
