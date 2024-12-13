@@ -53,7 +53,8 @@ class PagerSwipeTest {
 
     activityViewModel = ActivityViewModel(mockActivityRepository)
     calendarViewModel = CalendarViewModel(activityViewModel)
-    documentViewModel = DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
+    documentViewModel =
+        DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
     listTravelViewModel = ListTravelViewModel(mockTravelRepository)
   }
 

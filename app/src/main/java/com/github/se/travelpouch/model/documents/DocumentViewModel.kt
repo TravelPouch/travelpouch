@@ -142,7 +142,7 @@ constructor(
     if (_thumbnailUris.containsKey("${document.ref.id}-$width")) {
       return
     }
-    val deferredUri = documentsManager.getThumbnail(document.ref.id, width)
+    val deferredUri = documentsManager.getThumbnail(document.travelRef.id, document.ref.id, width)
     deferredUri.invokeOnCompletion {
       if (it != null) {
         Log.e("DocumentsViewModel", "Failed to get thumbnail", it)

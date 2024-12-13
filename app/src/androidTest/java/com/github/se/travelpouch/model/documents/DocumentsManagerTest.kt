@@ -4,22 +4,17 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.preferencesOf
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.documentfile.provider.DocumentFile
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.UiDevice
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.flow.Flow
+import java.nio.file.Files
+import kotlin.random.Random
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import org.junit.Assert.assertEquals
@@ -33,8 +28,6 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import java.nio.file.Files
-import kotlin.random.Random
 
 @RunWith(MockitoJUnitRunner::class)
 class DocumentsManagerTest {
@@ -62,16 +55,17 @@ class DocumentsManagerTest {
   fun assertUnableToCreateFile() {
 
     `when`(mockDataStore.data).thenReturn(flowOf(preferencesOf()))
-    val documentsManager = DocumentsManager(contentResolver, mockFirebaseStorage, mockDataStore, mock())
+    val documentsManager =
+        DocumentsManager(contentResolver, mockFirebaseStorage, mockDataStore, mock())
     `when`(mockDestinationFolder.createFile(ArgumentMatchers.any(), ArgumentMatchers.any()))
-      .thenReturn(null)
-      documentsManager.getDocument(
-        "image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder
-      ).invokeOnCompletion {
-        assert(it is Exception) {"Expected an exception but got $it"}
-        assertEquals(it?.message, "Failed to create document file in specified directory")
-        Mockito.verify(mockFirebaseStorage, never()).reference
-      }
+        .thenReturn(null)
+    documentsManager
+        .getDocument("image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
+        .invokeOnCompletion {
+          assert(it is Exception) { "Expected an exception but got $it" }
+          assertEquals(it?.message, "Failed to create document file in specified directory")
+          Mockito.verify(mockFirebaseStorage, never()).reference
+        }
   }
 
   @Test
@@ -83,7 +77,7 @@ class DocumentsManagerTest {
     val uri = Uri.fromFile(tempFile)
 
     `when`(mockDestinationFolder.createFile(ArgumentMatchers.any(), ArgumentMatchers.any()))
-      .thenReturn(mockDocumentFile)
+        .thenReturn(mockDocumentFile)
     `when`(mockDocumentFile.uri).thenReturn(uri)
     `when`(mockDataStore.data).thenReturn(flowOf(preferencesOf()))
 
@@ -102,8 +96,8 @@ class DocumentsManagerTest {
       taskSnapshot.result
 
       DocumentsManager(contentResolver, storage, mockDataStore, mock())
-        .getDocument("image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
-        .join()
+          .getDocument("image/jpeg", "mountain.jpg", "hWwbmtbnfwX5yRhAwL3o", mockDestinationFolder)
+          .join()
     }
     val downloadedData = Files.readAllBytes(tempFile.toPath())
     assert(downloadedData.contentEquals(data))

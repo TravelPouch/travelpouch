@@ -46,11 +46,15 @@ class TravelCreation {
 
   @After
   fun tearDown() {
-    runBlocking { firestore.terminate().await()
+    runBlocking {
+      firestore.terminate().await()
       auth.signOut()
-      auth.signInWithEmailAndPassword("travelpouchtest2@gmail.com", "travelpouchtest2password").await()
+      auth
+          .signInWithEmailAndPassword("travelpouchtest2@gmail.com", "travelpouchtest2password")
+          .await()
       val uid = auth.currentUser!!.uid
-      auth.currentUser!!.delete().await()}
+      auth.currentUser!!.delete().await()
+    }
   }
 
   @Test

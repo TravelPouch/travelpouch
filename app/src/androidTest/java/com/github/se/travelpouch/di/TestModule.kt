@@ -114,14 +114,15 @@ object TestModule {
   fun provideFileDownloader(
       @ApplicationContext context: Context,
       storage: FirebaseStorage,
+      functions: FirebaseFunctions,
       dataStore: DataStore<Preferences>
   ): DocumentsManager {
     return DocumentsManager(
-      context.contentResolver,
-      storage,
-      dataStore,
-      context.getDir(context.getString(R.string.thumbs_dir_name), Context.MODE_PRIVATE)
-    )
+        context.contentResolver,
+        storage,
+        functions,
+        dataStore,
+        context.getDir(context.getString(R.string.thumbs_dir_name), Context.MODE_PRIVATE))
   }
 
   @Provides
@@ -146,6 +147,6 @@ object TestModule {
   @Singleton
   fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
     return PreferenceDataStoreFactory.create(
-      produceFile = { context.preferencesDataStoreFile("documents") })
+        produceFile = { context.preferencesDataStoreFile("documents") })
   }
 }

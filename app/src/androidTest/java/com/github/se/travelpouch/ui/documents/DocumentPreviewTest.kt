@@ -11,7 +11,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.documentfile.provider.DocumentFile
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.se.travelpouch.di.AppModule
 import com.github.se.travelpouch.model.documents.DocumentContainer
@@ -46,8 +45,7 @@ class DocumentPreviewTest {
   private lateinit var document: DocumentContainer
   private lateinit var mockDataStore: DataStore<Preferences>
 
-  @get:Rule
-  val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
@@ -55,36 +53,33 @@ class DocumentPreviewTest {
     `when`(mockDocumentReference.id).thenReturn("ref_id")
 
     document =
-      DocumentContainer(
-        mockDocumentReference,
-        mockDocumentReference,
-        mockDocumentReference,
-        "title",
-        DocumentFileFormat.PDF,
-        0,
-        "email",
-        mockDocumentReference,
-        Timestamp(0, 0),
-        DocumentVisibility.ME
-      )
+        DocumentContainer(
+            mockDocumentReference,
+            mockDocumentReference,
+            mockDocumentReference,
+            "title",
+            DocumentFileFormat.PDF,
+            0,
+            "email",
+            mockDocumentReference,
+            Timestamp(0, 0),
+            DocumentVisibility.ME)
     navigationActions = mock(NavigationActions::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
     mockDocumentsManager = mock(DocumentsManager::class.java)
     mockDataStore = mock()
     val context = getInstrumentation().context
     val file = context.getDir("documentPreviewTest", Context.MODE_PRIVATE)
-    `when`(mockDataStore.data).thenReturn(
-      flowOf(
-        preferencesOf(
-          stringPreferencesKey("save_document_folder") to DocumentsContract.buildTreeDocumentUri(
-            "com.github.se.travelpouch",
-            file.toUri().path!!
-          ).toString()
-        )
-      )
-    )
+    `when`(mockDataStore.data)
+        .thenReturn(
+            flowOf(
+                preferencesOf(
+                    stringPreferencesKey("save_document_folder") to
+                        DocumentsContract.buildTreeDocumentUri(
+                                "com.github.se.travelpouch", file.toUri().path!!)
+                            .toString())))
     mockDocumentViewModel =
-      DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
+        DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
 
     mockDocumentViewModel.selectDocument(document)
   }
@@ -108,7 +103,7 @@ class DocumentPreviewTest {
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("deleteButton").assertIsDisplayed()
     composeTestRule
-      .onNodeWithTag("documentTitle", useUnmergedTree = true)
-      .assertTextContains("Document ID: ref_id")
+        .onNodeWithTag("documentTitle", useUnmergedTree = true)
+        .assertTextContains("Document ID: ref_id")
   }
 }

@@ -121,32 +121,6 @@ class DocumentRepositoryFirestore(
         .addOnFailureListener(onFailure)
   }
 
-  private fun generateThumbnail(
-      document: DocumentContainer,
-      width: Int,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    functions
-        .getHttpsCallable("generateThumbnailCall")
-        .call(
-            mapOf(
-                "travelId" to document.travelRef.id,
-                "documentId" to document.ref.id,
-                "width" to width))
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            onSuccess()
-          } else {
-            Log.e(
-                "DocumentRepositoryFirestore",
-                "Error generating thumbnail for document id=${document.ref.id},width=$width",
-                task.exception)
-            onFailure(task.exception!!)
-          }
-        }
-  }
-
   override fun uploadDocument(
       travelId: String,
       bytes: ByteArray,

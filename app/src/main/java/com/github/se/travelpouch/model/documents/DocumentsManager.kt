@@ -9,7 +9,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
+import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StreamDownloadTask
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -24,6 +26,7 @@ import kotlinx.coroutines.tasks.await
 open class DocumentsManager(
     private val contentResolver: ContentResolver,
     private val storage: FirebaseStorage,
+    private val functions: FirebaseFunctions,
     private val dataStore: DataStore<Preferences>,
     private val thumbsDirectory: File
 ) {
@@ -115,7 +118,7 @@ open class DocumentsManager(
    * @param sourceRef The reference of the source file
    * @param size The width of the thumbnail
    */
-  fun getThumbnail(sourceRef: String, size: Int): Deferred<Uri> {
+  fun getThumbnail(travelRef: String, sourceRef: String, size: Int): Deferred<Uri> {
     return CoroutineScope(Dispatchers.IO).async {
       val file = File(thumbsDirectory, "$sourceRef-$size")
       if (file.exists()) {
@@ -125,11 +128,48 @@ open class DocumentsManager(
 
       Log.d(tag, "Downloading thumbnail to ${file.toUri()}")
 
-      val storageRef = storage.reference
-      val thumbRef = storageRef.child("$sourceRef-thumb-$size")
-      val taskSnapshot = thumbRef.stream.await()
+      val taskSnapshot =
+          thumbnailInputStream(travelRef, sourceRef, size)
+              ?: throw Exception("Failed to download thumbnail")
       file.outputStream().use { taskSnapshot.stream.copyTo(it) }
       return@async file.toUri()
+    }
+  }
+
+  private suspend fun thumbnailInputStream(
+      travelRef: String,
+      sourceRef: String,
+      size: Int
+  ): StreamDownloadTask.TaskSnapshot? {
+    val storageRef = storage.reference
+    val thumbRef = storageRef.child("$sourceRef-thumb-$size")
+    return try {
+      thumbRef.stream.await()
+    } catch (e: Exception) {
+      Log.d(tag, "First download try failed, generating thumbnail")
+      if (generateThumbnail(travelRef, sourceRef, size)) {
+        try {
+          thumbRef.stream.await()
+        } catch (e: Exception) {
+          Log.e(tag, "Second download try failed. Abort", e)
+          null
+        }
+      } else {
+        null
+      }
+    }
+  }
+
+  private suspend fun generateThumbnail(travelRef: String, sourceRef: String, width: Int): Boolean {
+    return try {
+      functions
+          .getHttpsCallable("generateThumbnailCall")
+          .call(mapOf("travelId" to travelRef, "documentId" to sourceRef, "width" to width))
+          .await()
+      true
+    } catch (e: Exception) {
+      Log.e(tag, "Error generating thumbnail for document id=${sourceRef},width=$width", e)
+      false
     }
   }
 }

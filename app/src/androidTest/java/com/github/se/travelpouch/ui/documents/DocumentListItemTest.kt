@@ -1,7 +1,6 @@
 package com.github.se.travelpouch.ui.documents
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,16 +17,11 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import java.time.LocalDate
 import java.time.ZoneId
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 
 class DocumentListItemTest {
 
@@ -61,7 +55,8 @@ class DocumentListItemTest {
     navigationActions = mock(NavigationActions::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
     mockDataStore = mock()
-    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
+    mockDocumentViewModel =
+        DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
 
     mockDocumentViewModel.selectDocument(document)
   }
@@ -88,34 +83,36 @@ class DocumentListItemTest {
         .assertTextContains(document.title)
   }
 
-//  @Test
-//  fun testsLoadingBehavior() {
-//    composeTestRule.setContent { DocumentListItem(document, mockDocumentViewModel) {} }
-//
-//    // Test that the loading spinner is displayed and the document list item is not displayed
-//    composeTestRule
-//        .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
-//        .assertIsDisplayed()
-//    composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree = true).assertIsNotDisplayed()
-//
-//    runBlocking {
-//      `when`(
-//              mockDocumentRepository.getThumbnailUrl(
-//                  any(), anyInt(), anyOrNull<(String) -> Unit>(), anyOrNull(), anyBoolean()))
-//          .then {
-//            val onSuccess = it.arguments[2] as (String) -> Unit
-//            onSuccess("the-thumbnail-uri")
-//          }
-//    }
-//
-//    // Add the thumbnail URI to the documentViewModel
-//    mockDocumentViewModel.getDocumentThumbnail(document, 150)
-//    composeTestRule.waitForIdle()
-//
-//    // Test that the loading spinner is not displayed and the document list item is displayed
-//    composeTestRule
-//        .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
-//        .assertIsNotDisplayed()
-//    composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree = true).assertIsDisplayed()
-//  }
+  //  @Test
+  //  fun testsLoadingBehavior() {
+  //    composeTestRule.setContent { DocumentListItem(document, mockDocumentViewModel) {} }
+  //
+  //    // Test that the loading spinner is displayed and the document list item is not displayed
+  //    composeTestRule
+  //        .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
+  //        .assertIsDisplayed()
+  //    composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree =
+  // true).assertIsNotDisplayed()
+  //
+  //    runBlocking {
+  //      `when`(
+  //              mockDocumentRepository.getThumbnailUrl(
+  //                  any(), anyInt(), anyOrNull<(String) -> Unit>(), anyOrNull(), anyBoolean()))
+  //          .then {
+  //            val onSuccess = it.arguments[2] as (String) -> Unit
+  //            onSuccess("the-thumbnail-uri")
+  //          }
+  //    }
+  //
+  //    // Add the thumbnail URI to the documentViewModel
+  //    mockDocumentViewModel.getDocumentThumbnail(document, 150)
+  //    composeTestRule.waitForIdle()
+  //
+  //    // Test that the loading spinner is not displayed and the document list item is displayed
+  //    composeTestRule
+  //        .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
+  //        .assertIsNotDisplayed()
+  //    composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree =
+  // true).assertIsDisplayed()
+  //  }
 }

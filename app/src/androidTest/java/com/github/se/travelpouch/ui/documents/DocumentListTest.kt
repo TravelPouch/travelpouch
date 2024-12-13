@@ -120,7 +120,8 @@ class DocumentListTest {
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
     mockDataStore = mock()
-    val documentViewModel = DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
+    val documentViewModel =
+        DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
     mockDocumentViewModel = spy(documentViewModel)
   }
 

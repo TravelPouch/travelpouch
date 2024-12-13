@@ -103,11 +103,13 @@ object AppModule {
   fun provideFileDownloader(
       @ApplicationContext context: Context,
       storage: FirebaseStorage,
+      functions: FirebaseFunctions,
       dataStore: DataStore<Preferences>
   ): DocumentsManager {
     return DocumentsManager(
         context.contentResolver,
         storage,
+        functions,
         dataStore,
         context.getDir(context.getString(R.string.thumbs_dir_name), Context.MODE_PRIVATE))
   }
