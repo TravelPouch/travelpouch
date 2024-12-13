@@ -5,6 +5,7 @@ import android.app.Instrumentation
 import android.content.Intent
 import android.icu.util.GregorianCalendar
 import android.net.Uri
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -23,13 +24,13 @@ import com.github.se.travelpouch.di.AppModule
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -47,12 +48,14 @@ class DocumentUpload {
 
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @OptIn(ExperimentalTestApi::class)
+  @get:Rule(order = 1)
+  val composeTestRule =
+      createAndroidComposeRule<MainActivity>(effectContext = Dispatchers.Main.immediate)
 
   @get:Rule(order = 2) val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
   @Inject lateinit var firestore: FirebaseFirestore
-  @Inject lateinit var storage: FirebaseStorage
   @Inject lateinit var auth: FirebaseAuth
 
   @Before
@@ -62,18 +65,22 @@ class DocumentUpload {
     // seed the db
     runBlocking {
       val uid =
-          auth.createUserWithEmailAndPassword("example@example.com", "password").await().user!!.uid
+          auth
+              .createUserWithEmailAndPassword("example2@example.com", "password2")
+              .await()
+              .user!!
+              .uid
 
       firestore
           .collection("allTravels")
-          .document("w2HGCwaJ4KgcXJ5nVxkF")
+          .document("skibidiJ4KgcXJ5nVxkF")
           .set(
               mapOf(
                   "allAttachments" to emptyMap<String, String>(),
                   "allParticipants" to mapOf(uid to "OWNER"),
                   "description" to "Description of the test travel",
                   "endTime" to Timestamp(GregorianCalendar(2025, 8, 24).time),
-                  "fsUid" to "w2HGCwaJ4KgcXJ5nVxkF",
+                  "fsUid" to "skibidiJ4KgcXJ5nVxkF",
                   "listParticipant" to listOf(uid),
                   "location" to
                       mapOf(
@@ -91,12 +98,12 @@ class DocumentUpload {
           .document(uid)
           .set(
               mapOf(
-                  "email" to "example.example.com",
+                  "email" to "example2@example.com",
                   "friends" to emptyList<String>(),
                   "fsUid" to uid,
                   "name" to "Example",
                   "username" to "example",
-                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
+                  "userTravelList" to listOf("skibidiJ4KgcXJ5nVxkF"),
                   "needsOnboarding" to true))
           .await()
 
@@ -115,22 +122,22 @@ class DocumentUpload {
   fun tearDown() {
     runBlocking {
       auth.signOut()
-      auth.signInWithEmailAndPassword("example@example.com", "password").await()
+      auth.signInWithEmailAndPassword("example2@example.com", "password2").await()
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
 
       firestore
-          .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents")
+          .collection("allTravels/skibidiJ4KgcXJ5nVxkF/documents")
           .get()
           .await()
           .documents
           .forEach { it.reference.delete().await() }
-      firestore.collection("allTravels").document("w2HGCwaJ4KgcXJ5nVxkF").delete().await()
+      firestore.collection("allTravels").document("skibidiJ4KgcXJ5nVxkF").delete().await()
       firestore.collection("userslist").document(uid).delete().await()
+      auth.signOut()
       firestore.terminate().await()
+      file.delete()
     }
-
-    file.delete()
   }
 
   @Test
@@ -155,8 +162,8 @@ class DocumentUpload {
         composeTestRule.onNodeWithText("Sign up").assertIsDisplayed()
         composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("emailField").performTextInput("example@example.com")
-        composeTestRule.onNodeWithTag("passwordField").performTextInput("password")
+        composeTestRule.onNodeWithTag("emailField").performTextInput("example2@example.com")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("password2")
         composeTestRule.onNodeWithText("Log in").performClick()
 
         // Skip onboarding
