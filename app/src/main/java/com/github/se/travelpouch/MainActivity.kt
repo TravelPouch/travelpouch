@@ -33,8 +33,8 @@ import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 import com.github.se.travelpouch.ui.documents.DocumentPreview
 import com.github.se.travelpouch.ui.home.AddTravelScreen
-import com.github.se.travelpouch.ui.home.StorageDashboard
 import com.github.se.travelpouch.ui.home.OnboardingScreen
+import com.github.se.travelpouch.ui.home.StorageDashboard
 import com.github.se.travelpouch.ui.home.TravelListScreen
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Route
@@ -118,7 +118,9 @@ class MainActivity : ComponentActivity() {
         composable(Screen.ADD_ACTIVITY) {
           AddActivityScreen(navigationActions, activityModelView, eventViewModel = eventsViewModel)
         }
-        composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView, locationViewModel) }
+        composable(Screen.EDIT_ACTIVITY) {
+          EditActivity(navigationActions, activityModelView, locationViewModel)
+        }
         composable(Screen.ADD_TRAVEL) {
           AddTravelScreen(
               listTravelViewModel,
@@ -180,8 +182,10 @@ class MainActivity : ComponentActivity() {
               documentViewModel,
               eventsViewModel)
         }
-        
-        composable(Screen.STORAGE) { StorageDashboard(storageDashboardViewModel, navigationActions) }
+
+        composable(Screen.STORAGE) {
+          StorageDashboard(storageDashboardViewModel, navigationActions)
+        }
         composable(Screen.ONBOARDING) { OnboardingScreen(navigationActions, profileModelView) }
       }
     }

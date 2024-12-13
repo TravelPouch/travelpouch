@@ -176,7 +176,7 @@ class DocumentUpload {
 
         composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("emptyTravel1", useUnmergedTree = true).isDisplayed()
-            composeTestRule.onNodeWithTag("emptyTravel2", useUnmergedTree = true).isDisplayed()
+          composeTestRule.onNodeWithTag("emptyTravel2", useUnmergedTree = true).isDisplayed()
         }
 
         composeTestRule.onNodeWithTag("travelActivitiesScreen").performTouchInput { swipeLeft() }

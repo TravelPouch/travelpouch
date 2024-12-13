@@ -2,12 +2,12 @@ package com.github.se.travelpouch.model.home
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 fun formatStorageUnit(number: Long): String {
   val units = arrayOf("B", "KiB", "MiB", "GiB")
@@ -23,9 +23,9 @@ fun formatStorageUnit(number: Long): String {
 }
 
 data class StorageDashboardStats(
-  var storageLimit: Long?,
-  val storageUsed: Long,
-  val storageReclaimable: Long,
+    var storageLimit: Long?,
+    val storageUsed: Long,
+    val storageReclaimable: Long,
 ) {
   /**
    * Calculates the ratio of storage used to storage limit.
@@ -63,11 +63,8 @@ data class StorageDashboardStats(
   }
 }
 
-@HiltViewModel open
-class StorageDashboardViewModel
-@Inject
-
-constructor() : ViewModel() {
+@HiltViewModel
+open class StorageDashboardViewModel @Inject constructor() : ViewModel() {
   private val _isLoading = MutableStateFlow(true)
   open val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
   private val _storageStats = MutableStateFlow<StorageDashboardStats?>(null)
@@ -81,11 +78,10 @@ constructor() : ViewModel() {
   // Temporary function to update storage stats
   fun updateStorageStats() {
     setStorageStats(
-      StorageDashboardStats(
-        storageLimit = 500 * 1024L * 1024L,
-        storageUsed = 400 * 1024L * 1024L,
-        storageReclaimable = 50 * 1024L * 1024L,
-      )
-    )
+        StorageDashboardStats(
+            storageLimit = 500 * 1024L * 1024L,
+            storageUsed = 400 * 1024L * 1024L,
+            storageReclaimable = 50 * 1024L * 1024L,
+        ))
   }
 }

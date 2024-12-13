@@ -71,15 +71,18 @@ import com.github.se.travelpouch.model.home.StorageDashboardStats
 import com.github.se.travelpouch.model.home.StorageDashboardViewModel
 import com.github.se.travelpouch.model.home.formatStorageUnit
 import com.github.se.travelpouch.ui.navigation.NavigationActions
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.math.roundToLong
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navigationActions: NavigationActions) {
+fun StorageDashboard(
+    storageDashboardViewModel: StorageDashboardViewModel,
+    navigationActions: NavigationActions
+) {
   val isLoading by storageDashboardViewModel.isLoading.collectAsState()
   val storageStats by storageDashboardViewModel.storageStats.collectAsState()
   val storageLimitDialogOpened = remember { mutableStateOf(false) }
@@ -107,11 +110,7 @@ fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navig
             })
       },
   ) { pd ->
-    LazyColumn(
-      Modifier
-        .fillMaxSize()
-        .padding(pd)
-        .padding(horizontal = 10.dp)) {
+    LazyColumn(Modifier.fillMaxSize().padding(pd).padding(horizontal = 10.dp)) {
       item {
         Column(
             modifier = Modifier.fillMaxSize().animateItem(),
@@ -120,38 +119,41 @@ fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navig
         ) {
           Row(Modifier.padding(10.dp).align(Alignment.End)) {
             if (storageLimitDialogOpened.value) {
-              StorageLimitDialog(onDismissRequest = { storageLimitDialogOpened.value = false }, currentLimit = storageStats?.storageLimit ?: 0, onUpdate = {
-                storageDashboardViewModel.setStorageStats(storageStats!!.copy(storageLimit = it))
-                storageLimitDialogOpened.value = false
-              })
+              StorageLimitDialog(
+                  onDismissRequest = { storageLimitDialogOpened.value = false },
+                  currentLimit = storageStats?.storageLimit ?: 0,
+                  onUpdate = {
+                    storageDashboardViewModel.setStorageStats(
+                        storageStats!!.copy(storageLimit = it))
+                    storageLimitDialogOpened.value = false
+                  })
             }
-            Card(onClick = {
-              storageLimitDialogOpened.value = true
-            }, modifier = Modifier.testTag("storageLimitCard")) {
-              AnimatedVisibility(!isLoading, enter = fadeIn(), exit = fadeOut()) {
-                Row(modifier = Modifier.padding(8f.dp)) { Text("Storage limit: ${storageStats?.storageLimitToString() ?: "..."}", modifier = Modifier.testTag("storageLimitCardText")) }
-              }
-            }
+            Card(
+                onClick = { storageLimitDialogOpened.value = true },
+                modifier = Modifier.testTag("storageLimitCard")) {
+                  AnimatedVisibility(!isLoading, enter = fadeIn(), exit = fadeOut()) {
+                    Row(modifier = Modifier.padding(8f.dp)) {
+                      Text(
+                          "Storage limit: ${storageStats?.storageLimitToString() ?: "..."}",
+                          modifier = Modifier.testTag("storageLimitCardText"))
+                    }
+                  }
+                }
           }
           Spacer(Modifier.height(10.dp))
-          Row(modifier = Modifier
-            .fillMaxWidth(0.6f)
-            .align(Alignment.CenterHorizontally)) {
+          Row(modifier = Modifier.fillMaxWidth(0.6f).align(Alignment.CenterHorizontally)) {
             CircularStorageDiagram(storageStats)
           }
           Spacer(Modifier.height(20.dp))
 
           AnimatedVisibility(!isLoading, enter = fadeIn(), exit = fadeOut()) {
-            Row(
-              Modifier
-                .align(Alignment.Start)
-                .padding(10.dp)) {
+            Row(Modifier.align(Alignment.Start).padding(10.dp)) {
               Text(
-                "Storage usage by travel",
-                fontSize = 5.em,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.testTag("storageUsageByTravelTitle"))
+                  "Storage usage by travel",
+                  fontSize = 5.em,
+                  fontWeight = FontWeight.SemiBold,
+                  textAlign = TextAlign.Start,
+                  modifier = Modifier.testTag("storageUsageByTravelTitle"))
             }
           }
         }
@@ -168,7 +170,7 @@ fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navig
 
 @Composable
 fun CircularStorageDiagram(
-  stats: StorageDashboardStats?,
+    stats: StorageDashboardStats?,
 ) {
   val colorScheme = MaterialTheme.colorScheme
 
@@ -184,53 +186,43 @@ fun CircularStorageDiagram(
   }
   LaunchedEffect(stats) {
     if (stats == null) {
-      launch {
-        currentValue.animateTo(0.1f, tween(1500, 0, FastOutSlowInEasing))
-      }
+      launch { currentValue.animateTo(0.1f, tween(1500, 0, FastOutSlowInEasing)) }
       launch {
         indefiniteLoadingOffset.animateTo(
-          targetValue = 360f,
-          animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-          )
-        )
+            targetValue = 360f,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = 1500, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart))
       }
       currentIndicator.animateTo(
-        targetValue = 0f,
-        animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
-      )
+          targetValue = 0f,
+          animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing))
     } else {
       launch {
         currentValueScale.animateTo(
-          targetValue = 1f,
-          animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
-        )
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing))
       }
       launch {
         indefiniteLoadingOffset.animateTo(
-          targetValue = 0f,
-          animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-        )
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing))
       }
       launch {
         currentValue.animateTo(
-          targetValue = stats.storageUsedRatio(),
-          animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
-        )
+            targetValue = stats.storageUsedRatio(),
+            animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing))
       }
       currentIndicator.animateTo(
-        targetValue = stats.storageReclaimableRatio(),
-        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
-      )
+          targetValue = stats.storageReclaimableRatio(),
+          animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing))
     }
   }
 
   Box {
     Column(modifier = Modifier.align(Alignment.Center)) {
-      Canvas(modifier = Modifier
-        .aspectRatio(1f)
-        .fillMaxSize()) {
+      Canvas(modifier = Modifier.aspectRatio(1f).fillMaxSize()) {
         // Define the size of the circle and the padding for text
         val size = size.minDimension
         val strokeWidth = size * 0.10f // Stroke width of the arcs
@@ -238,64 +230,61 @@ fun CircularStorageDiagram(
         val arcSize = Size(width = size - 2 * margin, height = size - 2 * margin)
 
         drawArc(
-          topLeft = Offset(margin, margin),
-          color = colorScheme.primaryContainer,
-          startAngle = 270f,
-          sweepAngle = 360f,
-          useCenter = false,
-          size = arcSize,
-          style = Stroke(strokeWidth, cap = StrokeCap.Round))
+            topLeft = Offset(margin, margin),
+            color = colorScheme.primaryContainer,
+            startAngle = 270f,
+            sweepAngle = 360f,
+            useCenter = false,
+            size = arcSize,
+            style = Stroke(strokeWidth, cap = StrokeCap.Round))
 
         val valueAngle = currentValue.value * 360f
         val indicatorAngle = currentIndicator.value * 360f
 
         drawArc(
-          topLeft = Offset(margin, margin),
-          color = colorScheme.primary,
-          startAngle = 270f + indefiniteLoadingOffset.value,
-          sweepAngle = valueAngle,
-          useCenter = false,
-          size = arcSize,
-          style = Stroke(strokeWidth * 0.80f, cap = StrokeCap.Round))
+            topLeft = Offset(margin, margin),
+            color = colorScheme.primary,
+            startAngle = 270f + indefiniteLoadingOffset.value,
+            sweepAngle = valueAngle,
+            useCenter = false,
+            size = arcSize,
+            style = Stroke(strokeWidth * 0.80f, cap = StrokeCap.Round))
 
         drawArc(
-          topLeft = Offset(margin, margin),
-          color = colorScheme.primaryContainer,
-          startAngle = 270f + indefiniteLoadingOffset.value,
-          sweepAngle = min(indicatorAngle, valueAngle),
-          useCenter = false,
-          size = arcSize,
-          style =
-          Stroke(
-            strokeWidth * 0.70f,
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 15f), 0f),
-            cap = StrokeCap.Butt))
+            topLeft = Offset(margin, margin),
+            color = colorScheme.primaryContainer,
+            startAngle = 270f + indefiniteLoadingOffset.value,
+            sweepAngle = min(indicatorAngle, valueAngle),
+            useCenter = false,
+            size = arcSize,
+            style =
+                Stroke(
+                    strokeWidth * 0.70f,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 15f), 0f),
+                    cap = StrokeCap.Butt))
       }
     }
     Column(modifier = Modifier.align(Alignment.Center)) {
       Text(
-        formatStorageUnit(((stats?.storageUsed ?: 0) * currentValueScale.value).roundToLong()),
-        fontSize = 7.em,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center)
-      Text("${formatStorageUnit(((stats?.storageAvailable() ?: 0) * currentValueScale.value).roundToLong())} available", fontSize = 4.em, textAlign = TextAlign.Center)
+          formatStorageUnit(((stats?.storageUsed ?: 0) * currentValueScale.value).roundToLong()),
+          fontSize = 7.em,
+          fontWeight = FontWeight.SemiBold,
+          textAlign = TextAlign.Center)
+      Text(
+          "${formatStorageUnit(((stats?.storageAvailable() ?: 0) * currentValueScale.value).roundToLong())} available",
+          fontSize = 4.em,
+          textAlign = TextAlign.Center)
     }
   }
 }
-
 
 @Composable
 fun TravelCard(index: Int) {
   Card(Modifier.fillMaxWidth()) {
     Row(Modifier.padding(8.dp)) {
       Text("Travel $index", Modifier.align(Alignment.CenterVertically))
-      Spacer(
-        Modifier
-          .fillMaxWidth()
-          .weight(0.1f))
-      Text(
-        "${(index+1) * 244918795735983 % 27471} MiB",
-        Modifier.align(Alignment.CenterVertically))
+      Spacer(Modifier.fillMaxWidth().weight(0.1f))
+      Text("${(index+1) * 244918795735983 % 27471} MiB", Modifier.align(Alignment.CenterVertically))
       IconButton(onClick = {}, modifier = Modifier.testTag("editLimitButton")) {
         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
       }
@@ -304,52 +293,71 @@ fun TravelCard(index: Int) {
 }
 
 @Composable
-fun StorageLimitDialog(onDismissRequest: () -> Unit = {}, currentLimit: Long, onUpdate: (Long) -> Unit) {
+fun StorageLimitDialog(
+    onDismissRequest: () -> Unit = {},
+    currentLimit: Long,
+    onUpdate: (Long) -> Unit
+) {
   Dialog(onDismissRequest = onDismissRequest) {
     val text = remember { mutableStateOf("") }
     var selectedUnitIndex by remember { mutableIntStateOf(0) }
     val unitOptions = listOf("MiB", "GiB")
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
-    Box(modifier = Modifier.fillMaxWidth(1f).height(250.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.surface).testTag("storageLimitDialogBox")) {
-      Column(modifier = Modifier.padding(10.dp).fillMaxSize()) {
-        Text("Set storage limit", Modifier.align(Alignment.CenterHorizontally), fontWeight = FontWeight.Bold, fontSize = 5.em)
-        Spacer(Modifier.height(20.dp))
-        Text("Current limit: ${formatStorageUnit(currentLimit)}", modifier = Modifier.testTag("storageLimitDialogCurrentLimitText"))
-        Spacer(Modifier.height(10.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
-          TextField(
-            value = text.value,
-            modifier = Modifier.weight(0.5f).focusRequester(focusRequester).testTag("storageLimitDialogTextField"),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            onValueChange = { text.value = it },
-            label = { Text("New limit") })
-          Spacer(Modifier.width(5.dp))
-          SingleChoiceSegmentedButtonRow(Modifier.weight(0.5f)) {
-            unitOptions.forEachIndexed { index, label ->
-              SegmentedButton(
-                shape = SegmentedButtonDefaults.itemShape(
-                  index = index,
-                  count = unitOptions.size
-                ),
-                onClick = { selectedUnitIndex = index },
-                selected = index == selectedUnitIndex,
-                label = { Text(label) }
-              )
+    Box(
+        modifier =
+            Modifier.fillMaxWidth(1f)
+                .height(250.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .testTag("storageLimitDialogBox")) {
+          Column(modifier = Modifier.padding(10.dp).fillMaxSize()) {
+            Text(
+                "Set storage limit",
+                Modifier.align(Alignment.CenterHorizontally),
+                fontWeight = FontWeight.Bold,
+                fontSize = 5.em)
+            Spacer(Modifier.height(20.dp))
+            Text(
+                "Current limit: ${formatStorageUnit(currentLimit)}",
+                modifier = Modifier.testTag("storageLimitDialogCurrentLimitText"))
+            Spacer(Modifier.height(10.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+              TextField(
+                  value = text.value,
+                  modifier =
+                      Modifier.weight(0.5f)
+                          .focusRequester(focusRequester)
+                          .testTag("storageLimitDialogTextField"),
+                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                  onValueChange = { text.value = it },
+                  label = { Text("New limit") })
+              Spacer(Modifier.width(5.dp))
+              SingleChoiceSegmentedButtonRow(Modifier.weight(0.5f)) {
+                unitOptions.forEachIndexed { index, label ->
+                  SegmentedButton(
+                      shape =
+                          SegmentedButtonDefaults.itemShape(
+                              index = index, count = unitOptions.size),
+                      onClick = { selectedUnitIndex = index },
+                      selected = index == selectedUnitIndex,
+                      label = { Text(label) })
+                }
+              }
             }
+            Spacer(Modifier.height(10.dp))
+            Button(
+                onClick = {
+                  val value = text.value.toLongOrNull()
+                  if (value != null) {
+                    onUpdate(value * (1024L * 1024L shl selectedUnitIndex * 10))
+                  }
+                  onDismissRequest()
+                },
+                Modifier.fillMaxWidth().padding(10.dp).testTag("storageLimitDialogSaveButton")) {
+                  Text("Update")
+                }
           }
         }
-        Spacer(Modifier.height(10.dp))
-        Button(onClick = {
-          val value = text.value.toLongOrNull()
-          if (value != null) {
-            onUpdate(value * (1024L*1024L shl selectedUnitIndex * 10))
-          }
-          onDismissRequest()
-        }, Modifier.fillMaxWidth().padding(10.dp).testTag("storageLimitDialogSaveButton")) {
-          Text("Update")
-        }
-      }
-    }
   }
 }

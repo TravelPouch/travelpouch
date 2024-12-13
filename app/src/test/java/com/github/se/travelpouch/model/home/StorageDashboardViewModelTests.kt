@@ -1,46 +1,18 @@
 package com.github.se.travelpouch.model.home
 
-import android.net.Uri
-import android.util.Log
-import androidx.documentfile.provider.DocumentFile
-import com.github.se.travelpouch.helper.FileDownloader
-import com.github.se.travelpouch.model.travels.Location
-import com.github.se.travelpouch.model.travels.Participant
-import com.github.se.travelpouch.model.travels.Role
-import com.github.se.travelpouch.model.travels.TravelContainer
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.MockedStatic
-import org.mockito.Mockito.any
-import org.mockito.Mockito.anyString
-import org.mockito.Mockito.doAnswer
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.mockStatic
-import org.mockito.Mockito.spy
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class StorageDashboardViewModelTests {
 
-  @Before
-  fun setup() {
-
-  }
+  @Before fun setup() {}
 
   @Test
   fun formatStorageUnitAllUnits() {

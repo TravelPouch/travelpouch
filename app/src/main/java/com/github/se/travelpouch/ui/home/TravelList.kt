@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -374,17 +373,17 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
           Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
-              Text(
-                  text = travelContainer.title,
-                  style = MaterialTheme.typography.bodyMedium,
-                  fontWeight = FontWeight.Bold)
+                Text(
+                    text = travelContainer.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text =
-                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            .format(travelContainer.startTime.toDate()),
-                        style = MaterialTheme.typography.bodySmall)
+                  Text(
+                      text =
+                          SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                              .format(travelContainer.startTime.toDate()),
+                      style = MaterialTheme.typography.bodySmall)
                   Icon(
                       imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                       contentDescription = null)
@@ -394,9 +393,10 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
           Spacer(modifier = Modifier.height(4.dp))
 
           // Description
-          Text(text = travelContainer.description,
+          Text(
+              text = travelContainer.description,
               style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Normal)
+              fontWeight = FontWeight.Normal)
 
           // Location Name
           Text(
