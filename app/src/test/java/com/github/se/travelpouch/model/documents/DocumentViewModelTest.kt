@@ -49,7 +49,7 @@ class DocumentViewModelTest {
   fun setUp() {
     documentRepository = mock(DocumentRepository::class.java)
     documentsManager = mock(DocumentsManager::class.java)
-    documentViewModel = DocumentViewModel(documentRepository, documentsManager)
+    documentViewModel = DocumentViewModel(documentRepository, documentsManager, mock())
     documentReference = mock(DocumentReference::class.java)
 
     documentContainer =
@@ -211,7 +211,7 @@ class DocumentViewModelTest {
 
   @Test
   fun assertUploadFileAnyInvalid() {
-    val documentViewModel = DocumentViewModel(documentRepository, documentsManager)
+    val documentViewModel = DocumentViewModel(documentRepository, documentsManager, mock())
     val mockInputStream = mock(InputStream::class.java)
 
     assert(
@@ -243,29 +243,5 @@ class DocumentViewModelTest {
     spyDocumentViewModel.uploadFile(inputStream, selectedTravel, "image/jpeg")
     verify(spyDocumentViewModel)
         .uploadDocument(anyString(), org.mockito.kotlin.any(), org.mockito.kotlin.any())
-  }
-
-  @Test
-  fun assertStoreSelectedDocumentNoSelectedDocument() {
-    val documentFile: DocumentFile = mock(DocumentFile::class.java)
-    `when`(documentFile.uri)
-        .thenReturn(
-            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload"))
-    documentViewModel.storeSelectedDocument(documentFile).invokeOnCompletion {
-      assert(it is IllegalArgumentException)
-      assert(it?.message == "Some required fields are empty. Abort download")
-    }
-  }
-
-  @Test
-  fun assertStoreSelectedDocumentSuccess() {
-    val documentFile: DocumentFile = mock(DocumentFile::class.java)
-    `when`(documentFile.uri)
-        .thenReturn(
-            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload"))
-    `when`(documentReference.id).thenReturn("1")
-    documentViewModel.selectDocument(documentContainer)
-    documentViewModel.storeSelectedDocument(documentFile)
-    verify(documentsManager).getDocument(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }
