@@ -219,7 +219,7 @@ class DocumentUpload {
 
         val newDocumentRefId =
             firestore
-                .collection("allTravels/w2HGCwaJ4KgcXJ5nVxkF/documents")
+                .collection("allTravels/skibidiJ4KgcXJ5nVxkF/documents")
                 .get()
                 .await()
                 .documents

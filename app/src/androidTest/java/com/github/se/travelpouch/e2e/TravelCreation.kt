@@ -86,7 +86,7 @@ class TravelCreation {
       firestore.terminate().await()
       auth.signOut()
       auth
-          .signInWithEmailAndPassword("travelpouchtest2@gmail.com", "travelpouchtest2password")
+          .signInWithEmailAndPassword("example1@example.com", "password1")
           .await()
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
