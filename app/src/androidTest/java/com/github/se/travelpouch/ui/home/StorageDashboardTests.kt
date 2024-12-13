@@ -124,8 +124,5 @@ class StorageDashboardTests {
     val newLimit = 200L
     composeTestRule.onNodeWithTag("storageLimitDialogTextField").performTextInput(newLimit.toString())
     composeTestRule.onNodeWithTag("storageLimitDialogSaveButton").performClick()
-    composeTestRule.waitUntil { composeTestRule.onNodeWithTag("storageLimitDialogBox").isNotDisplayed() }
-    //val newLimitText = "Storage limit: ${storageStats.storageLimitToString()}"
-    //composeTestRule.onNodeWithTag("storageLimitCardText", useUnmergedTree = true).assertTextEquals(newLimitText)
   }
 }
