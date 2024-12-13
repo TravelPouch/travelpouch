@@ -122,6 +122,7 @@ fun StorageDashboard(
               StorageLimitDialog(
                   onDismissRequest = { storageLimitDialogOpened.value = false },
                   currentLimit = storageStats?.storageLimit ?: 0,
+                usedStorage = storageStats?.storageUsed ?: 0,
                   onUpdate = {
                     storageDashboardViewModel.setStorageStats(
                         storageStats!!.copy(storageLimit = it))
@@ -240,6 +241,7 @@ fun CircularStorageDiagram(
 
         val valueAngle = currentValue.value * 360f
         val indicatorAngle = currentIndicator.value * 360f
+        val effectiveIndicatorAngle = min(indicatorAngle, valueAngle)
 
         drawArc(
             topLeft = Offset(margin, margin),
@@ -253,8 +255,9 @@ fun CircularStorageDiagram(
         drawArc(
             topLeft = Offset(margin, margin),
             color = colorScheme.primaryContainer,
-            startAngle = 270f + indefiniteLoadingOffset.value,
-            sweepAngle = min(indicatorAngle, valueAngle),
+            startAngle =
+                270f + valueAngle - effectiveIndicatorAngle + indefiniteLoadingOffset.value,
+            sweepAngle = effectiveIndicatorAngle,
             useCenter = false,
             size = arcSize,
             style =
@@ -296,6 +299,7 @@ fun TravelCard(index: Int) {
 fun StorageLimitDialog(
     onDismissRequest: () -> Unit = {},
     currentLimit: Long,
+    usedStorage: Long,
     onUpdate: (Long) -> Unit
 ) {
   Dialog(onDismissRequest = onDismissRequest) {
@@ -303,6 +307,9 @@ fun StorageLimitDialog(
     var selectedUnitIndex by remember { mutableIntStateOf(0) }
     val unitOptions = listOf("MiB", "GiB")
     val focusRequester = remember { FocusRequester() }
+    val longOrNull = text.value.toLongOrNull()
+    val newValue = if (longOrNull != null) longOrNull * (1024L * 1024L shl selectedUnitIndex * 10) else 0
+    val validInput = newValue >= usedStorage && longOrNull != null
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
     Box(
         modifier =
@@ -354,7 +361,11 @@ fun StorageLimitDialog(
                   }
                   onDismissRequest()
                 },
-                Modifier.fillMaxWidth().padding(10.dp).testTag("storageLimitDialogSaveButton")) {
+                enabled = validInput,
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(10.dp)
+                        .testTag("storageLimitDialogSaveButton")) {
                   Text("Update")
                 }
           }
