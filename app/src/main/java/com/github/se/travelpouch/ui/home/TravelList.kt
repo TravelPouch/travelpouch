@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
@@ -27,8 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material3.Card
@@ -257,13 +258,13 @@ fun TravelListScreen(
                           }
                         } else {
                           item {
-                            Row(
+                            Column(
                                 modifier =
                                     Modifier.fillParentMaxSize()
-                                        .padding(top = 32.dp, start = 16.dp, end = 0.dp)
+                                        .padding(top = 32.dp, start = 0.dp, end = 0.dp)
                                         .padding(pd),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.Top) {
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center) {
                                   AnimatedVisibility(visible = isLoading.value) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.testTag("loadingSpinner").size(100.dp),
@@ -274,14 +275,42 @@ fun TravelListScreen(
                                   }
 
                                   Spacer(modifier = Modifier.fillMaxWidth(0.1f))
-
                                   Text(
                                       modifier = Modifier.testTag("emptyTravelPrompt"),
-                                      text = "You have no travels yet.",
+                                      text = "Create your first travel!",
                                       style =
-                                          MaterialTheme.typography.bodyLarge.copy(
+                                          MaterialTheme.typography.headlineMedium.copy(
                                               fontWeight = FontWeight.Bold),
                                       color = MaterialTheme.colorScheme.onBackground)
+                                }
+                            // Indicator to create a travel for new users
+                            Box(
+                                modifier =
+                                    Modifier.fillMaxSize()
+                                        .padding(bottom = 16.dp, end = 16.dp)
+                                        .offset(
+                                            y = (-60).dp), // Adjust padding to avoid overlap with
+                                // FAB
+                                contentAlignment = Alignment.BottomEnd // Align to the bottom right
+                                ) {
+                                  Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Create New Travel",
+                                        style =
+                                            MaterialTheme.typography.bodySmall.copy(
+                                                fontWeight = FontWeight.Bold))
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        contentDescription = "Indicator Arrow",
+                                        modifier =
+                                            Modifier.size(40.dp)
+                                                .graphicsLayer(
+                                                    rotationZ = 90f) // Rotate arrow to point down
+                                                .offset(
+                                                    y = (-30).dp) // Adjust position to align with
+                                        // FAB
+                                        )
+                                  }
                                 }
                           }
                         }
@@ -345,17 +374,17 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
           Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    text =
-                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            .format(travelContainer.startTime.toDate()),
-                    style = MaterialTheme.typography.bodySmall)
+              Text(
+                  text = travelContainer.title,
+                  style = MaterialTheme.typography.bodyMedium,
+                  fontWeight = FontWeight.Bold)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                  Text(
-                      text = travelContainer.title,
-                      style = MaterialTheme.typography.bodySmall,
-                      fontWeight = FontWeight.Bold)
+                    Text(
+                        text =
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            .format(travelContainer.startTime.toDate()),
+                        style = MaterialTheme.typography.bodySmall)
                   Icon(
                       imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                       contentDescription = null)
@@ -365,13 +394,15 @@ fun TravelItem(travelContainer: TravelContainer, onClick: () -> Unit) {
           Spacer(modifier = Modifier.height(4.dp))
 
           // Description
-          Text(text = travelContainer.description, style = MaterialTheme.typography.bodyMedium)
+          Text(text = travelContainer.description,
+              style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Normal)
 
           // Location Name
           Text(
               text = travelContainer.location.name,
               style = MaterialTheme.typography.bodySmall,
-              fontWeight = FontWeight.Light)
+              fontWeight = FontWeight.ExtraLight)
         }
       }
 }
@@ -429,7 +460,7 @@ fun ResizableStowableMapWithGoogleMap(
                   clip = true
                 }
                 .height(latchDp)
-                .background(MaterialTheme.colorScheme.tertiary)
+                .background(MaterialTheme.colorScheme.errorContainer)
                 .draggable(
                     orientation = Orientation.Vertical,
                     state =
@@ -438,7 +469,7 @@ fun ResizableStowableMapWithGoogleMap(
                               delta, density, mapHeight, maxHeight, minHeight, belowThreshold)
                         })) {
           Icon(
-              imageVector = Icons.Default.StopCircle,
+              imageVector = Icons.Default.Adjust,
               contentDescription = "MapLatch",
               modifier = Modifier.align(Alignment.Center))
         }

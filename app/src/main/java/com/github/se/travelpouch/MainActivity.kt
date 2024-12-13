@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.github.se.travelpouch.model.activity.ActivityViewModel
-import com.github.se.travelpouch.model.activity.map.DirectionsViewModel
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
@@ -85,12 +84,6 @@ class MainActivity : ComponentActivity() {
     val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
     val storageDashboardViewModel = viewModel<StorageDashboardViewModel>()
 
-    val directionsViewModel: DirectionsViewModel =
-        viewModel(
-            factory =
-                DirectionsViewModel.provideFactory(
-                    BuildConfig.MAPS_API_KEY) // Inject the API key for the DirectionsViewModel
-            )
     NavHost(navController = navController, startDestination = Route.DEFAULT) {
       navigation(
           startDestination = Screen.AUTH,
@@ -122,11 +115,16 @@ class MainActivity : ComponentActivity() {
               profileModelView)
         }
 
-        composable(Screen.ADD_ACTIVITY) { AddActivityScreen(navigationActions, activityModelView) }
-        composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView) }
+        composable(Screen.ADD_ACTIVITY) {
+          AddActivityScreen(navigationActions, activityModelView, eventViewModel = eventsViewModel)
+        }
+        composable(Screen.EDIT_ACTIVITY) { EditActivity(navigationActions, activityModelView, locationViewModel) }
         composable(Screen.ADD_TRAVEL) {
           AddTravelScreen(
-              listTravelViewModel, navigationActions, profileModelView = profileModelView)
+              listTravelViewModel,
+              navigationActions,
+              profileModelView = profileModelView,
+              eventViewModel = eventsViewModel)
         }
         composable(Screen.EDIT_TRAVEL_SETTINGS) {
           EditTravelSettingsScreen(
@@ -138,12 +136,16 @@ class MainActivity : ComponentActivity() {
         }
 
         composable(Screen.ACTIVITIES_MAP) {
-          ActivitiesMapScreen(activityModelView, navigationActions, directionsViewModel)
+          ActivitiesMapScreen(activityModelView, navigationActions)
         }
 
         composable(Screen.PARTICIPANT_LIST) {
           ParticipantListScreen(
-              listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+              listTravelViewModel,
+              navigationActions,
+              notificationViewModel,
+              profileModelView,
+              eventsViewModel)
         }
         composable(Screen.DOCUMENT_LIST) {
           DocumentListScreen(
@@ -157,7 +159,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.DOCUMENT_PREVIEW) {
           DocumentPreview(documentViewModel, navigationActions)
         }
-        composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel) }
+        composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel, navigationActions) }
 
         composable(Screen.PROFILE) { ProfileScreen(navigationActions, profileModelView) }
         composable(Screen.EDIT_PROFILE) {

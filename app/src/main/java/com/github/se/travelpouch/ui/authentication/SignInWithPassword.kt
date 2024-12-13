@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,19 @@ fun SignInWithPassword(
   var email by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
   val methodChosen = rememberSaveable { mutableStateOf(false) }
+  val waitUntilProfileFetched = rememberSaveable { mutableStateOf(false) }
+
+  // Navigate to the next screen after the profile is fetched
+  LaunchedEffect(waitUntilProfileFetched.value) {
+    if (waitUntilProfileFetched.value) {
+      if (profileModelView.profile.value.needsOnboarding) {
+        Toast.makeText(context, "Welcome to TravelPouch!", Toast.LENGTH_LONG).show()
+        navigationActions.navigateTo(Screen.ONBOARDING)
+      } else {
+        navigationActions.navigateTo(Screen.TRAVEL_LIST)
+      }
+    }
+  }
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
@@ -112,24 +126,26 @@ fun SignInWithPassword(
                           "User signed in: ${user?.uid} ${user?.email} ${user?.displayName} ${user?.isAnonymous}")
 
                       GlobalScope.launch {
-                        profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                        profileModelView.initAfterLogin {
+                          travelViewModel.initAfterLogin()
+                          waitUntilProfileFetched.value = true
+                        }
                       }
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-                      navigationActions.navigateTo(Screen.TRAVEL_LIST)
                     },
                     onFailure = { task ->
                       methodChosen.value = false
                       Log.w(TAG, "createUserWithEmail:failure", task.exception)
                       Toast.makeText(
                               context,
-                              "Signing in failed.",
+                              "Signup in failed.",
                               Toast.LENGTH_SHORT,
                           )
                           .show()
                     })
               }) {
-                Text("Sign in")
+                Text("Sign up")
               }
 
           Spacer(Modifier.padding(5.dp))
@@ -149,13 +165,13 @@ fun SignInWithPassword(
                       Log.d("SignInScreen", "User logged in: ${user?.displayName}")
 
                       GlobalScope.launch {
-                        profileModelView.initAfterLogin { travelViewModel.initAfterLogin() }
+                        profileModelView.initAfterLogin {
+                          travelViewModel.initAfterLogin()
+                          waitUntilProfileFetched.value = true
+                        }
                       }
 
                       Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
-                      if (profileModelView.profile.value.needsOnboarding) {
-                        navigationActions.navigateTo(Screen.ONBOARDING)
-                      } else navigationActions.navigateTo(Screen.TRAVEL_LIST)
                     },
                     onFailure = { task ->
                       Log.w(TAG, "LoginWithEmailAndPassword:failure", task.exception)

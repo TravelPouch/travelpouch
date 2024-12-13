@@ -1,6 +1,7 @@
 package com.github.se.travelpouch.model.events
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -15,7 +16,7 @@ class EventModelViewUnitTest {
   private lateinit var repository: EventRepository
   private lateinit var eventViewModel: EventViewModel
 
-  val event = Event("1", EventType.NEW_DOCUMENT, Timestamp(0, 0), "it", "it", null, null)
+  val event = Event("1", EventType.NEW_ACTIVITY, Timestamp(0, 0), "it", "it")
 
   @Before
   fun setUp() {
@@ -30,14 +31,13 @@ class EventModelViewUnitTest {
   }
 
   @Test
-  fun addEventTest() {
-    eventViewModel.addEvent(event)
-    verify(repository).addEvent(anyOrNull(), anyOrNull(), anyOrNull())
-  }
-
-  @Test
   fun getNewUidTest() {
-    `when`(repository.getNewUid()).thenReturn("uid")
-    assertThat(eventViewModel.getNewUid(), `is`("uid"))
+    val documentReference: DocumentReference = mock()
+
+    `when`(repository.getNewDocumentReferenceForNewTravel(anyOrNull()))
+        .thenReturn(documentReference)
+    assertThat(
+        eventViewModel.getNewDocumentReferenceForNewTravel("qwertzuiopasdfghjkly"),
+        `is`(documentReference))
   }
 }
