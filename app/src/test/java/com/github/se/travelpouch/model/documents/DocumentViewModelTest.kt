@@ -1,7 +1,9 @@
 package com.github.se.travelpouch.model.documents
 
+import android.net.Uri
 import android.util.Log
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.github.se.travelpouch.model.travels.Location
@@ -34,9 +36,12 @@ import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowLog
+import java.lang.Thread.sleep
 
 @RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
@@ -178,6 +183,18 @@ class DocumentViewModelTest {
       verify(documentRepository).getDocuments(anyOrNull(), anyOrNull())
       logMock.verify { Log.e("DocumentsViewModel", errorMessage, exception) }
     }
+  }
+
+  @Test
+  fun setSaveDocumentFolder_nullUri() = runTest {
+    whenever(dataStore.edit { any() }).thenAnswer { fail() }
+      documentViewModel.setSaveDocumentFolder(null)
+    }
+
+  @Test
+  fun setSaveDocumentFolder_notNullUri() = runTest {
+    documentViewModel.setSaveDocumentFolder(Uri.EMPTY)
+    org.mockito.kotlin.verify(dataStore, times(1)).edit(argumentCaptor<suspend (Preferences) -> Unit>().capture())
   }
 
   @Test
