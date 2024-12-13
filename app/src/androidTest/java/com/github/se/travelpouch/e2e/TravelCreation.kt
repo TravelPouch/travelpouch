@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.e2e
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -11,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.test.espresso.intent.rule.IntentsTestRule
 import com.github.se.travelpouch.MainActivity
 import com.github.se.travelpouch.di.AppModule
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +22,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
@@ -32,9 +35,16 @@ import org.junit.Test
 @UninstallModules(AppModule::class)
 class TravelCreation {
 
+  private val DEFAULT_TIMEOUT = 10000L
+
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @OptIn(ExperimentalTestApi::class)
+  @get:Rule(order = 1)
+  val composeTestRule =
+      createAndroidComposeRule<MainActivity>(effectContext = Dispatchers.Main.immediate)
+
+  @get:Rule(order = 2) val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
   @Inject lateinit var firestore: FirebaseFirestore
   @Inject lateinit var auth: FirebaseAuth
@@ -42,6 +52,32 @@ class TravelCreation {
   @Before
   fun setUp() {
     hiltRule.inject()
+
+    // seed DB with existing trave @Inject lateinit var auth: FirebaseAuthl and user
+    runBlocking {
+      val uid =
+          auth
+              .createUserWithEmailAndPassword("example1@example.com", "password1")
+              .await()
+              .user!!
+              .uid
+
+      firestore
+          .collection("userslist")
+          .document(uid)
+          .set(
+              mapOf(
+                  "email" to "example1@example.com",
+                  "friends" to emptyList<String>(),
+                  "fsUid" to uid,
+                  "name" to "Example",
+                  "username" to "example1",
+                  "userTravelList" to listOf("w2HGCwaJ4KgcXJ5nVxkF"),
+                  "needsOnboarding" to true))
+          .await()
+
+      auth.signOut()
+    }
   }
 
   @After
@@ -71,20 +107,20 @@ class TravelCreation {
 
         composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign up").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest2@gmail.com")
-        composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest2password")
-        composeTestRule.onNodeWithText("Sign up").performClick()
+        composeTestRule.onNodeWithTag("emailField").performTextInput("example1@example.com")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("password1")
+        composeTestRule.onNodeWithText("Log in").performClick()
 
         // Skip onboarding
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("OnboardingScreen", useUnmergedTree = true).isDisplayed()
         }
         composeTestRule.onNodeWithTag("SkipButton").performClick()
 
         // wait until we are in the travel list screen
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true).isDisplayed()
         }
 
@@ -96,7 +132,7 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("createTravelFab").performClick()
 
         // wait until we are in the screen to add a travel
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithTag("travelTitle", useUnmergedTree = true).isDisplayed()
         }
 
@@ -119,7 +155,7 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("inputTravelLocation").performTextInput("L")
 
         // wait to have La paz displayed
-        composeTestRule.waitUntil(timeoutMillis = 4000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule.onNodeWithText("La Paz, Bolivia").isDisplayed()
         }
 
@@ -137,7 +173,7 @@ class TravelCreation {
         composeTestRule.onNodeWithTag("createTravelFab").assertIsDisplayed()
 
         // verify that the empty travel prompt does not exist since we saved a travel
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
+        composeTestRule.waitUntil(timeoutMillis = DEFAULT_TIMEOUT) {
           composeTestRule
               .onNodeWithTag("emptyTravelPrompt", useUnmergedTree = true)
               .isNotDisplayed()
