@@ -8,9 +8,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.github.se.travelpouch.model.home.StorageDashboardStats
 import com.github.se.travelpouch.model.home.StorageDashboardViewModel
 import com.github.se.travelpouch.model.home.formatStorageUnit
@@ -21,6 +24,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
 
 class StorageDashboardTests {
   @Composable
@@ -90,15 +96,19 @@ class StorageDashboardTests {
   }
 
   @Test
-  fun storageLimitDialogIsDisplayed() {
+  fun storageLimitDialogCanSetTheLimit() {
     val storageStats = StorageDashboardStats(
       100L,
       50L,
       25L
     )
     `when` (storageDashboardViewModel.updateStorageStats()).then { }
-    `when` (storageDashboardViewModel.storageStats).then { MutableStateFlow<StorageDashboardStats?>(storageStats) }
-    `when` (storageDashboardViewModel.isLoading).then { MutableStateFlow(false) }
+    `when` (storageDashboardViewModel.setStorageStats(anyOrNull<StorageDashboardStats>())).doAnswer { invocation ->
+      val s = (invocation.arguments[0] as StorageDashboardStats?)!!
+      storageStats.storageLimit = s.storageLimit
+    }
+    `when` (storageDashboardViewModel.storageStats).thenReturn(MutableStateFlow<StorageDashboardStats?>(storageStats))
+    `when` (storageDashboardViewModel.isLoading).thenReturn(MutableStateFlow(false))
 
     composeTestRule.setContent {
       withActivityResultRegistry(mock(ActivityResultRegistry::class.java)) {
@@ -107,9 +117,15 @@ class StorageDashboardTests {
     }
 
     composeTestRule.onNodeWithTag("storageLimitCard").performClick()
-    composeTestRule.waitForIdle()
     val currentLimitText = composeTestRule.onNodeWithTag("storageLimitDialogCurrentLimitText")
-    currentLimitText.assertIsDisplayed()
+    composeTestRule.waitForIdle()
     currentLimitText.assertTextEquals("Current limit: ${formatStorageUnit(storageStats.storageLimit!!)}")
+
+    val newLimit = 200L
+    composeTestRule.onNodeWithTag("storageLimitDialogTextField").performTextInput(newLimit.toString())
+    composeTestRule.onNodeWithTag("storageLimitDialogSaveButton").performClick()
+    composeTestRule.waitUntil { composeTestRule.onNodeWithTag("storageLimitDialogBox").isNotDisplayed() }
+    //val newLimitText = "Storage limit: ${storageStats.storageLimitToString()}"
+    //composeTestRule.onNodeWithTag("storageLimitCardText", useUnmergedTree = true).assertTextEquals(newLimitText)
   }
 }

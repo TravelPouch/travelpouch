@@ -23,7 +23,7 @@ fun formatStorageUnit(number: Long): String {
 }
 
 data class StorageDashboardStats(
-  val storageLimit: Long?,
+  var storageLimit: Long?,
   val storageUsed: Long,
   val storageReclaimable: Long,
 ) {
@@ -36,7 +36,7 @@ data class StorageDashboardStats(
     if (storageLimit == null || storageLimit == 0L) {
       return 0f
     }
-    return min((storageUsed.toFloat() / storageLimit.toFloat()), 1f)
+    return min((storageUsed.toFloat() / storageLimit!!.toFloat()), 1f)
   }
 
   /**
@@ -48,18 +48,18 @@ data class StorageDashboardStats(
     if (storageLimit == null || storageLimit == 0L) {
       return 0f
     }
-    return min((storageReclaimable.toFloat() / storageLimit.toFloat()), 1f)
+    return min((storageReclaimable.toFloat() / storageLimit!!.toFloat()), 1f)
   }
 
   fun storageLimitToString(): String {
-    return if (storageLimit != null) formatStorageUnit(storageLimit) else "Unlimited"
+    return if (storageLimit != null) formatStorageUnit(storageLimit!!) else "Unlimited"
   }
 
   fun storageAvailable(): Long {
     if (storageLimit == null) {
       return -1
     }
-    return max(0, storageLimit - storageUsed)
+    return max(0, storageLimit!! - storageUsed)
   }
 }
 

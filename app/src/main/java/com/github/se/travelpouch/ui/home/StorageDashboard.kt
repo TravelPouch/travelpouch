@@ -129,7 +129,7 @@ fun StorageDashboard(storageDashboardViewModel: StorageDashboardViewModel, navig
               storageLimitDialogOpened.value = true
             }, modifier = Modifier.testTag("storageLimitCard")) {
               AnimatedVisibility(!isLoading, enter = fadeIn(), exit = fadeOut()) {
-                Row(modifier = Modifier.padding(8f.dp)) { Text("Storage limit: ${storageStats?.storageLimitToString() ?: "..."}") }
+                Row(modifier = Modifier.padding(8f.dp)) { Text("Storage limit: ${storageStats?.storageLimitToString() ?: "..."}", modifier = Modifier.testTag("storageLimitCardText")) }
               }
             }
           }
@@ -311,7 +311,7 @@ fun StorageLimitDialog(onDismissRequest: () -> Unit = {}, currentLimit: Long, on
     val unitOptions = listOf("MiB", "GiB")
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
-    Box(modifier = Modifier.fillMaxWidth(1f).height(250.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.surface)) {
+    Box(modifier = Modifier.fillMaxWidth(1f).height(250.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.surface).testTag("storageLimitDialogBox")) {
       Column(modifier = Modifier.padding(10.dp).fillMaxSize()) {
         Text("Set storage limit", Modifier.align(Alignment.CenterHorizontally), fontWeight = FontWeight.Bold, fontSize = 5.em)
         Spacer(Modifier.height(20.dp))
@@ -320,7 +320,7 @@ fun StorageLimitDialog(onDismissRequest: () -> Unit = {}, currentLimit: Long, on
         Row(modifier = Modifier.fillMaxWidth()) {
           TextField(
             value = text.value,
-            modifier = Modifier.weight(0.5f).focusRequester(focusRequester),
+            modifier = Modifier.weight(0.5f).focusRequester(focusRequester).testTag("storageLimitDialogTextField"),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = { text.value = it },
             label = { Text("New limit") })
@@ -346,7 +346,7 @@ fun StorageLimitDialog(onDismissRequest: () -> Unit = {}, currentLimit: Long, on
             onUpdate(value * (1024L*1024L shl selectedUnitIndex * 10))
           }
           onDismissRequest()
-        }, Modifier.fillMaxWidth().padding(10.dp)) {
+        }, Modifier.fillMaxWidth().padding(10.dp).testTag("storageLimitDialogSaveButton")) {
           Text("Update")
         }
       }
