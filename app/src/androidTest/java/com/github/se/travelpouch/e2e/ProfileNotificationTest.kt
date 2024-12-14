@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import com.github.se.travelpouch.MainActivity
@@ -236,5 +237,85 @@ class ProfileNotificationTest {
         // Go to profile screen
         composeTestRule.onNodeWithTag("menuFab").performClick()
         composeTestRule.onNodeWithText("Profile").performClick()
+
+        // add a friend, which is example6@example.com
+        composeTestRule.onNodeWithTag("settingsButton").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithText("Add Friend").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithTag("addingFriendField", useUnmergedTree = true)
+            .assertIsDisplayed()
+            .performTextClearance()
+        composeTestRule
+            .onNodeWithTag("addingFriendField", useUnmergedTree = true)
+            .performTextInput("example6@example.com")
+        composeTestRule.onNodeWithTag("addingFriendButton").assertIsDisplayed().performClick()
+
+        composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+
+        composeTestRule.onNodeWithTag("menuFab").performClick()
+        composeTestRule.onNodeWithText("Log out").performClick()
+
+        // After log out, we log in with example6@example.com a accept friend invitation
+        composeTestRule.onNodeWithText("Sign in with email and password").performClick()
+        composeTestRule.onNodeWithTag("emailField").performTextInput("example6@example.com")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("password6")
+        composeTestRule.onNodeWithText("Log in").performClick()
+
+        // Go to the travel and verify that example5@example.com was indeed added to both users
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithText("Test Notification Profile").isDisplayed()
+        }
+
+        composeTestRule
+            .onNodeWithText("Test Notification Profile")
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.onNodeWithTag("settingsButton").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("plusButton").performClick()
+        composeTestRule.onNodeWithText("Manage participants", useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithText("example5@example.com").assertIsDisplayed()
+        composeTestRule.onNodeWithText("example6@example.com").assertIsDisplayed()
+
+        // Return to the travelList screen to accept friend notification
+        composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+
+        composeTestRule.onNodeWithTag("menuFab").performClick()
+        composeTestRule.onNodeWithText("Notifications").performClick()
+        composeTestRule
+            .onNodeWithText("example5@example.com wants to be your friend")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("ACCEPT").assertIsDisplayed().performClick()
+
+        composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("menuFab").performClick()
+        composeTestRule.onNodeWithText("Profile").performClick()
+
+        composeTestRule.onNodeWithText("example5@example.com").assertIsDisplayed()
+
+        // Log out
+        composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed().performClick()
+
+        composeTestRule.onNodeWithTag("menuFab").performClick()
+        composeTestRule.onNodeWithText("Log out").performClick()
+
+        // Connect with example5@example.com to verify that example6@exmaple.com is indeed our
+        // friend
+        composeTestRule.onNodeWithText("Sign in with email and password").performClick()
+        composeTestRule.onNodeWithTag("emailField").performTextInput("example5@example.com")
+        composeTestRule.onNodeWithTag("passwordField").performTextInput("password5")
+        composeTestRule.onNodeWithText("Log in").performClick()
+
+        // We verify that we still have the travel displayed
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithText("Test Notification Profile").isDisplayed()
+        }
+
+        composeTestRule.onNodeWithTag("menuFab").performClick()
+        composeTestRule.onNodeWithText("Profile").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithText("example6@example.com").assertIsDisplayed()
       }
 }
