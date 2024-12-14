@@ -85,9 +85,7 @@ class TravelCreation {
     runBlocking {
       firestore.terminate().await()
       auth.signOut()
-      auth
-          .signInWithEmailAndPassword("example1@example.com", "password1")
-          .await()
+      auth.signInWithEmailAndPassword("example1@example.com", "password1").await()
       val uid = auth.currentUser!!.uid
       auth.currentUser!!.delete().await()
     }
