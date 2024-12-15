@@ -88,7 +88,7 @@ fun SignInScreen(
                 travelViewModel.initAfterLogin()
                 waitUntilProfileFetched.value = true
               }
-              isLoading.value = false
+              // isLoading.value = false
             }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
@@ -108,8 +108,10 @@ fun SignInScreen(
     if (waitUntilProfileFetched.value) {
       if (profileModelView.profile.value.needsOnboarding) {
         Toast.makeText(context, "Welcome to TravelPouch!", Toast.LENGTH_LONG).show()
+        isLoading.value = false
         navigationActions.navigateTo(Screen.ONBOARDING)
       } else {
+        isLoading.value = false
         navigationActions.navigateTo(Screen.TRAVEL_LIST)
       }
     }
@@ -214,7 +216,7 @@ fun SignInScreen(
                   }
                 }
                 // navigationActions.navigateTo(Screen.TRAVEL_LIST)
-                isLoading.value = false
+                // isLoading.value = false
               } catch (refreshError: Exception) {
                 Log.e(
                     "SignInScreen",
