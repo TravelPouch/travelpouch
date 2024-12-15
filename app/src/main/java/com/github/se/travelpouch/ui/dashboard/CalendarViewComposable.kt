@@ -77,7 +77,7 @@ fun CustomCalendarView(
               .background(
                   MaterialTheme.colorScheme
                       .background) // Set a distinct background color for the Days of the week
-              .padding(vertical = 4.dp, horizontal = 4.dp),
+              .padding(4.dp),
       horizontalAlignment = Alignment.CenterHorizontally) {
         // Days of the week titles
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -162,7 +162,7 @@ fun CalendarView(
   Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
     // Header with navigation arrows
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
           // Previous month arrow
