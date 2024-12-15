@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,14 +75,17 @@ fun CustomCalendarView(
           modifier
               .fillMaxWidth()
               .background(MaterialTheme.colorScheme.background) // Set a distinct background color for the Days of the week
-              .padding(8.dp)) {
+              .padding(vertical = 4.dp,horizontal = 4.dp),
+      horizontalAlignment = Alignment.CenterHorizontally) {
         // Days of the week titles
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
           listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").forEach { day ->
-            BasicText(
+            Text(
                 text = day,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .weight(1f, fill = false)
             )
           }
         }
@@ -88,7 +93,7 @@ fun CustomCalendarView(
 
   LazyVerticalGrid(
       columns = GridCells.Fixed(7),
-      modifier = modifier.fillMaxWidth().testTag("customCalendarGrid").background(MaterialTheme.colorScheme.onPrimary),
+      modifier = modifier.fillMaxWidth().testTag("customCalendarGrid").background(MaterialTheme.colorScheme.background),
       horizontalArrangement = Arrangement.Center) {
         // Add empty spaces for days before the start of the month
         items(firstDayOfWeek) { Spacer(modifier = Modifier.size(40.dp)) }
@@ -113,8 +118,8 @@ fun CustomCalendarView(
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
                             color =
-                                if (isSelected) Color.White
-                                else Color.Black))
+                                if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.onBackground),)
 
                 if (isEventDay) {
                   Box(
@@ -149,7 +154,7 @@ fun CalendarView(
   Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
     // Header with navigation arrows
     Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp,horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
           // Previous month arrow
@@ -164,7 +169,7 @@ fun CalendarView(
               }
 
           // Month and year text
-          BasicText(
+          Text(
               text =
                   "${
                     currentMonth.getDisplayName(
