@@ -267,17 +267,18 @@ fun TravelListScreen(
                                         .padding(pd),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center) {
-                                  AnimatedVisibility(visible = isLoading.value,
+                                  AnimatedVisibility(
+                                      visible = isLoading.value,
                                       enter = fadeIn(animationSpec = tween(150)),
-                                         exit= fadeOut(animationSpec = tween(150) )
-                                  ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.testTag("loadingSpinner").size(100.dp),
-                                        color = MaterialTheme.colorScheme.primary,
-                                        strokeWidth = 5.dp,
-                                        strokeCap = StrokeCap.Round,
-                                    )
-                                  }
+                                      exit = fadeOut(animationSpec = tween(150))) {
+                                        CircularProgressIndicator(
+                                            modifier =
+                                                Modifier.testTag("loadingSpinner").size(100.dp),
+                                            color = MaterialTheme.colorScheme.primary,
+                                            strokeWidth = 5.dp,
+                                            strokeCap = StrokeCap.Round,
+                                        )
+                                      }
 
                                   Spacer(modifier = Modifier.fillMaxWidth(0.1f))
                                   Text(
