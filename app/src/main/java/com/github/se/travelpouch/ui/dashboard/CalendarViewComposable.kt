@@ -74,8 +74,10 @@ fun CustomCalendarView(
       modifier =
           modifier
               .fillMaxWidth()
-              .background(MaterialTheme.colorScheme.background) // Set a distinct background color for the Days of the week
-              .padding(vertical = 4.dp,horizontal = 4.dp),
+              .background(
+                  MaterialTheme.colorScheme
+                      .background) // Set a distinct background color for the Days of the week
+              .padding(vertical = 4.dp, horizontal = 4.dp),
       horizontalAlignment = Alignment.CenterHorizontally) {
         // Days of the week titles
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -84,16 +86,18 @@ fun CustomCalendarView(
                 text = day,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .weight(1f, fill = false)
-            )
+                modifier = Modifier.weight(1f, fill = false))
           }
         }
       }
 
   LazyVerticalGrid(
       columns = GridCells.Fixed(7),
-      modifier = modifier.fillMaxWidth().testTag("customCalendarGrid").background(MaterialTheme.colorScheme.background),
+      modifier =
+          modifier
+              .fillMaxWidth()
+              .testTag("customCalendarGrid")
+              .background(MaterialTheme.colorScheme.background),
       horizontalArrangement = Arrangement.Center) {
         // Add empty spaces for days before the start of the month
         items(firstDayOfWeek) { Spacer(modifier = Modifier.size(40.dp)) }
@@ -108,7 +112,10 @@ fun CustomCalendarView(
               contentAlignment = Alignment.Center,
               modifier = Modifier.size(40.dp).clickable { onDateSelected(date) }) {
                 if (isSelected) {
-                  Box(modifier = Modifier.size(36.dp).background(MaterialTheme.colorScheme.primary, shape = CircleShape))
+                  Box(
+                      modifier =
+                          Modifier.size(36.dp)
+                              .background(MaterialTheme.colorScheme.primary, shape = CircleShape))
                 }
 
                 BasicText(
@@ -119,7 +126,8 @@ fun CustomCalendarView(
                             fontSize = 16.sp,
                             color =
                                 if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                else MaterialTheme.colorScheme.onBackground),)
+                                else MaterialTheme.colorScheme.onBackground),
+                )
 
                 if (isEventDay) {
                   Box(
@@ -154,7 +162,7 @@ fun CalendarView(
   Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
     // Header with navigation arrows
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp,horizontal = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
           // Previous month arrow
