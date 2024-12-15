@@ -122,7 +122,7 @@ fun StorageDashboard(
               StorageLimitDialog(
                   onDismissRequest = { storageLimitDialogOpened.value = false },
                   currentLimit = storageStats?.storageLimit ?: 0,
-                usedStorage = storageStats?.storageUsed ?: 0,
+                  usedStorage = storageStats?.storageUsed ?: 0,
                   onUpdate = {
                     storageDashboardViewModel.setStorageStats(
                         storageStats!!.copy(storageLimit = it))
@@ -308,7 +308,8 @@ fun StorageLimitDialog(
     val unitOptions = listOf("MiB", "GiB")
     val focusRequester = remember { FocusRequester() }
     val longOrNull = text.value.toLongOrNull()
-    val newValue = if (longOrNull != null) longOrNull * (1024L * 1024L shl selectedUnitIndex * 10) else 0
+    val newValue =
+        if (longOrNull != null) longOrNull * (1024L * 1024L shl selectedUnitIndex * 10) else 0
     val validInput = newValue >= usedStorage && longOrNull != null
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
     Box(
