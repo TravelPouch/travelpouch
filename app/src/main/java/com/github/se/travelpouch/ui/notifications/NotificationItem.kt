@@ -226,6 +226,7 @@ fun handleInvitationResponse(
                   { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() },
                   eventsViewModel.getNewDocumentReferenceForNewTravel(travel.fsUid))
             }
+            notificationViewModel.loadNotificationsForUser(profileViewModel.profile.value.fsUid)
             Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
           },
           onFailure = {
