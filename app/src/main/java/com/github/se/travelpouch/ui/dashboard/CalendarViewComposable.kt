@@ -81,7 +81,6 @@ fun CustomCalendarView(
                 text = day,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f),
-                // textAlign = TextAlign.Center
             )
           }
         }
@@ -115,7 +114,7 @@ fun CustomCalendarView(
                             fontSize = 16.sp,
                             color =
                                 if (isSelected) Color.White
-                                else Color.Black)) // TODO Use dark mode/Material theme
+                                else Color.Black))
 
                 if (isEventDay) {
                   Box(
