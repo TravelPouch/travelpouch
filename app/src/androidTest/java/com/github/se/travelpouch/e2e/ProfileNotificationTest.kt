@@ -256,7 +256,7 @@ class ProfileNotificationTest {
         composeTestRule.onNodeWithTag("menuFab").performClick()
         composeTestRule.onNodeWithText("Log out").performClick()
 
-        // After log out, we log in with example6@example.com a accept friend invitation
+        // After log out, we log in with example6@example.com and accept friend invitation
         composeTestRule.onNodeWithText("Sign in with email and password").performClick()
         composeTestRule.onNodeWithTag("emailField").performTextInput("example6@example.com")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("password6")
