@@ -162,7 +162,7 @@ fun ActivitiesMapScreen(
       })
 
   // State to track whether to show paths
-  var showPathsActivities by remember { mutableStateOf(false) }
+  var showPathsActivities by remember { mutableStateOf(true) }
   var showPathsGPS by remember { mutableStateOf(false) }
 
   // State to track the travel mode for directions
@@ -295,6 +295,14 @@ fun ActivitiesMapScreen(
 // Helper Functions for displaying the travel mode buttons
 // -------------------------------------------------
 
+/**
+ * Displays buttons for toggling paths and selecting travel modes for activities.
+ *
+ * @param showPaths Whether to show paths between activities.
+ * @param onTogglePaths Callback triggered when the paths are toggled.
+ * @param travelMode The selected travel mode for directions.
+ * @param onTravelModeChange Callback triggered when the travel mode is changed.
+ */
 @Composable
 fun TravelModeButtonActivities(
     showPaths: Boolean,
@@ -343,6 +351,15 @@ fun TravelModeButtonActivities(
       }
 }
 
+/**
+ * Displays a button for selecting a travel mode for activities.
+ *
+ * @param icon The icon to display on the button.
+ * @param contentDescription The content description for the icon.
+ * @param isActive Whether the button is currently active.
+ * @param onClick Callback triggered when the button is clicked.
+ * @param testTag A tag for identifying the composable during testing.
+ */
 @Composable
 fun TravelModesActivitiesButton(
     icon: ImageVector,
@@ -373,6 +390,12 @@ fun TravelModesActivitiesButton(
       }
 }
 
+/**
+ * Displays buttons for selecting travel modes for GPS
+ *
+ * @param selectedMode The currently selected travel mode.
+ * @param onModeSelected Callback triggered when a travel mode is selected.
+ */
 @Composable
 fun TravelModesGPS(selectedMode: String, onModeSelected: (String) -> Unit) {
   Row(
@@ -406,6 +429,15 @@ fun TravelModesGPS(selectedMode: String, onModeSelected: (String) -> Unit) {
       }
 }
 
+/**
+ * Displays a button for selecting a travel mode for GPS.
+ *
+ * @param icon The icon to display on the button.
+ * @param contentDescription The content description for the icon.
+ * @param isSelected Whether the button is currently selected.
+ * @param onClick Callback triggered when the button is clicked.
+ * @param testTag A tag for identifying the composable during testing.
+ */
 @Composable
 fun TravelModesGPSButton(
     icon: ImageVector,
