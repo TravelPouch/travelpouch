@@ -548,7 +548,8 @@ fun ActivityDetailsContent(
               onClick = { onShowPathGPS(activity) },
               enabled = isGPSAvailable,
               modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
-                Text("Show Path")
+                Text(
+                    if (isGPSAvailable) "Show Path to this Activity" else "Enable GPS to Show Path")
               }
         }
       }
