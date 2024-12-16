@@ -73,7 +73,9 @@ fun CustomCalendarView(
       modifier =
           modifier
               .fillMaxWidth()
-              .background(MaterialTheme.colorScheme.background) // Set a distinct background color for the Days of the week
+              .background(
+                  MaterialTheme.colorScheme
+                      .background) // Set a distinct background color for the Days of the week
               .padding(8.dp)) {
         // Days of the week titles
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -89,7 +91,11 @@ fun CustomCalendarView(
 
   LazyVerticalGrid(
       columns = GridCells.Fixed(7),
-      modifier = modifier.fillMaxWidth().testTag("customCalendarGrid").background(MaterialTheme.colorScheme.onPrimary),
+      modifier =
+          modifier
+              .fillMaxWidth()
+              .testTag("customCalendarGrid")
+              .background(MaterialTheme.colorScheme.onPrimary),
       horizontalArrangement = Arrangement.Center) {
         // Add empty spaces for days before the start of the month
         items(firstDayOfWeek) { Spacer(modifier = Modifier.size(40.dp)) }
@@ -104,7 +110,10 @@ fun CustomCalendarView(
               contentAlignment = Alignment.Center,
               modifier = Modifier.size(40.dp).clickable { onDateSelected(date) }) {
                 if (isSelected) {
-                  Box(modifier = Modifier.size(36.dp).background(MaterialTheme.colorScheme.primary, shape = CircleShape))
+                  Box(
+                      modifier =
+                          Modifier.size(36.dp)
+                              .background(MaterialTheme.colorScheme.primary, shape = CircleShape))
                 }
 
                 BasicText(
@@ -113,9 +122,7 @@ fun CustomCalendarView(
                         androidx.compose.ui.text.TextStyle(
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
-                            color =
-                                if (isSelected) Color.White
-                                else Color.Black))
+                            color = if (isSelected) Color.White else Color.Black))
 
                 if (isEventDay) {
                   Box(
