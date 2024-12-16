@@ -161,10 +161,12 @@ class DirectionsViewModel(private val repository: DirectionsRepositoryInterface)
               targetStateFlow.value = routeDetails
             } else {
               Log.e("DirectionsViewModel", "Failed to extract route details")
+              targetStateFlow.value = RouteDetails.EMPTY
             }
           },
           onFailure = { exception ->
             Log.e("DirectionsViewModel", "Failed to fetch directions", exception)
+            targetStateFlow.value = RouteDetails.EMPTY
           })
     }
   }
