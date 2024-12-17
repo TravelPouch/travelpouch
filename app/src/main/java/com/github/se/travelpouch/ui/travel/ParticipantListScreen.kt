@@ -433,16 +433,22 @@ private fun inviteUserToTravelViaFsuid(
     Toast.makeText(context, "Error: User already added", Toast.LENGTH_SHORT).show()
   } else if (fsUid != null) {
     try {
+        val invitationNotification =
+            NotificationContent.InvitationNotification(
+            profileViewModel.profile.value.name,
+            selectedTravel.title,
+            Role.PARTICIPANT)
       notificationViewModel.sendNotification(
           Notification(
               notificationViewModel.getNewUid(),
               profileViewModel.profile.value.fsUid,
               fsUid,
               selectedTravel!!.fsUid,
-              NotificationContent.InvitationNotification(
-                  profileViewModel.profile.value.name, selectedTravel!!.title, Role.PARTICIPANT),
+              invitationNotification,
               notificationType = NotificationType.INVITATION,
               sector = NotificationSector.TRAVEL))
+
+        notificationViewModel.sendNotificationToUser(fsUid, invitationNotification)
       Toast.makeText(context, "Invitation sent", Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
       Log.e("NotificationError", "Failed to send notification: ${e.message}")

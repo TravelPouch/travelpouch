@@ -34,9 +34,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
@@ -669,8 +671,7 @@ class ParticipantListScreenTest {
         .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    verify(notificationRepository).addNotification(anyOrNull())
-
+    verify(notificationRepository, atLeastOnce()).addNotification(anyOrNull())
     // throw impossible exception
     doAnswer { invocation ->
           val email = invocation.getArgument<String>(0)
