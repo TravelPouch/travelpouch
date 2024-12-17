@@ -75,7 +75,8 @@ fun NotificationItem(
                     listTravelViewModel,
                     profileViewModel,
                     notificationViewModel,
-                    context)
+                    context,
+                    eventsViewModel)
               }
             }
       }
@@ -106,15 +107,26 @@ fun InvitationButtons(
     listTravelViewModel: ListTravelViewModel,
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
-    context: android.content.Context
+    context: android.content.Context,
+    eventsViewModel: EventViewModel
 ) {
   Row(
       modifier = Modifier.fillMaxWidth().testTag("notification_item_buttons"),
       horizontalArrangement = Arrangement.Center) {
         AcceptButton(
-            notification, listTravelViewModel, profileViewModel, notificationViewModel, context)
+            notification,
+            listTravelViewModel,
+            profileViewModel,
+            notificationViewModel,
+            context,
+            eventsViewModel)
         DeclineButton(
-            notification, listTravelViewModel, profileViewModel, notificationViewModel, context)
+            notification,
+            listTravelViewModel,
+            profileViewModel,
+            notificationViewModel,
+            context,
+            eventsViewModel)
       }
 }
 
@@ -124,7 +136,8 @@ fun AcceptButton(
     listTravelViewModel: ListTravelViewModel,
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
-    context: android.content.Context
+    context: android.content.Context,
+    eventsViewModel: EventViewModel
 ) {
   Button(
       onClick = {
@@ -134,7 +147,8 @@ fun AcceptButton(
             profileViewModel,
             notificationViewModel,
             context,
-            isAccepted = true)
+            isAccepted = true,
+            eventsViewModel)
       },
       modifier = Modifier.padding(end = 8.dp).testTag("notification_item_accept_button"),
       colors =
@@ -150,7 +164,8 @@ fun DeclineButton(
     listTravelViewModel: ListTravelViewModel,
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
-    context: android.content.Context
+    context: android.content.Context,
+    eventsViewModel: EventViewModel
 ) {
   Button(
       onClick = {
@@ -160,7 +175,8 @@ fun DeclineButton(
             profileViewModel,
             notificationViewModel,
             context,
-            isAccepted = false)
+            isAccepted = false,
+            eventsViewModel = eventsViewModel)
       },
       colors =
           ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Red),
@@ -175,7 +191,8 @@ fun handleInvitationResponse(
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
     context: android.content.Context,
-    isAccepted: Boolean
+    isAccepted: Boolean,
+    eventsViewModel: EventViewModel
 ) {
   when (notification.sector) {
     NotificationSector.TRAVEL -> {
@@ -216,7 +233,8 @@ fun handleInvitationResponse(
                     listTravelViewModel.selectTravel(updatedContainer)
                     Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
                   },
-                  { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() })
+                  { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() },
+                  eventsViewModel.getNewDocumentReferenceForNewTravel(travel.fsUid))
             }
             Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
           },
@@ -266,10 +284,12 @@ fun handleInvitationResponse(
                 sector = notification.sector)
 
         notificationViewModel.sendNotification(invitationResponse)
+
           notificationViewModel.sendNotificationToUser(
               notification.senderUid,
               firendNotification
           )
+          
         Toast.makeText(context, "Request declined", Toast.LENGTH_LONG).show()
       }
     }

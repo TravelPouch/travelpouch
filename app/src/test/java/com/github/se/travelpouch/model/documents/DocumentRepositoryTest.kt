@@ -1,11 +1,8 @@
 package com.github.se.travelpouch.model.documents
 
-import android.net.Uri
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -15,11 +12,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.HttpsCallableReference
-import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
-import com.google.firebase.storage.StorageReference
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
@@ -180,128 +173,5 @@ class DocumentRepositoryTest {
 
       logMock.verify { Log.e("DocumentRepositoryFirestore", "Error deleting document", exception) }
     }
-  }
-
-  @Test
-  fun testsGetDownloadUrl() {
-    val task: Task<Uri> = mock()
-    val mockUri: Uri = mock()
-    val mockStorageReference: StorageReference = mock()
-
-    whenever(mockDocumentReference.id).thenReturn("documentId")
-    whenever(mockStorageReference.downloadUrl).thenReturn(task)
-    whenever(mockStorage.getReference(anyString())).thenReturn(mockStorageReference)
-
-    // enable listeners chaining in implementation
-    whenever(task.addOnSuccessListener(any())).thenReturn(task)
-
-    var successCalled = false
-    documentRepository.getDownloadUrl(
-        documentContainer, { successCalled = true }, { fail("Should not call onFailure") })
-
-    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Uri>>()
-    verify(task).addOnSuccessListener(onSuccessListenerCaptor.capture())
-    onSuccessListenerCaptor.firstValue.onSuccess(mockUri)
-
-    assertTrue(successCalled)
-  }
-
-  @Test
-  fun testsGetThumbnailIsCached() {
-    val downloadUrlTask: Task<Uri> = mock()
-    val mockStorageReference: StorageReference = mock()
-    whenever(mockDocumentReference.id).thenReturn("documentId")
-    whenever(mockStorageReference.downloadUrl).thenReturn(downloadUrlTask)
-    whenever(mockStorage.getReference(anyString())).thenReturn(mockStorageReference)
-    whenever(downloadUrlTask.addOnSuccessListener(any()))
-        .thenReturn(downloadUrlTask) // listeners chaining
-
-    var successCalled = false
-    documentRepository.getThumbnailUrl(
-        documentContainer,
-        300,
-        { successCalled = true },
-        { fail("Should not call onFailure") },
-        false)
-
-    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Uri>>()
-    verify(downloadUrlTask).addOnSuccessListener(onSuccessListenerCaptor.capture())
-    onSuccessListenerCaptor.firstValue.onSuccess(mock())
-
-    assertTrue(successCalled)
-  }
-
-  @Test
-  fun testsGetThumbnailNotFound() {
-    val downloadUrlTask: Task<Uri> = mock()
-    val mockStorageReference: StorageReference = mock()
-    whenever(mockDocumentReference.id).thenReturn("documentId")
-    whenever(mockStorageReference.downloadUrl).thenReturn(downloadUrlTask)
-    whenever(mockStorage.getReference(anyString())).thenReturn(mockStorageReference)
-    whenever(downloadUrlTask.addOnSuccessListener(any()))
-        .thenReturn(downloadUrlTask) // listeners chaining
-
-    var failureCalled = false
-    documentRepository.getThumbnailUrl(
-        documentContainer,
-        300,
-        { fail("Should not call onSuccess") },
-        { failureCalled = true },
-        false)
-
-    // Thumbnail not found, generateThumbnail should be called
-    val onDownloadFailureListenerCaptor = argumentCaptor<OnFailureListener>()
-    verify(downloadUrlTask).addOnFailureListener(onDownloadFailureListenerCaptor.capture())
-    onDownloadFailureListenerCaptor.firstValue.onFailure(
-        StorageException.fromExceptionAndHttpCode(Exception("Error"), 404)!!)
-
-    assertTrue(failureCalled)
-  }
-
-  @Test
-  fun testsGetThumbnailNotCachedAndGenerateSucceeds() {
-    // Mocking required by the internal generateThumbnail function
-    val functionTask: Task<HttpsCallableResult> = mock()
-    val mockCallableRef: HttpsCallableReference = mock()
-    whenever(mockFunctions.getHttpsCallable(anyString())).thenReturn(mockCallableRef)
-    whenever(mockCallableRef.call(any())).thenReturn(functionTask)
-    whenever(functionTask.isSuccessful).thenReturn(true)
-    whenever(functionTask.result).thenReturn(mock(HttpsCallableResult::class.java))
-
-    // Mocking required by the getThumbnailUrl function
-    val downloadUrlTask: Task<Uri> = mock()
-    val mockStorageReference: StorageReference = mock()
-    whenever(mockDocumentReference.id).thenReturn("documentId")
-    whenever(mockStorageReference.downloadUrl).thenReturn(downloadUrlTask)
-    whenever(mockStorage.getReference(anyString())).thenReturn(mockStorageReference)
-    whenever(downloadUrlTask.addOnSuccessListener(any()))
-        .thenReturn(downloadUrlTask) // listeners chaining
-
-    var successCalled = false
-    documentRepository.getThumbnailUrl(
-        documentContainer,
-        300,
-        { successCalled = true },
-        { fail("Should not call onFailure") },
-        true)
-
-    // Thumbnail not found, generateThumbnail should be called
-    val onDownloadFailureListenerCaptor = argumentCaptor<OnFailureListener>()
-    verify(downloadUrlTask, times(1))
-        .addOnFailureListener(onDownloadFailureListenerCaptor.capture())
-    onDownloadFailureListenerCaptor.firstValue.onFailure(
-        StorageException.fromExceptionAndHttpCode(Exception("Error"), 404)!!)
-
-    // Generate thumbnail completed successfully
-    val onFunctionCompleteListenerCaptor = argumentCaptor<OnCompleteListener<HttpsCallableResult>>()
-    verify(functionTask).addOnCompleteListener(onFunctionCompleteListenerCaptor.capture())
-    onFunctionCompleteListenerCaptor.firstValue.onComplete(functionTask)
-
-    // Get the download URL for the newly generated thumbnail
-    val onSuccessListenerCaptor = argumentCaptor<OnSuccessListener<Uri>>()
-    verify(downloadUrlTask, times(2)).addOnSuccessListener(onSuccessListenerCaptor.capture())
-    onSuccessListenerCaptor.firstValue.onSuccess(mock())
-
-    assertTrue(successCalled)
   }
 }

@@ -1,13 +1,18 @@
 package com.github.se.travelpouch.di
 
 import android.content.Context
-import com.github.se.travelpouch.helper.FileDownloader
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
+import com.github.se.travelpouch.R
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityRepositoryFirebase
 import com.github.se.travelpouch.model.authentication.AuthenticationService
 import com.github.se.travelpouch.model.authentication.FirebaseAuthenticationService
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentRepositoryFirestore
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.events.EventRepository
 import com.github.se.travelpouch.model.events.EventRepositoryFirebase
 import com.github.se.travelpouch.model.notifications.NotificationRepository
@@ -97,9 +102,16 @@ object AppModule {
   @Singleton
   fun provideFileDownloader(
       @ApplicationContext context: Context,
-      storage: FirebaseStorage
-  ): FileDownloader {
-    return FileDownloader(context.contentResolver, storage)
+      storage: FirebaseStorage,
+      functions: FirebaseFunctions,
+      dataStore: DataStore<Preferences>
+  ): DocumentsManager {
+    return DocumentsManager(
+        context.contentResolver,
+        storage,
+        functions,
+        dataStore,
+        context.getDir(context.getString(R.string.thumbs_dir_name), Context.MODE_PRIVATE))
   }
 
   @Provides
@@ -118,5 +130,12 @@ object AppModule {
   @Singleton
   fun provideTravelRepository(db: FirebaseFirestore): TravelRepository {
     return TravelRepositoryFirestore(db)
+  }
+
+  @Provides
+  @Singleton
+  fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+    return PreferenceDataStoreFactory.create(
+        produceFile = { context.preferencesDataStoreFile("documents") })
   }
 }

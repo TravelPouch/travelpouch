@@ -82,9 +82,8 @@ class TravelActivityScreenCopy {
     }
 
     composeTestRule.onNodeWithTag("emptyTravel").isDisplayed()
-    composeTestRule
-        .onNodeWithTag("emptyTravel")
-        .assertTextEquals("No activities planned for this trip")
+    composeTestRule.onNodeWithTag("emptyTravel1").assertTextEquals("No activities planned")
+    composeTestRule.onNodeWithTag("emptyTravel2").assertTextEquals("for this trip")
   }
 
   @Test

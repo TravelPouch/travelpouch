@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,7 +24,6 @@ import java.util.Locale
  *
  * @param calendarViewModel The ViewModel associated with the Calendar screen.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: NavigationActions) {
   // Observe the state of activities from the ViewModel
@@ -44,6 +42,7 @@ fun CalendarScreen(calendarViewModel: CalendarViewModel, navigationActions: Navi
           CalendarView(
               selectedDate = calendarViewModel.selectedDate,
               onDateSelected = { date -> calendarViewModel.onDateSelected(date) },
+              events = calendarState.map { it.date.toDate() },
               modifier = Modifier.fillMaxWidth().testTag("androidCalendarView"))
 
           // Activities list

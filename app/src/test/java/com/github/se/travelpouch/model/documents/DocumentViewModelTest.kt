@@ -2,8 +2,9 @@ package com.github.se.travelpouch.model.documents
 
 import android.net.Uri
 import android.util.Log
-import androidx.documentfile.provider.DocumentFile
-import com.github.se.travelpouch.helper.FileDownloader
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
@@ -14,8 +15,11 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import kotlin.random.Random
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,6 +33,8 @@ import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowLog
@@ -42,15 +48,17 @@ class DocumentViewModelTest {
 
   private lateinit var documentContainer: DocumentContainer
   private lateinit var documentReference: DocumentReference
-  private lateinit var fileDownloader: FileDownloader
+  private lateinit var documentsManager: DocumentsManager
   private lateinit var document: NewDocumentContainer
   private lateinit var selectedTravel: TravelContainer
+  private lateinit var dataStore: DataStore<Preferences>
 
   @Before
   fun setUp() {
     documentRepository = mock(DocumentRepository::class.java)
-    fileDownloader = mock(FileDownloader::class.java)
-    documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
+    documentsManager = mock(DocumentsManager::class.java)
+    dataStore = mock()
+    documentViewModel = DocumentViewModel(documentRepository, documentsManager, dataStore)
     documentReference = mock(DocumentReference::class.java)
 
     documentContainer =
@@ -174,6 +182,20 @@ class DocumentViewModelTest {
   }
 
   @Test
+  fun setSaveDocumentFolder_nullUri() = runTest {
+    whenever(dataStore.edit { any() }).thenAnswer { fail() }
+    documentViewModel.setSaveDocumentFolder(null)
+  }
+
+  @Test
+  fun setSaveDocumentFolder_notNullUri() = runBlocking {
+    documentViewModel.setSaveDocumentFolder(Uri.EMPTY).join()
+    org.mockito.kotlin.verifyBlocking(dataStore) {
+      edit(argumentCaptor<suspend (Preferences) -> Unit>().capture())
+    }
+  }
+
+  @Test
   fun deleteDocumentById_logsErrorOnFailure() {
     val errorMessage = "Failed to delete Document"
     val exception = Exception("Delete Document Failed Test")
@@ -212,7 +234,7 @@ class DocumentViewModelTest {
 
   @Test
   fun assertUploadFileAnyInvalid() {
-    val documentViewModel = DocumentViewModel(documentRepository, fileDownloader)
+    val documentViewModel = DocumentViewModel(documentRepository, documentsManager, mock())
     val mockInputStream = mock(InputStream::class.java)
 
     assert(
@@ -244,29 +266,5 @@ class DocumentViewModelTest {
     spyDocumentViewModel.uploadFile(inputStream, selectedTravel, "image/jpeg")
     verify(spyDocumentViewModel)
         .uploadDocument(anyString(), org.mockito.kotlin.any(), org.mockito.kotlin.any())
-  }
-
-  @Test
-  fun assertStoreSelectedDocumentNoSelectedDocument() {
-    val documentFile: DocumentFile = mock(DocumentFile::class.java)
-    `when`(documentFile.uri)
-        .thenReturn(
-            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload"))
-    documentViewModel.storeSelectedDocument(documentFile).invokeOnCompletion {
-      assert(it is IllegalArgumentException)
-      assert(it?.message == "Some required fields are empty. Abort download")
-    }
-  }
-
-  @Test
-  fun assertStoreSelectedDocumentSuccess() {
-    val documentFile: DocumentFile = mock(DocumentFile::class.java)
-    `when`(documentFile.uri)
-        .thenReturn(
-            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload"))
-    `when`(documentReference.id).thenReturn("1")
-    documentViewModel.selectDocument(documentContainer)
-    documentViewModel.storeSelectedDocument(documentFile)
-    verify(fileDownloader).downloadFile(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }

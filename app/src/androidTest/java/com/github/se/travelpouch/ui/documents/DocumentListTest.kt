@@ -13,14 +13,16 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.net.toUri
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
-import com.github.se.travelpouch.helper.FileDownloader
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.documents.DocumentVisibility
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
@@ -37,8 +39,8 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
-import org.mockito.kotlin.times
 
 class DocumentListTest {
   @Composable
@@ -59,39 +61,44 @@ class DocumentListTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var mockDocumentRepository: DocumentRepository
   private lateinit var mockDocumentViewModel: DocumentViewModel
-  private lateinit var mockDocumentReference: DocumentReference
+  private lateinit var mockDocumentReference1: DocumentReference
+  private lateinit var mockDocumentReference2: DocumentReference
   private lateinit var mockListTravelViewModel: ListTravelViewModel
-  private lateinit var mockFileDownloader: FileDownloader
+  private lateinit var mockDocumentsManager: DocumentsManager
   private lateinit var list_documents: List<DocumentContainer>
   private lateinit var travelContainer: TravelContainer
+  private lateinit var mockDataStore: DataStore<Preferences>
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
-    mockDocumentReference = mock(DocumentReference::class.java)
+    mockDocumentReference1 = mock(DocumentReference::class.java)
+    `when`(mockDocumentReference1.id).thenReturn("ref_id1")
+    mockDocumentReference2 = mock(DocumentReference::class.java)
+    `when`(mockDocumentReference2.id).thenReturn("ref_id2")
     list_documents =
         listOf(
             DocumentContainer(
-                mockDocumentReference,
-                mockDocumentReference,
-                mockDocumentReference,
+                mockDocumentReference1,
+                mockDocumentReference1,
+                mockDocumentReference1,
                 "title 1",
                 DocumentFileFormat.PDF,
                 0,
                 "email 1",
-                mockDocumentReference,
+                mockDocumentReference1,
                 Timestamp(0, 0),
                 DocumentVisibility.ME),
             DocumentContainer(
-                mockDocumentReference,
-                mockDocumentReference,
-                mockDocumentReference,
+                mockDocumentReference2,
+                mockDocumentReference2,
+                mockDocumentReference2,
                 "title 2",
                 DocumentFileFormat.PDF,
                 0,
                 "email 2",
-                mockDocumentReference,
+                mockDocumentReference2,
                 Timestamp(0, 0),
                 DocumentVisibility.ORGANIZERS),
         )
@@ -109,10 +116,12 @@ class DocumentListTest {
             participants,
             emptyList())
     navigationActions = mock(NavigationActions::class.java)
-    mockFileDownloader = mock(FileDownloader::class.java)
+    mockDocumentsManager = mock(DocumentsManager::class.java)
     mockListTravelViewModel = mock(ListTravelViewModel::class.java)
     mockDocumentRepository = mock(DocumentRepository::class.java)
-    val documentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
+    mockDataStore = mock()
+    val documentViewModel =
+        DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
     mockDocumentViewModel = spy(documentViewModel)
   }
 

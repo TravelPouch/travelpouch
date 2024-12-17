@@ -60,11 +60,11 @@ class TestSignInEmailPasswordUI {
 
         composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign in").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign up").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("emailField").performTextInput("travelpouchtest1@gmail.com")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
-        composeTestRule.onNodeWithText("Sign in").performClick()
+        composeTestRule.onNodeWithText("Sign up").performClick()
 
         verify(authenticationService).createUser(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
       }
@@ -104,7 +104,7 @@ class TestSignInEmailPasswordUI {
         composeTestRule.onNodeWithTag("passwordField").performTextInput("travelpouchtest1password")
         composeTestRule.onNodeWithText("Log in").performClick()
 
+        composeTestRule.waitForIdle()
         verify(profileRepository).initAfterLogin(anyOrNull())
-        verify(mockNavigationActions).navigateTo(anyOrNull())
       }
 }

@@ -11,12 +11,14 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
-import com.github.se.travelpouch.helper.FileDownloader
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.dashboard.CalendarViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
 import com.github.se.travelpouch.model.documents.DocumentViewModel
+import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.model.travels.TravelRepository
 import org.junit.Before
@@ -32,7 +34,8 @@ class PagerSwipeTest {
   private lateinit var mockNavigationActions: NavigationActions
   private lateinit var mockTravelRepository: TravelRepository
   private lateinit var mockDocumentRepository: DocumentRepository
-  private lateinit var mockFileDownloader: FileDownloader
+  private lateinit var mockDocumentsManager: DocumentsManager
+  private lateinit var mockDataStore: DataStore<Preferences>
 
   private lateinit var activityViewModel: ActivityViewModel
   private lateinit var calendarViewModel: CalendarViewModel
@@ -45,11 +48,13 @@ class PagerSwipeTest {
     mockNavigationActions = mock()
     mockTravelRepository = mock()
     mockDocumentRepository = mock()
-    mockFileDownloader = mock()
+    mockDocumentsManager = mock()
+    mockDataStore = mock()
 
     activityViewModel = ActivityViewModel(mockActivityRepository)
     calendarViewModel = CalendarViewModel(activityViewModel)
-    documentViewModel = DocumentViewModel(mockDocumentRepository, mockFileDownloader)
+    documentViewModel =
+        DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
     listTravelViewModel = ListTravelViewModel(mockTravelRepository)
   }
 
@@ -93,7 +98,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeRight() }
@@ -102,7 +108,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeLeft() }
@@ -112,7 +119,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Calendar")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeLeft() }
@@ -122,7 +130,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Documents")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeLeft() }
@@ -132,8 +141,14 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Documents")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
+
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
+    composeTestRule.onNodeWithTag("travelActivitiesScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("Documents").performClick()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeRight() }
 
@@ -142,7 +157,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Calendar")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(" for this trip").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("pagerSwipe").performTouchInput { swipeRight() }
@@ -151,7 +167,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
   }
 
@@ -172,7 +189,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithText("Calendar").performClick()
@@ -195,7 +213,8 @@ class PagerSwipeTest {
     composeTestRule.onNodeWithTag("documentListScreen").assertIsNotDisplayed()
     assertTopBarIsDisplayedCorrectly(composeTestRule, "Activities")
     assertBottomBarIsDisplayedCorrectly(composeTestRule)
-    composeTestRule.onNodeWithText("No activities planned for this trip").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No activities planned").assertIsDisplayed()
+    composeTestRule.onNodeWithText("for this trip").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addActivityButton").assertIsDisplayed()
   }
 }

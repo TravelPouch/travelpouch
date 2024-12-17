@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="thumbnail_documents_list_width">150</integer>
+</resources>

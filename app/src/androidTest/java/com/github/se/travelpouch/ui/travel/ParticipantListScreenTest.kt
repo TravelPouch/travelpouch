@@ -14,6 +14,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import com.github.se.travelpouch.model.events.EventRepository
+import com.github.se.travelpouch.model.events.EventViewModel
 import com.github.se.travelpouch.model.notifications.NotificationRepository
 import com.github.se.travelpouch.model.notifications.NotificationViewModel
 import com.github.se.travelpouch.model.profile.Profile
@@ -33,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -98,6 +101,8 @@ class ParticipantListScreenTest {
   private lateinit var notificationRepository: NotificationRepository
   private lateinit var profileModelView: ProfileModelView
   private lateinit var profileRepository: ProfileRepository
+  private lateinit var eventRepository: EventRepository
+  private lateinit var eventViewModel: EventViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -110,13 +115,19 @@ class ParticipantListScreenTest {
     notificationViewModel = NotificationViewModel(notificationRepository)
     profileRepository = mock(ProfileRepository::class.java)
     profileModelView = ProfileModelView(profileRepository)
+    eventRepository = mock(EventRepository::class.java)
+    eventViewModel = EventViewModel(eventRepository)
   }
 
   @Test
   fun testemptyView() {
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
 
     // Check if all elements are displayed
@@ -138,7 +149,11 @@ class ParticipantListScreenTest {
   fun testNonEmptyViewChangeRoleFailed() {
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
 
     listTravelViewModel.selectTravel(container)
@@ -202,7 +217,11 @@ class ParticipantListScreenTest {
   fun testNonEmptyViewChangeRoleToSameRole() {
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
 
     listTravelViewModel.selectTravel(container)
@@ -256,7 +275,11 @@ class ParticipantListScreenTest {
   fun testNonEmptyViewRemoveParticipant() {
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
 
     listTravelViewModel.selectTravel(container)
@@ -296,7 +319,11 @@ class ParticipantListScreenTest {
   fun testNonEmptyViewRemoveParticipantFail() {
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
 
     listTravelViewModel.selectTravel(container)
@@ -339,7 +366,11 @@ class ParticipantListScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
 
     // Open the Add User dialog
@@ -379,7 +410,9 @@ class ParticipantListScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
 
     // Click the Add User button
     composeTestRule.onNodeWithTag("addUserButton").performClick()
@@ -395,7 +428,11 @@ class ParticipantListScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
     composeTestRule.onNodeWithTag("addUserFab").performClick()
 
@@ -455,7 +492,11 @@ class ParticipantListScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
     composeTestRule.onNodeWithTag("addUserFab").performClick()
 
@@ -499,7 +540,9 @@ class ParticipantListScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     doAnswer { "sigmasigmasigmasigm2" }.`when`(travelRepository).getNewUid()
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
@@ -513,7 +556,11 @@ class ParticipantListScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
     composeTestRule.onNodeWithTag("addUserFab").performClick()
 
@@ -557,10 +604,11 @@ class ParticipantListScreenTest {
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
 
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    // verify(notificationRepository, never()).addNotification(anyOrNull())
   }
 
   @Test
@@ -569,7 +617,11 @@ class ParticipantListScreenTest {
     listTravelViewModel.selectTravel(travelContainer)
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
     composeTestRule.onNodeWithTag("addUserFab").performClick()
 
@@ -612,10 +664,127 @@ class ParticipantListScreenTest {
 
     doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
+    verify(notificationRepository).addNotification(anyOrNull())
 
+    // throw impossible exception
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = "qwertzuiopasdfghjklyxcvbnm12",
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = emptyMap())
+          // Call the onSuccess callback with the custom UserInfo
+
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
+    doThrow(RuntimeException("Impossible Exception"))
+        .`when`(notificationRepository)
+        .addNotification(anyOrNull())
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+    val randomEmail2 = "random.email@example.org"
+    composeTestRule.onNodeWithTag("addUserEmailField").performScrollTo()
+    composeTestRule.onNodeWithTag("addUserEmailField").assertIsDisplayed().assertTextContains("")
+    composeTestRule.onNodeWithTag("addUserEmailField").performTextClearance()
+    composeTestRule.onNodeWithTag("addUserEmailField").performTextInput(randomEmail2)
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    composeTestRule.waitForIdle()
+  }
+
+  @Test
+  fun addFriendMenuWithNoFriends() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
+    }
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+    composeTestRule.onNodeWithTag("addViaFriendListButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("friendListDialogBox", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("friendListDialogTitle", useUnmergedTree = true)
+        .assertTextContains("Select a Friend")
+    composeTestRule
+        .onNodeWithTag("noFriendsDialogText", useUnmergedTree = true)
+        .assertTextContains("No friends to choose from")
+  }
+
+  @Test
+  fun addFriendMenuWithFriend() {
+    val travelContainer = createContainer()
+    listTravelViewModel.selectTravel(travelContainer)
+
+    `when`(profileRepository.getProfileElements(anyOrNull(), anyOrNull())).then {
+      it.getArgument<(Profile) -> Unit>(0)(
+          Profile(
+              fsUid = "abcdefghijklmnopqrstuvwxyz13",
+              name = "Custom User",
+              userTravelList = listOf("00000000000000000000"),
+              email = "email@email.org",
+              username = "username",
+              friends = mapOf("example@mail.com" to "abcdefghijklmnopqrstuvwxyz12")))
+    }
+    profileModelView.getProfile()
+
+    composeTestRule.setContent {
+      ParticipantListScreen(
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
+    }
+    composeTestRule.onNodeWithTag("addUserFab").performClick()
+    composeTestRule.onNodeWithTag("addViaFriendListButton").performClick()
+    composeTestRule.onNodeWithTag("friendListDialogBox", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("friendListDialogTitle", useUnmergedTree = true)
+        .assertTextContains("Select a Friend")
+    doAnswer { invocation ->
+          val email = invocation.getArgument<String>(0)
+          val onSuccess = invocation.getArgument<(fsUid?) -> Unit>(1)
+          val customUserInfo =
+              Profile(
+                  fsUid = "qwertzuiopasdfghjklyxcvbnm12",
+                  name = "Custom User",
+                  userTravelList = listOf("00000000000000000000"),
+                  email = email,
+                  username = "username",
+                  friends = emptyMap())
+          // Call the onSuccess callback with the custom UserInfo
+
+          onSuccess(customUserInfo.fsUid)
+        }
+        .`when`(profileRepository)
+        .getFsUidByEmail(any(), any(), any())
+    doAnswer { "abcdefghijklmnopqrst" }.`when`(notificationRepository).getNewUid()
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
+    composeTestRule.onNodeWithTag("friendCard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friendCard").assertTextContains("example@mail.com")
+    composeTestRule.onNodeWithTag("friendCard").performClick()
     verify(notificationRepository).addNotification(anyOrNull())
   }
 
@@ -623,7 +792,11 @@ class ParticipantListScreenTest {
   fun addUserALotOfButton() {
     composeTestRule.setContent {
       ParticipantListScreen(
-          listTravelViewModel, navigationActions, notificationViewModel, profileModelView)
+          listTravelViewModel,
+          navigationActions,
+          notificationViewModel,
+          profileModelView,
+          eventViewModel)
     }
     // perform add user
     // Check that the dialog is displayed
@@ -673,7 +846,9 @@ class ParticipantListScreenTest {
         .`when`(travelRepository)
         .checkParticipantExists(any(), any(), any())
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     // Now this is a valid user that does exist
@@ -694,7 +869,9 @@ class ParticipantListScreenTest {
         .`when`(travelRepository)
         .checkParticipantExists(any(), any(), any())
     // Mock the repository.updateTravel method to do nothing
-    doNothing().`when`(travelRepository).updateTravel(any(), any(), anyOrNull(), any(), any())
+    doNothing()
+        .`when`(travelRepository)
+        .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
   }
 }
