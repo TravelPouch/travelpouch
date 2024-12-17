@@ -88,7 +88,6 @@ fun SignInScreen(
                 travelViewModel.initAfterLogin()
                 waitUntilProfileFetched.value = true
               }
-              // isLoading.value = false
             }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
@@ -215,8 +214,6 @@ fun SignInScreen(
                     waitUntilProfileFetched.value = true
                   }
                 }
-                // navigationActions.navigateTo(Screen.TRAVEL_LIST)
-                // isLoading.value = false
               } catch (refreshError: Exception) {
                 Log.e(
                     "SignInScreen",
