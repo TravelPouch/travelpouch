@@ -91,11 +91,9 @@ import com.github.se.travelpouch.ui.theme.logoutIconDark
 import com.github.se.travelpouch.ui.theme.logoutIconLight
 import com.github.se.travelpouch.ui.theme.logoutRedDark
 import com.github.se.travelpouch.ui.theme.logoutRedLight
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
 import java.util.Locale
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 // ChatGpt was used to organised the floating actions buttons and for the logic of tapping outside
 // the drawer menu to close it, while keeping the gestures of the drawer menu disabled

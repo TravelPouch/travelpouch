@@ -181,12 +181,15 @@ fun ParticipantListScreen(
                                           .show()
                                     } else if (fsUid != null) {
                                       try {
+                                          val invitationNotification =
+                                              NotificationContent.InvitationNotification(
+                                              profileViewModel.profile.value.name,
+                                              selectedTravel!!.title,
+                                              Role.PARTICIPANT)
+
                                           notificationViewModel.sendNotificationToUser(
                                               fsUid,
-                                                NotificationContent.InvitationNotification(
-                                                    profileViewModel.profile.value.name,
-                                                    selectedTravel!!.title,
-                                                    Role.PARTICIPANT)
+                                              invitationNotification
                                           )
 
                                         notificationViewModel.sendNotification(
@@ -195,10 +198,7 @@ fun ParticipantListScreen(
                                                 profileViewModel.profile.value.fsUid,
                                                 fsUid,
                                                 selectedTravel!!.fsUid,
-                                                NotificationContent.InvitationNotification(
-                                                    profileViewModel.profile.value.name,
-                                                    selectedTravel!!.title,
-                                                    Role.PARTICIPANT),
+                                                invitationNotification,
                                                 NotificationType.INVITATION,
                                                 sector = NotificationSector.TRAVEL))
                                       } catch (e: Exception) {
@@ -368,15 +368,23 @@ fun handleRoleChange(
     if (oldRole == Role.OWNER) {
       // Actual role change logic
       if (participant.key != profileViewModel.profile.value.fsUid) {
+          val roleChangeNotification =
+              NotificationContent.RoleChangeNotification(
+                  selectedTravel.title,
+                  newRole)
         notificationViewModel.sendNotification(
             Notification(
                 notificationViewModel.getNewUid(),
                 profileViewModel.profile.value.fsUid,
                 participant.key,
                 selectedTravel.fsUid,
-                NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
+                roleChangeNotification,
                 NotificationType.ROLE_UPDATE,
                 sector = NotificationSector.TRAVEL))
+          notificationViewModel.sendNotificationToUser(
+              participant.key,
+              roleChangeNotification
+          )
       }
       val participantMap = selectedTravel.allParticipants.toMutableMap()
       participantMap[Participant(participant.key)] = newRole

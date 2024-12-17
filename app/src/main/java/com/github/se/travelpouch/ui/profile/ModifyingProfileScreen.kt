@@ -253,19 +253,22 @@ fun ModifyingProfileScreen(
                                 onSuccess = { friendUid ->
                                   Toast.makeText(context, "Invitation sent", Toast.LENGTH_LONG)
                                       .show()
-
+                                    val notificationContent =
+                                        NotificationContent.FriendInvitationNotification(
+                                            profile.value.email)
                                   notificationViewModel.sendNotification(
                                       Notification(
                                           notificationViewModel.getNewUid(),
                                           senderUid = profile.value.fsUid,
                                           receiverUid = friendUid,
                                           travelUid = null,
-                                          content =
-                                              NotificationContent.FriendInvitationNotification(
-                                                  profile.value.email),
+                                          notificationContent,
                                           notificationType = NotificationType.INVITATION,
                                           status = NotificationStatus.UNREAD,
                                           sector = NotificationSector.PROFILE))
+                                    notificationViewModel.sendNotificationToUser(
+                                        friendUid,
+                                        notificationContent)
 
                                   openDialog = false
                                 },

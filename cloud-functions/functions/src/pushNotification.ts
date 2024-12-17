@@ -38,8 +38,8 @@ export async function sendPushNotification(tokens: string[], message: string): P
   // Construct the MulticastMessage payload
   const multicastMessage = {
     notification: {
-      title: message,
-      body: "This is a notification message",
+      title: "TravelPouch",
+      body: message,
     },
     tokens,
   };
