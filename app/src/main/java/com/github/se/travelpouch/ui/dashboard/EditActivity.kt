@@ -232,7 +232,7 @@ fun EditActivity(
                                 description,
                                 newLocation,
                                 finalDate,
-                                mapOf())
+                                selectedActivity.value!!.documentsNeeded)
 
                         activityViewModel.updateActivity(activity, context)
                         navigationActions.navigateTo(Screen.SWIPER)

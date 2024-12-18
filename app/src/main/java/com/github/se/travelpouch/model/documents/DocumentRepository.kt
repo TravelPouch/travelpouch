@@ -2,6 +2,7 @@ package com.github.se.travelpouch.model.documents
 
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.activity.Activity
 import com.google.android.gms.common.util.Base64Utils
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -16,7 +17,12 @@ interface DocumentRepository {
 
   fun getDocuments(onSuccess: (List<DocumentContainer>) -> Unit, onFailure: (Exception) -> Unit)
 
-  fun deleteDocumentById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun deleteDocumentById(
+      document: DocumentContainer,
+      listOfActivities: List<Activity>,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  )
 
   fun uploadDocument(
       travelId: String,
@@ -79,21 +85,62 @@ class DocumentRepositoryFirestore(
    * @param onSuccess Callback function to be called when the document is deleted successfully.
    * @param onFailure Callback function to be called when an error occurs.
    */
+  //  override fun deleteDocumentById(
+  //      id: String,
+  //      onSuccess: () -> Unit,
+  //      onFailure: (Exception) -> Unit
+  //  ) {
+  //    db.collection(collectionPath).document(id).delete().addOnCompleteListener { task ->
+  //      if (task.isSuccessful) {
+  //        onSuccess()
+  //      } else {
+  //        task.exception?.let { e ->
+  //          Log.e("DocumentRepositoryFirestore", "Error deleting document", e)
+  //          onFailure(e)
+  //        }
+  //      }
+  //    }
+  //  }
+
   override fun deleteDocumentById(
-      id: String,
+      document: DocumentContainer,
+      listOfActivities: List<Activity>,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    db.collection(collectionPath).document(id).delete().addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        onSuccess()
-      } else {
-        task.exception?.let { e ->
-          Log.e("DocumentRepositoryFirestore", "Error deleting document", e)
-          onFailure(e)
+    db.runTransaction {
+          val referenceDocument = db.collection(collectionPath).document(document.ref.id)
+          val stringToActivities =
+              FirebasePaths.constructPath(
+                  collectionPath.dropLast(FirebasePaths.documents.length + 1),
+                  FirebasePaths.activities)
+          val referenceToActivitiesCollection = db.collection(stringToActivities)
+
+          it.delete(referenceDocument)
+
+          val listActivitiesUpdated =
+              listOfActivities.map { ac ->
+                val documentsNeeded = ac.documentsNeeded.toMutableList()
+                documentsNeeded.remove(document)
+                ac.copy(documentsNeeded = documentsNeeded.toList())
+              }
+
+          for (activity in listActivitiesUpdated) {
+            val activityReference =
+                db.collection(referenceToActivitiesCollection.path).document(activity.uid)
+            it.set(activityReference, activity)
+          }
         }
-      }
-    }
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            task.exception?.let { e ->
+              Log.e("DocumentRepositoryFirestore", "Error deleting document", e)
+              onFailure(e)
+            }
+          }
+        }
   }
 
   override fun uploadDocument(

@@ -1,19 +1,28 @@
 package com.github.se.travelpouch.ui.documents
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,7 +34,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -33,9 +45,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.documentfile.provider.DocumentFile
 import coil.compose.rememberAsyncImagePainter
+import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentViewModel
@@ -43,6 +58,8 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.rizzi.bouquet.ResourceType
 import com.rizzi.bouquet.VerticalPDFReader
 import com.rizzi.bouquet.rememberVerticalPdfReaderState
+import java.util.Calendar
+import java.util.GregorianCalendar
 import kotlinx.coroutines.launch
 
 /**
@@ -50,9 +67,16 @@ import kotlinx.coroutines.launch
  *
  * @param documentViewModel the document view model with the current document set as selected.
  */
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: NavigationActions) {
+fun DocumentPreview(
+    documentViewModel: DocumentViewModel,
+    navigationActions: NavigationActions,
+    activityViewModel: ActivityViewModel
+) {
+  var openDialog by remember { mutableStateOf(false) }
+
   val documentContainer: DocumentContainer =
       documentViewModel.selectedDocument.collectAsState().value!!
   val uri = documentViewModel.documentUri.value
@@ -109,12 +133,30 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
             actions = {
               IconButton(
                   onClick = {
-                    documentViewModel.deleteDocumentById(documentContainer.ref.id)
+                    val activitiesLinkedToDocument =
+                        activityViewModel.activities.value.filter {
+                          it.documentsNeeded.contains(documentContainer)
+                        }
+                    documentViewModel.deleteDocumentById(
+                        documentContainer, activitiesLinkedToDocument)
                     navigationActions.goBack()
                   },
                   modifier = Modifier.testTag("deleteButton")) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Document")
                   }
+
+              IconButton(
+                  onClick = {
+                    if (activityViewModel.activities.value.isEmpty()) {
+                      Toast.makeText(context, "No Activities to available", Toast.LENGTH_LONG)
+                          .show()
+                    } else {
+                      openDialog = true
+                    }
+                  },
+              ) {
+                Icon(imageVector = Icons.Default.AddLink, contentDescription = null)
+              }
             })
       },
   ) { paddingValue ->
@@ -143,6 +185,83 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
             }
           }
         }
+      }
+    }
+
+    if (openDialog) {
+      Dialog(
+          onDismissRequest = { openDialog = false },
+      ) {
+        Column(
+            modifier =
+                Modifier.fillMaxWidth(1f)
+                    .background(MaterialTheme.colorScheme.background)
+                    .testTag("participantDialogBox"),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly) {
+              Text(
+                  "Link to what activities",
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(8.dp))
+
+              LazyColumn(
+                  modifier =
+                      Modifier.fillMaxWidth(1f)
+                          .height(250.dp)
+                          .padding(horizontal = 8.dp)
+                          .background(MaterialTheme.colorScheme.background)
+                          .testTag("participantDialogBox"),
+                  verticalArrangement = Arrangement.spacedBy(8.dp),
+                  contentPadding = PaddingValues(vertical = 8.dp)) {
+                    items(activityViewModel.activities.value.size) { i ->
+                      val activity = activityViewModel.activities.value[i]
+                      val calendar = GregorianCalendar().apply { time = activity.date.toDate() }
+
+                      Card(
+                          modifier = Modifier.testTag("activityItem").fillMaxSize(),
+                          elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                          colors =
+                              CardColors(
+                                  containerColor = MaterialTheme.colorScheme.surface,
+                                  disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
+                                  contentColor = MaterialTheme.colorScheme.onSurface,
+                                  disabledContainerColor =
+                                      MaterialTheme.colorScheme.inverseOnSurface,
+                              ),
+                          onClick = {
+                            if (!activity.documentsNeeded.contains(documentContainer)) {
+                              val documentNeeded = activity.documentsNeeded.toMutableList()
+                              documentNeeded.add(documentContainer)
+                              val newActivity =
+                                  activity.copy(documentsNeeded = documentNeeded.toList())
+                              activityViewModel.updateActivity(newActivity, context)
+                              openDialog = false
+                            } else {
+                              Toast.makeText(
+                                      context,
+                                      "You already linked this document to this activity",
+                                      Toast.LENGTH_LONG)
+                                  .show()
+                            }
+                          }) {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                              Text(
+                                  activity.title,
+                                  fontWeight = FontWeight.SemiBold,
+                                  style = MaterialTheme.typography.bodyLarge)
+                              Text(
+                                  activity.location.name,
+                                  style = MaterialTheme.typography.bodyMedium)
+                              Text(
+                                  "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(
+                                          Calendar.YEAR)}",
+                                  style = MaterialTheme.typography.bodyMedium,
+                                  fontWeight = FontWeight.Light)
+                            }
+                          }
+                    }
+                  }
+            }
       }
     }
   }

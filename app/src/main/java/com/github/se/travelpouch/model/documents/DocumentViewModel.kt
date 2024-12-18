@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
+import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.travels.TravelContainer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.ByteArrayOutputStream
@@ -101,9 +102,10 @@ constructor(
    *
    * @param id The ID of the Document to be deleted.
    */
-  fun deleteDocumentById(id: String) {
+  fun deleteDocumentById(document: DocumentContainer, activityList: List<Activity>) {
     repository.deleteDocumentById(
-        id,
+        document,
+        activityList,
         onSuccess = { getDocuments() },
         onFailure = { Log.e("DocumentsViewModel", "Failed to delete Document", it) })
   }

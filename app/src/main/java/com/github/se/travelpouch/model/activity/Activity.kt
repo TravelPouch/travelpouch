@@ -1,5 +1,6 @@
 package com.github.se.travelpouch.model.activity
 
+import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.travels.Location
 import com.google.firebase.Timestamp
 
@@ -21,5 +22,5 @@ data class Activity(
     val description: String,
     val location: Location,
     val date: Timestamp,
-    val documentsNeeded: Map<String, Int>?
+    val documentsNeeded: List<DocumentContainer> = emptyList()
 )

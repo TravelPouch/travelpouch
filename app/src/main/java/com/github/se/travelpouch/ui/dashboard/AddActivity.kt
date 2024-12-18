@@ -183,7 +183,7 @@ fun AddActivityScreen(
                                 description,
                                 selectedLocation ?: Location(0.0, 0.0, finalDate, "Unknown"),
                                 finalDate,
-                                mapOf())
+                                emptyList())
 
                         activityModelView.addActivity(
                             activity, context, eventViewModel.getNewDocumentReference())

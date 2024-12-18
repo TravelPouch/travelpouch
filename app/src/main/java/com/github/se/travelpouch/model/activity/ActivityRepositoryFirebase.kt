@@ -2,6 +2,9 @@ package com.github.se.travelpouch.model.activity
 
 import android.util.Log
 import com.github.se.travelpouch.model.FirebasePaths
+import com.github.se.travelpouch.model.documents.DocumentContainer
+import com.github.se.travelpouch.model.documents.DocumentFileFormat
+import com.github.se.travelpouch.model.documents.DocumentVisibility
 import com.github.se.travelpouch.model.events.Event
 import com.github.se.travelpouch.model.events.EventType
 import com.github.se.travelpouch.model.travels.Location
@@ -178,9 +181,24 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
       val title = document.getString("title")
       val description = document.getString("description")
       val date = document.getTimestamp("date")
-      val documentsNeededData = document["documentsNeeded"] as? Map<*, *>
+      val documentsNeededData = document["documentsNeeded"] as? List<Map<*, *>>
       val documentsNeeded =
-          documentsNeededData?.map { (key, value) -> key as String to value as Int }?.toMap()
+          documentsNeededData
+              ?.map {
+                DocumentContainer(
+                    ref = it["ref"] as DocumentReference,
+                    travelRef = it["travelRef"] as DocumentReference,
+                    activityRef = it["activityRef"] as DocumentReference?,
+                    title = it["title"] as String,
+                    fileFormat = DocumentFileFormat.valueOf(it["fileFormat"] as String),
+                    fileSize = it["fileSize"] as Long,
+                    addedByEmail = it["addedByEmail"] as String?,
+                    addedByUser = it["addedByUser"] as DocumentReference?,
+                    addedAt = it["addedAt"] as Timestamp,
+                    visibility = DocumentVisibility.valueOf(it["visibility"] as String))
+              }
+              ?.toList() ?: emptyList()
+      // documentsNeededData?.map { (key, value) -> key as String to value as Int }?.toMap()
       val locationData = document.get("location") as? Map<*, *>
       val location =
           locationData?.let {
