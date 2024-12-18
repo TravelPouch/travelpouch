@@ -51,7 +51,7 @@ class ActivityRepositoryUnitTest {
           "activityDescription",
           Location(0.0, 0.0, Timestamp(0, 0), "location"),
           Timestamp(0, 0),
-          null)
+          emptyList())
 
   @Before
   fun setUp() {

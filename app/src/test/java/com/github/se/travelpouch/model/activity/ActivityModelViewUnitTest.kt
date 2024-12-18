@@ -28,7 +28,7 @@ class ActivityModelViewUnitTest {
           "description",
           Location(0.0, 0.0, Timestamp(0, 0), "location"),
           Timestamp(0, 0),
-          mapOf())
+          emptyList())
 
   val activity2 =
       Activity(
@@ -37,7 +37,7 @@ class ActivityModelViewUnitTest {
           "description2",
           Location(0.0, 0.0, Timestamp(0, 0), "location2"),
           Timestamp(50, 0), // Earlier timestamp
-          mapOf())
+          emptyList())
 
   val activity3 =
       Activity(
@@ -46,7 +46,7 @@ class ActivityModelViewUnitTest {
           "description3",
           Location(0.0, 0.0, Timestamp(0, 0), "location3"),
           Timestamp(150, 0), // Latest timestamp
-          mapOf())
+          emptyList())
 
   @Before
   fun setUp() {

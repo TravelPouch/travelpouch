@@ -109,12 +109,13 @@ class DocumentRepositoryFirestore(
       onFailure: (Exception) -> Unit
   ) {
     db.runTransaction {
-          val referenceDocument = db.collection(collectionPath).document(document.ref.id)
-          val stringToActivities =
-              FirebasePaths.constructPath(
-                  collectionPath.dropLast(FirebasePaths.documents.length + 1),
-                  FirebasePaths.activities)
-          val referenceToActivitiesCollection = db.collection(stringToActivities)
+          val referenceDocument = document.ref
+
+          val referenceToActivitiesCollection =
+              db.collection(
+                  FirebasePaths.constructPath(
+                      collectionPath.dropLast(FirebasePaths.documents.length + 1),
+                      FirebasePaths.activities))
 
           it.delete(referenceDocument)
 
@@ -126,8 +127,7 @@ class DocumentRepositoryFirestore(
               }
 
           for (activity in listActivitiesUpdated) {
-            val activityReference =
-                db.collection(referenceToActivitiesCollection.path).document(activity.uid)
+            val activityReference = referenceToActivitiesCollection.document(activity.uid)
             it.set(activityReference, activity)
           }
         }

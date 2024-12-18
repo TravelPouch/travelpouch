@@ -35,14 +35,14 @@ class DirectionsViewModelTest {
               "description",
               Location(0.0, 0.0, Timestamp(0, 0), "location"),
               Timestamp(0, 0),
-              mapOf()),
+              emptyList()),
           Activity(
               "uid2",
               "title2",
               "description2",
               Location(0.0, 0.0, Timestamp(0, 0), "location2"),
               Timestamp(50, 0),
-              mapOf()))
+              emptyList()))
 
   @Before
   fun setUp() {
