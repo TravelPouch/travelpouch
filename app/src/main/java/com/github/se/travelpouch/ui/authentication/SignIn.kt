@@ -79,7 +79,7 @@ fun SignInScreen(
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-            methodChosen.value = false
+            // methodChosen.value = false
             signInCompleted.value = true // Mark sign-in as completed
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
