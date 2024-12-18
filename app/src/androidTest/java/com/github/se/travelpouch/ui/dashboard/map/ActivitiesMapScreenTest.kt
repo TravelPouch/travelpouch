@@ -3,6 +3,7 @@ package com.github.se.travelpouch.ui.dashboard.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -183,7 +184,13 @@ class ActivitiesMapScreenTest {
 
   @Test
   fun testActivityDetailsContentDisplaysCorrectDetails() {
-    composeTestRule.setContent { ActivityDetailsContent(activity = listOfActivities[0]) }
+    composeTestRule.setContent {
+      ActivityDetailsContent(
+          activity = listOfActivities[0], // Pass the first activity
+          isGPSAvailable = true, // Mock GPS availability
+          onShowPathGPS = {} // Provide a no-op lambda for the callback
+          )
+    }
 
     // Verify title
     composeTestRule.onNodeWithTag("ActivityTitle").assertExists().assertTextEquals("Team Meeting")
@@ -219,9 +226,11 @@ class ActivitiesMapScreenTest {
                       listOf(
                           listOf(
                               LatLng(48.8566, 2.3522),
-                              LatLng(48.8570, 2.3530)) // Mock GPS to activity route
-                          )),
-          selectedActivity = listOfActivities[0] // Mock selected activity
+                              LatLng(48.8570, 2.3530) // Mock GPS to activity route
+                              ))),
+          selectedActivity = listOfActivities[0], // Mock selected activity
+          travelMode = "walking", // Mock travel mode
+          onTravelModeSelected = {} // No-op lambda for testing
           )
     }
 
@@ -229,7 +238,7 @@ class ActivitiesMapScreenTest {
     composeTestRule
         .onNodeWithTag("RouteDetailsTitle_Gps")
         .assertExists()
-        .assertTextEquals("Your current Location")
+        .assertTextEquals("Your Current Location")
 
     // Verify distance
     composeTestRule
@@ -266,8 +275,10 @@ class ActivitiesMapScreenTest {
                           listOf(LatLng(48.8566, 2.3522), LatLng(48.8570, 2.3530)), // Mock leg 1
                           listOf(LatLng(48.8570, 2.3530), LatLng(49.8566, 2.3522)) // Mock leg 2
                           )),
-          legIndex = 0,
-          activities = listOfActivities)
+          legIndex = 0, // Testing the first leg
+          activities = listOfActivities,
+          travelMode = "walking" // Mock travel mode
+          )
     }
 
     // Verify title (start activity)
@@ -293,6 +304,77 @@ class ActivitiesMapScreenTest {
         .onNodeWithTag("RouteDetailsSubtitle_Leg")
         .assertExists()
         .assertTextEquals("Client Presentation")
+  }
+
+  @Test
+  fun testTravelModeButtonActivities() {
+    var showPathsState = false
+    var selectedTravelMode = "walking"
+
+    composeTestRule.setContent {
+      TravelModeButtonActivities(
+          showPaths = showPathsState,
+          onTogglePaths = { showPathsState = !showPathsState },
+          travelMode = selectedTravelMode,
+          onTravelModeChange = { mode -> selectedTravelMode = mode })
+    }
+
+    // Verify initial state of toggle button
+    composeTestRule.onNodeWithTag("ToggleModeButtonActivities").assertExists()
+
+    // Click the toggle button to enable paths
+    composeTestRule.onNodeWithTag("ToggleModeButtonActivities").performClick()
+    assert(showPathsState) // Verify state is updated
+
+    // Verify "Walking Mode" button exists
+    composeTestRule.onNodeWithTag("WalkingModeButtonActivities").assertExists()
+
+    // Switch to "Driving Mode"
+    composeTestRule.onNodeWithTag("WalkingModeButtonActivities").performClick()
+    assert(selectedTravelMode == "walking") // Verify state is updated
+
+    // Verify "Driving Mode" button exists
+    composeTestRule.onNodeWithTag("DrivingModeButtonActivities").assertExists()
+
+    // Switch to "Driving Mode"
+    composeTestRule.onNodeWithTag("DrivingModeButtonActivities").performClick()
+    assert(selectedTravelMode == "driving") // Verify state is updated
+
+    // Verify "Bicycling Mode" button exists
+    composeTestRule.onNodeWithTag("BicyclingModeButtonActivities").assertExists()
+
+    // Switch to "Bicycling Mode"
+    composeTestRule.onNodeWithTag("BicyclingModeButtonActivities").performClick()
+    assert(selectedTravelMode == "bicycling") // Verify state is updated
+  }
+
+  @Test
+  fun testTravelModesGPS() {
+    var selectedMode = "walking"
+
+    composeTestRule.setContent {
+      TravelModesGPS(selectedMode = selectedMode, onModeSelected = { mode -> selectedMode = mode })
+    }
+
+    // Switch to "walking" mode
+    composeTestRule.onNodeWithTag("WalkingModeButtonGPS").assertExists()
+    composeTestRule.onNodeWithTag("WalkingModeButtonGPS").performClick()
+    assert(selectedMode == "walking") // Verify initial mode
+
+    // Switch to "Car" mode
+    composeTestRule.onNodeWithTag("DrivingModeButtonGPS").assertExists()
+    composeTestRule.onNodeWithTag("DrivingModeButtonGPS").performClick()
+    assert(selectedMode == "driving") // Verify mode is updated
+
+    // Switch to "Bicycle" mode
+    composeTestRule.onNodeWithTag("BicyclingModeButtonGPS").assertExists()
+    composeTestRule.onNodeWithTag("BicyclingModeButtonGPS").performClick()
+    assert(selectedMode == "bicycling") // Verify mode is updated
+
+    // Switch to "None" mode
+    composeTestRule.onNodeWithTag("NoneModeButtonGPS").assertExists()
+    composeTestRule.onNodeWithTag("NoneModeButtonGPS").performClick()
+    assert(selectedMode == "None") // Verify mode is updated
   }
 }
 
