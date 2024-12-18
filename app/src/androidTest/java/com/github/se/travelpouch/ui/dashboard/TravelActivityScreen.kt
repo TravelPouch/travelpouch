@@ -11,6 +11,8 @@ import androidx.compose.ui.test.performClick
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.documents.DocumentRepository
+import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
@@ -25,6 +27,8 @@ class TravelActivityScreenCopy {
   private lateinit var mockActivityRepositoryFirebase: ActivityRepository
   private lateinit var mockActivityModelView: ActivityViewModel
   private lateinit var navigationActions: NavigationActions
+  private lateinit var mockDocumentViewModel: DocumentViewModel
+  private lateinit var mockDocumentRepository: DocumentRepository
 
   val activites_test =
       listOf(
@@ -34,14 +38,14 @@ class TravelActivityScreenCopy {
               "description1",
               Location(0.0, 0.0, Timestamp(0, 0), "lcoation1"),
               Timestamp(0, 0),
-              mapOf<String, Int>()),
+              emptyList()),
           Activity(
               "2",
               "title2",
               "description2",
               Location(0.0, 0.0, Timestamp(0, 0), "lcoation2"),
               Timestamp(0, 0),
-              mapOf<String, Int>()))
+              emptyList()))
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -50,12 +54,17 @@ class TravelActivityScreenCopy {
     navigationActions = mock(NavigationActions::class.java)
     mockActivityRepositoryFirebase = mock(ActivityRepository::class.java)
     mockActivityModelView = ActivityViewModel(mockActivityRepositoryFirebase)
+    mockDocumentRepository = mock()
+    mockDocumentViewModel = DocumentViewModel(mockDocumentRepository, mock(), mock())
   }
 
   @Test
   fun verifiesEverythingIsDisplayed() {
     composeTestRule.setContent {
-      TravelActivitiesScreen(navigationActions, activityModelView = mockActivityModelView)
+      TravelActivitiesScreen(
+          navigationActions,
+          activityModelView = mockActivityModelView,
+          documentViewModel = mockDocumentViewModel)
     }
 
     `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
@@ -74,7 +83,10 @@ class TravelActivityScreenCopy {
   @Test
   fun verifiesEmptyPromptWhenEmptyList() {
     composeTestRule.setContent {
-      TravelActivitiesScreen(navigationActions, activityModelView = mockActivityModelView)
+      TravelActivitiesScreen(
+          navigationActions,
+          activityModelView = mockActivityModelView,
+          documentViewModel = mockDocumentViewModel)
     }
 
     `when`(mockActivityRepositoryFirebase.getAllActivities(any(), any())).then {
@@ -89,12 +101,10 @@ class TravelActivityScreenCopy {
   @Test
   fun verifyActivityCardWorksCorrectly() {
     val activity = activites_test[0]
-    val images =
-        listOf(
-            "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
-            "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
-            "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
-    composeTestRule.setContent { ActivityItem(activity, {}, LocalContext.current, images) }
+
+    composeTestRule.setContent {
+      ActivityItem(activity, {}, LocalContext.current, mockDocumentViewModel)
+    }
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityItem").assertIsDisplayed()
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.title)
@@ -103,41 +113,43 @@ class TravelActivityScreenCopy {
     composeTestRule.onNodeWithTag("extraDocumentButton").assertIsDisplayed().performClick()
   }
 
-  @Test
-  fun verify1ImageActivity() {
-    val activity = activites_test[0]
-    val images =
-        listOf(
-            "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
-            "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
-            "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
-    composeTestRule.setContent {
-      ActivityItem(activity, {}, LocalContext.current, listOf(images[0]))
-    }
-    composeTestRule.waitForIdle()
-  }
-
-  @Test
-  fun verify2ImagesActivity() {
-    val activity = activites_test[0]
-    val images =
-        listOf(
-            "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
-            "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
-            "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
-    composeTestRule.setContent {
-      ActivityItem(activity, {}, LocalContext.current, listOf(images[0], images[1]))
-    }
-    composeTestRule.waitForIdle()
-  }
+  //  @Test
+  //  fun verify1ImageActivity() {
+  //    val activity = activites_test[0]
+  //    val images =
+  //        listOf(
+  //
+  // "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
+  //
+  // "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
+  //
+  // "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
+  //    composeTestRule.setContent {
+  //      ActivityItem(activity, {}, LocalContext.current, listOf(images[0]))
+  //    }
+  //    composeTestRule.waitForIdle()
+  //  }
+  //
+  //  @Test
+  //  fun verify2ImagesActivity() {
+  //    val activity = activites_test[0]
+  //    val images =
+  //        listOf(
+  //
+  // "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
+  //
+  // "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
+  //
+  // "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
+  //    composeTestRule.setContent {
+  //      ActivityItem(activity, {}, LocalContext.current, listOf(images[0], images[1]))
+  //    }
+  //    composeTestRule.waitForIdle()
+  //  }
 
   @Test
   fun runDefaultErrorUIToCheckFailure() {
     composeTestRule.setContent { DefaultErrorUI() }
-  }
-
-  fun runAsyncLoadingSpinner() {
-    composeTestRule.setContent { AdvancedImageDisplayWithEffects("https://epic.gamer.huh") }
   }
 
   @Test
@@ -151,14 +163,14 @@ class TravelActivityScreenCopy {
                 "description1",
                 Location(0.0, 0.0, Timestamp(0, 0), "lcoation1"),
                 Timestamp(nowSeconds + 3600L, 0),
-                mapOf<String, Int>()),
+                emptyList()),
             Activity(
                 "2",
                 "title2",
                 "description2",
                 Location(0.0, 0.0, Timestamp(0, 0), "lcoation2"),
                 Timestamp(nowSeconds + 3600L, 0),
-                mapOf<String, Int>()))
+                emptyList()))
 
     composeTestRule.setContent { NextActivitiesBanner(activitiesNow, {}) }
     composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertIsDisplayed()
@@ -189,14 +201,14 @@ class TravelActivityScreenCopy {
                 "description1",
                 Location(0.0, 0.0, Timestamp(0, 0), "location1"),
                 Timestamp(nowSeconds - 100_000L, 0),
-                mapOf<String, Int>()),
+                emptyList()),
             Activity(
                 "2",
                 "title2",
                 "description2",
                 Location(0.0, 0.0, Timestamp(0, 0), "location2"),
                 Timestamp(nowSeconds + 100_000L, 0),
-                mapOf<String, Int>()))
+                emptyList()))
 
     composeTestRule.setContent { NextActivitiesBanner(activitiesOutOfDate, {}) }
     composeTestRule.onNodeWithTag("NextActivitiesBannerBox").assertDoesNotExist()

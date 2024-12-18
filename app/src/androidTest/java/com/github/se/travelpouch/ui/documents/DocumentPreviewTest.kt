@@ -15,6 +15,8 @@ import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.se.travelpouch.di.AppModule
+import com.github.se.travelpouch.model.activity.ActivityRepository
+import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentContainer
 import com.github.se.travelpouch.model.documents.DocumentFileFormat
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -50,10 +52,16 @@ class DocumentPreviewTest {
   private lateinit var mockDataStore: DataStore<Preferences>
   private lateinit var file: File
 
+  private lateinit var mockActivityRepository: ActivityRepository
+  private lateinit var mockActivityViewModel: ActivityViewModel
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
+    mockActivityRepository = mock()
+    mockActivityViewModel = ActivityViewModel(mockActivityRepository)
+
     mockDocumentReference = mock(DocumentReference::class.java)
     `when`(mockDocumentReference.id).thenReturn("ref_id")
 
@@ -105,7 +113,9 @@ class DocumentPreviewTest {
 
   @Test
   fun testsEverythingIsDisplayed() {
-    composeTestRule.setContent { DocumentPreview(mockDocumentViewModel, navigationActions) }
+    composeTestRule.setContent {
+      DocumentPreview(mockDocumentViewModel, navigationActions, mockActivityViewModel)
+    }
 
     composeTestRule.onNodeWithTag("documentPreviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("documentTitleTopBarApp").assertIsDisplayed()
