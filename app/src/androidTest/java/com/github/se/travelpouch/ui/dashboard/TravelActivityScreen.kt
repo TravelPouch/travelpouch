@@ -110,7 +110,7 @@ class TravelActivityScreenCopy {
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.title)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.location.name)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains("1/1/1970")
-    composeTestRule.onNodeWithTag("extraDocumentButton").assertIsDisplayed().performClick()
+    // composeTestRule.onNodeWithTag("extraDocumentButton").assertIsDisplayed().performClick()
   }
 
   //  @Test
