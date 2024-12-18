@@ -69,7 +69,7 @@ class CalendarScreenTest {
             date = Timestamp(today),
             description = "This is a mock activity for today.",
             location = Location(0.0, 0.0, Timestamp(0, 0), "location"),
-            documentsNeeded = mapOf())
+            documentsNeeded = emptyList())
 
     val listOfActivities = listOf(activityToday)
 

@@ -57,21 +57,21 @@ class ActivitiesMapScreenTest {
               description = "Monthly team meeting to discuss project progress.",
               location = Location(48.8566, 2.3522, Timestamp.now(), "Paris"),
               date = createTimestamp("20/12/2024 12:00"),
-              documentsNeeded = mapOf("Agenda" to 1, "Meeting Notes" to 2)),
+              documentsNeeded = emptyList()),
           Activity(
               uid = "2",
               title = "Client Presentation",
               description = "Presentation to showcase the project to the client.",
               location = Location(49.8566, 2.3522, Timestamp.now(), "Paris"),
               date = createTimestamp("21/12/2024 13:00"),
-              documentsNeeded = null),
+              documentsNeeded = emptyList()),
           Activity(
               uid = "3",
               title = "Workshop",
               description = "Workshop on team building and skill development.",
               location = Location(49.02, 2.5, Timestamp.now(), "Paris"),
               date = createTimestamp("23/12/2024 14:00"),
-              documentsNeeded = mapOf("Workshop Material" to 1)))
+              documentsNeeded = emptyList()))
 
   private val mockLeg =
       Leg(
