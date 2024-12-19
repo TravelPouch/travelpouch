@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.dashboard
 
 import androidx.compose.ui.semantics.SemanticsProperties.EditableText
@@ -63,7 +64,7 @@ class AddActivityScreenTest {
           "description",
           Location(0.0, 0.0, Timestamp(0, 0), "location"),
           Timestamp(0, 0),
-          mapOf())
+          emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
 

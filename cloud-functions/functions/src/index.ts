@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 import {HttpsError, onCall, onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
@@ -8,6 +9,8 @@ import {
 } from "./gmail.js";
 import {storeFile} from "./storage.js";
 import {generateThumbnailForDocument} from "./thumbnailing.js";
+
+import {fetchNotificationTokens, sendPushNotification} from "./pushNotification.js";
 
 initializeApp();
 
@@ -78,6 +81,58 @@ export const generateThumbnailHttp = onRequest(
       await generateThumbnailForDocument(req.body.travelId, req.body.documentId, req.body.width);
     } catch (err) {
       res.status(500).json({success: false, message: err});
+      return;
+    }
+    res.json({success: true});
+  });
+
+
+export const sendNotification = onCall(
+  {region: "europe-west9"},
+  async (req) => {
+    if (!req.data.userId || !req.data.message) {
+      throw new HttpsError("invalid-argument", "Missing parameters: userId or message");
+    }
+    try {
+      const userId = req.data.userId;
+      const message = req.data.message;
+
+      const tokens = await fetchNotificationTokens(userId);
+      if (tokens.length === 0) {
+        logger.warn(`No notification tokens found for user: ${userId}`);
+        return {success: false, message: "No tokens found"};
+      }
+
+      await sendPushNotification(tokens, message);
+      return {success: true, message: "Notification sent successfully"};
+    } catch (err) {
+      logger.error("Error sending notification", err);
+      throw new HttpsError("internal", "Error sending notification");
+    }
+  });
+
+export const sendNotificationHttp = onRequest(
+  {region: "europe-west9"},
+  async (req, res) => {
+    if (!req.body.userId || !req.body.message) {
+      res.status(400).json({success: false, message: "Missing parameters"});
+      return;
+    }
+    try {
+      const userId = req.body.userId;
+      const message = req.body.message;
+
+      const tokens = await fetchNotificationTokens(userId);
+      if (tokens.length === 0) {
+        logger.warn(`No notification tokens found for user: ${userId}`);
+        res.status(400).json({success: false, message: "No tokens found"});
+        return;
+      }
+
+      await sendPushNotification(tokens, message);
+    } catch (err) {
+      logger.error("Error sending notification", err);
+      res.status(500).json({error: "internal", message: "Error sending notification"});
       return;
     }
     res.json({success: true});

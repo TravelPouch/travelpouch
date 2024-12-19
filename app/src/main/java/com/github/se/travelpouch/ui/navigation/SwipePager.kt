@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.navigation
 
 import androidx.compose.foundation.layout.padding
@@ -124,7 +125,7 @@ fun SwipePager(
       }) { pd ->
         HorizontalPager(state = pagerState, modifier = Modifier.padding(pd)) { pageIndex ->
           when (pageIndex) {
-            0 -> TravelActivitiesScreen(navigationActions, activityViewModel)
+            0 -> TravelActivitiesScreen(navigationActions, activityViewModel, documentViewModel)
             1 -> CalendarScreen(calendarViewModel, navigationActions)
             2 ->
                 DocumentListScreen(

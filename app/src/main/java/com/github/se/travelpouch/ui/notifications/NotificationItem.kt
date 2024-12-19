@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.notifications
 
 import android.widget.Toast
@@ -224,16 +225,26 @@ fun handleInvitationResponse(
                 if (isAccepted) NotificationType.ACCEPTED else NotificationType.DECLINED
             val responseMessage = if (isAccepted) "ACCEPTED" else "DECLINED"
 
+
+              val responseNotification =
+                  NotificationContent.InvitationResponseNotification(
+                    profileViewModel.profile.value.username,
+                      travel!!.title, isAccepted)
             val invitationResponse =
                 Notification(
                     notification.notificationUid,
                     profileViewModel.profile.value.fsUid,
                     notification.senderUid,
                     notification.travelUid,
-                    NotificationContent.InvitationResponseNotification(
-                        profileViewModel.profile.value.username, travel!!.title, isAccepted),
+                    responseNotification,
                     responseType,
                     sector = notification.sector)
+
+              notificationViewModel.sendNotificationToUser(
+                  notification.senderUid,
+                  responseNotification
+              )
+
 
             notificationViewModel.sendNotification(invitationResponse)
             if (isAccepted) {
@@ -263,36 +274,49 @@ fun handleInvitationResponse(
         profileViewModel.addFriend(
             notification.senderUid,
             onSuccess = {
+                val firendNotification =
+                    NotificationContent.FriendInvitationResponseNotification(
+                        profileViewModel.profile.value.email, true)
               val invitationResponse =
                   Notification(
                       notification.notificationUid,
                       profileViewModel.profile.value.fsUid,
                       notification.senderUid,
                       notification.travelUid,
-                      NotificationContent.FriendInvitationResponseNotification(
-                          profileViewModel.profile.value.email, true),
+                      firendNotification,
                       NotificationType.ACCEPTED,
                       sector = notification.sector)
 
               notificationViewModel.sendNotification(invitationResponse)
+                notificationViewModel.sendNotificationToUser(
+                    notification.senderUid,
+                    firendNotification
+                )
 
               Toast.makeText(context, "Friend added", Toast.LENGTH_LONG).show()
             },
             onFailure = { e -> Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show() })
       } else {
+          val firendNotification =
+              NotificationContent.FriendInvitationResponseNotification(
+                  profileViewModel.profile.value.email, false)
         val invitationResponse =
             Notification(
                 notification.notificationUid,
                 profileViewModel.profile.value.fsUid,
                 notification.senderUid,
                 notification.travelUid,
-                NotificationContent.FriendInvitationResponseNotification(
-                    profileViewModel.profile.value.email, false),
+                firendNotification,
                 NotificationType.DECLINED,
                 sector = notification.sector)
 
         notificationViewModel.sendNotification(invitationResponse)
 
+          notificationViewModel.sendNotificationToUser(
+              notification.senderUid,
+              firendNotification
+          )
+          
         Toast.makeText(context, "Request declined", Toast.LENGTH_LONG).show()
       }
     }
