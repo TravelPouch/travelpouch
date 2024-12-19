@@ -2,6 +2,9 @@ package com.github.se.travelpouch.model.activity
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
+import com.github.se.travelpouch.model.documents.DocumentContainer
+import com.github.se.travelpouch.model.documents.DocumentFileFormat
+import com.github.se.travelpouch.model.documents.DocumentVisibility
 import com.github.se.travelpouch.model.travels.Location
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -42,6 +45,9 @@ class ActivityRepositoryUnitTest {
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
   @Mock private lateinit var mockToDoQuerySnapshot: QuerySnapshot
 
+  @Mock private lateinit var mockDocumentDocumentReference: DocumentReference
+  @Mock private lateinit var mockTravelReference: DocumentReference
+
   private lateinit var activityRepositoryFirestore: ActivityRepositoryFirebase
 
   val activity =
@@ -51,10 +57,13 @@ class ActivityRepositoryUnitTest {
           "activityDescription",
           Location(0.0, 0.0, Timestamp(0, 0), "location"),
           Timestamp(0, 0),
-          emptyList())
+          listOf())
 
   @Before
   fun setUp() {
+    mockTravelReference = mock()
+    mockDocumentDocumentReference = mock()
+
     MockitoAnnotations.openMocks(this)
 
     // Initialize Firebase if necessary
@@ -76,7 +85,20 @@ class ActivityRepositoryUnitTest {
                 "longitude" to activity.location.longitude,
                 "name" to activity.location.name,
                 "insertTime" to activity.location.insertTime))
-    `when`(mockDocumentSnapshot.get("documentsNeeded")).thenReturn(null)
+    `when`(mockDocumentSnapshot.get("documentsNeeded"))
+        .thenReturn(
+            listOf(
+                mapOf(
+                    "ref" to mockDocumentDocumentReference,
+                    "travelRef" to mockTravelReference,
+                    "activityRef" to null,
+                    "title" to "titleDoc",
+                    "fileFormat" to "JPEG",
+                    "fileSize" to 0L,
+                    "addedByEmail" to null,
+                    "addedByUser" to null,
+                    "addedAt" to Timestamp(0, 0),
+                    "visibility" to "ME")))
 
     `when`(mockFirestore.collection(any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(any())).thenReturn(mockDocumentReference)
@@ -165,6 +187,26 @@ class ActivityRepositoryUnitTest {
 
   @Test
   fun documentToActivity() {
+    val activity1 =
+        Activity(
+            "activityUid",
+            "activityTitle",
+            "activityDescription",
+            Location(0.0, 0.0, Timestamp(0, 0), "location"),
+            Timestamp(0, 0),
+            listOf(
+                DocumentContainer(
+                    mockDocumentDocumentReference,
+                    mockTravelReference,
+                    null,
+                    "titleDoc",
+                    DocumentFileFormat.JPEG,
+                    0L,
+                    null,
+                    null,
+                    Timestamp(0, 0),
+                    DocumentVisibility.ME)))
+
     val privateFunc =
         activityRepositoryFirestore.javaClass.getDeclaredMethod(
             "documentToActivity", DocumentSnapshot::class.java)
@@ -172,6 +214,6 @@ class ActivityRepositoryUnitTest {
     val parameters = arrayOfNulls<Any>(1)
     parameters[0] = mockDocumentSnapshot
     val result = privateFunc.invoke(activityRepositoryFirestore, *parameters)
-    assertThat(result, `is`(activity))
+    assertThat(result, `is`(activity1))
   }
 }
