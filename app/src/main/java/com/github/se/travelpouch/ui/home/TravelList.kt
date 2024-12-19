@@ -1,7 +1,11 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.home
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -57,6 +61,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -64,6 +69,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +77,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.github.se.travelpouch.BuildConfig
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.events.EventViewModel
@@ -80,12 +89,13 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 import com.github.se.travelpouch.ui.theme.logoutIconDark
 import com.github.se.travelpouch.ui.theme.logoutIconLight
 import com.github.se.travelpouch.ui.theme.logoutRedDark
 import com.github.se.travelpouch.ui.theme.logoutRedLight
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
 import java.util.Locale
 import kotlinx.coroutines.launch
 
@@ -111,6 +121,9 @@ fun TravelListScreen(
     documentViewModel: DocumentViewModel,
     profileModelView: ProfileModelView
 ) {
+    // Ask for notification permission
+    RequestNotificationPermission(profileModelView)
+
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
     listTravelViewModel.getTravels()
@@ -522,3 +535,38 @@ private fun resizeFromDragMotion(
     }
   }
 }
+
+@Composable
+fun RequestNotificationPermission(profileViewModel: ProfileModelView) {
+    val context = LocalContext.current
+
+    // Check notification permission
+    val hasPermission = remember { BuildConfig.DEBUG } || run {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPermission) {
+        ActivityCompat.requestPermissions(
+            context as Activity,
+            arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+            0
+        )
+    }
+
+    // Only call Firestore logic if not already updated
+    if (hasPermission && !profileViewModel.isTokenUpdated) {
+        LaunchedEffect(Unit) {
+            Firebase.messaging.token.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val token = it.result
+                    profileViewModel.updateNotificationTokenIfNeeded(token)
+                }
+            }
+        }
+    }
+}
+

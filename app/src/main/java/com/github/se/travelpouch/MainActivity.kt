@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch
 
 import android.os.Bundle
@@ -46,6 +47,7 @@ import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -67,6 +69,7 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
+      FirebaseApp.initializeApp(this)
   }
 
   @Composable
@@ -159,7 +162,7 @@ class MainActivity : ComponentActivity() {
               })
         }
         composable(Screen.DOCUMENT_PREVIEW) {
-          DocumentPreview(documentViewModel, navigationActions)
+          DocumentPreview(documentViewModel, navigationActions, activityModelView)
         }
         composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel, navigationActions) }
 

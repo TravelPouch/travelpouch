@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.notification
 
 import androidx.compose.ui.test.assertIsDisplayed
@@ -5,6 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ApplicationProvider
 import com.github.se.travelpouch.model.activity.ActivityRepository
 import com.github.se.travelpouch.model.activity.ActivityViewModel
 import com.github.se.travelpouch.model.documents.DocumentRepository
@@ -31,6 +33,7 @@ import com.github.se.travelpouch.ui.notifications.DeclineButton
 import com.github.se.travelpouch.ui.notifications.InvitationButtons
 import com.github.se.travelpouch.ui.notifications.NotificationMessage
 import com.github.se.travelpouch.ui.notifications.NotificationTimestamp
+import com.google.firebase.FirebaseApp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -77,6 +80,9 @@ class NotificationItemTest {
 
   @Before
   fun setUp() {
+
+      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+
     travelRepository = mock(TravelRepository::class.java)
     notificationRepository = mock(NotificationRepository::class.java)
     profileRepository = mock(ProfileRepository::class.java)
@@ -92,6 +98,7 @@ class NotificationItemTest {
     activityViewModel = ActivityViewModel(activityRepository)
     documentViewModel = DocumentViewModel(documentRepository, documentsManager, mock())
     eventViewModel = EventViewModel(eventRepository)
+
   }
 
   @Test
