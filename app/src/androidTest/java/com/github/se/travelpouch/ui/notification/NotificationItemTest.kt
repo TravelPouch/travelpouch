@@ -81,7 +81,7 @@ class NotificationItemTest {
   @Before
   fun setUp() {
 
-      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+    FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
 
     travelRepository = mock(TravelRepository::class.java)
     notificationRepository = mock(NotificationRepository::class.java)
@@ -98,7 +98,6 @@ class NotificationItemTest {
     activityViewModel = ActivityViewModel(activityRepository)
     documentViewModel = DocumentViewModel(documentRepository, documentsManager, mock())
     eventViewModel = EventViewModel(eventRepository)
-
   }
 
   @Test

@@ -422,7 +422,7 @@ class ParticipantListScreenTest {
 
     // Verify interactions with the repositories
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    verify(notificationRepository, never()).addNotification(anyOrNull())
+    verify(notificationRepository, never()).addNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
@@ -471,7 +471,7 @@ class ParticipantListScreenTest {
 
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    verify(notificationRepository, never()).addNotification(anyOrNull())
+    verify(notificationRepository, never()).addNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
@@ -550,7 +550,7 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    verify(notificationRepository, never()).addNotification(anyOrNull())
+    verify(notificationRepository, never()).addNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
@@ -672,7 +672,8 @@ class ParticipantListScreenTest {
         .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     verify(profileRepository).getFsUidByEmail(anyOrNull(), anyOrNull(), anyOrNull())
-    verify(notificationRepository, atLeastOnce()).addNotification(anyOrNull())
+    verify(notificationRepository, atLeastOnce())
+        .addNotification(anyOrNull(), anyOrNull(), anyOrNull())
     // throw impossible exception
     doAnswer { invocation ->
           val email = invocation.getArgument<String>(0)
@@ -697,7 +698,7 @@ class ParticipantListScreenTest {
         .updateTravel(any(), any(), anyOrNull(), any(), any(), anyOrNull())
     doThrow(RuntimeException("Impossible Exception"))
         .`when`(notificationRepository)
-        .addNotification(anyOrNull())
+        .addNotification(anyOrNull(), anyOrNull(), anyOrNull())
     composeTestRule.onNodeWithTag("addUserFab").performClick()
     val randomEmail2 = "random.email@example.org"
     composeTestRule.onNodeWithTag("addUserEmailField").performScrollTo()
@@ -787,7 +788,7 @@ class ParticipantListScreenTest {
     composeTestRule.onNodeWithTag("friendCard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("friendCard").assertTextContains("example@mail.com")
     composeTestRule.onNodeWithTag("friendCard").performClick()
-    verify(notificationRepository).addNotification(anyOrNull())
+    verify(notificationRepository).addNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test
