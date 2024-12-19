@@ -1,7 +1,7 @@
 // Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.dashboard
 
-import android.widget.Toast
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -23,14 +22,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,9 +42,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.activity.ActivityViewModel
+import com.github.se.travelpouch.model.documents.DocumentContainer
+import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import java.util.Calendar
@@ -62,7 +64,8 @@ private const val A4_ASPECT_RATIO = 1f / 1.414f
 @Composable
 fun TravelActivitiesScreen(
     navigationActions: NavigationActions,
-    activityModelView: ActivityViewModel
+    activityModelView: ActivityViewModel,
+    documentViewModel: DocumentViewModel
 ) {
 
   activityModelView.getAllActivities()
@@ -136,7 +139,7 @@ fun TravelActivitiesScreen(
                               navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
                             },
                             LocalContext.current,
-                            images)
+                            documentViewModel)
                       }
                     }
                   }
@@ -165,7 +168,7 @@ fun ActivityItem(
     activity: Activity,
     onClick: () -> Unit = {},
     context: android.content.Context,
-    images: List<String>
+    documentViewModel: DocumentViewModel
 ) {
   val calendar = GregorianCalendar().apply { time = activity.date.toDate() }
   // we hardcode for the moment placeholder images
@@ -194,9 +197,9 @@ fun ActivityItem(
           fontWeight = FontWeight.Light)
 
       // Handling image display logic
-      if (images.isEmpty()) {
+      if (activity.documentsNeeded.isEmpty()) {
         // No images to show, do nothing
-      } else if (images.size == 1) {
+      } else if (activity.documentsNeeded.size == 1) {
         // Single image
         Box(
             modifier =
@@ -205,16 +208,17 @@ fun ActivityItem(
                         A4_ASPECT_RATIO) // Maintain A4 aspect ratio (width / height ~ 1:1.414)
                     .background(Color.Transparent)) {
               AdvancedImageDisplayWithEffects(
-                  imageUrl = images[0],
+                  documentViewModel,
+                  activity.documentsNeeded[0],
                   loadingContent = { DefaultLoadingUI() },
                   errorContent = { DefaultErrorUI() })
             }
-      } else if (images.size == 2) {
+      } else {
         // Two images - display side by side with space in between
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-              images.take(2).forEach { imageUrl ->
+              activity.documentsNeeded.take(2).forEach { document ->
                 Box(
                     modifier =
                         Modifier.weight(1f)
@@ -222,57 +226,13 @@ fun ActivityItem(
                                 A4_ASPECT_RATIO) // Use the same A4 aspect ratio for both images
                             .background(Color.Transparent)) {
                       AdvancedImageDisplayWithEffects(
-                          imageUrl = imageUrl,
+                          documentViewModel,
+                          document,
                           loadingContent = { DefaultLoadingUI() },
                           errorContent = { DefaultErrorUI() })
                     }
               }
             }
-      } else if (images.size >= 3) {
-        // Three or more images - show the first two with a button above them
-        Column(modifier = Modifier.fillMaxWidth()) {
-          Box { // Box to layer
-            // Display the first two images inside a Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                  images.take(2).forEach { imageUrl ->
-                    Box(
-                        modifier =
-                            Modifier.weight(1f) // Ensure the images take equal space
-                                .aspectRatio(A4_ASPECT_RATIO) // Maintain A4 aspect ratio
-                                .background(Color.Transparent)) {
-                          AdvancedImageDisplayWithEffects(
-                              imageUrl = imageUrl,
-                              loadingContent = { DefaultLoadingUI() },
-                              errorContent = { DefaultErrorUI() })
-                        }
-                  }
-                }
-
-            // More options button on top of the second image
-            IconButton(
-                onClick = {
-                  Toast.makeText(
-                          context, "Placeholder for document view of activity", Toast.LENGTH_LONG)
-                      .show()
-                },
-                modifier =
-                    Modifier.align(Alignment.BottomEnd) // Position the button on the bottom right
-                        .background(
-                            Color.Gray,
-                            shape =
-                                androidx.compose.foundation.shape.RoundedCornerShape(
-                                    10)) // Rounded background
-                        .testTag("extraDocumentButton") // Add padding to the button
-                ) {
-                  Icon(
-                      imageVector = Icons.Default.MoreVert,
-                      contentDescription = "More options",
-                      tint = Color.White)
-                }
-          }
-        }
       }
     }
   }
@@ -290,12 +250,20 @@ fun ActivityItem(
  */
 @Composable
 fun AdvancedImageDisplayWithEffects(
-    imageUrl: String,
+    documentViewModel: DocumentViewModel,
+    documentContainer: DocumentContainer,
     loadingContent: @Composable () -> Unit = { DefaultLoadingUI() },
     errorContent: @Composable () -> Unit = { DefaultErrorUI() }
 ) {
+  var thumbnailUri by remember { mutableStateOf<Uri?>(null) }
+  LaunchedEffect(documentContainer) {
+    documentViewModel.getDocumentThumbnail(documentContainer, 150)
+  }
+  thumbnailUri = documentViewModel.thumbnailUris["${documentContainer.ref.id}-${150}"]
+
   SubcomposeAsyncImage(
-      model = ImageRequest.Builder(LocalContext.current).data(imageUrl).crossfade(true).build(),
+      model =
+          thumbnailUri, // ImageRequest.Builder(LocalContext.current).data(imageUrl).crossfade(true).build(),
       contentDescription = "Advanced Image with Effects",
       modifier = Modifier.fillMaxWidth(),
       contentScale = ContentScale.Fit,

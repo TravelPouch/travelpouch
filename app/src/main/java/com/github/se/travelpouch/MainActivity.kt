@@ -160,7 +160,7 @@ class MainActivity : ComponentActivity() {
               })
         }
         composable(Screen.DOCUMENT_PREVIEW) {
-          DocumentPreview(documentViewModel, navigationActions)
+          DocumentPreview(documentViewModel, navigationActions, activityModelView)
         }
         composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel, navigationActions) }
 

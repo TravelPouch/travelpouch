@@ -125,7 +125,7 @@ fun SwipePager(
       }) { pd ->
         HorizontalPager(state = pagerState, modifier = Modifier.padding(pd)) { pageIndex ->
           when (pageIndex) {
-            0 -> TravelActivitiesScreen(navigationActions, activityViewModel)
+            0 -> TravelActivitiesScreen(navigationActions, activityViewModel, documentViewModel)
             1 -> CalendarScreen(calendarViewModel, navigationActions)
             2 ->
                 DocumentListScreen(

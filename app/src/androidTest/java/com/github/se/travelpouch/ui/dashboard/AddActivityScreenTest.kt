@@ -64,7 +64,7 @@ class AddActivityScreenTest {
           "description",
           Location(0.0, 0.0, Timestamp(0, 0), "location"),
           Timestamp(0, 0),
-          mapOf())
+          emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
 

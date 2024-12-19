@@ -135,12 +135,12 @@ class DocumentViewModelTest {
   fun deleteDocumentById_successfulDelete_updatesDocuments() {
     val emptyDocumentList = emptyList<DocumentContainer>()
     doAnswer { invocation ->
-          val onSuccess = invocation.getArgument(1) as () -> Unit
+          val onSuccess = invocation.getArgument(2) as () -> Unit
           onSuccess()
           null
         }
         .whenever(documentRepository)
-        .deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull())
+        .deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     doAnswer { invocation ->
           val onSuccess = invocation.getArgument(0) as (List<DocumentContainer>) -> Unit
@@ -150,7 +150,7 @@ class DocumentViewModelTest {
         .whenever(documentRepository)
         .getDocuments(anyOrNull(), anyOrNull())
 
-    documentViewModel.deleteDocumentById("1")
+    documentViewModel.deleteDocumentById(mock(DocumentContainer::class.java), emptyList())
     assertThat(documentViewModel.documents.value, `is`(emptyDocumentList))
   }
 
@@ -201,19 +201,20 @@ class DocumentViewModelTest {
     val errorMessage = "Failed to delete Document"
     val exception = Exception("Delete Document Failed Test")
     doAnswer { invocation ->
-          val onFailure = invocation.getArgument(2) as (Exception) -> Unit
+          val onFailure = invocation.getArgument(3) as (Exception) -> Unit
           onFailure(exception)
           null
         }
         .whenever(documentRepository)
-        .deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull())
+        .deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
 
     mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
       logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
 
-      documentViewModel.deleteDocumentById("1")
+      documentViewModel.deleteDocumentById(mock(DocumentContainer::class.java), emptyList())
 
-      verify(documentRepository).deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull())
+      verify(documentRepository)
+          .deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
       logMock.verify { Log.e("DocumentsViewModel", errorMessage, exception) }
     }
   }
