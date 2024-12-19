@@ -154,9 +154,9 @@ fun DocumentPreview(
                       openDialog = true
                     }
                   },
-              ) {
-                Icon(imageVector = Icons.Default.AddLink, contentDescription = null)
-              }
+                  modifier = Modifier.testTag("linkingButton")) {
+                    Icon(imageVector = Icons.Default.AddLink, contentDescription = null)
+                  }
             })
       },
   ) { paddingValue ->
@@ -196,7 +196,7 @@ fun DocumentPreview(
             modifier =
                 Modifier.fillMaxWidth(1f)
                     .background(MaterialTheme.colorScheme.background)
-                    .testTag("participantDialogBox"),
+                    .testTag("activitiesDialog"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly) {
               Text(
@@ -210,7 +210,7 @@ fun DocumentPreview(
                           .height(250.dp)
                           .padding(horizontal = 8.dp)
                           .background(MaterialTheme.colorScheme.background)
-                          .testTag("participantDialogBox"),
+                          .testTag("activitiesList"),
                   verticalArrangement = Arrangement.spacedBy(8.dp),
                   contentPadding = PaddingValues(vertical = 8.dp)) {
                     items(activityViewModel.activities.value.size) { i ->
@@ -218,7 +218,7 @@ fun DocumentPreview(
                       val calendar = GregorianCalendar().apply { time = activity.date.toDate() }
 
                       Card(
-                          modifier = Modifier.testTag("activityItem").fillMaxSize(),
+                          modifier = Modifier.testTag("activityItem_${activity.uid}").fillMaxSize(),
                           elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
                           colors =
                               CardColors(
