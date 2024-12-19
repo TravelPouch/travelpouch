@@ -44,6 +44,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
@@ -187,5 +188,18 @@ class DocumentPreviewTest {
     composeTestRule.onNodeWithText("Link to what activities").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("activitiesList").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("activityItem_qwertzuiopasdfghjkly").assertIsNotDisplayed()
+
+    verify(mockActivityRepository).updateActivity(anyOrNull(), anyOrNull(), anyOrNull())
+  }
+
+  @Test
+  fun testDeleteCallsDelete() {
+    composeTestRule.setContent {
+      DocumentPreview(mockDocumentViewModel, navigationActions, mockActivityViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("deleteButton").performClick()
+    verify(mockDocumentRepository)
+        .deleteDocumentById(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
   }
 }
