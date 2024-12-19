@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -21,7 +20,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -194,7 +192,7 @@ fun DocumentPreview(
       ) {
         Column(
             modifier =
-                Modifier.fillMaxWidth(1f)
+                Modifier.fillMaxWidth(0.9f)
                     .background(MaterialTheme.colorScheme.background)
                     .testTag("activitiesDialog"),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -207,9 +205,7 @@ fun DocumentPreview(
               LazyColumn(
                   modifier =
                       Modifier.fillMaxWidth(1f)
-                          .height(250.dp)
                           .padding(horizontal = 8.dp)
-                          .background(MaterialTheme.colorScheme.background)
                           .testTag("activitiesList"),
                   verticalArrangement = Arrangement.spacedBy(8.dp),
                   contentPadding = PaddingValues(vertical = 8.dp)) {
@@ -220,14 +216,6 @@ fun DocumentPreview(
                       Card(
                           modifier = Modifier.testTag("activityItem_${activity.uid}").fillMaxSize(),
                           elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-                          colors =
-                              CardColors(
-                                  containerColor = MaterialTheme.colorScheme.surface,
-                                  disabledContentColor = MaterialTheme.colorScheme.inverseSurface,
-                                  contentColor = MaterialTheme.colorScheme.onSurface,
-                                  disabledContainerColor =
-                                      MaterialTheme.colorScheme.inverseOnSurface,
-                              ),
                           onClick = {
                             if (!activity.documentsNeeded.contains(documentContainer)) {
                               val documentNeeded = activity.documentsNeeded.toMutableList()
