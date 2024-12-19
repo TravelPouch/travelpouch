@@ -165,11 +165,6 @@ fun DocumentPreview(
     Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
       Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(modifier = Modifier.fillMaxWidth()) {
-          Text(
-              text = "Document ID: ${documentContainer.ref.id}",
-              style = MaterialTheme.typography.bodyLarge,
-              modifier = Modifier.padding(8.dp).testTag("documentTitle"))
-
           if (uri != null) {
             if (documentContainer.fileFormat == DocumentFileFormat.PDF) {
               val pdfState =
