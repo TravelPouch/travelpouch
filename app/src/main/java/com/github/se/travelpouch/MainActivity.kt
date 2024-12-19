@@ -47,6 +47,7 @@ import com.github.se.travelpouch.ui.profile.ProfileScreen
 import com.github.se.travelpouch.ui.theme.SampleAppTheme
 import com.github.se.travelpouch.ui.travel.EditTravelSettingsScreen
 import com.github.se.travelpouch.ui.travel.ParticipantListScreen
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -68,6 +69,7 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
+      FirebaseApp.initializeApp(this)
   }
 
   @Composable

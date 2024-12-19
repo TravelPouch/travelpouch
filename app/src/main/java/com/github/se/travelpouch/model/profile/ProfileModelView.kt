@@ -4,6 +4,7 @@ package com.github.se.travelpouch.model.profile
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,6 +27,9 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
 
   private val profile_ = MutableStateFlow<Profile>(ErrorProfile.errorProfile)
   val profile: StateFlow<Profile> = profile_.asStateFlow()
+
+    private var _isTokenUpdated = mutableStateOf(false)
+    val isTokenUpdated: Boolean get() = _isTokenUpdated.value
 
   /** The initialisation function of the profile model view. It fetches the profile of the user */
   suspend fun initAfterLogin(onSuccess: () -> Unit) {
@@ -86,6 +90,21 @@ class ProfileModelView @Inject constructor(private val repository: ProfileReposi
           onFailure(it)
         })
   }
+
+    private fun addNotificationTokenToProfile(token: String) {
+        repository.addNotificationTokenToProfile(token, profile_.value.fsUid, {
+            Log.d("Notification token added", "Notification token added")
+        }, {
+            Log.e(onFailureTag, "Failed to add notification token", it)
+        })
+    }
+
+    fun updateNotificationTokenIfNeeded(token: String) {
+        if (!_isTokenUpdated.value) {
+            addNotificationTokenToProfile(token)
+            _isTokenUpdated.value = true // Mark the token as updated for this session
+        }
+    }
 
   /**
    * This function sends to notification to add a friend

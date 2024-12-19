@@ -381,16 +381,22 @@ private fun inviteUserToTravelViaFsuid(
     Toast.makeText(context, "Error: User already added", Toast.LENGTH_SHORT).show()
   } else if (fsUid != null) {
     try {
+        val invitationNotification =
+            NotificationContent.InvitationNotification(
+            profileViewModel.profile.value.name,
+            selectedTravel.title,
+            Role.PARTICIPANT)
       notificationViewModel.sendNotification(
           Notification(
               notificationViewModel.getNewUid(),
               profileViewModel.profile.value.fsUid,
               fsUid,
               selectedTravel!!.fsUid,
-              NotificationContent.InvitationNotification(
-                  profileViewModel.profile.value.name, selectedTravel!!.title, Role.PARTICIPANT),
+              invitationNotification,
               notificationType = NotificationType.INVITATION,
               sector = NotificationSector.TRAVEL))
+
+        notificationViewModel.sendNotificationToUser(fsUid, invitationNotification)
       Toast.makeText(context, "Invitation sent", Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
       Log.e("NotificationError", "Failed to send notification: ${e.message}")
@@ -431,15 +437,23 @@ fun handleRoleChange(
     if (oldRole == Role.OWNER) {
       // Actual role change logic
       if (participant.key != profileViewModel.profile.value.fsUid) {
+          val roleChangeNotification =
+              NotificationContent.RoleChangeNotification(
+                  selectedTravel.title,
+                  newRole)
         notificationViewModel.sendNotification(
             Notification(
                 notificationViewModel.getNewUid(),
                 profileViewModel.profile.value.fsUid,
                 participant.key,
                 selectedTravel.fsUid,
-                NotificationContent.RoleChangeNotification(selectedTravel.title, newRole),
+                roleChangeNotification,
                 NotificationType.ROLE_UPDATE,
                 sector = NotificationSector.TRAVEL))
+          notificationViewModel.sendNotificationToUser(
+              participant.key,
+              roleChangeNotification
+          )
       }
       val participantMap = selectedTravel.allParticipants.toMutableMap()
       participantMap[Participant(participant.key)] = newRole
