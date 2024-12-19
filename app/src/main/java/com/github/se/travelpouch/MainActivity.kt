@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch
 
 import android.os.Bundle
@@ -161,7 +162,7 @@ class MainActivity : ComponentActivity() {
               })
         }
         composable(Screen.DOCUMENT_PREVIEW) {
-          DocumentPreview(documentViewModel, navigationActions)
+          DocumentPreview(documentViewModel, navigationActions, activityModelView)
         }
         composable(Screen.TIMELINE) { TimelineScreen(eventsViewModel, navigationActions) }
 
