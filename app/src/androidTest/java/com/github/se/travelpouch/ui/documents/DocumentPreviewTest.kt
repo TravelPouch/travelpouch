@@ -174,7 +174,7 @@ class DocumentPreviewTest {
 
     composeTestRule.onNodeWithTag("linkingButton").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("activitiesDialog").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Link to what activities").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Activity to link the image to").assertIsDisplayed()
     composeTestRule.onNodeWithTag("activitiesList").assertIsDisplayed()
     composeTestRule.onNodeWithTag("activityItem_qwertzuiopasdfghjkly").assertIsDisplayed()
     composeTestRule.onNodeWithTag("activityItem_qwertzuiopasdfghjkly").assertTextContains("titleAc")
@@ -185,7 +185,7 @@ class DocumentPreviewTest {
 
     composeTestRule.onNodeWithTag("activityItem_qwertzuiopasdfghjkly").performClick()
     composeTestRule.onNodeWithTag("activitiesDialog").assertIsNotDisplayed()
-    composeTestRule.onNodeWithText("Link to what activities").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("Activity to link the image to").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("activitiesList").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("activityItem_qwertzuiopasdfghjkly").assertIsNotDisplayed()
 
