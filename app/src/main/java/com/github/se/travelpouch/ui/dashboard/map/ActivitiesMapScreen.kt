@@ -267,17 +267,6 @@ fun ActivitiesMapScreen(
                 }
               }
 
-          // Add a floating action button for going back
-          FloatingActionButton(
-              onClick = { navigationActions.goBack() },
-              modifier =
-                  Modifier.align(Alignment.TopStart) // Position the button at the top-left
-                      .padding(16.dp)
-                      .size(48.dp)
-                      .testTag("GoBackButton")) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
-              }
-
           // Add a floating action button for toggling paths and travel modes
           Box(
               modifier = Modifier.fillMaxSize().padding(16.dp),
