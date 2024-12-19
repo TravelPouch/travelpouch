@@ -79,7 +79,7 @@ fun SignInScreen(
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-            methodChosen.value = false
+            // methodChosen.value = false
             signInCompleted.value = true // Mark sign-in as completed
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
 
@@ -88,7 +88,6 @@ fun SignInScreen(
                 travelViewModel.initAfterLogin()
                 waitUntilProfileFetched.value = true
               }
-              isLoading.value = false
             }
 
             Toast.makeText(context, "Login successful", Toast.LENGTH_LONG).show()
@@ -108,8 +107,10 @@ fun SignInScreen(
     if (waitUntilProfileFetched.value) {
       if (profileModelView.profile.value.needsOnboarding) {
         Toast.makeText(context, "Welcome to TravelPouch!", Toast.LENGTH_LONG).show()
+        isLoading.value = false
         navigationActions.navigateTo(Screen.ONBOARDING)
       } else {
+        isLoading.value = false
         navigationActions.navigateTo(Screen.TRAVEL_LIST)
       }
     }
@@ -213,8 +214,6 @@ fun SignInScreen(
                     waitUntilProfileFetched.value = true
                   }
                 }
-                // navigationActions.navigateTo(Screen.TRAVEL_LIST)
-                isLoading.value = false
               } catch (refreshError: Exception) {
                 Log.e(
                     "SignInScreen",
