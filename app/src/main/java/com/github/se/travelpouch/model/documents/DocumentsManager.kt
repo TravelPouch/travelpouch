@@ -119,7 +119,7 @@ open class DocumentsManager(
    * @param sourceRef The reference of the source file
    * @param size The width of the thumbnail
    */
-  fun getThumbnail(travelRef: String, sourceRef: String, size: Int): Deferred<Uri> {
+  open fun getThumbnail(travelRef: String, sourceRef: String, size: Int): Deferred<Uri> {
     return CoroutineScope(Dispatchers.IO).async {
       val file = File(thumbsDirectory, "$sourceRef-$size")
       if (file.exists()) {

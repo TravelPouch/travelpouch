@@ -32,11 +32,14 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import kotlinx.coroutines.CompletableDeferred
 import java.io.File
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.anyInt
+import org.mockito.Mockito.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
@@ -123,6 +126,8 @@ class DocumentListTest {
     mockDataStore = mock()
     val documentViewModel =
         DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
+    `when`(mockDocumentsManager.getThumbnail(anyString(), anyString(), anyInt()))
+      .thenReturn(CompletableDeferred())
     mockDocumentViewModel = spy(documentViewModel)
   }
 
