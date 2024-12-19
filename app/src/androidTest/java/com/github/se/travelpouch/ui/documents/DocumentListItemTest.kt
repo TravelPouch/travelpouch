@@ -37,6 +37,7 @@ class DocumentListItemTest {
   private lateinit var mockDocumentsManager: DocumentsManager
   private lateinit var mockDataStore: DataStore<Preferences>
   private lateinit var document: DocumentContainer
+  private lateinit var deferred: CompletableDeferred<Uri>
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -62,6 +63,10 @@ class DocumentListItemTest {
     mockDataStore = mock()
     mockDocumentViewModel =
         DocumentViewModel(mockDocumentRepository, mockDocumentsManager, mockDataStore)
+
+    deferred = CompletableDeferred()
+    `when`(mockDocumentsManager.getThumbnail(anyString(), anyString(), anyInt()))
+      .thenReturn(deferred)
 
     mockDocumentViewModel.selectDocument(document)
   }
@@ -90,10 +95,6 @@ class DocumentListItemTest {
 
   @Test
   fun testsLoadingBehavior() {
-    val deferred = CompletableDeferred<Uri>()
-    `when`(mockDocumentsManager.getThumbnail(anyString(), anyString(), anyInt()))
-        .thenReturn(deferred)
-
     composeTestRule.setContent { DocumentListItem(document, mockDocumentViewModel) {} }
 
     // Test that the loading spinner is displayed and the document list item is not displayed
