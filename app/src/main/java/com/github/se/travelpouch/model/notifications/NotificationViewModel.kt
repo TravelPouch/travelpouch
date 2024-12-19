@@ -3,7 +3,6 @@ package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Firebase
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.functions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -80,19 +79,16 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
   }
 
   fun sendNotificationToUser(userId: String, notificationContent: NotificationContent) {
-    val data = hashMapOf(
-      "userId" to userId,
-      "message" to notificationContent.toDisplayString(),
-    )
+    val data =
+        hashMapOf(
+            "userId" to userId,
+            "message" to notificationContent.toDisplayString(),
+        )
 
     functions
-      .getHttpsCallable("sendNotification")
-      .call(data)
-      .addOnSuccessListener { result ->
-        Log.d("Notification", "Success: ${result.data}")
-      }
-      .addOnFailureListener { e ->
-        Log.e("Notification", "Error: ${e.message}")
-      }
+        .getHttpsCallable("sendNotification")
+        .call(data)
+        .addOnSuccessListener { result -> Log.d("Notification", "Success: ${result.data}") }
+        .addOnFailureListener { e -> Log.e("Notification", "Error: ${e.message}") }
   }
 }

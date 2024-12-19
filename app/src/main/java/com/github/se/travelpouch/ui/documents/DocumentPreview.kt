@@ -63,7 +63,6 @@ import java.util.GregorianCalendar
  *
  * @param documentViewModel the document view model with the current document set as selected.
  */
-@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentPreview(

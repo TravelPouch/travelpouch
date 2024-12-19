@@ -5,13 +5,13 @@ import com.google.firebase.messaging.RemoteMessage
 
 class PushNotificationService : FirebaseMessagingService() {
 
-    @Override
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-    }
+  @Override
+  override fun onNewToken(token: String) {
+    super.onNewToken(token)
+  }
 
-    @Override
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        super.onMessageReceived(remoteMessage)
-    }
+  @Override
+  override fun onMessageReceived(remoteMessage: RemoteMessage) {
+    super.onMessageReceived(remoteMessage)
+  }
 }

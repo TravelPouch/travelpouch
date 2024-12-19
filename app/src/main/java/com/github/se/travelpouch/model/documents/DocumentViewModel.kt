@@ -15,6 +15,9 @@ import androidx.lifecycle.ViewModel
 import com.github.se.travelpouch.model.activity.Activity
 import com.github.se.travelpouch.model.travels.TravelContainer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +30,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import javax.inject.Inject
 
 /**
  * ViewModel for managing documents and related operations.
@@ -97,13 +97,12 @@ constructor(
           Log.d("DocumentViewModel", "Document retrieved as ${result.getCompleted()}")
         }
         is DocumentsManager.FileCreationException -> {
-          Log.i("DocumentViewModel", "Failed to create document file in same directory. Re-asking permission")
-            resetSaveDocumentFolder().invokeOnCompletion {
-              _needReload.value = true
-            }
+          Log.i(
+              "DocumentViewModel",
+              "Failed to create document file in same directory. Re-asking permission")
+          resetSaveDocumentFolder().invokeOnCompletion { _needReload.value = true }
         }
-        else ->
-          Log.e("DocumentViewModel", "Failed to download document", it)
+        else -> Log.e("DocumentViewModel", "Failed to download document", it)
       }
     }
   }

@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
-      FirebaseApp.initializeApp(this)
+    FirebaseApp.initializeApp(this)
   }
 
   @Composable
