@@ -17,13 +17,9 @@ import com.github.se.travelpouch.model.documents.DocumentsManager
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlinx.coroutines.CompletableDeferred
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -92,29 +88,28 @@ class DocumentListItemTest {
         .assertTextContains(document.title)
   }
 
-    @Test
-    fun testsLoadingBehavior() {
-      val deferred = CompletableDeferred<Uri>()
-      `when`(mockDocumentsManager.getThumbnail(anyString(), anyString(), anyInt()))
+  @Test
+  fun testsLoadingBehavior() {
+    val deferred = CompletableDeferred<Uri>()
+    `when`(mockDocumentsManager.getThumbnail(anyString(), anyString(), anyInt()))
         .thenReturn(deferred)
 
-      composeTestRule.setContent { DocumentListItem(document, mockDocumentViewModel) {} }
+    composeTestRule.setContent { DocumentListItem(document, mockDocumentViewModel) {} }
 
-      // Test that the loading spinner is displayed and the document list item is not displayed
-      composeTestRule
-          .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree = true).assertIsNotDisplayed()
+    // Test that the loading spinner is displayed and the document list item is not displayed
+    composeTestRule
+        .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree = true).assertIsNotDisplayed()
 
-      // Add the thumbnail URI to the documentViewModel
-      deferred.complete(Uri.EMPTY)
-      composeTestRule.waitForIdle()
+    // Add the thumbnail URI to the documentViewModel
+    deferred.complete(Uri.EMPTY)
+    composeTestRule.waitForIdle()
 
-      // Test that the loading spinner is not displayed and the document list item is displayed
-      composeTestRule
-          .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
-          .assertIsNotDisplayed()
-      composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree =
-   true).assertIsDisplayed()
-    }
+    // Test that the loading spinner is not displayed and the document list item is displayed
+    composeTestRule
+        .onNodeWithTag("loadingSpinner-ref_id", useUnmergedTree = true)
+        .assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("thumbnail-ref_id", useUnmergedTree = true).assertIsDisplayed()
+  }
 }
