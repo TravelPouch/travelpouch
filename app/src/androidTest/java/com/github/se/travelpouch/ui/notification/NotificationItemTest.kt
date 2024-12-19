@@ -137,6 +137,7 @@ class NotificationItemTest {
   @Test
   fun acceptButtonTest() {
     val context: android.content.Context = mock()
+    var clicked = false
 
     composeTestRule.setContent {
       AcceptButton(
@@ -145,18 +146,23 @@ class NotificationItemTest {
           profileModelView,
           notificationViewModel,
           context,
-          eventViewModel)
+          eventViewModel,
+          { clicked = true },
+          true)
     }
 
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notification_item_accept_button").assertTextEquals("ACCEPT")
     composeTestRule.onNodeWithTag("notification_item_accept_button").performClick()
     verify(travelRepository).getTravelById(anyOrNull(), anyOrNull(), anyOrNull())
+    assert(clicked)
   }
 
   @Test
   fun declineButtonTest() {
     val context: android.content.Context = mock()
+
+    var clicked = false
 
     composeTestRule.setContent {
       DeclineButton(
@@ -165,12 +171,15 @@ class NotificationItemTest {
           profileModelView,
           notificationViewModel,
           context,
-          eventsViewModel = eventViewModel)
+          eventsViewModel = eventViewModel,
+          { clicked = true },
+          true)
     }
 
     composeTestRule.onNodeWithTag("notification_item_decline_button").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notification_item_decline_button").assertTextEquals("DECLINE")
     composeTestRule.onNodeWithTag("notification_item_decline_button").performClick()
     verify(travelRepository).getTravelById(anyOrNull(), anyOrNull(), anyOrNull())
+    assert(clicked)
   }
 }

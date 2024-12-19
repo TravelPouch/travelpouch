@@ -13,6 +13,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -111,6 +115,8 @@ fun InvitationButtons(
     context: android.content.Context,
     eventsViewModel: EventViewModel
 ) {
+  var b by remember { mutableStateOf(true) }
+
   Row(
       modifier = Modifier.fillMaxWidth().testTag("notification_item_buttons"),
       horizontalArrangement = Arrangement.Center) {
@@ -120,14 +126,18 @@ fun InvitationButtons(
             profileViewModel,
             notificationViewModel,
             context,
-            eventsViewModel)
+            eventsViewModel,
+            { b = !b },
+            b)
         DeclineButton(
             notification,
             listTravelViewModel,
             profileViewModel,
             notificationViewModel,
             context,
-            eventsViewModel)
+            eventsViewModel,
+            { b = !b },
+            b)
       }
 }
 
@@ -138,10 +148,13 @@ fun AcceptButton(
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
     context: android.content.Context,
-    eventsViewModel: EventViewModel
+    eventsViewModel: EventViewModel,
+    chosen: () -> Unit,
+    enabled: Boolean
 ) {
   Button(
       onClick = {
+        chosen()
         handleInvitationResponse(
             notification,
             listTravelViewModel,
@@ -149,12 +162,14 @@ fun AcceptButton(
             notificationViewModel,
             context,
             isAccepted = true,
-            eventsViewModel)
+            eventsViewModel,
+            chosen)
       },
       modifier = Modifier.padding(end = 8.dp).testTag("notification_item_accept_button"),
       colors =
           ButtonDefaults.buttonColors(
-              containerColor = Color.Transparent, contentColor = Color(0xFF12c15d))) {
+              containerColor = Color.Transparent, contentColor = Color(0xFF12c15d)),
+      enabled = enabled) {
         Text(text = "ACCEPT")
       }
 }
@@ -166,10 +181,13 @@ fun DeclineButton(
     profileViewModel: ProfileModelView,
     notificationViewModel: NotificationViewModel,
     context: android.content.Context,
-    eventsViewModel: EventViewModel
+    eventsViewModel: EventViewModel,
+    chosen: () -> Unit,
+    enabled: Boolean
 ) {
   Button(
       onClick = {
+        chosen()
         handleInvitationResponse(
             notification,
             listTravelViewModel,
@@ -177,11 +195,13 @@ fun DeclineButton(
             notificationViewModel,
             context,
             isAccepted = false,
-            eventsViewModel = eventsViewModel)
+            eventsViewModel = eventsViewModel,
+            chosen)
       },
       colors =
           ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Red),
-      modifier = Modifier.testTag("notification_item_decline_button")) {
+      modifier = Modifier.testTag("notification_item_decline_button"),
+      enabled = enabled) {
         Text(text = "DECLINE")
       }
 }
@@ -193,7 +213,8 @@ fun handleInvitationResponse(
     notificationViewModel: NotificationViewModel,
     context: android.content.Context,
     isAccepted: Boolean,
-    eventsViewModel: EventViewModel
+    eventsViewModel: EventViewModel,
+    chosen: () -> Unit
 ) {
   when (notification.sector) {
     NotificationSector.TRAVEL -> {
@@ -224,13 +245,18 @@ fun handleInvitationResponse(
                     listTravelViewModel.selectTravel(updatedContainer)
                     Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
                   },
-                  { Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show() },
+                  {
+                    Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
+                    chosen()
+                  },
                   eventsViewModel.getNewDocumentReferenceForNewTravel(travel.fsUid))
             }
+            notificationViewModel.loadNotificationsForUser(profileViewModel.profile.value.fsUid)
             Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
           },
           onFailure = {
             Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
+            chosen()
           })
     }
     NotificationSector.PROFILE -> {
