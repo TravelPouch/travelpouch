@@ -1,6 +1,7 @@
 // Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.authentication
 
+import com.github.se.travelpouch.model.authentication.NetworkConnectivityHelper
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -74,7 +76,14 @@ fun SignInScreen(
   } // this extra state is necessary to prevent token refresh errors
   val waitUntilProfileFetched = rememberSaveable { mutableStateOf(false) }
 
+  val networkHelper = NetworkConnectivityHelper(context)
+  networkHelper.registerNetworkCallback()
+  val isConnectedToNetwork = networkHelper.isConnected.collectAsState()
+
   val currentUser = auth.currentUser
+  if (currentUser != null) {
+    Log.d("SignInScreen", "Current user: ${currentUser.email}")
+  }
 
   // launcher for Firebase authentication
   val launcher =
@@ -196,14 +205,19 @@ fun SignInScreen(
           }
           if (currentUser != null &&
               !signInCompleted
-                  .value) { // extra condition on sign-in completion to avoid unnecessary
+                  .value && isConnectedToNetwork.value != null) { // extra condition on sign-in completion to avoid unnecessary
             // recompositions
             LaunchedEffect(Unit) {
               try {
                 isLoading.value = true
                 methodChosen.value = true
 
-                currentUser.getIdToken(true).await() // We shouldn't continue until this passes
+                if (isConnectedToNetwork.value == true) {
+                  Log.d("SignInScreen", "User connected to network, refresh id token...")
+                  currentUser.getIdToken(true).await() // We shouldn't continue until this passes
+                } else {
+                  Log.d("SignInScreen", "User offline, skipping id token refresh.")
+                }
 
                 Log.d(
                     "SignInScreen",
