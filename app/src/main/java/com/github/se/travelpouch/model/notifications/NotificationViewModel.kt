@@ -3,7 +3,6 @@ package com.github.se.travelpouch.model.notifications
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Firebase
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.functions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +21,7 @@ class NotificationViewModel
 @Inject
 constructor(private val notificationRepository: NotificationRepository) : ViewModel() {
 
-  //Preparing branch PR
+  // Preparing branch PR
   // LiveData holding the list of notifications
   private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
   val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
@@ -58,8 +57,12 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
    *
    * @param notification The notification to be sent.
    */
-  fun sendNotification(notification: Notification) {
-    notificationRepository.addNotification(notification)
+  fun sendNotification(
+      notification: Notification,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    notificationRepository.addNotification(notification, onSuccess, onFailure)
   }
 
   /**
@@ -81,19 +84,16 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
   }
 
   fun sendNotificationToUser(userId: String, notificationContent: NotificationContent) {
-    val data = hashMapOf(
-      "userId" to userId,
-      "message" to notificationContent.toDisplayString(),
-    )
+    val data =
+        hashMapOf(
+            "userId" to userId,
+            "message" to notificationContent.toDisplayString(),
+        )
 
     functions
-      .getHttpsCallable("sendNotification")
-      .call(data)
-      .addOnSuccessListener { result ->
-        Log.d("Notification", "Success: ${result.data}")
-      }
-      .addOnFailureListener { e ->
-        Log.e("Notification", "Error: ${e.message}")
-      }
+        .getHttpsCallable("sendNotification")
+        .call(data)
+        .addOnSuccessListener { result -> Log.d("Notification", "Success: ${result.data}") }
+        .addOnFailureListener { e -> Log.e("Notification", "Error: ${e.message}") }
   }
 }

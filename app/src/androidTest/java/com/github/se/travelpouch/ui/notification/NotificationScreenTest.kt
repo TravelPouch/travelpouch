@@ -267,7 +267,7 @@ class NotificationScreenTest {
 
     composeTestRule.onNodeWithText("DECLINE").performClick()
     verify(profileRepository, never()).addFriend(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
-    verify(notificationRepository).addNotification(anyOrNull())
+    verify(notificationRepository).addNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   // Chat-GPT was helpful in this test because he helped me understand how to separate the capture
@@ -395,6 +395,6 @@ class NotificationScreenTest {
     verify(secondLayerTask).addOnSuccessListener(onCompleteListenerCaptor.capture())
     composeTestRule.runOnIdle { onCompleteListenerCaptor.firstValue.onSuccess(null) }
 
-    verify(notificationRepository).addNotification(anyOrNull())
+    verify(notificationRepository).addNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 }

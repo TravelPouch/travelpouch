@@ -89,13 +89,13 @@ import com.github.se.travelpouch.model.travels.TravelContainer
 import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.github.se.travelpouch.ui.navigation.Screen
 import com.github.se.travelpouch.ui.navigation.TopLevelDestinations
-import com.google.firebase.Firebase
-import com.google.firebase.messaging.messaging
 import com.github.se.travelpouch.ui.theme.logoutIconDark
 import com.github.se.travelpouch.ui.theme.logoutIconLight
 import com.github.se.travelpouch.ui.theme.logoutRedDark
 import com.github.se.travelpouch.ui.theme.logoutRedLight
+import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.messaging.messaging
 import java.util.Locale
 import kotlinx.coroutines.launch
 
@@ -121,8 +121,8 @@ fun TravelListScreen(
     documentViewModel: DocumentViewModel,
     profileModelView: ProfileModelView
 ) {
-    // Ask for notification permission
-    RequestNotificationPermission(profileModelView)
+  // Ask for notification permission
+  RequestNotificationPermission(profileModelView)
 
   // Fetch travels when the screen is launched
   LaunchedEffect(Unit) {
@@ -538,35 +538,32 @@ private fun resizeFromDragMotion(
 
 @Composable
 fun RequestNotificationPermission(profileViewModel: ProfileModelView) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    // Check notification permission
-    val hasPermission = remember { BuildConfig.DEBUG } || run {
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+  // Check notification permission
+  val hasPermission =
+      remember { BuildConfig.DEBUG } ||
+          run {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
                 ContextCompat.checkSelfPermission(
-                    context,
-                    android.Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
-    }
+                    context, android.Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED
+          }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPermission) {
-        ActivityCompat.requestPermissions(
-            context as Activity,
-            arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-            0
-        )
-    }
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasPermission) {
+    ActivityCompat.requestPermissions(
+        context as Activity, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0)
+  }
 
-    // Only call Firestore logic if not already updated
-    if (hasPermission && !profileViewModel.isTokenUpdated) {
-        LaunchedEffect(Unit) {
-            Firebase.messaging.token.addOnCompleteListener {
-                if (it.isSuccessful) {
-                    val token = it.result
-                    profileViewModel.updateNotificationTokenIfNeeded(token)
-                }
-            }
+  // Only call Firestore logic if not already updated
+  if (hasPermission && !profileViewModel.isTokenUpdated) {
+    LaunchedEffect(Unit) {
+      Firebase.messaging.token.addOnCompleteListener {
+        if (it.isSuccessful) {
+          val token = it.result
+          profileViewModel.updateNotificationTokenIfNeeded(token)
         }
+      }
     }
+  }
 }
-

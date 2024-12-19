@@ -26,6 +26,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.robolectric.RobolectricTestRunner
 
@@ -131,8 +132,9 @@ class NotificationViewModelUnitTest {
                     "John Doe", "Trip to Paris", Role.PARTICIPANT),
             notificationType = NotificationType.INVITATION,
             sector = sector)
-    notificationViewModel.sendNotification(notification)
-    verify(notificationRepositoryFirestore, times(1)).addNotification(eq(notification))
+    notificationViewModel.sendNotification(notification, {}, {})
+    verify(notificationRepositoryFirestore, times(1))
+        .addNotification(eq(notification), anyOrNull(), anyOrNull())
   }
 
   @Test

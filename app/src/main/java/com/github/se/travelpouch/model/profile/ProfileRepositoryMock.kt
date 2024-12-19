@@ -57,15 +57,15 @@ class ProfileRepositoryMock : ProfileRepository {
     TODO("Not yet implemented")
   }
 
-    override fun addNotificationTokenToProfile(
-        token: String,
-        user: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-    
+  override fun addNotificationTokenToProfile(
+      token: String,
+      user: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    TODO("Not yet implemented")
+  }
+
   override fun sendFriendNotification(
       email: String,
       onSuccess: (String) -> Unit,
