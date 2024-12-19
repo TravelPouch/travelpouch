@@ -171,59 +171,6 @@ fun ParticipantListScreen(
                               profileViewModel.getFsUidByEmail(
                                   addUserEmail.value,
                                   onSuccess = { fsUid ->
-
-                                    val isUserAlreadyAdded =
-                                        selectedTravel!!.allParticipants.keys.any {
-                                          it.fsUid == fsUid
-                                        }
-                                    if (fsUid == profileViewModel.profile.value.fsUid) {
-                                      Toast.makeText(
-                                              context,
-                                              "Error: You can't invite yourself",
-                                              Toast.LENGTH_SHORT)
-                                          .show()
-                                    } else if (isUserAlreadyAdded) {
-                                      Toast.makeText(
-                                              context,
-                                              "Error: User already added",
-                                              Toast.LENGTH_SHORT)
-                                          .show()
-                                    } else if (fsUid != null) {
-                                      try {
-                                          val invitationNotification =
-                                              NotificationContent.InvitationNotification(
-                                              profileViewModel.profile.value.name,
-                                              selectedTravel!!.title,
-                                              Role.PARTICIPANT)
-
-                                          notificationViewModel.sendNotificationToUser(
-                                              fsUid,
-                                              invitationNotification
-                                          )
-
-                                        notificationViewModel.sendNotification(
-                                            Notification(
-                                                notificationViewModel.getNewUid(),
-                                                profileViewModel.profile.value.fsUid,
-                                                fsUid,
-                                                selectedTravel!!.fsUid,
-                                                invitationNotification,
-                                                NotificationType.INVITATION,
-                                                sector = NotificationSector.TRAVEL))
-                                      } catch (e: Exception) {
-                                        Log.e(
-                                            "NotificationError",
-                                            "Failed to send notification: ${e.message}")
-                                      }
-                                      // Go back
-                                      setExpandedAddUserDialog(false)
-                                    } else {
-                                      Toast.makeText(
-                                              context,
-                                              "Error: User with email not found",
-                                              Toast.LENGTH_SHORT)
-                                          .show()
-                                    }
                                     inviteUserToTravelViaFsuid(
                                         selectedTravel,
                                         fsUid,
