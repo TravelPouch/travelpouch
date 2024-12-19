@@ -1,7 +1,5 @@
 package com.github.se.travelpouch.ui.notifications
 
-// parts of this file was generated using Github Copilot or ChatGPT
-
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme

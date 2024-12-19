@@ -1,7 +1,5 @@
 package com.github.se.travelpouch.ui.notifications
 
-// parts of this file was generated using Github Copilot or ChatGPT
-
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
