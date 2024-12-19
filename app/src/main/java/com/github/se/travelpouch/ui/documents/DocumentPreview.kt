@@ -75,6 +75,7 @@ fun DocumentPreview(
   var openDialog by remember { mutableStateOf(false) }
   val documentContainer: DocumentContainer =
       documentViewModel.selectedDocument.collectAsState().value!!
+  val activities = activityViewModel.activities.collectAsState().value
   val needReload = documentViewModel.needReload.collectAsState().value
   val uri = documentViewModel.documentUri.value
   val context = LocalContext.current
@@ -131,9 +132,7 @@ fun DocumentPreview(
               IconButton(
                   onClick = {
                     val activitiesLinkedToDocument =
-                        activityViewModel.activities.value.filter {
-                          it.documentsNeeded.contains(documentContainer)
-                        }
+                        activities.filter { it.documentsNeeded.contains(documentContainer) }
                     documentViewModel.deleteDocumentById(
                         documentContainer, activitiesLinkedToDocument)
                     navigationActions.goBack()
@@ -144,7 +143,7 @@ fun DocumentPreview(
 
               IconButton(
                   onClick = {
-                    if (activityViewModel.activities.value.isEmpty()) {
+                    if (activities.isEmpty()) {
                       Toast.makeText(
                               context,
                               "Cannot link image if there are no activities",
@@ -211,8 +210,8 @@ fun DocumentPreview(
                           .testTag("activitiesList"),
                   verticalArrangement = Arrangement.spacedBy(8.dp),
                   contentPadding = PaddingValues(vertical = 8.dp)) {
-                    items(activityViewModel.activities.value.size) { i ->
-                      val activity = activityViewModel.activities.value[i]
+                    items(activities.size) { i ->
+                      val activity = activities[i]
                       val calendar = GregorianCalendar().apply { time = activity.date.toDate() }
 
                       Card(
