@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.model.profile
 
 import com.github.se.travelpouch.di.profileCollection
@@ -56,6 +57,15 @@ class ProfileRepositoryMock : ProfileRepository {
     TODO("Not yet implemented")
   }
 
+    override fun addNotificationTokenToProfile(
+        token: String,
+        user: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+    
   override fun sendFriendNotification(
       email: String,
       onSuccess: (String) -> Unit,

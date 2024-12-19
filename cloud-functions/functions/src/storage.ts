@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 import {DocumentData, getFirestore, Timestamp}
   from "firebase-admin/firestore";
 import {getStorage} from "firebase-admin/storage";

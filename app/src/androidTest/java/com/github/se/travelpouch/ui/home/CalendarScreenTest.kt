@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.home
 
 import androidx.compose.ui.test.assertIsDisplayed
@@ -69,7 +70,7 @@ class CalendarScreenTest {
             date = Timestamp(today),
             description = "This is a mock activity for today.",
             location = Location(0.0, 0.0, Timestamp(0, 0), "location"),
-            documentsNeeded = mapOf())
+            documentsNeeded = emptyList())
 
     val listOfActivities = listOf(activityToday)
 

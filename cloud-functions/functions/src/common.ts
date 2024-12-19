@@ -1,3 +1,4 @@
+// Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 import {Timestamp, DocumentReference} from "firebase-admin/firestore";
 
 /**
