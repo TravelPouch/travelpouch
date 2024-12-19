@@ -98,9 +98,10 @@ constructor(
   }
 
   /**
-   * Deletes a Document by its ID.
+   * Deletes a Document.
    *
-   * @param id The ID of the Document to be deleted.
+   * @param document The Document to be deleted.
+   * @param activityList The list of activities the document is linked to
    */
   fun deleteDocumentById(document: DocumentContainer, activityList: List<Activity>) {
     repository.deleteDocumentById(

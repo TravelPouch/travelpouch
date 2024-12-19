@@ -198,7 +198,6 @@ class ActivityRepositoryFirebase(private val db: FirebaseFirestore) : ActivityRe
                     visibility = DocumentVisibility.valueOf(it["visibility"] as String))
               }
               ?.toList() ?: emptyList()
-      // documentsNeededData?.map { (key, value) -> key as String to value as Int }?.toMap()
       val locationData = document.get("location") as? Map<*, *>
       val location =
           locationData?.let {

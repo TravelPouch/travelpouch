@@ -146,7 +146,10 @@ fun DocumentPreview(
               IconButton(
                   onClick = {
                     if (activityViewModel.activities.value.isEmpty()) {
-                      Toast.makeText(context, "No Activities to available", Toast.LENGTH_LONG)
+                      Toast.makeText(
+                              context,
+                              "Cannot link image if there are no activities",
+                              Toast.LENGTH_LONG)
                           .show()
                     } else {
                       openDialog = true
@@ -198,7 +201,7 @@ fun DocumentPreview(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly) {
               Text(
-                  "Link to what activities",
+                  "Activity to link the image to",
                   fontWeight = FontWeight.Bold,
                   modifier = Modifier.padding(8.dp))
 

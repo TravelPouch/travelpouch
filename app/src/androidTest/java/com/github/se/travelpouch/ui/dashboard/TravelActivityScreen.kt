@@ -110,42 +110,7 @@ class TravelActivityScreenCopy {
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.title)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains(activity.location.name)
     composeTestRule.onNodeWithTag("activityItem").assertTextContains("1/1/1970")
-    // composeTestRule.onNodeWithTag("extraDocumentButton").assertIsDisplayed().performClick()
   }
-
-  //  @Test
-  //  fun verify1ImageActivity() {
-  //    val activity = activites_test[0]
-  //    val images =
-  //        listOf(
-  //
-  // "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
-  //
-  // "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
-  //
-  // "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
-  //    composeTestRule.setContent {
-  //      ActivityItem(activity, {}, LocalContext.current, listOf(images[0]))
-  //    }
-  //    composeTestRule.waitForIdle()
-  //  }
-  //
-  //  @Test
-  //  fun verify2ImagesActivity() {
-  //    val activity = activites_test[0]
-  //    val images =
-  //        listOf(
-  //
-  // "https://img.yumpu.com/30185842/1/500x640/afps-attestation-de-formation-aux-premiers-secours-programme-.jpg",
-  //
-  // "https://wallpapercrafter.com/desktop6/1606440-architecture-buildings-city-downtown-finance-financial.jpg",
-  //
-  // "https://assets.entrepreneur.com/content/3x2/2000/20151023204134-poker-game-gambling-gamble-cards-money-chips-game.jpeg")
-  //    composeTestRule.setContent {
-  //      ActivityItem(activity, {}, LocalContext.current, listOf(images[0], images[1]))
-  //    }
-  //    composeTestRule.waitForIdle()
-  //  }
 
   @Test
   fun runDefaultErrorUIToCheckFailure() {

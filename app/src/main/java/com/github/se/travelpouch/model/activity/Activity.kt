@@ -13,8 +13,8 @@ import com.google.firebase.Timestamp
  * @property description (String) : the description of the travel
  * @property location (Location) : the location where the activity takes place
  * @property date (Timestamp) : the date when the activity will occur
- * @property documentsNeeded (Map<String, Int>?) : the list of documents needed for the activity. If
- *   no document is needed the map is null
+ * @property documentsNeeded (List<DocumentContainer>) : the list of documents needed for the
+ *   activity.
  */
 data class Activity(
     val uid: String,
