@@ -1,3 +1,5 @@
+// parts of this file was generated using Github Copilot or ChatGPT
+
 import {getFirestore} from "firebase-admin/firestore";
 import {getMessaging} from "firebase-admin/messaging";
 import * as logger from "firebase-functions/logger";

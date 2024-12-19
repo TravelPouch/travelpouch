@@ -1,3 +1,5 @@
+// parts of this file was generated using Github Copilot or ChatGPT
+
 import {HttpsError, onCall, onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
