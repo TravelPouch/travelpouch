@@ -252,6 +252,9 @@ fun handleInvitationResponse(
 
                           notificationViewModel.sendNotificationToUser(
                               notification.senderUid, responseNotification)
+
+                          notificationViewModel.loadNotificationsForUser(
+                              profileViewModel.profile.value.fsUid)
                         },
                         onFailure = {
                           Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
@@ -269,13 +272,14 @@ fun handleInvitationResponse(
                     Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
                     notificationViewModel.sendNotificationToUser(
                         notification.senderUid, responseNotification)
+                    notificationViewModel.loadNotificationsForUser(
+                        profileViewModel.profile.value.fsUid)
                   },
                   onFailure = {
                     Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                     chosen()
                   })
             }
-            notificationViewModel.loadNotificationsForUser(profileViewModel.profile.value.fsUid)
           },
           onFailure = {
             Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
@@ -305,6 +309,9 @@ fun handleInvitationResponse(
                   onSuccess = {
                     notificationViewModel.sendNotificationToUser(
                         notification.senderUid, firendNotification)
+
+                    notificationViewModel.loadNotificationsForUser(
+                        profileViewModel.profile.value.fsUid)
                   },
                   onFailure = { Toast.makeText(context, it.message, Toast.LENGTH_LONG).show() })
               Toast.makeText(context, "Friend added", Toast.LENGTH_LONG).show()
@@ -334,6 +341,8 @@ fun handleInvitationResponse(
                   notification.senderUid, firendNotification)
 
               Toast.makeText(context, "Request declined", Toast.LENGTH_LONG).show()
+
+              notificationViewModel.loadNotificationsForUser(profileViewModel.profile.value.fsUid)
             },
             onFailure = {
               chosen()
