@@ -24,8 +24,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -43,7 +41,6 @@ import com.github.se.travelpouch.ui.navigation.NavigationActions
 import com.rizzi.bouquet.ResourceType
 import com.rizzi.bouquet.VerticalPDFReader
 import com.rizzi.bouquet.rememberVerticalPdfReaderState
-import kotlinx.coroutines.launch
 
 /**
  * Composable function for previewing a document.
@@ -53,8 +50,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: NavigationActions) {
+  documentViewModel.resetNeedReload()
   val documentContainer: DocumentContainer =
       documentViewModel.selectedDocument.collectAsState().value!!
+  val needReload = documentViewModel.needReload.collectAsState().value
   val uri = documentViewModel.documentUri.value
   val context = LocalContext.current
   val openDirectoryLauncher =
@@ -75,7 +74,7 @@ fun DocumentPreview(documentViewModel: DocumentViewModel, navigationActions: Nav
           }
         }
       }
-  LaunchedEffect(documentContainer) {
+  LaunchedEffect(needReload) {
     val documentFileUri = documentViewModel.getSaveDocumentFolder().await()
     if (documentFileUri == null) {
       openDirectoryLauncher.launch(null)

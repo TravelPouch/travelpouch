@@ -12,7 +12,6 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StreamDownloadTask
-import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import java.io.File
 
 /** Helper class to download files from Firbase storage to local files */
 open class DocumentsManager(
@@ -58,7 +58,7 @@ open class DocumentsManager(
 
       if (file == null) {
         Log.e("DocumentViewModel", "Failed to create document file in specified directory")
-        throw Exception("Failed to create document file in specified directory")
+        throw FileCreationException("Failed to create document file in specified directory")
       }
 
       Log.d(tag, "Downloading file to ${file.uri}")
@@ -172,4 +172,6 @@ open class DocumentsManager(
       false
     }
   }
+
+  class FileCreationException(message: String) : Exception(message)
 }
