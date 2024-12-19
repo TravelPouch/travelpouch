@@ -21,7 +21,6 @@ class NotificationViewModel
 @Inject
 constructor(private val notificationRepository: NotificationRepository) : ViewModel() {
 
-  // Preparing branch PR
   // LiveData holding the list of notifications
   private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
   val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
