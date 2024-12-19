@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -328,6 +329,29 @@ class ProfileRepositoryFirebase(private val db: FirebaseFirestore) : ProfileRepo
           onFailure(e)
         }
   }
+
+    /**
+     * Adds a notification token to the user's profile in the Firestore database.
+     *
+     * @param token The notification token to be added to the profile.
+     * @param user The user identifier to whom the token belongs.
+     * @param onSuccess A callback function that is invoked when the token is successfully added.
+     * @param onFailure A callback function that is invoked with an Exception if an error occurs during the operation.
+     */
+    override fun addNotificationTokenToProfile(
+        token: String,
+        user: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        performFirestoreOperation(
+            db.collection(collectionPath)
+                .document(user)
+                .update("notificationTokens", FieldValue.arrayUnion(token)),
+            onSuccess,
+            onFailure
+        )
+    }
 }
 
 /** This class is used to convert a document to a profile, across the project */
