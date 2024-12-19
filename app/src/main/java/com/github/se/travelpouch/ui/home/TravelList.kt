@@ -6,6 +6,9 @@ import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -276,14 +279,18 @@ fun TravelListScreen(
                                         .padding(pd),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center) {
-                                  AnimatedVisibility(visible = isLoading.value) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.testTag("loadingSpinner").size(100.dp),
-                                        color = MaterialTheme.colorScheme.primary,
-                                        strokeWidth = 5.dp,
-                                        strokeCap = StrokeCap.Round,
-                                    )
-                                  }
+                                  AnimatedVisibility(
+                                      visible = isLoading.value,
+                                      enter = fadeIn(animationSpec = tween(150)),
+                                      exit = fadeOut(animationSpec = tween(150))) {
+                                        CircularProgressIndicator(
+                                            modifier =
+                                                Modifier.testTag("loadingSpinner").size(100.dp),
+                                            color = MaterialTheme.colorScheme.primary,
+                                            strokeWidth = 5.dp,
+                                            strokeCap = StrokeCap.Round,
+                                        )
+                                      }
 
                                   Spacer(modifier = Modifier.fillMaxWidth(0.1f))
                                   Text(
