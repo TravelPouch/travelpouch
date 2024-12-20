@@ -191,7 +191,7 @@ class ProfileEditTest {
     // piece of code is executed from the argument captor
     composeTestRule.runOnIdle { onCompleteListenerCaptor2.firstValue.onSuccess(mockQuerySnapshot) }
 
-    verify(notificationRepository).addNotification(anyOrNull())
+    verify(notificationRepository).addNotification(anyOrNull(), anyOrNull(), anyOrNull())
   }
 
   @Test

@@ -56,8 +56,12 @@ constructor(private val notificationRepository: NotificationRepository) : ViewMo
    *
    * @param notification The notification to be sent.
    */
-  fun sendNotification(notification: Notification) {
-    notificationRepository.addNotification(notification)
+  fun sendNotification(
+      notification: Notification,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    notificationRepository.addNotification(notification, onSuccess, onFailure)
   }
 
   /**

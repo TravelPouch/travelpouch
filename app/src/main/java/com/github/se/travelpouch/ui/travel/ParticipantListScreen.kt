@@ -392,10 +392,14 @@ private fun inviteUserToTravelViaFsuid(
               selectedTravel!!.fsUid,
               invitationNotification,
               notificationType = NotificationType.INVITATION,
-              sector = NotificationSector.TRAVEL))
-
-      notificationViewModel.sendNotificationToUser(fsUid, invitationNotification)
-      Toast.makeText(context, "Invitation sent", Toast.LENGTH_SHORT).show()
+              sector = NotificationSector.TRAVEL),
+          onSuccess = {
+            notificationViewModel.sendNotificationToUser(fsUid, invitationNotification)
+            Toast.makeText(context, "Invitation sent", Toast.LENGTH_SHORT).show()
+          },
+          onFailure = {
+            Toast.makeText(context, "Failed to send invitation", Toast.LENGTH_SHORT).show()
+          })
     } catch (e: Exception) {
       Log.e("NotificationError", "Failed to send notification: ${e.message}")
     }
@@ -445,8 +449,13 @@ fun handleRoleChange(
                 selectedTravel.fsUid,
                 roleChangeNotification,
                 NotificationType.ROLE_UPDATE,
-                sector = NotificationSector.TRAVEL))
-        notificationViewModel.sendNotificationToUser(participant.key, roleChangeNotification)
+                sector = NotificationSector.TRAVEL),
+            onSuccess = {
+              notificationViewModel.sendNotificationToUser(participant.key, roleChangeNotification)
+            },
+            onFailure = {
+              Toast.makeText(context, "Failed to send invitation", Toast.LENGTH_SHORT).show()
+            })
       }
       val participantMap = selectedTravel.allParticipants.toMutableMap()
       participantMap[Participant(participant.key)] = newRole
