@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -115,7 +116,8 @@ fun InvitationButtons(
     context: android.content.Context,
     eventsViewModel: EventViewModel
 ) {
-  var b by remember { mutableStateOf(true) }
+  var buttonPressed by remember { mutableStateOf(true) }
+  LaunchedEffect(notification.notificationUid) { buttonPressed = true }
 
   Row(
       modifier = Modifier.fillMaxWidth().testTag("notification_item_buttons"),
@@ -127,8 +129,8 @@ fun InvitationButtons(
             notificationViewModel,
             context,
             eventsViewModel,
-            { b = !b },
-            b)
+            { buttonPressed = !buttonPressed },
+            buttonPressed)
         DeclineButton(
             notification,
             listTravelViewModel,
@@ -136,8 +138,8 @@ fun InvitationButtons(
             notificationViewModel,
             context,
             eventsViewModel,
-            { b = !b },
-            b)
+            { buttonPressed = !buttonPressed },
+            buttonPressed)
       }
 }
 
@@ -238,26 +240,48 @@ fun handleInvitationResponse(
                     responseType,
                     sector = notification.sector)
 
-            notificationViewModel.sendNotificationToUser(
-                notification.senderUid, responseNotification)
-
-            notificationViewModel.sendNotification(invitationResponse)
             if (isAccepted) {
               listTravelViewModel.addUserToTravel(
                   profileViewModel.profile.value.email,
                   travel,
-                  { updatedContainer ->
+                  onSuccess = { updatedContainer ->
                     listTravelViewModel.selectTravel(updatedContainer)
                     Toast.makeText(context, "User added successfully!", Toast.LENGTH_SHORT).show()
+                    notificationViewModel.sendNotification(
+                        invitationResponse,
+                        onSuccess = {
+                          Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
+
+                          notificationViewModel.sendNotificationToUser(
+                              notification.senderUid, responseNotification)
+
+                          notificationViewModel.loadNotificationsForUser(
+                              profileViewModel.profile.value.fsUid)
+                        },
+                        onFailure = {
+                          Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                        })
                   },
-                  {
+                  onFailure = {
                     Toast.makeText(context, "Failed to add user", Toast.LENGTH_SHORT).show()
                     chosen()
                   },
                   eventsViewModel.getNewDocumentReferenceForNewTravel(travel.fsUid))
+            } else {
+              notificationViewModel.sendNotification(
+                  invitationResponse,
+                  onSuccess = {
+                    Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
+                    notificationViewModel.sendNotificationToUser(
+                        notification.senderUid, responseNotification)
+                    notificationViewModel.loadNotificationsForUser(
+                        profileViewModel.profile.value.fsUid)
+                  },
+                  onFailure = {
+                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    chosen()
+                  })
             }
-            notificationViewModel.loadNotificationsForUser(profileViewModel.profile.value.fsUid)
-            Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
           },
           onFailure = {
             Toast.makeText(context, "Failed to get travel", Toast.LENGTH_SHORT).show()
@@ -282,13 +306,22 @@ fun handleInvitationResponse(
                       NotificationType.ACCEPTED,
                       sector = notification.sector)
 
-              notificationViewModel.sendNotification(invitationResponse)
-              notificationViewModel.sendNotificationToUser(
-                  notification.senderUid, firendNotification)
+              notificationViewModel.sendNotification(
+                  invitationResponse,
+                  onSuccess = {
+                    notificationViewModel.sendNotificationToUser(
+                        notification.senderUid, firendNotification)
 
+                    notificationViewModel.loadNotificationsForUser(
+                        profileViewModel.profile.value.fsUid)
+                  },
+                  onFailure = { Toast.makeText(context, it.message, Toast.LENGTH_LONG).show() })
               Toast.makeText(context, "Friend added", Toast.LENGTH_LONG).show()
             },
-            onFailure = { e -> Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show() })
+            onFailure = { e ->
+              Toast.makeText(context, e.message!!, Toast.LENGTH_LONG).show()
+              chosen()
+            })
       } else {
         val firendNotification =
             NotificationContent.FriendInvitationResponseNotification(
@@ -303,11 +336,20 @@ fun handleInvitationResponse(
                 NotificationType.DECLINED,
                 sector = notification.sector)
 
-        notificationViewModel.sendNotification(invitationResponse)
+        notificationViewModel.sendNotification(
+            invitationResponse,
+            onSuccess = {
+              notificationViewModel.sendNotificationToUser(
+                  notification.senderUid, firendNotification)
 
-        notificationViewModel.sendNotificationToUser(notification.senderUid, firendNotification)
+              Toast.makeText(context, "Request declined", Toast.LENGTH_LONG).show()
 
-        Toast.makeText(context, "Request declined", Toast.LENGTH_LONG).show()
+              notificationViewModel.loadNotificationsForUser(profileViewModel.profile.value.fsUid)
+            },
+            onFailure = {
+              chosen()
+              Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+            })
       }
     }
   }

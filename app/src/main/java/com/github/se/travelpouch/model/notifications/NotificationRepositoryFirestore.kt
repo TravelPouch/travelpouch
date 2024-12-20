@@ -27,13 +27,21 @@ class NotificationRepositoryFirestore(private val firestore: FirebaseFirestore) 
    *
    * @param notification The notification to be added.
    */
-  override fun addNotification(notification: Notification) {
+  override fun addNotification(
+      notification: Notification,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     firestore
         .collection(FirebasePaths.notifications)
         .document(notification.notificationUid)
         .set(notification)
-        .addOnSuccessListener { Log.d("NotificationRepository", "Notification added successfully") }
+        .addOnSuccessListener {
+          onSuccess()
+          Log.d("NotificationRepository", "Notification added successfully")
+        }
         .addOnFailureListener { e ->
+          onFailure(Exception("An error occurred. Could not send the notification"))
           Log.e("NotificationRepository", "Error adding notification", e)
         }
   }

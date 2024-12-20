@@ -5,7 +5,11 @@ interface NotificationRepository {
 
   fun getNewUid(): String
 
-  fun addNotification(notification: Notification)
+  fun addNotification(
+      notification: Notification,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  )
 
   fun fetchNotificationsForUser(
       userId: String,

@@ -94,7 +94,7 @@ class NotificationRepositoryFirestoreUnitTest {
         .thenReturn(documentReference)
     `when`(documentReference.set(any())).thenReturn(task)
 
-    notificationRepositoryFirestore.addNotification(notification)
+    notificationRepositoryFirestore.addNotification(notification, {}, {})
 
     verify(documentReference).set(any())
   }
@@ -121,7 +121,7 @@ class NotificationRepositoryFirestoreUnitTest {
           }
 
       // Act
-      notificationRepositoryFirestore.addNotification(notification)
+      notificationRepositoryFirestore.addNotification(notification, {}, {})
 
       // Wait for the latch to be released or timeout
       latch.await(2, TimeUnit.SECONDS)

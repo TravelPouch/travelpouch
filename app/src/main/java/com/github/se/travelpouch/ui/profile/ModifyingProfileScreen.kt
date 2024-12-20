@@ -252,8 +252,6 @@ fun ModifyingProfileScreen(
                             profileModelView.sendFriendNotification(
                                 email = friendMail,
                                 onSuccess = { friendUid ->
-                                  Toast.makeText(context, "Invitation sent", Toast.LENGTH_LONG)
-                                      .show()
                                   val notificationContent =
                                       NotificationContent.FriendInvitationNotification(
                                           profile.value.email)
@@ -266,9 +264,22 @@ fun ModifyingProfileScreen(
                                           notificationContent,
                                           notificationType = NotificationType.INVITATION,
                                           status = NotificationStatus.UNREAD,
-                                          sector = NotificationSector.PROFILE))
-                                  notificationViewModel.sendNotificationToUser(
-                                      friendUid, notificationContent)
+                                          sector = NotificationSector.PROFILE),
+                                      onSuccess = {
+                                        notificationViewModel.sendNotificationToUser(
+                                            friendUid, notificationContent)
+
+                                        Toast.makeText(
+                                                context, "Invitation sent", Toast.LENGTH_LONG)
+                                            .show()
+                                      },
+                                      onFailure = {
+                                        Toast.makeText(
+                                                context,
+                                                "Failed to send invitation",
+                                                Toast.LENGTH_LONG)
+                                            .show()
+                                      })
 
                                   openDialog = false
                                 },
