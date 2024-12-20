@@ -325,10 +325,12 @@ class DocumentViewModelTest {
     mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
       logMock.`when`<Int> { Log.i(anyString(), anyString()) }.thenReturn(0)
 
-      documentViewModel.selectDocument(document)
-      val exception = DocumentsManager.FileCreationException("Test")
-      deferred.completeExceptionally(exception)
-      documentViewModel.getSelectedDocument(mockDocumentFile)
+      runBlocking {
+        documentViewModel.selectDocument(document)
+        val exception = DocumentsManager.FileCreationException("Test")
+        deferred.completeExceptionally(exception)
+        documentViewModel.getSelectedDocument(mockDocumentFile)
+      }
 
       logMock.verify {
         Log.i(
