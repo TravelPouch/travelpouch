@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.documentfile.provider.DocumentFile
 import com.github.se.travelpouch.model.travels.Location
 import com.github.se.travelpouch.model.travels.Participant
 import com.github.se.travelpouch.model.travels.Role
@@ -15,11 +16,15 @@ import com.google.firebase.firestore.DocumentReference
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import kotlin.random.Random
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +40,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -268,5 +274,72 @@ class DocumentViewModelTest {
     spyDocumentViewModel.uploadFile(inputStream, selectedTravel, "image/jpeg")
     verify(spyDocumentViewModel)
         .uploadDocument(anyString(), org.mockito.kotlin.any(), org.mockito.kotlin.any())
+  }
+
+  @Test
+  fun getSelectedDocument_illegalArgument() {
+    val document = documentContainer
+    val mockDocumentFile = mock(DocumentFile::class.java)
+
+    documentViewModel.selectDocument(document)
+    assertThrows(IllegalArgumentException::class.java) {
+      documentViewModel.getSelectedDocument(mockDocumentFile)
+    }
+  }
+
+  @Test
+  fun getSelectedDocument_anyException() {
+    val document = documentContainer
+    val mockDocumentFile = mock(DocumentFile::class.java)
+    whenever(documentReference.id).thenReturn("documentId")
+    val deferred = CompletableDeferred<Uri>()
+    whenever(
+            documentsManager.getDocument(
+                anyString(), anyString(), anyString(), eq(mockDocumentFile)))
+        .thenReturn(deferred)
+
+    mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
+      logMock.`when`<Int> { Log.e(anyString(), anyString(), any()) }.thenReturn(0)
+
+      documentViewModel.selectDocument(document)
+      val exception = Exception("Test")
+      deferred.completeExceptionally(exception)
+      documentViewModel.getSelectedDocument(mockDocumentFile)
+
+      logMock.verify { Log.e("DocumentViewModel", "Failed to download document", exception) }
+    }
+  }
+
+  @Test
+  fun getSelectedDocument_FileCreationException() {
+    val document = documentContainer
+    val mockDocumentFile = mock(DocumentFile::class.java)
+    whenever(documentReference.id).thenReturn("documentId")
+    val deferred = CompletableDeferred<Uri>()
+    whenever(
+            documentsManager.getDocument(
+                anyString(), anyString(), anyString(), eq(mockDocumentFile)))
+        .thenReturn(deferred)
+
+    runBlocking { whenever(dataStore.edit { any() }).thenAnswer { null } }
+    mockStatic(Log::class.java).use { logMock: MockedStatic<Log> ->
+      logMock.`when`<Int> { Log.i(anyString(), anyString()) }.thenReturn(0)
+
+      runBlocking {
+        documentViewModel.selectDocument(document)
+        val exception = DocumentsManager.FileCreationException("Test")
+        deferred.completeExceptionally(exception)
+        documentViewModel.getSelectedDocument(mockDocumentFile)
+      }
+
+      logMock.verify {
+        Log.i(
+            "DocumentViewModel",
+            "Failed to create document file in same directory. Re-asking permission")
+      }
+    }
+    assertTrue(documentViewModel.needReload.value)
+    documentViewModel.resetNeedReload()
+    assertFalse(documentViewModel.needReload.value)
   }
 }

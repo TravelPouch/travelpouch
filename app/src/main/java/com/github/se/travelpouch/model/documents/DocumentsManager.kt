@@ -59,7 +59,7 @@ open class DocumentsManager(
 
       if (file == null) {
         Log.e("DocumentViewModel", "Failed to create document file in specified directory")
-        throw Exception("Failed to create document file in specified directory")
+        throw FileCreationException("Failed to create document file in specified directory")
       }
 
       Log.d(tag, "Downloading file to ${file.uri}")
@@ -173,4 +173,6 @@ open class DocumentsManager(
       false
     }
   }
+
+  class FileCreationException(message: String) : Exception(message)
 }
