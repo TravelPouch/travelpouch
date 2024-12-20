@@ -1,6 +1,8 @@
 // Portions of this code were generated and or inspired by the help of GitHub Copilot or Chatgpt
 package com.github.se.travelpouch.ui.navigation
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -30,6 +32,7 @@ import com.github.se.travelpouch.model.documents.DocumentViewModel
 import com.github.se.travelpouch.model.travels.ListTravelViewModel
 import com.github.se.travelpouch.ui.dashboard.CalendarScreen
 import com.github.se.travelpouch.ui.dashboard.TravelActivitiesScreen
+import com.github.se.travelpouch.ui.dashboard.map.ActivitiesMapScreen
 import com.github.se.travelpouch.ui.documents.DocumentListScreen
 
 // credit to : https://www.youtube.com/watch?v=inrGyNJbZaI&t=620s
@@ -44,11 +47,6 @@ fun SwipePager(
     listTravelViewModel: ListTravelViewModel,
     onNavigateToDocumentPreview: () -> Unit
 ) {
-  val listOfTopLevelDestinationForSwipe =
-      listOf(
-          TopLevelDestinations.ACTIVITIES,
-          TopLevelDestinations.CALENDAR,
-          TopLevelDestinations.DOCUMENTS)
 
   val listOfTopLevelDestination =
       listOf(
@@ -57,7 +55,7 @@ fun SwipePager(
           TopLevelDestinations.DOCUMENTS,
           TopLevelDestinations.MAP)
 
-  val pagerState = rememberPagerState(initialPage = 0) { listOfTopLevelDestinationForSwipe.size }
+  val pagerState = rememberPagerState(initialPage = 0) { listOfTopLevelDestination.size }
 
   var selectedScreen by remember { mutableIntStateOf(pagerState.currentPage) }
 
@@ -72,18 +70,12 @@ fun SwipePager(
             modifier = Modifier.testTag("topBar"),
             title = {
               Text(
-                  listOfTopLevelDestinationForSwipe[selectedScreen].textId,
+                  listTravelViewModel.selectedTravel.value?.title ?: "",
                   Modifier.testTag("travelTitle"))
             },
             navigationIcon = {
               IconButton(
-                  onClick = {
-                    when (pagerState.currentPage) {
-                      0 -> navigationActions.navigateTo(Screen.TRAVEL_LIST)
-                      1 -> selectedScreen = 0
-                      2 -> selectedScreen = 0
-                    }
-                  },
+                  onClick = { navigationActions.navigateTo(Screen.TRAVEL_LIST) },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -106,24 +98,24 @@ fun SwipePager(
       },
       bottomBar = {
         NavigationBar(modifier = Modifier.testTag("navigationBarTravelList")) {
-          listOfTopLevelDestination.forEach { destination ->
+          listOfTopLevelDestination.forEachIndexed { i, destination ->
             NavigationBarItem(
                 onClick = {
                   when (destination.textId) {
                     "Activities" -> selectedScreen = 0
                     "Calendar" -> selectedScreen = 1
                     "Documents" -> selectedScreen = 2
-                    "Map" -> navigationActions.navigateTo(Screen.ACTIVITIES_MAP)
+                    "Map" -> selectedScreen = 3
                   }
                 },
                 icon = { Icon(destination.icon, contentDescription = null) },
-                selected = false,
+                selected = i == selectedScreen,
                 label = { Text(destination.textId) },
                 modifier = Modifier.testTag(destination.textId))
           }
         }
       }) { pd ->
-        HorizontalPager(state = pagerState, modifier = Modifier.padding(pd)) { pageIndex ->
+        HorizontalPager(state = pagerState, modifier = Modifier.padding(pd), userScrollEnabled = selectedScreen != 3) { pageIndex ->
           when (pageIndex) {
             0 -> TravelActivitiesScreen(navigationActions, activityViewModel, documentViewModel)
             1 -> CalendarScreen(calendarViewModel, navigationActions)
@@ -133,6 +125,7 @@ fun SwipePager(
                     listTravelViewModel,
                     navigationActions,
                     onNavigateToDocumentPreview)
+            3 -> ActivitiesMapScreen(activityViewModel, navigationActions)
           }
         }
       }

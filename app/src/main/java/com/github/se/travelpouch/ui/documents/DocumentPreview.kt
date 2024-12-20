@@ -6,6 +6,10 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +26,7 @@ import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -164,28 +169,34 @@ fun DocumentPreview(
   ) { paddingValue ->
     Column(modifier = Modifier.fillMaxWidth().padding(paddingValue)) {
       Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-          Text(
-              text = "Document ID: ${documentContainer.ref.id}",
-              style = MaterialTheme.typography.bodyLarge,
-              modifier = Modifier.padding(8.dp).testTag("documentTitle"))
-
-          if (uri != null) {
-            if (documentContainer.fileFormat == DocumentFileFormat.PDF) {
-              val pdfState =
-                  rememberVerticalPdfReaderState(
-                      resource = ResourceType.Local(uri), isZoomEnable = true)
-              VerticalPDFReader(
-                  state = pdfState,
-                  modifier = Modifier.fillMaxSize().background(color = Color.Gray))
-            } else {
-              Image(
-                  painter = rememberAsyncImagePainter(uri),
-                  contentDescription = null,
-                  contentScale = ContentScale.Fit,
-                  modifier = Modifier.fillMaxSize().testTag("document"))
-            }
+        if (uri != null) {
+          if (documentContainer.fileFormat == DocumentFileFormat.PDF) {
+            val pdfState =
+                rememberVerticalPdfReaderState(
+                    resource = ResourceType.Local(uri), isZoomEnable = true)
+            VerticalPDFReader(
+                state = pdfState, modifier = Modifier.fillMaxSize().background(color = Color.Gray))
+          } else {
+            Image(
+                painter = rememberAsyncImagePainter(uri),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize().testTag("document"))
           }
+        } else {
+          androidx.compose.animation.AnimatedVisibility(
+              modifier = Modifier.align(Alignment.Center).fillMaxSize(0.2f),
+              visible = true,
+              enter = fadeIn(animationSpec = tween(50)),
+              exit = fadeOut(animationSpec = tween(500))) {
+                CircularProgressIndicator(
+                    modifier =
+                        Modifier // Adjust spinner size fifth of screen height
+                            .align(Alignment.Center) // Center the spinner
+                            .testTag("loadingSpinner"),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 10.dp)
+              }
         }
       }
     }
