@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -116,6 +117,7 @@ fun InvitationButtons(
     eventsViewModel: EventViewModel
 ) {
   var buttonPressed by remember { mutableStateOf(true) }
+  LaunchedEffect(notification.notificationUid) { buttonPressed = true }
 
   Row(
       modifier = Modifier.fillMaxWidth().testTag("notification_item_buttons"),
